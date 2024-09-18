@@ -2,6 +2,7 @@ import earthkit.data
 import numpy as np
 
 from .graph import graph_manager
+import xarray
 
 
 class RiverNetwork:
@@ -11,7 +12,7 @@ class RiverNetwork:
         self.n_nodes = len(nodes)
         self.edges = edges
         graph_backend = graph_manager(graph_type)
-        self.graph = graph_backend(nodes, edges)
+        self.graph = graph_backend(self.n_nodes, edges)
 
         # downstream node (currently assume only exists one downstream node)
         self.downstream = np.ones(self.n_nodes, dtype=int)*-1
@@ -42,10 +43,14 @@ class RiverNetwork:
     #     return field
 
 
-def from_d8(source, graph_type="igraph"):
+def from_netcdf_d8(filename, **kwargs):
+    #  read river network from netcdf using xarray
+    data = xarray.open_dataset(filename, mask_and_scale=False)['Band1'].values
+    return from_d8(data, **kwargs)
 
-    #  read river network from netcdf
-    data = earthkit.data.from_source(**source).to_numpy()
+
+def from_d8(data, graph_type="igraph"):
+
     data_flat = data.flatten()
 
     # create mask to remove missing values and sinks

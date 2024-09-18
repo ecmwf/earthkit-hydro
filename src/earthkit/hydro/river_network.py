@@ -8,9 +8,38 @@ class RiverNetwork:
     def __init__(self, nodes, edges, graph_type) -> None:
 
         self.nodes = nodes
+        self.n_nodes = len(nodes)
         self.edges = edges
         graph_backend = graph_manager(graph_type)
         self.graph = graph_backend(nodes, edges)
+
+        # downstream node (currently assume only exists one downstream node)
+        self.downstream = np.ones(self.n_nodes, dtype=int)*-1
+        for edge in self.edges:
+            self.downstream[edge[1]] = edge[0]
+
+        self.topologically_sorted = self.graph.topological_sorting()
+
+        # upstream = [[]]*self.n_nodes
+        # for edge in self.edges:
+        #     upstream[edge[0]].append(edge[1])
+        # self.upstream = upstream
+
+    def accuflux(self, field):
+        for node_index in self.topologically_sorted:
+            if self.downstream[node_index] > 0:
+                child_index = self.downstream[node_index]
+                field[child_index] += field[node_index]
+        return field
+    
+    # implementation using upstream nodes
+    # def accuflux(self, field):
+    #     for node_index in self.topologically_sorted:
+    #         sum = field[node_index]
+    #         for parent in self.upstream[node_index]:
+    #             sum += field[parent]
+    #         field[node_index] = sum
+    #     return field
 
 
 def from_d8(source, graph_type="igraph"):

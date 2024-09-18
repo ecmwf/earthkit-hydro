@@ -97,3 +97,38 @@ def from_d8(data, graph_type="igraph"):
     edges = list(zip(upstream_nodes, downstream_nodes))
 
     return RiverNetwork(nodes, edges, graph_type)
+
+
+def from_camaflood(filename):
+    downxy = xr.open_dataset(filename, mask_and_scale=False)
+
+    dx, dy = downxy.downx.values, downxy.downy.values
+    # return arrays of indices that are not ocean or sinks
+    bmask = (dx != -999) & (dx != -9999)
+    mask = np.where(bmask)
+    # indicies of the non-ocean, non-sink cells
+    indices = np.arange(dx.size).reshape(dx.shape)[mask].flatten()
+    ncols = dx.shape[1]
+    # calculate the indicies of the downstream cells
+    ji = indices + dx[mask].flatten() * ncols + dy[mask].flatten()
+    # translate 2d indices to 1d indices including sinks
+    bmask = bmask.flatten()
+    nodes = np.arange(np.sum(bmask), dtype=int)
+    nodes_matrix = np.ones(bmask.shape, dtype=int) * -1
+    nodes_matrix[bmask] = nodes
+    nodes_indices = nodes_matrix[indices]
+    downstream_nodes_indices = nodes_matrix[ji]
+    # add ix, iy and lon, lat attributes
+    ix, iy = np.meshgrid(np.arange(dx.shape[0]), np.arange(dx.shape[1]))
+    ix, iy = ix.flatten()[indices], iy.flatten()[indices]
+    lon, lat = np.meshgrid(downxy.lon.values, downxy.lat.values)
+    lon, lat = lon.flatten()[indices], lat.flatten()[indices]
+    return pd.DataFrame(
+        {
+            "ix": ix,
+            "iy": iy,
+            "lon": lon,
+            "lat": lat,
+            "downstream_id": downstream_nodes_indices,
+        },
+        index=nodes_indices)

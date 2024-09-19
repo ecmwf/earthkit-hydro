@@ -40,7 +40,8 @@ def test_downstream(d8_ldd, test_field, downstream):
     print(downstream)
     np.testing.assert_array_equal(down, downstream)
 
-def test_catchments(d8_ldd):
-    network = from_d8(d8_ldd)
-    catchments = network.catchment(11)
-    assert False
+# def test_catchments(d8_ldd):
+#     network = from_d8(d8_ldd)
+#     catchments = network.catchment(11)
+#     assert False
+

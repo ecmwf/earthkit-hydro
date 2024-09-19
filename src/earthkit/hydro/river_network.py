@@ -22,6 +22,7 @@ class RiverNetwork:
 
         self.topological_sort = self.graph.topological_sorting()
         self.topological_groups = self.construct_topological_groups()
+        self.topological_groups_numpy = self.topological_sort_numpy()
 
     def get_inlets(self):
         tmp_nodes = self.nodes.copy()
@@ -43,8 +44,13 @@ class RiverNetwork:
             
             inlets = self.downstream_nodes[inlets]
             n += 1
+<<<<<<< HEAD
             print(labels)
 
+=======
+        
+        # labels[np.isinf(labels)] = n+1
+>>>>>>> 101e9a2c1df5951a5bd80e346b1e955ec3405881
         groups = self.group_labels(labels)
 
         return groups
@@ -74,8 +80,7 @@ class RiverNetwork:
     def accuflux(self, field, in_place=True, operation=np.add):
         if not in_place:
             field = field.copy()
-        topo_groups = self.topological_sort_numpy()
-        for grouping in topo_groups[:-1]:  # exclude sinks here
+        for grouping in self.topological_groups_numpy[:-1]:  # exclude sinks here
             operation.at(field, self.downstream_nodes[grouping], field[grouping])
         return field
 

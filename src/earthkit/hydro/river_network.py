@@ -44,13 +44,6 @@ class RiverNetwork:
             
             inlets = self.downstream_nodes[inlets]
             n += 1
-<<<<<<< HEAD
-            print(labels)
-
-=======
-        
-        # labels[np.isinf(labels)] = n+1
->>>>>>> 101e9a2c1df5951a5bd80e346b1e955ec3405881
         groups = self.group_labels(labels)
 
         return groups

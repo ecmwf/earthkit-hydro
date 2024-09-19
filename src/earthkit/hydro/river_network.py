@@ -23,6 +23,7 @@ class RiverNetwork:
 
         self.topological_sort = self.graph.topological_sorting()
         self.topological_groups = self.construct_topological_groups()
+        self.topological_groups_numpy = self.topological_sort_numpy()
 
         # upstream = [[]]*self.n_nodes
         # for edge in self.edges:
@@ -71,20 +72,15 @@ class RiverNetwork:
             
             inlets = self.downstream_nodes[inlets]
             n += 1
-            print(labels)
         
         # labels[np.isinf(labels)] = n+1
-        print(labels)
         groups = self.group_labels(labels)
-        print(groups)
 
         return groups
 
     def group_labels(self, labels):
         # or could look at https://stackoverflow.com/questions/68331835/split-numpy-2d-array-based-on-separate-label-array
         sorted_indices = np.argsort(labels)  # sort by labels
-        print("sorted indices")
-        print(sorted_indices)
         sorted_array = self.nodes[sorted_indices]
         sorted_labels = labels[sorted_indices]
         _, indices = np.unique(sorted_labels, return_index=True)
@@ -129,8 +125,7 @@ class RiverNetwork:
     def accuflux(self, field, in_place=True, operation=np.add):
         if not in_place:
             field = field.copy()
-        topo_groups = self.topological_sort_numpy()
-        for grouping in topo_groups[:-1]:  # exclude sinks here
+        for grouping in self.topological_groups_numpy[:-1]:  # exclude sinks here
             operation.at(field, self.downstream_nodes[grouping], field[grouping])
         return field
 

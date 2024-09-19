@@ -4,9 +4,9 @@ import pytest
 @pytest.fixture
 def d8_ldd():
     return [
-        [8, 8, 8, 7, 7],
-        [8, 8, 8, 7, 7],
-        [9, 8, 7, 4, 4],
+        [2, 2, 2, 1, 1],
+        [2, 2, 2, 1, 1],
+        [3, 2, 1, 4, 4],
         [6, 5, 4, 4, 4],
     ]
 
@@ -63,3 +63,7 @@ def downstream_list():
         17,
         18,
     ]
+
+@pytest.fixture
+def unit_field_accuflux_list():
+    return [1,1,1,1,1,2,2,3,2,1,3,3,9,3,1,1,20,3,2,1]

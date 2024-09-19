@@ -2,7 +2,8 @@ import earthkit.data
 import numpy as np
 
 from .graph import graph_manager
-import xarray
+import xarray as xr
+import time
 
 
 class RiverNetwork:
@@ -17,21 +18,24 @@ class RiverNetwork:
         # downstream node (currently assume only exists one downstream node)
         self.downstream = np.ones(self.n_nodes, dtype=int)*-1
         for edge in self.edges:
-            self.downstream[edge[1]] = edge[0]
+            self.downstream[edge[0]] = edge[1]
 
         self.topologically_sorted = self.graph.topological_sorting()
+        self.construct_split_topological_sort()
 
         # upstream = [[]]*self.n_nodes
         # for edge in self.edges:
         #     upstream[edge[0]].append(edge[1])
         # self.upstream = upstream
 
-    def accuflux(self, field):
-        for node_index in self.topologically_sorted:
-            if self.downstream[node_index] > 0:
-                child_index = self.downstream[node_index]
-                field[child_index] += field[node_index]
-        return field
+    # def accuflux(self, field, in_place=True):
+    #     if not in_place:
+    #         field = field.copy()
+    #     for node_index in self.topologically_sorted:
+    #         if self.downstream[node_index] > 0:
+    #             child_index = self.downstream[node_index]
+    #             field[child_index] += field[node_index]
+    #     return field
     
     # implementation using upstream nodes
     # def accuflux(self, field):
@@ -42,10 +46,73 @@ class RiverNetwork:
     #         field[node_index] = sum
     #     return field
 
+    # def find_sources(self):
+    #     sources = self.graph.graph.vs.select(lambda v: v.indegree() == 0)
+    #     self.sources = [x.index for x in sources]
+
+    def split_array_by_labels(self, array, labels):
+        # or could look at https://stackoverflow.com/questions/68331835/split-numpy-2d-array-based-on-separate-label-array
+        sorted_indices = np.argsort(labels) #sort by labels
+        sorted_array = array[sorted_indices] 
+        sorted_labels = labels[sorted_indices]
+        _, indices = np.unique(sorted_labels, return_index=True)
+        subarrays = np.split(sorted_array, indices[1:])
+        return subarrays
+
+    # def construct_split_topological_sort(self):
+    #     start_time = time.time()
+    #     labels = np.zeros(self.n_nodes)
+
+    #     stack = self.sources
+    #     while len(stack)!=0:
+    #         source = stack.pop()
+    #         new_node = self.downstream[source]
+    #         if new_node>0:
+    #             candidate_label = labels[new_node]
+    #             if labels[source] + 1 > candidate_label:
+    #                 labels[new_node] = labels[source]+1
+    #                 stack.append(new_node)
+    #         else:
+    #             labels[source] = np.inf 
+    #     start_time = time.time()
+    #     self.split_topological_sort = self.split_array_by_labels(np.arange(self.n_nodes), labels)
+
+    # def prepare_for_accuflux_splitter(self):
+    #     self.find_sources()
+    #     self.construct_split_topological_sort()
+
+    def construct_split_topological_sort(self):
+        labels = np.zeros(self.n_nodes)
+
+        for node_index in self.topologically_sorted:
+            if self.downstream[node_index] > 0:
+                child_index = self.downstream[node_index]
+                if labels[node_index] + 1 > labels[child_index]:
+                    labels[child_index] = labels[node_index]+1
+            else:
+                labels[node_index] = np.inf
+        self.split_topological_sort = self.split_array_by_labels(np.arange(self.n_nodes), labels)
+        return self.split_topological_sort
+
+    def accuflux(self, field, in_place=True):
+        if not in_place:
+            field = field.copy()
+        for grouping in self.split_topological_sort[:-1]:
+            np.add.at(field, self.downstream[grouping], field[grouping])
+        return field
+    
+    # def naive_splitter_accuflux(self, field):
+    #     for grouping in self.split_topological_sort:
+    #         for node_index in grouping[:-1]:
+    #             if self.downstream[node_index] > 0:
+    #                 child_index = self.downstream[node_index]
+    #                 field[child_index] += field[node_index]
+    #     return field
+
 
 def from_netcdf_d8(filename, **kwargs):
     #  read river network from netcdf using xarray
-    data = xarray.open_dataset(filename, mask_and_scale=False)['Band1'].values
+    data = xr.open_dataset(filename, mask_and_scale=False)['Band1'].values
     return from_d8(data, **kwargs)
 
 
@@ -123,12 +190,8 @@ def from_camaflood(filename):
     ix, iy = ix.flatten()[indices], iy.flatten()[indices]
     lon, lat = np.meshgrid(downxy.lon.values, downxy.lat.values)
     lon, lat = lon.flatten()[indices], lat.flatten()[indices]
-    return pd.DataFrame(
-        {
-            "ix": ix,
-            "iy": iy,
-            "lon": lon,
-            "lat": lat,
-            "downstream_id": downstream_nodes_indices,
-        },
-        index=nodes_indices)
+
+    edges = list(zip(nodes_indices, downstream_nodes_indices))
+    nodes = np.arange(np.sum(dx != -999))
+
+    return RiverNetwork(nodes, edges, graph_type)

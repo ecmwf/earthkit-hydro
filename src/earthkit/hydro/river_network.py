@@ -1,28 +1,12 @@
-import time
-
-import earthkit.data
 import numpy as np
 import xarray as xr
 
-from .graph import graph_manager
-
-
 class RiverNetwork:
-    def __init__(self, nodes, edges, graph_type) -> None:
+    def __init__(self, nodes, downstream, graph_type) -> None:
         self.nodes = nodes
         self.n_nodes = len(nodes)
-        self.edges = edges
-        graph_backend = graph_manager(graph_type)
-        self.graph = graph_backend(self.n_nodes, edges)
-
-        # downstream nodes (currently assume only exists one downstream node)
-        self.downstream_nodes = np.ones(self.n_nodes, dtype=int)*self.n_nodes
-        for edge in self.edges:
-            self.downstream_nodes[edge[0]] = edge[1]
-
-        self.topological_sort = self.graph.topological_sorting()
-        self.topological_groups = self.construct_topological_groups()
-        self.topological_groups_numpy = self.topological_sort_numpy()
+        self.downstream_nodes = downstream
+        self.topological_groups = self.topological_sort()
 
     def get_inlets(self):
         tmp_nodes = self.nodes.copy()
@@ -31,8 +15,7 @@ class RiverNetwork:
         inlets = tmp_nodes[tmp_nodes != -1]
         return inlets
 
-    def topological_sort_numpy(self):
-
+    def topological_sort(self):
         inlets = self.get_inlets()
         labels = np.zeros(self.n_nodes)
         n = 1
@@ -57,23 +40,10 @@ class RiverNetwork:
         subarrays = np.split(sorted_array, indices[1:])
         return subarrays
 
-    def construct_topological_groups(self):
-        labels = np.zeros(self.n_nodes)
-
-        for node_index in self.topological_sort:
-            if self.downstream_nodes[node_index] < self.n_nodes:
-                child_index = self.downstream_nodes[node_index]
-                if labels[node_index] + 1 > labels[child_index]:
-                    labels[child_index] = labels[node_index] + 1
-            else:
-                labels[node_index] = np.inf
-        split_topological_sort = self.group_labels(labels)
-        return split_topological_sort
-
     def accuflux(self, field, in_place=True, operation=np.add):
         if not in_place:
             field = field.copy()
-        for grouping in self.topological_groups_numpy[:-1]:  # exclude sinks here
+        for grouping in self.topological_groups[:-1]:  # exclude sinks here
             operation.at(field, self.downstream_nodes[grouping], field[grouping])
         return field
 
@@ -137,17 +107,19 @@ def from_d8(data, graph_type="igraph"):
     nodes = np.arange(n_nodes, dtype=int)
 
     # put back nodes indices in original 1d array
-    nodes_matrix = np.ones(data_flat.shape, dtype=int) * -1
+    nodes_matrix = np.ones(data_flat.shape, dtype=int) * n_nodes
     nodes_matrix[mask_nodes] = nodes
 
     # create upstream and downstream nodes using local nodes indexing
     upstream_nodes = nodes_matrix[upstream_indices]
     downstream_nodes = nodes_matrix[downstream_indices]
     
-    # create edges
-    edges = list(zip(upstream_nodes, downstream_nodes))
+    # downstream nodes (currently assume only exists one downstream node)
+    downstream = np.ones(n_nodes, dtype=int)*n_nodes
+    
+    downstream[upstream_nodes] = downstream_nodes
 
-    return RiverNetwork(nodes, edges, graph_type)
+    return RiverNetwork(nodes, downstream, graph_type)
 
 
 def from_camaflood(filename, graph_type="igraph"):
@@ -164,7 +136,7 @@ def from_camaflood(filename, graph_type="igraph"):
     new_x_coords = (x_coords + dx_flat[mask_upstream]) % ny
     new_y_coords = (y_coords + dy_flat[mask_upstream]) % nx
 
-    downstream_indices = new_x_coords + new_y_coords*ny
+    downstream_indices = new_x_coords + new_y_coords * ny
 
     # nodes mask, only removing missing values (oceans)
     mask_nodes = dx_flat != -9999
@@ -174,14 +146,16 @@ def from_camaflood(filename, graph_type="igraph"):
     nodes = np.arange(n_nodes, dtype=int)
 
     # put back nodes indices in original 1d array
-    nodes_matrix = np.ones(dx_flat.shape, dtype=int) * -1
+    nodes_matrix = np.ones(dx_flat.shape, dtype=int) * n_nodes
     nodes_matrix[mask_nodes] = nodes
 
     # create upstream and downstream nodes using local nodes indexing
     upstream_nodes = nodes_matrix[upstream_indices]
     downstream_nodes = nodes_matrix[downstream_indices]
 
-    # create edges
-    edges = list(zip(upstream_nodes, downstream_nodes))
+    # downstream nodes (currently assume only exists one downstream node)
+    downstream = np.ones(n_nodes, dtype=int) * n_nodes
+    
+    downstream[upstream_nodes] = downstream_nodes
 
-    return RiverNetwork(nodes, edges, graph_type)
+    return RiverNetwork(nodes, downstream, graph_type)

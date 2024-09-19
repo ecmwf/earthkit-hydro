@@ -17,39 +17,11 @@ class RiverNetwork:
 
         # downstream nodes (currently assume only exists one downstream node)
         self.downstream_nodes = np.ones(self.n_nodes, dtype=int)*self.n_nodes
-        # self.downstream_nodes[self.downstream_nodes == -1] = None
         for edge in self.edges:
             self.downstream_nodes[edge[0]] = edge[1]
 
         self.topological_sort = self.graph.topological_sorting()
         self.topological_groups = self.construct_topological_groups()
-
-        # upstream = [[]]*self.n_nodes
-        # for edge in self.edges:
-        #     upstream[edge[0]].append(edge[1])
-        # self.upstream = upstream
-
-    # def accuflux(self, field, in_place=True):
-    #     if not in_place:
-    #         field = field.copy()
-    #     for node_index in self.topologically_sorted:
-    #         if self.downstream_nodes[node_index] > 0:
-    #             child_index = self.downstream_nodes[node_index]
-    #             field[child_index] += field[node_index]
-    #     return field
-
-    # implementation using upstream nodes
-    # def accuflux(self, field):
-    #     for node_index in self.topologically_sorted:
-    #         sum = field[node_index]
-    #         for parent in self.upstream[node_index]:
-    #             sum += field[parent]
-    #         field[node_index] = sum
-    #     return field
-
-    # def find_sources(self):
-    #     sources = self.graph.graph.vs.select(lambda v: v.indegree() == 0)
-    #     self.sources = [x.index for x in sources]
 
     def get_inlets(self):
         tmp_nodes = self.nodes.copy()
@@ -72,46 +44,19 @@ class RiverNetwork:
             inlets = self.downstream_nodes[inlets]
             n += 1
             print(labels)
-        
-        # labels[np.isinf(labels)] = n+1
-        print(labels)
+
         groups = self.group_labels(labels)
-        print(groups)
 
         return groups
 
     def group_labels(self, labels):
         # or could look at https://stackoverflow.com/questions/68331835/split-numpy-2d-array-based-on-separate-label-array
         sorted_indices = np.argsort(labels)  # sort by labels
-        print("sorted indices")
-        print(sorted_indices)
         sorted_array = self.nodes[sorted_indices]
         sorted_labels = labels[sorted_indices]
         _, indices = np.unique(sorted_labels, return_index=True)
         subarrays = np.split(sorted_array, indices[1:])
         return subarrays
-
-    # def construct_split_topological_sort(self):
-    #     start_time = time.time()
-    #     labels = np.zeros(self.n_nodes)
-
-    #     stack = self.sources
-    #     while len(stack)!=0:
-    #         source = stack.pop()
-    #         new_node = self.downstream_nodes[source]
-    #         if new_node>0:
-    #             candidate_label = labels[new_node]
-    #             if labels[source] + 1 > candidate_label:
-    #                 labels[new_node] = labels[source]+1
-    #                 stack.append(new_node)
-    #         else:
-    #             labels[source] = np.inf
-    #     start_time = time.time()
-    #     self.split_topological_sort = self.split_array_by_labels(np.arange(self.n_nodes), labels)
-
-    # def prepare_for_accuflux_splitter(self):
-    #     self.find_sources()
-    #     self.construct_split_topological_sort()
 
     def construct_topological_groups(self):
         labels = np.zeros(self.n_nodes)
@@ -153,14 +98,6 @@ class RiverNetwork:
     def catchment(self, nodes):
         catchments = self.graph.subgraph(nodes)
 
-    # def naive_splitter_accuflux(self, field):
-    #     for grouping in self.topological_sort:
-    #         for node_index in grouping[:-1]:
-    #             if self.downstream_nodes[node_index] > 0:
-    #                 child_index = self.downstream_nodes[node_index]
-    #                 field[child_index] += field[node_index]
-    #     return field
-
 
 def from_netcdf_d8(filename, **kwargs):
     #  read river network from netcdf using xarray
@@ -172,7 +109,7 @@ def from_d8(data, graph_type="igraph"):
     data_flat = data.flatten()
 
     # create mask to remove missing values and sinks
-    mask_upstream = ((data != 255) & (data != 5)).flatten()
+    mask_upstream = (data_flat != 255) & (data_flat != 5)
     directions = data_flat[mask_upstream].astype("int")
 
     # create offsets from d8 convention (numpad directions):
@@ -215,32 +152,38 @@ def from_d8(data, graph_type="igraph"):
     return RiverNetwork(nodes, edges, graph_type)
 
 
-def from_camaflood(filename):
+def from_camaflood(filename, graph_type="igraph"):
     downxy = xr.open_dataset(filename, mask_and_scale=False)
+    dx_flat, dy_flat = downxy.downx.values.flatten(), downxy.downy.values.flatten()
+    nx = downxy.downx.values.shape[0]
+    ny = downxy.downx.values.shape[1]
 
-    dx, dy = downxy.downx.values, downxy.downy.values
-    # return arrays of indices that are not ocean or sinks
-    bmask = (dx != -999) & (dx != -9999)
-    mask = np.where(bmask)
-    # indicies of the non-ocean, non-sink cells
-    indices = np.arange(dx.size).reshape(dx.shape)[mask].flatten()
-    ncols = dx.shape[1]
-    # calculate the indicies of the downstream cells
-    ji = indices + dx[mask].flatten() * ncols + dy[mask].flatten()
-    # translate 2d indices to 1d indices including sinks
-    bmask = bmask.flatten()
-    nodes = np.arange(np.sum(bmask), dtype=int)
-    nodes_matrix = np.ones(bmask.shape, dtype=int) * -1
-    nodes_matrix[bmask] = nodes
-    nodes_indices = nodes_matrix[indices]
-    downstream_nodes_indices = nodes_matrix[ji]
-    # add ix, iy and lon, lat attributes
-    ix, iy = np.meshgrid(np.arange(dx.shape[0]), np.arange(dx.shape[1]))
-    ix, iy = ix.flatten()[indices], iy.flatten()[indices]
-    lon, lat = np.meshgrid(downxy.lon.values, downxy.lat.values)
-    lon, lat = lon.flatten()[indices], lat.flatten()[indices]
+    mask_upstream = ((dx_flat != -999) & (dx_flat != -9999)) & (dx_flat != -1000) # 1d flattened indices
 
-    edges = list(zip(nodes_indices, downstream_nodes_indices))
-    nodes = np.arange(np.sum(dx != -999))
+    upstream_indices = np.arange(dx_flat.size)[mask_upstream] # indices with names according to old 2d array
+    x_coords = upstream_indices % ny
+    y_coords = np.floor_divide(upstream_indices, ny)
+    new_x_coords = (x_coords + dx_flat[mask_upstream]) % ny
+    new_y_coords = (y_coords + dy_flat[mask_upstream]) % nx
+
+    downstream_indices = new_x_coords + new_y_coords*ny
+
+    # nodes mask, only removing missing values (oceans)
+    mask_nodes = dx_flat != -9999
+
+    # create simple local indexing for nodes, 0 to n
+    n_nodes = np.sum(mask_nodes)
+    nodes = np.arange(n_nodes, dtype=int)
+
+    # put back nodes indices in original 1d array
+    nodes_matrix = np.ones(dx_flat.shape, dtype=int) * -1
+    nodes_matrix[mask_nodes] = nodes
+
+    # create upstream and downstream nodes using local nodes indexing
+    upstream_nodes = nodes_matrix[upstream_indices]
+    downstream_nodes = nodes_matrix[downstream_indices]
+
+    # create edges
+    edges = list(zip(upstream_nodes, downstream_nodes))
 
     return RiverNetwork(nodes, edges, graph_type)

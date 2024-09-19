@@ -1,0 +1,31 @@
+default_language_version:
+    python: python3
+default_stages:
+    - commit
+    - push
+repos:
+    - repo: https://github.com/charliermarsh/ruff-pre-commit
+      rev: v0.5.6
+      hooks:
+          - id: ruff
+            args: [ --fix ]
+          - id: ruff-format
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v4.4.0
+      hooks:
+          - id: detect-private-key
+          - id: check-ast
+          - id: end-of-file-fixer
+          - id: mixed-line-ending
+            args: [--fix=lf]
+          - id: trailing-whitespace
+          - id: check-case-conflict
+    - repo: local
+      hooks:
+          - id: forbid-to-commit
+            name: Don't commit rej files
+            entry: |
+                Cannot commit .rej files. These indicate merge conflicts that arise during automated template updates.
+                Fix the merge conflicts manually and remove the .rej files.
+            language: fail
+            files: '.*\.rej$'

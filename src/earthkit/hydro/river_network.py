@@ -124,38 +124,54 @@ def from_d8(data, graph_type="igraph"):
 
 def from_camaflood(filename, graph_type="igraph"):
     downxy = xr.open_dataset(filename, mask_and_scale=False)
-    dx_flat, dy_flat = downxy.downx.values.flatten(), downxy.downy.values.flatten()
-    nx = downxy.downx.values.shape[0]
-    ny = downxy.downx.values.shape[1]
+    dx = downxy.downx.values
+    nx = dx.shape[0]
+    ny = dx.shape[1]
+    dx_flat = dx.flatten()
+    del dx
+    # , dy_flat = downxy.downx.values.flatten(), downxy.downy.values.flatten()
 
     mask_upstream = ((dx_flat != -999) & (dx_flat != -9999)) & (dx_flat != -1000) # 1d flattened indices
 
     upstream_indices = np.arange(dx_flat.size)[mask_upstream] # indices with names according to old 2d array
+    
     x_coords = upstream_indices % ny
-    y_coords = np.floor_divide(upstream_indices, ny)
     new_x_coords = (x_coords + dx_flat[mask_upstream]) % ny
+    del x_coords
+    del dx_flat
+
+    dy_flat = downxy.downy.values.flatten()
+    y_coords = np.floor_divide(upstream_indices, ny)
     new_y_coords = (y_coords + dy_flat[mask_upstream]) % nx
+    del y_coords
 
     downstream_indices = new_x_coords + new_y_coords * ny
+    del new_x_coords
+    del new_y_coords
 
     # nodes mask, only removing missing values (oceans)
-    mask_nodes = dx_flat != -9999
+    mask_nodes = dy_flat != -9999
+    del dy_flat
 
     # create simple local indexing for nodes, 0 to n
     n_nodes = np.sum(mask_nodes)
     nodes = np.arange(n_nodes, dtype=int)
 
     # put back nodes indices in original 1d array
-    nodes_matrix = np.ones(dx_flat.shape, dtype=int) * n_nodes
+    nodes_matrix = np.ones(nx*ny, dtype=int) * n_nodes
     nodes_matrix[mask_nodes] = nodes
+    del mask_nodes
 
     # create upstream and downstream nodes using local nodes indexing
     upstream_nodes = nodes_matrix[upstream_indices]
     downstream_nodes = nodes_matrix[downstream_indices]
+    del nodes_matrix
 
     # downstream nodes (currently assume only exists one downstream node)
     downstream = np.ones(n_nodes, dtype=int) * n_nodes
     
     downstream[upstream_nodes] = downstream_nodes
+    del upstream_nodes
+    del downstream_nodes
 
     return RiverNetwork(nodes, downstream, graph_type)

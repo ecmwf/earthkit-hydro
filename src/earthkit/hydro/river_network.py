@@ -70,22 +70,18 @@ class RiverNetwork:
         # down[~mask] = None # set sinks to have None downstream?
         return down
 
-    def catchment(self, nodes, overwrite=False):
+    def catchment(self, nodes):
         # given a list of nodes, make a graph showing the node catchement areas
         # This will be efficient for shallow chains (only interested in nodes near the source), but for deep chains (nodes far from source) it will be slow
-        catchment = np.zeros(self.n_nodes)
+        catchment = np.zeros(self.n_nodes+1)
         catchment[nodes] = nodes+1 # need +1 for summing to work
-        initial_mask = self.downstream_nodes != self.n_nodes # get anything that isnt a sink
-        old_catchment = np.zeros(self.n_nodes) # initialise with zeros, so an empty catchment
-        while (old_catchment!=catchment).any(): # until we stop updating
-            old_catchment = catchment.copy()
-            temp_mask = np.zeros(self.n_nodes, dtype=bool)
-            temp_mask[initial_mask] = catchment[self.downstream_nodes[initial_mask]] != 0 # update all parents with values of downstream nodes, provided that the downstream node has a value
-            mask = initial_mask & temp_mask
-            if not overwrite:
-                mask = mask &(catchment == 0) # get anything that hasnt been assigned a catchment (so don't overwrite)
-            catchment[mask] = catchment[self.downstream_nodes[mask]]
-        return catchment
+
+        downstream_belongs_to_catchment = np.where(catchment[self.downstream_nodes] != 0)[0] # sink downstream will never belong to a catchment
+        changed_catchment = downstream_belongs_to_catchment[np.where(catchment[downstream_belongs_to_catchment]!=catchment[self.downstream_nodes[downstream_belongs_to_catchment]])[0]]
+        while changed_catchment.shape[0] > 0:
+            catchment[changed_catchment] = catchment[self.downstream_nodes[changed_catchment]]
+            changed_catchment = np.where(np.isin(self.downstream_nodes, changed_catchment))[0]
+        return catchment[:-1]
 
 
 def from_netcdf_d8(filename, **kwargs):

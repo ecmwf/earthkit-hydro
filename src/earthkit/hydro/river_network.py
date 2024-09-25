@@ -41,30 +41,51 @@ class RiverNetwork:
         return subarrays
 
     def accuflux(self, field, in_place=True, operation=np.add):
+        # propagates a field downstream along the river network
         if not in_place:
             field = field.copy()
-        for grouping in self.topological_groups[:-1]:  # exclude sinks here
+        for grouping in self.topological_groups[:-1]:  # exclude sinks here since they have nowhere to propagate downstream
             operation.at(field, self.downstream_nodes[grouping], field[grouping])
         return field
 
     def upstream_points(self):
+        # count the number of steps to get to the source.
+        # 1 means the node is a source
         ones = np.ones(self.n_nodes)
         return self.accuflux(ones)
 
     def upstream(self, field):
-        mask = self.downstream_nodes != self.n_nodes
+        #update each node with the sum of its parent (upstream) nodes
+        mask = self.downstream_nodes != self.n_nodes # remove sinks since they have no downstream
         ups = np.zeros(self.n_nodes, dtype=field.dtype)
-        np.add.at(ups, self.downstream_nodes[mask], field[mask])
+        np.add.at(ups, self.downstream_nodes[mask], field[mask]) #update each downstream node with the sum of its upstream nodes
+        # ups[mask] = None # set sinks to have None as upstream contribution?
         return ups
 
     def downstream(self, field):
+        # update each node with its children (downstream) node (currently only one downstream node)
         down = np.zeros(self.n_nodes, dtype=field.dtype)
-        mask = self.downstream_nodes != self.n_nodes
+        mask = self.downstream_nodes != self.n_nodes # remove sinks
         down[mask] = field[self.downstream_nodes[mask]]
+        # down[~mask] = None # set sinks to have None downstream?
         return down
 
-    def catchment(self, nodes):
-        catchments = self.graph.subgraph(nodes)
+    def catchment(self, nodes, overwrite=False):
+        # given a list of nodes, make a graph showing the node catchement areas
+        # This will be efficient for shallow chains (only interested in nodes near the source), but for deep chains (nodes far from source) it will be slow
+        catchment = np.zeros(self.n_nodes)
+        catchment[nodes] = nodes+1 # need +1 for summing to work
+        initial_mask = self.downstream_nodes != self.n_nodes # get anything that isnt a sink
+        old_catchment = np.zeros(self.n_nodes) # initialise with zeros, so an empty catchment
+        while (old_catchment!=catchment).any(): # until we stop updating
+            old_catchment = catchment.copy()
+            temp_mask = np.zeros(self.n_nodes, dtype=bool)
+            temp_mask[initial_mask] = catchment[self.downstream_nodes[initial_mask]] != 0 # update all parents with values of downstream nodes, provided that the downstream node has a value
+            mask = initial_mask & temp_mask
+            if not overwrite:
+                mask = mask &(catchment == 0) # get anything that hasnt been assigned a catchment (so don't overwrite)
+            catchment[mask] = catchment[self.downstream_nodes[mask]]
+        return catchment
 
 
 def from_netcdf_d8(filename, **kwargs):
@@ -129,7 +150,6 @@ def from_camaflood(filename, graph_type="igraph"):
     ny = dx.shape[1]
     dx_flat = dx.flatten()
     del dx
-    # , dy_flat = downxy.downx.values.flatten(), downxy.downy.values.flatten()
 
     mask_upstream = ((dx_flat != -999) & (dx_flat != -9999)) & (dx_flat != -1000) # 1d flattened indices
 

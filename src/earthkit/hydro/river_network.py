@@ -70,18 +70,20 @@ class RiverNetwork:
         # down[~mask] = None # set sinks to have None downstream?
         return down
 
-    def catchment(self, nodes):
-        # given a list of nodes, make a graph showing the node catchement areas
-        # This will be efficient for shallow chains (only interested in nodes near the source), but for deep chains (nodes far from source) it will be slow
-        catchment = np.zeros(self.n_nodes+1)
-        catchment[nodes] = nodes+1 # need +1 for summing to work
+    def catchment(self, nodes, overwrite=True):
+        # This always loops over the entire length of the chain
+        # Better would be to do a BFS starting at each of the nodes
+        # but this will be slow in Python
+        catchment = np.empty(self.n_nodes)
+        catchment.fill(np.nan)
+        catchment[nodes] = nodes
 
-        downstream_belongs_to_catchment = np.where(catchment[self.downstream_nodes] != 0)[0] # sink downstream will never belong to a catchment
-        changed_catchment = downstream_belongs_to_catchment[np.where(catchment[downstream_belongs_to_catchment]!=catchment[self.downstream_nodes[downstream_belongs_to_catchment]])[0]]
-        while changed_catchment.shape[0] > 0:
-            catchment[changed_catchment] = catchment[self.downstream_nodes[changed_catchment]]
-            changed_catchment = np.where(np.isin(self.downstream_nodes, changed_catchment))[0]
-        return catchment[:-1]
+        for group in self.topological_groups[:-1][::-1]:
+            valid_group = group[np.isnan(catchment[self.downstream_nodes[group]])] #only update nodes where the downstream belongs to a catchment
+            if not overwrite:
+                valid_group = valid_group[np.isnan(catchment[valid_group])]
+            catchment[valid_group] = catchment[self.downstream_nodes[valid_group]]
+        return catchment
 
 
 def from_netcdf_d8(filename, **kwargs):
@@ -141,7 +143,9 @@ def from_d8(data, graph_type="igraph"):
 
 def from_camaflood(filename, graph_type="igraph"):
     downxy = xr.open_dataset(filename, mask_and_scale=False)
+    dy_flat = downxy.downy.values.flatten()
     dx = downxy.downx.values
+    del downxy
     nx = dx.shape[0]
     ny = dx.shape[1]
     dx_flat = dx.flatten()
@@ -156,7 +160,6 @@ def from_camaflood(filename, graph_type="igraph"):
     del x_coords
     del dx_flat
 
-    dy_flat = downxy.downy.values.flatten()
     y_coords = np.floor_divide(upstream_indices, ny)
     new_y_coords = (y_coords + dy_flat[mask_upstream]) % nx
     del y_coords

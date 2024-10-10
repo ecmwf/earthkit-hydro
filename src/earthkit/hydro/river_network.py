@@ -7,7 +7,9 @@ class RiverNetwork:
         self.downstream_nodes = downstream
         # Note: a node with no upstream or downstream is considered both a source and a sink
         self.sinks = self.nodes[self.downstream_nodes == self.n_nodes] # nodes with no downstreams
+        print("finding sources")
         self.sources = self.get_sources() # nodes with no upstreams
+        print("topological sorting")
         self.topological_groups = self.topological_sort()
 
     def get_sources(self):

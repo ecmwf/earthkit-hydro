@@ -8,7 +8,7 @@ def from_netcdf_d8(filename):
     return from_d8(data)
 
 def from_d8(data):
-    nx, ny = data.shape
+    shape = data.shape
     data_flat = data.flatten()
     del data
 
@@ -29,10 +29,10 @@ def from_d8(data):
     # 2  0 -1
     # 1 -1 -1
     x_offsets = np.array([0, -1, 0, +1, -1, 0, +1, -1, 0, +1])[directions]
-    y_offsets = np.array([0, -1, -1, -1, 0, 0, 0, 1, 1, 1])[directions]
+    y_offsets = -np.array([0, -1, -1, -1, 0, 0, 0, 1, 1, 1])[directions]
     del directions
 
-    return create_network(x_offsets, y_offsets, missing_mask, mask_upstream, nx, ny)
+    return create_network(x_offsets, y_offsets, missing_mask, mask_upstream, shape)
 
 def from_netcdf_cama(filename):
     data = xr.open_dataset(filename, mask_and_scale=False)
@@ -40,7 +40,7 @@ def from_netcdf_cama(filename):
 
 def from_cama(data):
     x_offsets = data.downx.values
-    nx, ny = x_offsets.shape
+    shape = x_offsets.shape
     x_offsets = x_offsets.flatten()
     y_offsets = data.downy.values.flatten()
     del data
@@ -49,19 +49,21 @@ def from_cama(data):
     y_offsets = y_offsets[mask_upstream]
     missing_mask = x_offsets != -9999
 
-    return create_network(x_offsets, y_offsets, missing_mask, mask_upstream, nx, ny)
+    return create_network(x_offsets, y_offsets, missing_mask, mask_upstream, shape)
 
-def create_network(x_offsets, y_offsets, missing_mask, mask_upstream, nx, ny):
+def create_network(x_offsets, y_offsets, missing_mask, mask_upstream, shape):
+    ny, nx = shape
+    del shape
     upstream_indices = np.arange(missing_mask.size)[mask_upstream] # all indices, including missing values
     del mask_upstream
 
-    x_coords = upstream_indices % ny # old x_coords
-    x_coords = (x_coords + x_offsets) % nx # new x_coords
+    x_coords = upstream_indices % nx
+    x_coords = (x_coords + x_offsets) % nx
 
-    y_coords = np.floor_divide(upstream_indices, ny) # old y_coords
+    y_coords = np.floor_divide(upstream_indices, nx) # old y_coords
     y_coords = (y_coords + y_offsets) % ny # new y_coords
     
-    downstream_indices = x_coords + y_coords * ny
+    downstream_indices = x_coords + y_coords * nx
 
     # relabel to only index nodes that are not missing
     n_nodes = np.sum(missing_mask)

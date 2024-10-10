@@ -18,9 +18,10 @@ def test_downstream_nodes(d8_ldd, downstream_nodes):
     np.testing.assert_array_equal(network.downstream_nodes, downstream_nodes)
 
 
-def test_upstream_points(d8_ldd, upstream_points):
+def test_upstream_cells(d8_ldd, upstream_points):
     network = from_d8(d8_ldd)
-    ups = network.upstream_points()
+    field = np.ones(network.n_nodes, dtype=int)
+    ups = network.accuflux(field, in_place=False)
     np.testing.assert_array_equal(ups, upstream_points)
 
 

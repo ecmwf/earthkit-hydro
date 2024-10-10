@@ -1,7 +1,7 @@
 import numpy as np
 
 class RiverNetwork:
-    def __init__(self, nodes, downstream, mask) -> None:
+    def __init__(self, nodes, downstream) -> None:
         self.nodes = nodes
         self.n_nodes = len(nodes)
         self.downstream_nodes = downstream
@@ -9,7 +9,6 @@ class RiverNetwork:
         self.sinks = self.nodes[self.downstream_nodes == self.n_nodes] # nodes with no downstreams
         self.sources = self.get_sources() # nodes with no upstreams
         self.topological_groups = self.topological_sort()
-        self.mask = mask
 
     def get_sources(self):
         tmp_nodes = self.nodes.copy()

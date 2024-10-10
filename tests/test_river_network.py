@@ -6,7 +6,6 @@ def test_accuflux(d8_ldd, upstream_points):
     network = from_d8(d8_ldd)
     field = np.ones(network.n_nodes, dtype=int)
     accum = network.accuflux(field)
-
     print(accum)
     print(upstream_points)
     np.testing.assert_array_equal(accum, upstream_points)

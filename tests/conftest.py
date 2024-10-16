@@ -24,6 +24,7 @@ def d8_ldd_2():
         ]
     )
 
+
 @fixture
 def cama_downxy_1():
     return (
@@ -65,6 +66,50 @@ def cama_downxy_2():
             ]
         ),
     )
+
+
+@fixture
+def cama_nextxy_1():
+    return (
+        np.array(
+            [
+                [1, 2, 3, 3, 4],
+                [1, 2, 3, 3, 4],
+                [2, 2, 2, 3, 4],
+                [2, -9, 2, 3, 4],
+            ]
+        ),
+        np.array(
+            [
+                [2, 2, 2, 2, 2],
+                [3, 3, 3, 3, 3],
+                [4, 4, 4, 3, 3],
+                [4, -9, 4, 4, 4],
+            ]
+        ),
+    )
+
+@fixture
+def cama_nextxy_2():
+    return (
+        np.array(
+            [
+                [-9, 3, 4, -9],
+                [2, 3, 3, 4],
+                [2, 2, 2, 3],
+                [1, -9, 4, 4],
+            ]
+        ),
+        np.array(
+            [
+                [-9, 1, 2, -9],
+                [2, 3, 3, 3],
+                [4, 4, 4, 2],
+                [1, -9, 4, 3],
+            ]
+        ),
+    )
+
 
 @fixture
 def downstream_nodes_1():
@@ -124,11 +169,6 @@ def unit_field_accuflux_1():
 @fixture
 def unit_field_accuflux_2():
     return np.array([2, 1, 2, 1, 1, 2, 7, 3, 1, 1, 10, 6, 1, 13, 1, 2])
-
-
-@fixture
-def test_field():
-    return np.arange(1, 21, dtype=int)
 
 
 @fixture

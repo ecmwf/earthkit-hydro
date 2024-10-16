@@ -4,6 +4,17 @@ from earthkit.hydro import from_d8, from_cama_downxy, from_cama_nextxy
 from pytest_cases import parametrize
 from conftest import *
 
+def read_network(reader, map_name):
+    if 'd8_ldd' in reader:
+        network = from_d8(map_name)
+    elif 'cama_downxy' in reader:
+        network = from_cama_downxy(*map_name)
+    elif 'cama_nextxy' in reader:
+        network = from_cama_nextxy(*map_name)
+    else:
+        raise Exception("Unknown map type")
+    return network
+
 @parametrize("reader,map_name,upstream_points",
             [('d8_ldd',d8_ldd_1,unit_field_accuflux_1),
             ('cama_downxy',cama_downxy_1,unit_field_accuflux_1),
@@ -14,14 +25,7 @@ from conftest import *
             ])
 @parametrize("N", range(4))
 def test_accuflux(reader, map_name, upstream_points, N):
-    if 'd8_ldd' in reader:
-        network = from_d8(map_name)
-    elif 'cama_downxy' in reader:
-        network = from_cama_downxy(*map_name)
-    elif 'cama_nextxy' in reader:
-        network = from_cama_nextxy(*map_name)
-    else:
-        raise Exception("Unknown map type")
+    network = read_network(reader, map_name)
     extra_dims = [np.random.randint(10) for _ in range(N)]
     field = np.ones((*extra_dims, network.n_nodes), dtype=int)
     accum = network.accuflux(field)
@@ -41,14 +45,7 @@ def test_accuflux(reader, map_name, upstream_points, N):
             ])
 @parametrize("N", range(4))
 def test_accuflux_2d(reader, map_name, N):
-    if 'd8_ldd' in reader:
-        network = from_d8(map_name)
-    elif 'cama_downxy' in reader:
-        network = from_cama_downxy(*map_name)
-    elif 'cama_nextxy' in reader:
-        network = from_cama_nextxy(*map_name)
-    else:
-        raise Exception("Unknown map type")
+    network = read_network(reader, map_name)
     field = np.random.rand(*([np.random.randint(10)]*N), *network.mask.shape)
     field_1d = field[...,network.mask]
     accum = network.accuflux(field_1d)
@@ -63,14 +60,7 @@ def test_accuflux_2d(reader, map_name, N):
             ('cama_nextxy',cama_nextxy_2,downstream_nodes_2),
             ])
 def test_downstream_nodes(reader, map_name, downstream_nodes):
-    if 'd8_ldd' in reader:
-        network = from_d8(map_name)
-    elif 'cama_downxy' in reader:
-        network = from_cama_downxy(*map_name)
-    elif 'cama_nextxy' in reader:
-        network = from_cama_nextxy(*map_name)
-    else:
-        raise Exception("Unknown map type")
+    network = read_network(reader, map_name)
     print(network.downstream_nodes)
     print(downstream_nodes)
     np.testing.assert_array_equal(network.downstream_nodes, downstream_nodes)
@@ -84,14 +74,7 @@ def test_downstream_nodes(reader, map_name, downstream_nodes):
             ('cama_nextxy',cama_nextxy_2,upstream_2),
             ])
 def test_upstream(reader, map_name, upstream):
-    if 'd8_ldd' in reader:
-        network = from_d8(map_name)
-    elif 'cama_downxy' in reader:
-        network = from_cama_downxy(*map_name)
-    elif 'cama_nextxy' in reader:
-        network = from_cama_nextxy(*map_name)
-    else:
-        raise Exception("Unknown map type")
+    network = read_network(reader, map_name)
     field = np.arange(1, network.n_nodes+1)
     ups = network.upstream(field)
     np.testing.assert_array_equal(ups, upstream)
@@ -105,17 +88,12 @@ def test_upstream(reader, map_name, upstream):
             ('cama_nextxy',cama_nextxy_2,downstream_2),
             ])
 def test_downstream(reader, map_name, downstream):
-    if 'd8_ldd' in reader:
-        network = from_d8(map_name)
-    elif 'cama_downxy' in reader:
-        network = from_cama_downxy(*map_name)
-    elif 'cama_nextxy' in reader:
-        network = from_cama_nextxy(*map_name)
-    else:
-        raise Exception("Unknown map type")
+    network = read_network(reader, map_name)
     field = np.arange(1, network.n_nodes+1)
     down = network.downstream(field)
     print(down)
     print(downstream)
     np.testing.assert_array_equal(down, downstream)
+
+# def test_catchments(reader, map_name, downstream)
 

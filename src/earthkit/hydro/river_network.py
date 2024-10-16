@@ -1,10 +1,26 @@
 import numpy as np
 
+def mask_data(func):
+    def wrapper(self, field, *args, **kwargs):
+        if field.shape[-2:] == self.mask.shape:
+            in_place = kwargs.get("in_place", False)
+            if in_place:
+                return func(self, field[...,self.mask].T, *args, **kwargs).T
+            else:
+                out_field = field.copy()
+                new_field = func(self, field[...,self.mask].T, *args, **kwargs).T
+                out_field[...,self.mask] = new_field
+                return out_field
+        else:
+            return func(self, field.T, *args,  **kwargs).T
+    return wrapper
+
 class RiverNetwork:
-    def __init__(self, nodes, downstream) -> None:
+    def __init__(self, nodes, downstream, mask) -> None:
         self.nodes = nodes
         self.n_nodes = len(nodes)
         self.downstream_nodes = downstream
+        self.mask = mask
         # Note: a node with no upstream or downstream is considered both a source and a sink
         self.sinks = self.nodes[self.downstream_nodes == self.n_nodes] # nodes with no downstreams
         print("finding sources")
@@ -18,7 +34,6 @@ class RiverNetwork:
         tmp_nodes[downstream_no_sinks] = -1 # downstream nodes that aren't sinks = -1
         inlets = tmp_nodes[tmp_nodes != -1] # sources are nodes that are not downstream nodes
         return inlets
-    
 
     def topological_sort(self):
         inlets = self.sources
@@ -35,6 +50,8 @@ class RiverNetwork:
             inlets = self.downstream_nodes[inlets]
             n += 1
             current_sum = np.sum(labels)
+            if n>10000:
+                raise Exception("maximum iterations reached")
         labels[self.sinks] = n # put all sinks in last group in topological ordering
         groups = self.group_labels(labels)
 
@@ -47,8 +64,9 @@ class RiverNetwork:
         _, indices = np.unique(sorted_labels, return_index=True) # find index of first occurrence of each label
         subarrays = np.split(sorted_array, indices[1:]) # split array at each first occurrence of a label
         return subarrays
-
-    def accuflux(self, field, in_place=True, operation=np.add):
+    
+    @mask_data
+    def accuflux(self, field, in_place=False, operation=np.add):
         # propagates a field all the way downstream along the river network
         if not in_place:
             field = field.copy()

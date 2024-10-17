@@ -66,7 +66,7 @@ def test_accuflux_2d(reader, map_name, N):
     [
         ("d8_ldd", d8_ldd_1, downstream_nodes_1),
         ("cama_downxy", cama_downxy_1, downstream_nodes_1),
-        ("cama_nextxy", cama_nextxy_1, downstream_nodes_1),
+        ('cama_nextxy', cama_nextxy_1, downstream_nodes_1),
         ("d8_ldd", d8_ldd_2, downstream_nodes_2),
         ("cama_downxy", cama_downxy_2, downstream_nodes_2),
         ("cama_nextxy", cama_nextxy_2, downstream_nodes_2),

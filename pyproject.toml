@@ -44,11 +44,11 @@ dependencies = [
 [project.optional-dependencies]
     test = [
         "pytest",
-        "pytest-cases"
+        "pytest-cases",
     ]
     dev = [
         "pytest",
-        "pytest-cases"
+        "pytest-cases",
         "ruff",
         "pre-commit"
     ]

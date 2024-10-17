@@ -2,10 +2,12 @@ import numpy as np
 import xarray as xr
 from .river_network import RiverNetwork
 
+
 def from_netcdf_d8(filename):
     # read river network from netcdf using xarray
     data = xr.open_dataset(filename, mask_and_scale=False)["Band1"].values
     return from_d8(data)
+
 
 def from_d8(data):
     shape = data.shape
@@ -32,45 +34,50 @@ def from_d8(data):
     y_offsets = -np.array([0, -1, -1, -1, 0, 0, 0, 1, 1, 1])[directions]
     del directions
 
-    upstream_indices, downstream_indices = find_upstream_downstream_indices_from_offsets(x_offsets, y_offsets, missing_mask, mask_upstream, shape)
+    upstream_indices, downstream_indices = find_upstream_downstream_indices_from_offsets(
+        x_offsets, y_offsets, missing_mask, mask_upstream, shape
+    )
 
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
+
 
 def from_netcdf_cama(filename, type="downxy"):
     data = xr.open_dataset(filename, mask_and_scale=False)
     if type == "downxy":
         dx, dy = data.downx.values, data.downy.values
         return from_cama_downxy(dx, -dy)
-    elif type =='nextxy':
+    elif type == "nextxy":
         x, y = data.nextx.values, data.nexty.values
         return from_cama_nextxy(x, y)
     else:
         raise Exception("Unknown type")
 
-def from_bin_cama(filename, type='downxy'):
+
+def from_bin_cama(filename, type="downxy"):
     f = open(f"{filename}.ctl", "r")
     readfile = f.read()
     f.close()
     for line in readfile.splitlines():
-        if 'xdef' in line:
+        if "xdef" in line:
             split_line = line.split()
-            assert split_line[0]=='xdef'
+            assert split_line[0] == "xdef"
             nx = int(split_line[1])
-        elif 'ydef' in line:
+        elif "ydef" in line:
             split_line = line.split()
-            assert split_line[0]=='ydef'
+            assert split_line[0] == "ydef"
             ny = int(split_line[1])
-    data = np.fromfile(f"{filename}.bin", dtype=np.int32).reshape((nx, ny, 2), order='F')
-    if type == 'downxy':
+    data = np.fromfile(f"{filename}.bin", dtype=np.int32).reshape((nx, ny, 2), order="F")
+    if type == "downxy":
         dx = data[:, :, 0].T
         dy = data[:, :, 1].T
         return from_cama_downxy(dx, dy)
-    elif type == 'nextxy':
+    elif type == "nextxy":
         x = data[:, :, 0].T
         y = data[:, :, 1].T
         return from_cama_nextxy(x, y)
     else:
         raise Exception("Unknown type")
+
 
 def from_cama_downxy(dx, dy):
     x_offsets = dx
@@ -82,9 +89,12 @@ def from_cama_downxy(dx, dy):
     x_offsets = x_offsets[mask_upstream]
     y_offsets = y_offsets[mask_upstream]
 
-    upstream_indicies, downstream_indices = find_upstream_downstream_indices_from_offsets(x_offsets, y_offsets, missing_mask, mask_upstream, shape)
+    upstream_indicies, downstream_indices = find_upstream_downstream_indices_from_offsets(
+        x_offsets, y_offsets, missing_mask, mask_upstream, shape
+    )
 
     return create_network(upstream_indicies, downstream_indices, missing_mask, shape)
+
 
 def from_cama_nextxy(x, y):
     shape = x.shape
@@ -103,9 +113,10 @@ def from_cama_nextxy(x, y):
 
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
+
 def find_upstream_downstream_indices_from_offsets(x_offsets, y_offsets, missing_mask, mask_upstream, shape):
     ny, nx = shape
-    upstream_indices = np.arange(missing_mask.size)[mask_upstream] # all indices, including missing values
+    upstream_indices = np.arange(missing_mask.size)[mask_upstream]  # all indices, including missing values
     del mask_upstream
 
     x_coords = upstream_indices % nx
@@ -113,16 +124,16 @@ def find_upstream_downstream_indices_from_offsets(x_offsets, y_offsets, missing_
     downstream_indices = x_coords
     del x_coords
 
-    y_coords = np.floor_divide(upstream_indices, nx) # old y_coords
-    y_coords = (y_coords + y_offsets) % ny # new y_coords
-    
+    y_coords = np.floor_divide(upstream_indices, nx)  # old y_coords
+    y_coords = (y_coords + y_offsets) % ny  # new y_coords
+
     downstream_indices += y_coords * nx
     del y_coords
 
     return upstream_indices, downstream_indices
 
-def create_network(upstream_indices, downstream_indices, missing_mask, shape):
 
+def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     # relabel to only index nodes that are not missing
     n_nodes = int(np.sum(missing_mask))
     nodes = np.arange(n_nodes, dtype=int)
@@ -135,10 +146,10 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     upstream_nodes = nodes_matrix[upstream_indices]
     downstream_nodes = nodes_matrix[downstream_indices]
     del upstream_indices, downstream_indices, nodes_matrix
-    
+
     # downstream nodes (currently assume only exists one downstream node)
     downstream = np.ones(n_nodes, dtype=int) * n_nodes
-    
+
     downstream[upstream_nodes] = downstream_nodes
 
     print("data loaded, initialising river network")

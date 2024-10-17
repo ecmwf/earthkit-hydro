@@ -1,4 +1,3 @@
-import pytest
 import numpy as np
 from pytest_cases import fixture
 

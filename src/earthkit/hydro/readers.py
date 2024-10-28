@@ -1,6 +1,14 @@
 import numpy as np
 import xarray as xr
 from .river_network import RiverNetwork
+import joblib
+from urllib.request import urlopen
+
+def load_river_network(domain='efas', version='5'):
+    from ._version import __version__ as ekh_version
+    url = f"https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version[0:3]}/{domain}/{version}/river_network.joblib"
+    network = joblib.load(urlopen(url))
+    return network
 
 
 def from_netcdf_d8(filename):

@@ -120,5 +120,5 @@ class RiverNetwork:
     def subcatchment(self, nodes):
         return self.catchment(nodes, overwrite=False)
 
-    def export(self, fname='river_network.joblib', compress=1):
+    def export(self, fname="river_network.joblib", compress=1):
         joblib.dump(self, fname, compress=compress)

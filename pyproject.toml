@@ -29,11 +29,8 @@ dynamic = ["version", "readme"]
 
 dependencies = [
     "numpy",
-    "pandas",
     "xarray",
-    "geopandas",
-    "igraph",
-    "earthkit-data",
+    "joblib"
 ]
 
 [project.urls]

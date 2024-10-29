@@ -2,13 +2,35 @@ import numpy as np
 import xarray as xr
 from .river_network import RiverNetwork
 import joblib
-from urllib.request import urlopen
+from urllib.request import urlopen, urlretrieve
+import os.path
+import shutil
 
-def load_river_network(domain='efas', version='5'):
+
+def load_river_network(domain="efas", version="5", cache=True):
     from ._version import __version__ as ekh_version
-    url = f"https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version[0:3]}/{domain}/{version}/river_network.joblib"
-    network = joblib.load(urlopen(url))
+
+    dirname = os.path.expandvars("$TMPDIR/earthkit_hydro/")
+    fname = f"{ekh_version[0:3]}_{domain}_{version}.joblib"
+    filepath = dirname + fname
+    if os.path.isfile(filepath):
+        network = joblib.load(filepath)
+    else:
+        url = f"https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version[0:3]}/{domain}/{version}/river_network.joblib"
+        if cache:
+            if not os.path.isdir(dirname):
+                os.makedirs(dirname)
+            urlretrieve(url, filepath)
+            network = joblib.load(filepath)
+        else:
+            network = joblib.load(urlopen(url))
+
     return network
+
+
+def delete_cache():
+    dirname = os.path.expandvars("$TMPDIR/earthkit_hydro/")
+    shutil.rmtree(dirname)
 
 
 def from_netcdf_d8(filename):

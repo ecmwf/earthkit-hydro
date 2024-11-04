@@ -2,41 +2,30 @@ import numpy as np
 import xarray as xr
 from .river_network import RiverNetwork
 import joblib
-from urllib.request import urlopen, urlretrieve
-import os.path
-import shutil
+from .caching import Cache
+import tempfile
 
 
-def load_river_network(domain="efas", version="5", cache=True):
+def load_river_network(
+    domain="efas",
+    version="5",
+    cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
+    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{domain}/{version}/river_network.joblib",
+    cache_fname="{ekh_version}_{domain}_{version}.joblib",
+):
     from ._version import __version__ as ekh_version
 
-    url = f"https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version[0:3]}/{domain}/{version}/river_network.joblib"
-
-    if cache:
-        dirname = os.path.expandvars("$TMPDIR/earthkit_hydro/")
-        fname = f"{ekh_version[0:3]}_{domain}_{version}.joblib"
-        filepath = dirname + fname
-        if os.path.isfile(filepath):
-            network = joblib.load(filepath)
-        else:
-            if not os.path.isdir(dirname):
-                os.makedirs(dirname)
-            urlretrieve(url, filepath)
-            network = joblib.load(filepath)
-    else:
-        network = joblib.load(urlopen(url))
+    cache = Cache(cache_dir, data_source, cache_fname)
+    filepath = cache(ekh_version=ekh_version[0:3], domain=domain, version=version)
+    network = joblib.load(filepath)
 
     return network
-
-
-def delete_cache():
-    dirname = os.path.expandvars("$TMPDIR/earthkit_hydro/")
-    shutil.rmtree(dirname)
 
 
 def from_netcdf_d8(filename):
     # read river network from netcdf using xarray
     data = xr.open_dataset(filename, mask_and_scale=False)["Band1"].values
+
     return from_d8(data)
 
 

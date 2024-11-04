@@ -6,6 +6,5 @@ from .readers import (
     from_cama_nextxy,
     from_d8,
     load_river_network,
-    delete_cache,
 )
 from .river_network import RiverNetwork

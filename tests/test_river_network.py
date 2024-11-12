@@ -59,6 +59,7 @@ def test_accuflux_2d(reader, map_name, N):
     field_1d = field[..., network.mask]
     accum = network.accuflux(field_1d)
     np.testing.assert_array_equal(accum, network.accuflux(field)[..., network.mask])
+    np.testing.assert_array_equal(network.accuflux(field)[..., ~network.mask], field[..., ~network.mask])
 
 
 @parametrize(
@@ -117,13 +118,124 @@ def test_downstream(reader, map_name, downstream):
     np.testing.assert_array_equal(down, downstream)
 
 
-# @parametrize("reader,map_name,downstream",
-#             [('d8_ldd',d8_ldd_1,downstream_1),
-#             ('cama_downxy',cama_downxy_1,downstream_1),
-#             ('cama_nextxy',cama_nextxy_1,downstream_1),
-#             ('d8_ldd',d8_ldd_2,downstream_2),
-#             ('cama_downxy',cama_downxy_2,downstream_2),
-#             ('cama_nextxy',cama_nextxy_2,downstream_2),
-#             ])
-# def test_catchments(reader, map_name, catchment):
-#     network = read_network(reader, map_name)
+@parametrize(
+    "reader,map_name",
+    [
+        ("d8_ldd", d8_ldd_1),
+        ("cama_downxy", cama_downxy_1),
+        ("cama_nextxy", cama_nextxy_1),
+        ("d8_ldd", d8_ldd_2),
+        ("cama_downxy", cama_downxy_2),
+        ("cama_nextxy", cama_nextxy_2),
+    ],
+)
+def test_subcatchment_does_not_overwrite(reader, map_name):
+    network = read_network(reader, map_name)
+    field = np.arange(network.n_nodes) + 1
+    subcatchment = network.subcatchment(field)
+    print(subcatchment)
+    print(field)
+    np.testing.assert_array_equal(subcatchment, field)
+
+
+@parametrize(
+    "reader,map_name",
+    [
+        ("d8_ldd", d8_ldd_1),
+        ("cama_downxy", cama_downxy_1),
+        ("cama_nextxy", cama_nextxy_1),
+        ("d8_ldd", d8_ldd_2),
+        ("cama_downxy", cama_downxy_2),
+        ("cama_nextxy", cama_nextxy_2),
+    ],
+)
+def test_subcatchment_does_not_overwrite_2d(reader, map_name):
+    network = read_network(reader, map_name)
+    field = np.zeros(network.mask.shape)
+    field[network.mask] = np.arange(network.n_nodes) + 1
+    subcatchment = network.subcatchment(field)
+    print(subcatchment)
+    print(field)
+    np.testing.assert_array_equal(subcatchment, field)
+
+
+@parametrize(
+    "reader,map_name,query_field,subcatchment",
+    [
+        ("d8_ldd", d8_ldd_1, catchment_query_field_1, subcatchment_1),
+        ("cama_downxy", cama_downxy_1, catchment_query_field_1, subcatchment_1),
+        ("cama_nextxy", cama_nextxy_1, catchment_query_field_1, subcatchment_1),
+        ("d8_ldd", d8_ldd_2, catchment_query_field_2, subcatchment_2),
+        ("cama_downxy", cama_downxy_2, catchment_query_field_2, subcatchment_2),
+        ("cama_nextxy", cama_nextxy_2, catchment_query_field_2, subcatchment_2),
+    ],
+)
+def test_subcatchment(reader, map_name, query_field, subcatchment):
+    network = read_network(reader, map_name)
+    network_subcatchment = network.subcatchment(query_field)
+    print(subcatchment)
+    print(network_subcatchment)
+    np.testing.assert_array_equal(network_subcatchment, subcatchment)
+
+
+@parametrize(
+    "reader,map_name,query_field,subcatchment",
+    [
+        ("d8_ldd", d8_ldd_1, catchment_query_field_1, subcatchment_1),
+        ("cama_downxy", cama_downxy_1, catchment_query_field_1, subcatchment_1),
+        ("cama_nextxy", cama_nextxy_1, catchment_query_field_1, subcatchment_1),
+        ("d8_ldd", d8_ldd_2, catchment_query_field_2, subcatchment_2),
+        ("cama_downxy", cama_downxy_2, catchment_query_field_2, subcatchment_2),
+        ("cama_nextxy", cama_nextxy_2, catchment_query_field_2, subcatchment_2),
+    ],
+)
+def test_subcatchment_2d(reader, map_name, query_field, subcatchment):
+    network = read_network(reader, map_name)
+    field = np.zeros(network.mask.shape)
+    field[network.mask] = query_field
+    network_subcatchment = network.subcatchment(field)
+    print(subcatchment)
+    print(network_subcatchment)
+    np.testing.assert_array_equal(network_subcatchment[network.mask], subcatchment)
+    np.testing.assert_array_equal(network_subcatchment[~network.mask], 0)
+
+
+@parametrize(
+    "reader,map_name,query_field,catchment",
+    [
+        ("d8_ldd", d8_ldd_1, catchment_query_field_1, catchment_1),
+        ("cama_downxy", cama_downxy_1, catchment_query_field_1, catchment_1),
+        ("cama_nextxy", cama_nextxy_1, catchment_query_field_1, catchment_1),
+        ("d8_ldd", d8_ldd_2, catchment_query_field_2, catchment_2),
+        ("cama_downxy", cama_downxy_2, catchment_query_field_2, catchment_2),
+        ("cama_nextxy", cama_nextxy_2, catchment_query_field_2, catchment_2),
+    ],
+)
+def test_catchment(reader, map_name, query_field, catchment):
+    network = read_network(reader, map_name)
+    network_catchment = network.catchment(query_field)
+    print(catchment)
+    print(network_catchment)
+    np.testing.assert_array_equal(network_catchment, catchment)
+
+
+@parametrize(
+    "reader,map_name,query_field,catchment",
+    [
+        ("d8_ldd", d8_ldd_1, catchment_query_field_1, catchment_1),
+        ("cama_downxy", cama_downxy_1, catchment_query_field_1, catchment_1),
+        ("cama_nextxy", cama_nextxy_1, catchment_query_field_1, catchment_1),
+        ("d8_ldd", d8_ldd_2, catchment_query_field_2, catchment_2),
+        ("cama_downxy", cama_downxy_2, catchment_query_field_2, catchment_2),
+        ("cama_nextxy", cama_nextxy_2, catchment_query_field_2, catchment_2),
+    ],
+)
+def test_catchment_2d(reader, map_name, query_field, catchment):
+    network = read_network(reader, map_name)
+    field = np.zeros(network.mask.shape)
+    field[network.mask] = query_field
+    network_catchment = network.catchment(field)
+    print(catchment)
+    print(network_catchment)
+    np.testing.assert_array_equal(network_catchment[network.mask], catchment)
+    np.testing.assert_array_equal(network_catchment[~network.mask], 0)

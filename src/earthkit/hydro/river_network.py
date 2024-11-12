@@ -82,6 +82,7 @@ class RiverNetwork:
             operation.at(field, self.downstream_nodes[grouping], field[grouping])
         return field
 
+    @mask_data
     def upstream(self, field):
         # update each node with the sum of its parent (upstream) nodes
         mask = self.downstream_nodes != self.n_nodes  # remove sinks since they have no downstream
@@ -92,6 +93,7 @@ class RiverNetwork:
         # ups[mask] = None # set sinks to have None as upstream contribution?
         return ups
 
+    @mask_data
     def downstream(self, field):
         # update each node with its children (downstream) node (currently only one downstream node)
         down = np.zeros(self.n_nodes, dtype=field.dtype)
@@ -100,25 +102,24 @@ class RiverNetwork:
         # down[~mask] = None # set sinks to have None downstream?
         return down
 
-    def catchment(self, nodes, overwrite=True):
+    @mask_data
+    def catchment(self, field, overwrite=True):
         # this always loops over the entire length of the chain
         # Better would be to do a BFS starting at each of the nodes
         # but this will be slow in Python
-        catchment = np.zeros(self.n_nodes)
-        catchment.fill(np.nan)
-        catchment[nodes] = nodes
 
         for group in self.topological_groups[:-1][::-1]:  # exclude sinks and invert topological ordering
             valid_group = group[
-                ~np.isnan(catchment[self.downstream_nodes[group]])
+                field[self.downstream_nodes[group]] != 0
             ]  # only update nodes where the downstream belongs to a catchment
             if not overwrite:
-                valid_group = valid_group[np.isnan(catchment[valid_group])]
-            catchment[valid_group] = catchment[self.downstream_nodes[valid_group]]
-        return catchment
+                valid_group = valid_group[field[valid_group] == 0]
+            field[valid_group] = field[self.downstream_nodes[valid_group]]
+        return field
 
-    def subcatchment(self, nodes):
-        return self.catchment(nodes, overwrite=False)
+    @mask_data
+    def subcatchment(self, field):
+        return self.catchment(field, overwrite=False)
 
     def export(self, fname="river_network.joblib", compress=1):
         joblib.dump(self, fname, compress=compress)

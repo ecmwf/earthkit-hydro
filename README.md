@@ -1,11 +1,74 @@
 # earthkit-hydro
 
 **DISCLAIMER**
-This project is **BETA** and will be **Experimental** for the foreseeable future.
-Interfaces and functionality are likely to change, and the project itself may be scrapped.
-**DO NOT** use this software in any project/software that is operational.
 
-**earthkit-hydro** is a home for hydrological functions
+> This project is in the **BETA** stage of development. Please be aware that interfaces and functionality may change as the project develops. If this software is to be used in operational systems you are **strongly advised to use a released tag in your system configuration**, and you should be willing to accept incoming changes and bug fixes that require adaptations on your part. ECMWF **does use** this software in operations and abides by the same caveats.
+
+**earthkit-hydro** is a computationally efficient library for common hydrological functions
+
+## Installation
+Clone source code repository
+
+    $ git clone https://github.com/ecmwf/earthkit-hydro.git
+    $ cd earthkit-hydro
+
+Create and activate conda environment
+
+    $ conda create -n hydro python=3.10
+    $ conda activate hydro
+
+For default installation, run
+
+    $ pip install .
+
+For a developer installation (includes linting and test libraries), run
+
+    $ pip install -e .[dev]
+    $ pre-commit install
+
+If you only plan to run the tests, instead run
+
+    $ pip install -e .[test]
+
+## Documentation
+
+    $ import earthkit.hydro as ekh
+
+- ### Readers
+
+#### ``` ekh.load_river_network(domain,version,...) ```
+Loads a precomputed `RiverNetwork`. Current options are
+- domain: "efas", version: "5"
+- domain: "glofas", version: "4"
+
+#### ``` ekh.from_netcdf_d8(filename) ```
+Creates a `RiverNetwork` from a d8 netcdf format.
+
+#### ``` ekh.from_netcdf_cama(filename, type) ```
+Creates a `RiverNetwork` from a CAMA netcdf format of type "downxy" or "nextxy".
+
+#### ``` ekh.from_netcdf_cama(filename, type) ```
+Creates a `RiverNetwork` from a CAMA bin format of type "downxy" or "nextxy".
+
+- ### RiverNetwork methods
+
+#### network.accuflux(field, in_place)
+Calculates the total accumulated flux down a river network.
+
+#### network.upstream(field)
+Updates each node with the sum of its upstream nodes.
+
+#### network.downstream(field)
+Updates each node with its downstream node.
+
+#### network.catchment(field)
+Finds the catchment (all upstream nodes) of specified nodes, without overwriting.
+
+#### network.subcatchment(field)
+Finds the catchment (all upstream nodes) of specified nodes, with overwriting.
+
+#### network.export(filename)
+Exports the `RiverNetwork` as a joblib pickle.
 
 ## License
 

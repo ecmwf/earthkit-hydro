@@ -194,3 +194,33 @@ def downstream_1():
 @fixture
 def downstream_2():
     return np.array([0, 3, 8, 0, 6, 11, 11, 12, 14, 14, 14, 7, 1, 0, 16, 12])
+
+
+@fixture
+def catchment_query_field_1():
+    return np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5, 4, 2, 3, 0, 0, 0, 0, 0, 0])
+
+
+@fixture
+def catchment_query_field_2():
+    return np.array([4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2, 0, 0])
+
+
+@fixture
+def subcatchment_1():
+    return np.array([5, 4, 2, 2, 1, 5, 4, 2, 1, 3, 5, 4, 2, 3, 3, 0, 0, 0, 0, 0])
+
+
+@fixture
+def subcatchment_2():
+    return np.array([4, 1, 1, 0, 2, 2, 2, 3, 2, 2, 2, 3, 4, 2, 3, 3])
+
+
+@fixture
+def catchment_1():
+    return np.array([5, 4, 2, 2, 2, 5, 4, 2, 2, 2, 5, 4, 2, 2, 2, 0, 0, 0, 0, 0])
+
+
+@fixture
+def catchment_2():
+    return np.array([4, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2])

@@ -4,7 +4,7 @@
 
 > This project is in the **BETA** stage of development. Please be aware that interfaces and functionality may change as the project develops. If this software is to be used in operational systems you are **strongly advised to use a released tag in your system configuration**, and you should be willing to accept incoming changes and bug fixes that require adaptations on your part. ECMWF **does use** this software in operations and abides by the same caveats.
 
-**earthkit-hydro** is a computationally efficient library for common hydrological functions.
+**earthkit-hydro** is a Python library for common hydrological functions.
 
 ## Installation
 Clone source code repository
@@ -41,15 +41,18 @@ pip install -e .[test]
 ```
 
 ## Documentation
-
+Earthkit-hydro can be imported as following:
 ```
 import earthkit.hydro as ekh
 ```
 
-- ### Readers
+The package contains different ways of constructing or loading a RiverNetwork object. A RiverNetwork object is a representation of a river network on a grid.
+It can be used to compute basic hydrological functions, such as propagating a scalar along the river network or extract a catchment from the river network.
+
+### Readers
 
 ```
-ekh.load_river_network(domain="efas",version="5",...)
+ekh.load_river_network(domain="efas",version="5")
 ```
 Loads a precomputed `RiverNetwork`. Current options are
 - domain: "efas", version: "5"
@@ -59,19 +62,19 @@ Loads a precomputed `RiverNetwork`. Current options are
 ```
 ekh.from_netcdf_d8(filename)
 ```
-Creates a `RiverNetwork` from a d8 netcdf format.
+Creates a `RiverNetwork` from a D8 (PCRaster LDD convention) NetCDF format.
 
 ```
 ekh.from_netcdf_cama(filename, type)
 ```
-Creates a `RiverNetwork` from a CAMA netcdf format of type "downxy" or "nextxy".
+Creates a `RiverNetwork` from a CaMa-Flood NetCDF format of type "downxy" or "nextxy".
 
 ```
 ekh.from_bin_cama(filename, type)
 ```
-Creates a `RiverNetwork` from a CAMA bin format of type "downxy" or "nextxy".
+Creates a `RiverNetwork` from a CaMa-Flood bin format of type "downxy" or "nextxy".
 
-- ### RiverNetwork methods
+### RiverNetwork methods
 
 ```
 network.accuflux(field)

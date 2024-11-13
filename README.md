@@ -9,71 +9,104 @@
 ## Installation
 Clone source code repository
 
-    $ git clone https://github.com/ecmwf/earthkit-hydro.git
-    $ cd earthkit-hydro
+```
+git clone https://github.com/ecmwf/earthkit-hydro.git
+cd earthkit-hydro
+```
 
 Create and activate conda environment
 
-    $ conda create -n hydro python=3.10
-    $ conda activate hydro
+```
+conda create -n hydro python=3.10
+conda activate hydro
+```
 
 For default installation, run
 
-    $ pip install .
+```
+pip install .
+```
 
 For a developer installation (includes linting and test libraries), run
 
-    $ pip install -e .[dev]
-    $ pre-commit install
+```
+pip install -e .[dev]
+pre-commit install
+```
 
 If you only plan to run the tests, instead run
 
-    $ pip install -e .[test]
+```
+pip install -e .[test]
+```
 
 ## Documentation
 
-    $ import earthkit.hydro as ekh
+```
+import earthkit.hydro as ekh
+```
 
 - ### Readers
 
-#### ekh.load_river_network(domain,version,...)
+```
+ekh.load_river_network(domain,version,...)
+```
 Loads a precomputed `RiverNetwork`. Current options are
 - domain: "efas", version: "5"
 - domain: "glofas", version: "4"
 
-#### ekh.from_netcdf_d8(filename)
+
+```
+ekh.from_netcdf_d8(filename)
+```
 Creates a `RiverNetwork` from a d8 netcdf format.
 
-#### ekh.from_netcdf_cama(filename, type)
+```
+ekh.from_netcdf_cama(filename, type)
+```
 Creates a `RiverNetwork` from a CAMA netcdf format of type "downxy" or "nextxy".
 
-#### ekh.from_bin_cama(filename, type)
+```
+ekh.from_bin_cama(filename, type)
+```
 Creates a `RiverNetwork` from a CAMA bin format of type "downxy" or "nextxy".
 
 - ### RiverNetwork methods
 
-#### network.accuflux(field, in_place)
+```
+network.accuflux(field)
+```
 Calculates the total accumulated flux down a river network.
 
 <img src="docs/accuflux.gif" width="200px" height="160px" />
 
-#### network.upstream(field)
+```
+network.upstream(field)
+```
 Updates each node with the sum of its upstream nodes.
 
-#### network.downstream(field)
+```
+network.downstream(field)
+```
 Updates each node with its downstream node.
 
-#### network.catchment(field)
+```
+network.catchment(field)
+```
 Finds the catchments (all upstream nodes of specified nodes, with overwriting).
 
 <img src="docs/catchment.gif" width="200px" height="160px" />
 
-#### network.subcatchment(field)
+```
+network.subcatchment(field)
+```
 Finds the subcatchments (all upstream nodes of specified nodes, without overwriting).
 
 <img src="docs/subcatchment.gif" width="200px" height="160px" />
 
-#### network.export(filename)
+```
+network.export(filename)
+```
 Exports the `RiverNetwork` as a joblib pickle.
 
 ## License

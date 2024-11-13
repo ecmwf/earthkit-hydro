@@ -36,18 +36,18 @@ If you only plan to run the tests, instead run
 
 - ### Readers
 
-#### ``` ekh.load_river_network(domain,version,...) ```
+#### ekh.load_river_network(domain,version,...)
 Loads a precomputed `RiverNetwork`. Current options are
 - domain: "efas", version: "5"
 - domain: "glofas", version: "4"
 
-#### ``` ekh.from_netcdf_d8(filename) ```
+#### ekh.from_netcdf_d8(filename)
 Creates a `RiverNetwork` from a d8 netcdf format.
 
-#### ``` ekh.from_netcdf_cama(filename, type) ```
+#### ekh.from_netcdf_cama(filename, type)
 Creates a `RiverNetwork` from a CAMA netcdf format of type "downxy" or "nextxy".
 
-#### ``` ekh.from_netcdf_cama(filename, type) ```
+#### ekh.from_netcdf_cama(filename, type)
 Creates a `RiverNetwork` from a CAMA bin format of type "downxy" or "nextxy".
 
 - ### RiverNetwork methods

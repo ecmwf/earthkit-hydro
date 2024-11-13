@@ -47,7 +47,7 @@ Creates a `RiverNetwork` from a d8 netcdf format.
 #### ekh.from_netcdf_cama(filename, type)
 Creates a `RiverNetwork` from a CAMA netcdf format of type "downxy" or "nextxy".
 
-#### ekh.from_netcdf_cama(filename, type)
+#### ekh.from_bin_cama(filename, type)
 Creates a `RiverNetwork` from a CAMA bin format of type "downxy" or "nextxy".
 
 - ### RiverNetwork methods

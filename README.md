@@ -64,12 +64,12 @@ Updates each node with the sum of its upstream nodes.
 Updates each node with its downstream node.
 
 #### network.catchment(field)
-Finds the catchment (all upstream nodes) of specified nodes, without overwriting.
+Finds the catchment (all upstream nodes) of specified nodes, with overwriting.
 
 <img src="docs/catchment.gif" width="200px" height="160px" />
 
 #### network.subcatchment(field)
-Finds the catchment (all upstream nodes) of specified nodes, with overwriting.
+Finds the catchment (all upstream nodes) of specified nodes, without overwriting.
 
 <img src="docs/subcatchment.gif" width="200px" height="160px" />
 

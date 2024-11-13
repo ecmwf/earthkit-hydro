@@ -55,6 +55,8 @@ Creates a `RiverNetwork` from a CAMA bin format of type "downxy" or "nextxy".
 #### network.accuflux(field, in_place)
 Calculates the total accumulated flux down a river network.
 
+<img src="docs/accuflux.gif" width="200px" height="160px" />
+
 #### network.upstream(field)
 Updates each node with the sum of its upstream nodes.
 
@@ -64,8 +66,12 @@ Updates each node with its downstream node.
 #### network.catchment(field)
 Finds the catchment (all upstream nodes) of specified nodes, without overwriting.
 
+<img src="docs/catchment.gif" width="200px" height="160px" />
+
 #### network.subcatchment(field)
 Finds the catchment (all upstream nodes) of specified nodes, with overwriting.
+
+<img src="docs/subcatchment.gif" width="200px" height="160px" />
 
 #### network.export(filename)
 Exports the `RiverNetwork` as a joblib pickle.

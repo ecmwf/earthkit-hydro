@@ -4,7 +4,7 @@
 
 > This project is in the **BETA** stage of development. Please be aware that interfaces and functionality may change as the project develops. If this software is to be used in operational systems you are **strongly advised to use a released tag in your system configuration**, and you should be willing to accept incoming changes and bug fixes that require adaptations on your part. ECMWF **does use** this software in operations and abides by the same caveats.
 
-**earthkit-hydro** is a computationally efficient library for common hydrological functions
+**earthkit-hydro** is a computationally efficient library for common hydrological functions.
 
 ## Installation
 Clone source code repository
@@ -78,7 +78,7 @@ network.accuflux(field)
 ```
 Calculates the total accumulated flux down a river network.
 
-<img src="docs/accuflux.gif" width="200px" height="160px" />
+<img src="docs/images/accuflux.gif" width="200px" height="160px" />
 
 ```
 network.upstream(field)
@@ -95,14 +95,14 @@ network.catchment(field)
 ```
 Finds the catchments (all upstream nodes of specified nodes, with overwriting).
 
-<img src="docs/catchment.gif" width="200px" height="160px" />
+<img src="docs/images/catchment.gif" width="200px" height="160px" />
 
 ```
 network.subcatchment(field)
 ```
 Finds the subcatchments (all upstream nodes of specified nodes, without overwriting).
 
-<img src="docs/subcatchment.gif" width="200px" height="160px" />
+<img src="docs/images/subcatchment.gif" width="200px" height="160px" />
 
 ```
 network.export(filename)

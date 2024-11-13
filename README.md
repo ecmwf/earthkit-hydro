@@ -49,7 +49,7 @@ import earthkit.hydro as ekh
 - ### Readers
 
 ```
-ekh.load_river_network(domain,version,...)
+ekh.load_river_network(domain="efas",version="5",...)
 ```
 Loads a precomputed `RiverNetwork`. Current options are
 - domain: "efas", version: "5"

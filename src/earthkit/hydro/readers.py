@@ -7,8 +7,8 @@ import tempfile
 
 
 def load_river_network(
-    domain="efas",
-    version="5",
+    domain,
+    version,
     cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
     data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{domain}/{version}/river_network.joblib",
     cache_fname="{ekh_version}_{domain}_{version}.joblib",

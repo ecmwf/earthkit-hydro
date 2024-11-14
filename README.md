@@ -46,13 +46,13 @@ Earthkit-hydro can be imported as following:
 import earthkit.hydro as ekh
 ```
 
-The package contains different ways of constructing or loading a RiverNetwork object. A RiverNetwork object is a representation of a river network on a grid.
+The package contains different ways of constructing or loading a `RiverNetwork` object. A `RiverNetwork` object is a representation of a river network on a grid.
 It can be used to compute basic hydrological functions, such as propagating a scalar along the river network or extract a catchment from the river network.
 
 ### Readers
 
 ```
-ekh.load_river_network(domain="efas",version="5")
+ekh.load_river_network(domain="efas", version="5")
 ```
 Loads a precomputed `RiverNetwork`. Current options are
 - domain: "efas", version: "5"

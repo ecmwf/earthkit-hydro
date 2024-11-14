@@ -3,7 +3,40 @@ import joblib
 
 
 def mask_data(func):
+    """
+    Decorator to mask data based on the shape of the mask attribute of the input.
+
+    Parameters
+    ----------
+    func : callable
+        The function to be wrapped and executed with masking applied.
+
+    Returns
+    -------
+    callable
+        The wrapped function with masking logic applied.
+    """
+
     def wrapper(self, field, *args, **kwargs):
+        """
+        Applies the mask to the input data field before and after calling the wrapped function.
+
+        Parameters
+        ----------
+        self : object
+            The instance of the class calling the method.
+        field : numpy.ndarray
+            The input data field to be processed.
+        *args : tuple
+            Positional arguments passed to the wrapped function.
+        **kwargs : dict
+            Keyword arguments passed to the wrapped function.
+
+        Returns
+        -------
+        numpy.ndarray
+            The processed field, potentially modified in-place or as a copy.
+        """
         if field.shape[-2:] == self.mask.shape:
             in_place = kwargs.get("in_place", False)
             if in_place:
@@ -20,12 +53,44 @@ def mask_data(func):
 
 
 class RiverNetwork:
+    """
+    A class representing a river network for hydrological processing.
+
+    Attributes
+    ----------
+    nodes : numpy.ndarray
+        Array containing the nodes id of the river network.
+    n_nodes : int
+        The number of nodes in the river network.
+    downstream_nodes : numpy.ndarray
+        Array of downstream nodes corresponding to each node.
+    mask : numpy.ndarray
+        A mask indicating the spatial extent of the river network.
+    sinks : numpy.ndarray
+        Nodes with no downstream connections.
+    sources : numpy.ndarray
+        Nodes with no upstream connections.
+    topological_groups : list of numpy.ndarray
+        Groups of nodes sorted in topological order.
+    """
+
     def __init__(self, nodes, downstream, mask) -> None:
+        """
+        Initialises the RiverNetwork class with nodes, downstream connections, and a mask.
+
+        Parameters
+        ----------
+        nodes : numpy.ndarray
+            Array of nodes representing the river network.
+        downstream : numpy.ndarray
+            Array of downstream nodes corresponding to each node.
+        mask : numpy.ndarray
+            Mask indicating the spatial extent of the river network.
+        """
         self.nodes = nodes
         self.n_nodes = len(nodes)
         self.downstream_nodes = downstream
         self.mask = mask
-        # Note: a node with no upstream or downstream is considered both a source and a sink
         self.sinks = self.nodes[self.downstream_nodes == self.n_nodes]  # nodes with no downstreams
         print("finding sources")
         self.sources = self.get_sources()  # nodes with no upstreams
@@ -33,6 +98,14 @@ class RiverNetwork:
         self.topological_groups = self.topological_sort()
 
     def get_sources(self):
+        """
+        Identifies the source nodes in the river network (nodes with no upstream nodes).
+
+        Returns
+        -------
+        numpy.ndarray
+            Array of source nodes.
+        """
         tmp_nodes = self.nodes.copy()
         downstream_no_sinks = self.downstream_nodes[self.downstream_nodes != self.n_nodes]  # get all downstream nodes
         tmp_nodes[downstream_no_sinks] = -1  # downstream nodes that aren't sinks = -1
@@ -40,16 +113,20 @@ class RiverNetwork:
         return inlets
 
     def topological_sort(self):
+        """
+        Performs a topological sorting of the nodes in the river network.
+
+        Returns
+        -------
+        list of numpy.ndarray
+            A list of groups of nodes sorted in topological order.
+        """
         inlets = self.sources
         labels = np.zeros(self.n_nodes, dtype=int)
-
-        # this does a BFS from the sources to find largest distance to each node
         old_sum = -1
         current_sum = 0  # sum of labels
         n = 1  # distance from source
-        while (
-            current_sum > old_sum
-        ):  # sum is monotonic increasing since we only increase labels. Could also do a != check here (is equivalent)
+        while current_sum > old_sum:
             old_sum = current_sum
             inlets = inlets[inlets != self.n_nodes]  # subset to valid nodes
             labels[inlets] = n  # update furthest distance from source
@@ -60,10 +137,22 @@ class RiverNetwork:
                 raise Exception("maximum iterations reached")
         labels[self.sinks] = n  # put all sinks in last group in topological ordering
         groups = self.group_labels(labels)
-
         return groups
 
     def group_labels(self, labels):
+        """
+        Groups nodes by their topological distance labels.
+
+        Parameters
+        ----------
+        labels : numpy.ndarray
+            Array of labels representing the topological distances of nodes.
+
+        Returns
+        -------
+        list of numpy.ndarray
+            A list of subarrays, each containing nodes with the same label.
+        """
         sorted_indices = np.argsort(labels)  # sort by labels
         sorted_array = self.nodes[sorted_indices]
         sorted_labels = labels[sorted_indices]
@@ -73,41 +162,86 @@ class RiverNetwork:
 
     @mask_data
     def accuflux(self, field, in_place=False, operation=np.add):
-        # propagates a field all the way downstream along the river network
+        """
+        Accumulate a field downstream along the river network.
+
+        Parameters
+        ----------
+        field : numpy.ndarray
+            The input field to propagate.
+        in_place : bool, optional
+            If True, modifies the field in-place (default is False).
+        operation : callable, optional
+            The operation to perform when propagating (default is numpy.add).
+
+        Returns
+        -------
+        numpy.ndarray
+            The propagated field.
+        """
         if not in_place:
             field = field.copy()
-        for grouping in self.topological_groups[
-            :-1
-        ]:  # exclude sinks here since they have nowhere to propagate downstream
+        for grouping in self.topological_groups[:-1]:
             operation.at(field, self.downstream_nodes[grouping], field[grouping])
         return field
 
     @mask_data
     def upstream(self, field):
-        # update each node with the sum of its parent (upstream) nodes
+        """
+        Updates each node with the sum of its upstream nodes values.
+
+        Parameters
+        ----------
+        field : numpy.ndarray
+            The input field representing node values.
+
+        Returns
+        -------
+        numpy.ndarray
+            The updated field with upstream contributions.
+        """
         mask = self.downstream_nodes != self.n_nodes  # remove sinks since they have no downstream
         ups = np.zeros(self.n_nodes, dtype=field.dtype)
-        np.add.at(
-            ups, self.downstream_nodes[mask], field[mask]
-        )  # update each downstream node with the sum of its upstream nodes
-        # ups[mask] = None # set sinks to have None as upstream contribution?
+        np.add.at(ups, self.downstream_nodes[mask], field[mask])
         return ups
 
     @mask_data
     def downstream(self, field):
-        # update each node with its children (downstream) node (currently only one downstream node)
+        """
+        Updates each node with its downstream node value.
+
+        Parameters
+        ----------
+        field : numpy.ndarray
+            The input field representing node values.
+
+        Returns
+        -------
+        numpy.ndarray
+            The updated field with downstream values.
+        """
         down = np.zeros(self.n_nodes, dtype=field.dtype)
         mask = self.downstream_nodes != self.n_nodes  # remove sinks
         down[mask] = field[self.downstream_nodes[mask]]
-        # down[~mask] = None # set sinks to have None downstream?
         return down
 
     @mask_data
     def catchment(self, field, overwrite=True):
-        # this always loops over the entire length of the chain
-        # Better would be to do a BFS starting at each of the nodes
-        # but this will be slow in Python
+        """
+        Propagates a field upstream to define catchments.
 
+        Parameters
+        ----------
+        field : numpy.ndarray
+            The input field to propagate.
+        overwrite : bool, optional
+            If True, overwrites existing values (default is True).
+
+        Returns
+        -------
+        numpy.ndarray
+            The propagated catchment field.
+        """
         for group in self.topological_groups[:-1][::-1]:  # exclude sinks and invert topological ordering
             valid_group = group[
                 field[self.downstream_nodes[group]] != 0
@@ -119,7 +253,30 @@ class RiverNetwork:
 
     @mask_data
     def subcatchment(self, field):
+        """
+        Defines subcatchments within the river network.
+
+        Parameters
+        ----------
+        field : numpy.ndarray
+            The input field to propagate.
+
+        Returns
+        -------
+        numpy.ndarray
+            The propagated subcatchment field.
+        """
         return self.catchment(field, overwrite=False)
 
     def export(self, fname="river_network.joblib", compress=1):
+        """
+        Exports the river network instance to a file.
+
+        Parameters
+        ----------
+        fname : str, optional
+            The file name to save the instance (default is "river_network.joblib").
+        compress : int, optional
+            Compression level for joblib (default is 1).
+        """
         joblib.dump(self, fname, compress=compress)

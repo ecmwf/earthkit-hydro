@@ -4,7 +4,7 @@ import joblib
 
 def mask_data(func):
     """
-    Decorator to mask data based on the shape of the mask attribute of the input.
+    Decorator to allow function to accept 2d inputs.
 
     Parameters
     ----------
@@ -14,17 +14,17 @@ def mask_data(func):
     Returns
     -------
     callable
-        The wrapped function with masking logic applied.
+        The wrapped function.
     """
 
     def wrapper(self, field, *args, **kwargs):
         """
-        Applies the mask to the input data field before and after calling the wrapped function.
+        Wrapper masking 2d data fields to allow for processing along the river network, then undoing the masking.
 
         Parameters
         ----------
         self : object
-            The instance of the class calling the method.
+            The RiverNetwork instance calling the method.
         field : numpy.ndarray
             The input data field to be processed.
         *args : tuple
@@ -35,7 +35,7 @@ def mask_data(func):
         Returns
         -------
         numpy.ndarray
-            The processed field, potentially modified in-place or as a copy.
+            The processed field.
         """
         if field.shape[-2:] == self.mask.shape:
             in_place = kwargs.get("in_place", False)
@@ -59,13 +59,13 @@ class RiverNetwork:
     Attributes
     ----------
     nodes : numpy.ndarray
-        Array containing the nodes id of the river network.
+        Array containing the node ids of the river network.
     n_nodes : int
         The number of nodes in the river network.
     downstream_nodes : numpy.ndarray
-        Array of downstream nodes corresponding to each node.
+        Array of downstream node ids corresponding to each node.
     mask : numpy.ndarray
-        A mask indicating the spatial extent of the river network.
+        A mask converting from the domain to the river network.
     sinks : numpy.ndarray
         Nodes with no downstream connections.
     sources : numpy.ndarray
@@ -76,16 +76,16 @@ class RiverNetwork:
 
     def __init__(self, nodes, downstream, mask) -> None:
         """
-        Initialises the RiverNetwork class with nodes, downstream connections, and a mask.
+        Initialises the RiverNetwork with nodes, downstream nodes, and a mask.
 
         Parameters
         ----------
         nodes : numpy.ndarray
-            Array of nodes representing the river network.
+            Array containing the node ids of the river network.
         downstream : numpy.ndarray
-            Array of downstream nodes corresponding to each node.
+            Array of downstream node ids corresponding to each node.
         mask : numpy.ndarray
-            Mask indicating the spatial extent of the river network.
+            A mask converting from the domain to the river network.
         """
         self.nodes = nodes
         self.n_nodes = len(nodes)
@@ -160,6 +160,27 @@ class RiverNetwork:
         subarrays = np.split(sorted_array, indices[1:])  # split array at each first occurrence of a label
         return subarrays
 
+    def get_missing_value(field):
+        """
+        Find the missing value for a field.
+
+        Parameters
+        ----------
+        field: numpy.ndarray
+            The input field to find the missing value for.
+
+        Returns
+        -------
+        float or int
+            The missing value for the field
+        """
+        if isinstance(field.dtype, np.floating):
+            return np.nan
+        elif isinstance(field.dtype, np.integer):
+            return 0
+        else:
+            raise Exception("Input field is neither float nor integer type")
+
     @mask_data
     def accuflux(self, field, in_place=False, operation=np.add):
         """
@@ -186,9 +207,9 @@ class RiverNetwork:
         return field
 
     @mask_data
-    def upstream(self, field):
+    def upstream(self, field, operation=np.add):
         """
-        Updates each node with the sum of its upstream nodes values.
+        Sets each node to be the sum of its upstream nodes values, or a missing value.
 
         Parameters
         ----------
@@ -202,13 +223,13 @@ class RiverNetwork:
         """
         mask = self.downstream_nodes != self.n_nodes  # remove sinks since they have no downstream
         ups = np.zeros(self.n_nodes, dtype=field.dtype)
-        np.add.at(ups, self.downstream_nodes[mask], field[mask])
+        operation.at(ups, self.downstream_nodes[mask], field[mask])
         return ups
 
     @mask_data
-    def downstream(self, field):
+    def downstream(self, field, operation=np.add):
         """
-        Updates each node with its downstream node value.
+        Sets each node to be its downstream node value, or a missing value.
 
         Parameters
         ----------
@@ -228,7 +249,7 @@ class RiverNetwork:
     @mask_data
     def catchment(self, field, overwrite=True):
         """
-        Propagates a field upstream to define catchments.
+        Propagates a field upstream to find catchments.
 
         Parameters
         ----------
@@ -240,7 +261,7 @@ class RiverNetwork:
         Returns
         -------
         numpy.ndarray
-            The propagated catchment field.
+            The catchment field.
         """
         for group in self.topological_groups[:-1][::-1]:  # exclude sinks and invert topological ordering
             valid_group = group[
@@ -254,7 +275,7 @@ class RiverNetwork:
     @mask_data
     def subcatchment(self, field):
         """
-        Defines subcatchments within the river network.
+        Propagates a field upstream to find subcatchments.
 
         Parameters
         ----------

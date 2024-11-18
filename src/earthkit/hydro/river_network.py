@@ -1,6 +1,7 @@
 import numpy as np
 import joblib
 
+
 def get_missing_value(field, mv=None):
     """
     Find the missing value for a field.
@@ -15,23 +16,27 @@ def get_missing_value(field, mv=None):
     float or int
         The missing value for the field
     """
+    print("FIELD DYTYPE", field.dtype, mv)
+    print(isinstance(field, np.floating), isinstance(field, np.integer))
+
     if mv is None:
-        if isinstance(field.dtype, np.floating):
+        if issubclass(field.dtype.type, np.floating):
             return np.nan
-        elif isinstance(field.dtype, np.integer):
+        elif issubclass(field.dtype.type, np.integer):
             return 0
         else:
             raise Exception("Input field is neither float nor integer type")
     else:
-        if isinstance(field.dtype, np.floating):
+        if issubclass(field.dtype.type, np.floating):
             return mv
-        elif isinstance(field.dtype, np.integer):
+        elif issubclass(field.dtype.type, np.integer):
             if np.isfinite(mv):
                 return int(mv)
             else:
                 raise Exception("Integer field cannot accept non-finite missing values")
         else:
             raise Exception("Input field is neither float nor integer type")
+
 
 def mask_data(func):
     """
@@ -74,11 +79,13 @@ def mask_data(func):
                 out_field = field
             else:
                 out_field = np.empty(field.shape)
-            
+
             mv = get_missing_value(field, mv=kwargs.pop("mv", None))
-            if kwargs.get("accept_nans", False) and np.any(np.isnan(field[..., self.mask]) if np.isnan(mv) else field[..., self.mask]==mv):
-                    raise Exception("Error: Missing values present in field.")
-            
+            if kwargs.get("accept_nans", False) and np.any(
+                field[..., self.mask] == mv if np.isfinite(mv) else ~np.isfinite(field[..., self.mask])
+            ):
+                raise Exception("Error: Missing values present in field.")
+
             out_field[..., self.mask] = func(self, field[..., self.mask].T, *args, **kwargs).T
             out_field[..., ~self.mask] = mv
             return out_field

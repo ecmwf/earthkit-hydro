@@ -36,9 +36,9 @@ def get_missing_value(field, mv=None):
             raise Exception("Input field is neither float nor integer type")
 
 
-def check_no_missing(self, field, mv, accept_missing):
+def check_no_missing(field, mv, accept_missing):
     mv = get_missing_value(field, mv=mv)
-    if not accept_missing and np.any(field == mv if np.isnan(mv) else ~np.isnan(field)):
+    if not accept_missing and np.any(field == mv if not np.isnan(mv) else np.isnan(field)):
         raise Exception("Field contains missing values.")
 
 
@@ -82,9 +82,10 @@ def mask_data(func):
             if in_place:
                 out_field = field
             else:
-                out_field = np.empty(field.shape)
+                out_field = np.empty(field.shape, dtype=field.dtype)
 
             mv = get_missing_value(field, mv=kwargs.get("mv"))
+            print(mv)
 
             out_field[..., self.mask] = func(self, field[..., self.mask].T, *args, **kwargs).T
             out_field[..., ~self.mask] = mv
@@ -291,6 +292,10 @@ class RiverNetwork:
         numpy.ndarray
             The catchment field.
         """
+        if not issubclass(field.dtype.type, np.integer):
+            print(field.dtype)
+            raise Exception("Field is not of integer type.")
+
         for group in self.topological_groups[:-1][::-1]:  # exclude sinks and invert topological ordering
             valid_group = group[
                 field[self.downstream_nodes[group]] != 0

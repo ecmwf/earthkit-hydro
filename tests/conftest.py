@@ -198,12 +198,12 @@ def downstream_2():
 
 @fixture
 def catchment_query_field_1():
-    return np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5, 4, 2, 3, 0, 0, 0, 0, 0, 0])
+    return np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5, 4, 2, 3, 0, 0, 0, 0, 0, 0], dtype="int")
 
 
 @fixture
 def catchment_query_field_2():
-    return np.array([4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2, 0, 0])
+    return np.array([4, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 3, 0, 2, 0, 0], dtype="int")
 
 
 @fixture

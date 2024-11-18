@@ -151,7 +151,7 @@ def test_subcatchment_does_not_overwrite(reader, map_name):
 )
 def test_subcatchment_does_not_overwrite_2d(reader, map_name):
     network = read_network(reader, map_name)
-    field = np.zeros(network.mask.shape)
+    field = np.zeros(network.mask.shape, dtype="int")
     field[network.mask] = np.arange(network.n_nodes) + 1
     subcatchment = network.subcatchment(field)
     print(subcatchment)
@@ -191,7 +191,7 @@ def test_subcatchment(reader, map_name, query_field, subcatchment):
 )
 def test_subcatchment_2d(reader, map_name, query_field, subcatchment):
     network = read_network(reader, map_name)
-    field = np.zeros(network.mask.shape)
+    field = np.zeros(network.mask.shape, dtype="int")
     field[network.mask] = query_field
     network_subcatchment = network.subcatchment(field)
     print(subcatchment)
@@ -232,7 +232,7 @@ def test_catchment(reader, map_name, query_field, catchment):
 )
 def test_catchment_2d(reader, map_name, query_field, catchment):
     network = read_network(reader, map_name)
-    field = np.zeros(network.mask.shape)
+    field = np.zeros(network.mask.shape, dtype="int")
     field[network.mask] = query_field
     network_catchment = network.catchment(field)
     print(catchment)

@@ -16,8 +16,6 @@ def get_missing_value(field, mv=None):
     float or int
         The missing value for the field
     """
-    print("FIELD DYTYPE", field.dtype, mv)
-    print(isinstance(field, np.floating), isinstance(field, np.integer))
 
     if mv is None:
         if issubclass(field.dtype.type, np.floating):
@@ -36,6 +34,12 @@ def get_missing_value(field, mv=None):
                 raise Exception("Integer field cannot accept non-finite missing values")
         else:
             raise Exception("Input field is neither float nor integer type")
+
+
+def check_no_missing(self, field, mv, accept_missing):
+    mv = get_missing_value(field, mv=mv)
+    if not accept_missing and np.any(field == mv if np.isnan(mv) else ~np.isnan(field)):
+        raise Exception("Field contains missing values.")
 
 
 def mask_data(func):
@@ -80,11 +84,7 @@ def mask_data(func):
             else:
                 out_field = np.empty(field.shape)
 
-            mv = get_missing_value(field, mv=kwargs.pop("mv", None))
-            if kwargs.get("accept_nans", False) and np.any(
-                field[..., self.mask] == mv if np.isfinite(mv) else ~np.isfinite(field[..., self.mask])
-            ):
-                raise Exception("Error: Missing values present in field.")
+            mv = get_missing_value(field, mv=kwargs.get("mv"))
 
             out_field[..., self.mask] = func(self, field[..., self.mask].T, *args, **kwargs).T
             out_field[..., ~self.mask] = mv
@@ -204,7 +204,7 @@ class RiverNetwork:
         return subarrays
 
     @mask_data
-    def accuflux(self, field, in_place=False, operation=np.add):
+    def accuflux(self, field, in_place=False, operation=np.add, accept_missing=False, mv=None):
         """
         Accumulate a field downstream along the river network.
 
@@ -222,6 +222,8 @@ class RiverNetwork:
         numpy.ndarray
             The propagated field.
         """
+        check_no_missing(field, mv, accept_missing)
+
         if not in_place:
             field = field.copy()
         for grouping in self.topological_groups[:-1]:
@@ -229,7 +231,7 @@ class RiverNetwork:
         return field
 
     @mask_data
-    def upstream(self, field, operation=np.add):
+    def upstream(self, field, operation=np.add, accept_missing=False, mv=None):
         """
         Sets each node to be the sum of its upstream nodes values, or a missing value.
 
@@ -243,13 +245,15 @@ class RiverNetwork:
         numpy.ndarray
             The updated field with upstream contributions.
         """
+        check_no_missing(field, mv, accept_missing)
+
         mask = self.downstream_nodes != self.n_nodes  # remove sinks since they have no downstream
         ups = np.zeros(self.n_nodes, dtype=field.dtype)
         operation.at(ups, self.downstream_nodes[mask], field[mask])
         return ups
 
     @mask_data
-    def downstream(self, field):
+    def downstream(self, field, accept_missing=False, mv=None):
         """
         Sets each node to be its downstream node value, or a missing value.
 
@@ -263,6 +267,8 @@ class RiverNetwork:
         numpy.ndarray
             The updated field with downstream values.
         """
+        check_no_missing(field, mv, accept_missing)
+
         down = np.zeros(self.n_nodes, dtype=field.dtype)
         mask = self.downstream_nodes != self.n_nodes  # remove sinks
         down[mask] = field[self.downstream_nodes[mask]]

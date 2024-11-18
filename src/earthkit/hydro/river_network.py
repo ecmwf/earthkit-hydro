@@ -1,6 +1,37 @@
 import numpy as np
 import joblib
 
+def get_missing_value(field, mv=None):
+    """
+    Find the missing value for a field.
+
+    Parameters
+    ----------
+    field: numpy.ndarray
+        The input field to find the missing value for.
+
+    Returns
+    -------
+    float or int
+        The missing value for the field
+    """
+    if mv is None:
+        if isinstance(field.dtype, np.floating):
+            return np.nan
+        elif isinstance(field.dtype, np.integer):
+            return 0
+        else:
+            raise Exception("Input field is neither float nor integer type")
+    else:
+        if isinstance(field.dtype, np.floating):
+            return mv
+        elif isinstance(field.dtype, np.integer):
+            if np.isfinite(mv):
+                return int(mv)
+            else:
+                raise Exception("Integer field cannot accept non-finite missing values")
+        else:
+            raise Exception("Input field is neither float nor integer type")
 
 def mask_data(func):
     """
@@ -40,12 +71,17 @@ def mask_data(func):
         if field.shape[-2:] == self.mask.shape:
             in_place = kwargs.get("in_place", False)
             if in_place:
-                return func(self, field[..., self.mask].T, *args, **kwargs).T
+                out_field = field
             else:
-                out_field = field.copy()
-                new_field = func(self, field[..., self.mask].T, *args, **kwargs).T
-                out_field[..., self.mask] = new_field
-                return out_field
+                out_field = np.empty(field.shape)
+            
+            mv = get_missing_value(field, mv=kwargs.pop("mv", None))
+            if kwargs.get("accept_nans", False) and np.any(np.isnan(field[..., self.mask]) if np.isnan(mv) else field[..., self.mask]==mv):
+                    raise Exception("Error: Missing values present in field.")
+            
+            out_field[..., self.mask] = func(self, field[..., self.mask].T, *args, **kwargs).T
+            out_field[..., ~self.mask] = mv
+            return out_field
         else:
             return func(self, field.T, *args, **kwargs).T
 
@@ -160,27 +196,6 @@ class RiverNetwork:
         subarrays = np.split(sorted_array, indices[1:])  # split array at each first occurrence of a label
         return subarrays
 
-    def get_missing_value(field):
-        """
-        Find the missing value for a field.
-
-        Parameters
-        ----------
-        field: numpy.ndarray
-            The input field to find the missing value for.
-
-        Returns
-        -------
-        float or int
-            The missing value for the field
-        """
-        if isinstance(field.dtype, np.floating):
-            return np.nan
-        elif isinstance(field.dtype, np.integer):
-            return 0
-        else:
-            raise Exception("Input field is neither float nor integer type")
-
     @mask_data
     def accuflux(self, field, in_place=False, operation=np.add):
         """
@@ -227,7 +242,7 @@ class RiverNetwork:
         return ups
 
     @mask_data
-    def downstream(self, field, operation=np.add):
+    def downstream(self, field):
         """
         Sets each node to be its downstream node value, or a missing value.
 

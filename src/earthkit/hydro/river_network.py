@@ -269,7 +269,7 @@ class RiverNetwork:
             for grouping in self.topological_groups[:-1]:
                 nodes_to_update = self.downstream_nodes[grouping]
                 values_to_add = field[grouping]
-                missing_indices = is_missing(field[grouping], mv)
+                missing_indices = np.logical_or(is_missing(field[grouping], mv), is_missing(field[nodes_to_update], mv))
                 operation.at(field, nodes_to_update, values_to_add)
                 field[nodes_to_update[missing_indices]] = mv
         return field

@@ -1,0 +1,96 @@
+[build-system]
+requires = ["setuptools>=65", "setuptools_scm[toml]>=6.2"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "earthkit-hydro"
+requires-python = ">=3.8"
+authors = [
+    {name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int"},
+]
+maintainers = [
+    {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"},
+]
+description = "Earthkit hydrological module"
+license = {file = "LICENSE"}
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Natural Language :: English",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Scientific/Engineering",
+]
+dynamic = ["version", "readme"]
+
+dependencies = [
+    "numpy",
+    "xarray",
+    "joblib"
+]
+
+[project.urls]
+    repository = "https://github.com/ecmwf/earthkit-hydro"
+    documentation = "https://github.com/ecmwf/earthkit-hydro"
+    issues = "https://github.com/ecmwf/earthkit-hydro/issues"
+
+[project.optional-dependencies]
+    test = [
+        "pytest",
+        "pytest-cases",
+    ]
+    dev = [
+        "pytest",
+        "pytest-cases",
+        "ruff",
+        "pre-commit"
+    ]
+
+# Linting settings
+[tool.ruff]
+line-length = 120
+indent-width = 4
+
+[tool.ruff.format]
+quote-style = "double"
+indent-style = "space"
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = [
+    "F401", # unused imports
+]
+"tests/*" = [
+    "F405", # variable may be undefined, or defined from star imports
+    "F403" # use of wildcard imports
+]
+
+# Testing
+[tool.pytest]
+addopts = "--pdbcls=IPython.terminal.debugger:Pdb"
+testpaths = [
+    "tests",
+]
+
+# Packaging/setuptools options
+[tool.setuptools]
+include-package-data = true
+
+[tool.setuptools.dynamic]
+readme = {file = ["README.md"], content-type = "text/markdown"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+exclude = ["tests"]
+
+[tool.setuptools_scm]
+write_to = "src/earthkit/hydro/_version.py"
+write_to_template = '''
+# Do not change! Do not track in version control!
+__version__ = "{version}"
+'''
+parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs
+fallback_version='0.1'

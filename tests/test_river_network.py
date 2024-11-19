@@ -42,6 +42,25 @@ def test_accuflux(reader, map_name, upstream_points, N):
 
 
 @parametrize(
+    "reader,map_name,input_field,accum_field",
+    [
+        ("d8_ldd", d8_ldd_1, input_field_accuflux_1, field_accuflux_1),
+        ("cama_downxy", cama_downxy_1, input_field_accuflux_1, field_accuflux_1),
+        ("cama_nextxy", cama_nextxy_1, input_field_accuflux_1, field_accuflux_1),
+        ("d8_ldd", d8_ldd_2, input_field_accuflux_2, field_accuflux_2),
+        ("cama_downxy", cama_downxy_2, input_field_accuflux_2, field_accuflux_2),
+        ("cama_nextxy", cama_nextxy_2, input_field_accuflux_2, field_accuflux_2),
+    ],
+)
+def test_accuflux_missing(reader, map_name, input_field, accum_field):
+    network = read_network(reader, map_name)
+    accum = network.accuflux(input_field, mv=-1, accept_missing=True)
+    print(accum)
+    print(accum_field)
+    np.testing.assert_array_equal(accum, accum_field)
+
+
+@parametrize(
     "reader,map_name",
     [
         ("d8_ldd", d8_ldd_1),

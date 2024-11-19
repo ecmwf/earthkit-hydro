@@ -177,6 +177,26 @@ def unit_field_accuflux_2():
 
 
 @fixture
+def input_field_accuflux_1():
+    return np.array([1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1])
+
+
+@fixture
+def input_field_accuflux_2():
+    return np.array([1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16])
+
+
+@fixture
+def field_accuflux_1():
+    return np.array([1, 2, 3, -1, 5, 7, 9, -1, 14, 10, 8, 11, -1, 19, 5, 6, -1, -1, -1, -1])
+
+
+@fixture
+def field_accuflux_2():
+    return np.array([-1, 2, -1, 4, 5, 11, -1, -1, 9, 10, -1, -1, -1, -1, 15, 31])
+
+
+@fixture
 def upstream_1():
     return np.array([0, 0, 0, 0, 0, 1, 2, 7, 5, 0, 6, 7, 31, 25, 0, 0, 70, 19, 20, 0])
 

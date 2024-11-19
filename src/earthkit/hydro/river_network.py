@@ -2,44 +2,74 @@ import numpy as np
 import joblib
 
 
-def get_missing_value(field, mv=None):
+def is_missing(field, mv):
     """
-    Find the missing value for a field.
+    Finds a mask of missing values.
 
     Parameters
     ----------
-    field: numpy.ndarray
-        The input field to find the missing value for.
+    field : numpy.ndarray
+        The scalar input field to check for missing values.
+    mv : scalar
+        The missing value to check for.
 
     Returns
     -------
-    float or int
-        The missing value for the field
+    numpy.ndarray
+        A boolean mask of missing values.
     """
-
-    if mv is None:
-        if issubclass(field.dtype.type, np.floating):
-            return np.nan
-        elif issubclass(field.dtype.type, np.integer):
-            return 0
-        else:
-            raise Exception("Input field is neither float nor integer type")
+    if np.isnan(mv):
+        return np.isnan(field)
+    elif np.isinf(mv):
+        return np.isinf(field)
     else:
-        if issubclass(field.dtype.type, np.floating):
-            return mv
-        elif issubclass(field.dtype.type, np.integer):
-            if np.isfinite(mv):
-                return int(mv)
-            else:
-                raise Exception("Integer field cannot accept non-finite missing values")
+        return field == mv
+
+
+def are_missing_values_present(field, mv):
+    """
+    Finds if missing values are present in a field.
+
+    Parameters
+    ----------
+    field : numpy.ndarray
+        The scalar input field to check for missing values.
+    mv : scalar
+        The missing value to check for.
+
+    Returns
+    -------
+    bool
+        True if missing values are present, False otherwise.
+    """
+    return np.any(is_missing(field, mv))
+
+
+def check_missing(field, mv, accept_missing):
+    """
+    Finds missing values and checks if they are allowed in the input field.
+
+    Parameters
+    ----------
+    field : numpy.ndarray
+        The scalar input field to check for missing values.
+    mv : scalar
+        The missing value to check for.
+    accept_missing : bool
+        If True, missing values are allowed in the input field.
+
+    Returns
+    -------
+    bool
+        True if missing values are present, False otherwise.
+    """
+    missing_values_present = are_missing_values_present(field, mv)
+    if missing_values_present:
+        if not accept_missing:
+            raise ValueError("Missing values present in input field and accept_missing is False.")
         else:
-            raise Exception("Input field is neither float nor integer type")
-
-
-def check_no_missing(field, mv, accept_missing):
-    mv = get_missing_value(field, mv=mv)
-    if not accept_missing and np.any(field == mv if not np.isnan(mv) else np.isnan(field)):
-        raise Exception("Field contains missing values.")
+            print("Warning: missing values present in input field.")
+    return missing_values_present
 
 
 def mask_data(func):
@@ -83,11 +113,12 @@ def mask_data(func):
                 out_field = field
             else:
                 out_field = np.empty(field.shape, dtype=field.dtype)
-
-            mv = get_missing_value(field, mv=kwargs.get("mv"))
-            print(mv)
-
             out_field[..., self.mask] = func(self, field[..., self.mask].T, *args, **kwargs).T
+
+            # gets the missing value from the keyword arguments if it is present, otherwise takes default value of mv from func
+            mv = kwargs.get("mv")
+            mv = mv if mv is not None else func.__defaults__[0]
+
             out_field[..., ~self.mask] = mv
             return out_field
         else:
@@ -109,7 +140,7 @@ class RiverNetwork:
     downstream_nodes : numpy.ndarray
         Array of downstream node ids corresponding to each node.
     mask : numpy.ndarray
-        A mask converting from the domain to the river network.
+        A boolean mask converting from the domain to the river network.
     sinks : numpy.ndarray
         Nodes with no downstream connections.
     sources : numpy.ndarray
@@ -177,8 +208,6 @@ class RiverNetwork:
             inlets = self.downstream_nodes[inlets]
             n += 1
             current_sum = np.sum(labels)
-            if n > 10000:
-                raise Exception("maximum iterations reached")
         labels[self.sinks] = n  # put all sinks in last group in topological ordering
         groups = self.group_labels(labels)
         return groups
@@ -205,7 +234,7 @@ class RiverNetwork:
         return subarrays
 
     @mask_data
-    def accuflux(self, field, in_place=False, operation=np.add, accept_missing=False, mv=None):
+    def accuflux(self, field, mv=np.nan, in_place=False, operation=np.add, accept_missing=False):
         """
         Accumulate a field downstream along the river network.
 
@@ -213,26 +242,40 @@ class RiverNetwork:
         ----------
         field : numpy.ndarray
             The input field to propagate.
+        mv : scalar, optional
+            The missing value to use (default is np.nan).
         in_place : bool, optional
             If True, modifies the field in-place (default is False).
         operation : callable, optional
             The operation to perform when propagating (default is numpy.add).
+        accept_missing : bool, optional
+            If True, missing values are allowed in the input field (default is False).
 
         Returns
         -------
         numpy.ndarray
             The propagated field.
         """
-        check_no_missing(field, mv, accept_missing)
+
+        missing_values_present = check_missing(field, mv, accept_missing)
 
         if not in_place:
             field = field.copy()
-        for grouping in self.topological_groups[:-1]:
-            operation.at(field, self.downstream_nodes[grouping], field[grouping])
+
+        if not missing_values_present:
+            for grouping in self.topological_groups[:-1]:
+                operation.at(field, self.downstream_nodes[grouping], field[grouping])
+        else:
+            for grouping in self.topological_groups[:-1]:
+                nodes_to_update = self.downstream_nodes[grouping]
+                values_to_add = field[grouping]
+                missing_indices = is_missing(field[grouping], mv)
+                operation.at(field, nodes_to_update, values_to_add)
+                field[nodes_to_update[missing_indices]] = mv
         return field
 
     @mask_data
-    def upstream(self, field, operation=np.add, accept_missing=False, mv=None):
+    def upstream(self, field, mv=np.nan, operation=np.add, accept_missing=False):
         """
         Sets each node to be the sum of its upstream nodes values, or a missing value.
 
@@ -240,21 +283,32 @@ class RiverNetwork:
         ----------
         field : numpy.ndarray
             The input field representing node values.
+        mv : scalar, optional
+            The missing value to use (default is np.nan).
+        operation : callable, optional
+            The operation to perform when propagating (default is numpy.add).
+        accept_missing : bool, optional
+            If True, missing values are allowed in the input field (default is False
 
         Returns
         -------
         numpy.ndarray
             The updated field with upstream contributions.
         """
-        check_no_missing(field, mv, accept_missing)
+        missing_values_present = check_missing(field, mv, accept_missing)
 
-        mask = self.downstream_nodes != self.n_nodes  # remove sinks since they have no downstream
         ups = np.zeros(self.n_nodes, dtype=field.dtype)
-        operation.at(ups, self.downstream_nodes[mask], field[mask])
+        mask = self.downstream_nodes != self.n_nodes  # remove sinks since they have no downstream
+        nodes_to_update = self.downstream_nodes[mask]
+        values_to_add = field[mask]
+        operation.at(ups, nodes_to_update, values_to_add)
+        if missing_values_present:
+            missing_indices = is_missing(values_to_add, mv)
+            ups[nodes_to_update[missing_indices]] = mv
         return ups
 
     @mask_data
-    def downstream(self, field, accept_missing=False, mv=None):
+    def downstream(self, field, mv=np.nan, accept_missing=False):
         """
         Sets each node to be its downstream node value, or a missing value.
 
@@ -262,13 +316,17 @@ class RiverNetwork:
         ----------
         field : numpy.ndarray
             The input field representing node values.
+        mv : scalar, optional
+            The missing value to use (default is np.nan).
+        accept_missing : bool, optional
+            If True, missing values are allowed in the input field (default is False).
 
         Returns
         -------
         numpy.ndarray
             The updated field with downstream values.
         """
-        check_no_missing(field, mv, accept_missing)
+        _ = check_missing(field, mv, accept_missing)
 
         down = np.zeros(self.n_nodes, dtype=field.dtype)
         mask = self.downstream_nodes != self.n_nodes  # remove sinks
@@ -276,7 +334,7 @@ class RiverNetwork:
         return down
 
     @mask_data
-    def catchment(self, field, overwrite=True):
+    def catchment(self, field, mv=0, overwrite=True):
         """
         Propagates a field upstream to find catchments.
 
@@ -284,6 +342,8 @@ class RiverNetwork:
         ----------
         field : numpy.ndarray
             The input field to propagate.
+        mv : int, optional
+            The missing value to use (default is 0).
         overwrite : bool, optional
             If True, overwrites existing values (default is True).
 
@@ -292,21 +352,17 @@ class RiverNetwork:
         numpy.ndarray
             The catchment field.
         """
-        if not issubclass(field.dtype.type, np.integer):
-            print(field.dtype)
-            raise Exception("Field is not of integer type.")
-
         for group in self.topological_groups[:-1][::-1]:  # exclude sinks and invert topological ordering
             valid_group = group[
-                field[self.downstream_nodes[group]] != 0
+                ~is_missing(field[self.downstream_nodes[group]], mv)
             ]  # only update nodes where the downstream belongs to a catchment
             if not overwrite:
-                valid_group = valid_group[field[valid_group] == 0]
+                valid_group = valid_group[is_missing(field[valid_group], mv)]
             field[valid_group] = field[self.downstream_nodes[valid_group]]
         return field
 
     @mask_data
-    def subcatchment(self, field):
+    def subcatchment(self, field, mv=0):
         """
         Propagates a field upstream to find subcatchments.
 
@@ -314,13 +370,15 @@ class RiverNetwork:
         ----------
         field : numpy.ndarray
             The input field to propagate.
+        mv : int, optional
+            The missing value to use (default is 0).
 
         Returns
         -------
         numpy.ndarray
             The propagated subcatchment field.
         """
-        return self.catchment(field, overwrite=False)
+        return self.catchment(field, mv=mv, overwrite=False)
 
     def export(self, fname="river_network.joblib", compress=1):
         """

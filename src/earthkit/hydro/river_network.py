@@ -149,7 +149,7 @@ class RiverNetwork:
         Groups of nodes sorted in topological order.
     """
 
-    def __init__(self, nodes, downstream, mask) -> None:
+    def __init__(self, nodes, downstream, mask, sinks=None, sources=None, topological_labels=None) -> None:
         """
         Initialises the RiverNetwork with nodes, downstream nodes, and a mask.
 
@@ -166,11 +166,57 @@ class RiverNetwork:
         self.n_nodes = len(nodes)
         self.downstream_nodes = downstream
         self.mask = mask
-        self.sinks = self.nodes[self.downstream_nodes == self.n_nodes]  # nodes with no downstreams
+        self.sinks = (
+            sinks if sinks is not None else self.nodes[self.downstream_nodes == self.n_nodes]
+        )  # nodes with no downstreams
         print("finding sources")
-        self.sources = self.get_sources()  # nodes with no upstreams
+        self.sources = sources if sources is not None else self.get_sources()  # nodes with no upstreams
         print("topological sorting")
-        self.topological_groups = self.topological_sort()
+        self.topological_labels = (
+            topological_labels if topological_labels is not None else self.compute_topological_labels()
+        )
+        self.topological_groups = self.topological_groups_from_labels()
+
+    def create_subnetwork(self, mask, on_domain=True, recompute=False):
+        """
+        Creates a subnetwork from the river network based on a mask.
+
+        Parameters
+        ----------
+        mask : numpy.ndarray
+            A boolean mask to subset the river network.
+        on_domain : bool, optional
+            If True, the mask is applied to the domain, otherwise it is applied directly to the river network (default is True).
+        recompute : bool, optional
+            If True, recomputes the topological labels for the subnetwork (default is False).
+
+        Returns
+        -------
+        RiverNetwork
+            A subnetwork of the river network.
+        """
+        if on_domain:
+            network_mask = np.logical_and(self.mask, mask)
+            mask = mask[self.mask]
+        else:
+            network_mask = np.full(self.mask.shape, False)
+            temp_mask = np.full(self.n_nodes, False)
+            temp_mask[mask] = True
+            network_mask[self.mask] = temp_mask
+            del temp_mask
+        downstream = self.downstream_nodes[mask].copy()
+        n_nodes = len(downstream)
+        nodes = np.arange(n_nodes)
+        mapping = dict(zip(self.nodes[mask], nodes))
+        downstream = np.vectorize(lambda x: mapping.get(x, n_nodes))(downstream)
+        if not recompute:
+            sinks = nodes[downstream == n_nodes]
+            topological_labels = self.topological_labels[mask]
+            topological_labels[sinks] = self.n_nodes
+
+            return RiverNetwork(nodes, downstream, network_mask, sinks=sinks, topological_labels=topological_labels)
+        else:
+            return RiverNetwork(nodes, downstream, network_mask)
 
     def get_sources(self):
         """
@@ -187,14 +233,14 @@ class RiverNetwork:
         inlets = tmp_nodes[tmp_nodes != -1]  # sources are nodes that are not downstream nodes
         return inlets
 
-    def topological_sort(self):
+    def compute_topological_labels(self):
         """
-        Performs a topological sorting of the nodes in the river network.
+        Finds the topological distance labels for each node in the river network.
 
         Returns
         -------
-        list of numpy.ndarray
-            A list of groups of nodes sorted in topological order.
+        numpy.ndarray
+            Array of topological distance labels for each node.
         """
         inlets = self.sources
         labels = np.zeros(self.n_nodes, dtype=int)
@@ -209,10 +255,9 @@ class RiverNetwork:
             n += 1
             current_sum = np.sum(labels)
         labels[self.sinks] = n  # put all sinks in last group in topological ordering
-        groups = self.group_labels(labels)
-        return groups
+        return labels
 
-    def group_labels(self, labels):
+    def topological_groups_from_labels(self):
         """
         Groups nodes by their topological distance labels.
 
@@ -226,9 +271,9 @@ class RiverNetwork:
         list of numpy.ndarray
             A list of subarrays, each containing nodes with the same label.
         """
-        sorted_indices = np.argsort(labels)  # sort by labels
+        sorted_indices = np.argsort(self.topological_labels)  # sort by labels
         sorted_array = self.nodes[sorted_indices]
-        sorted_labels = labels[sorted_indices]
+        sorted_labels = self.topological_labels[sorted_indices]
         _, indices = np.unique(sorted_labels, return_index=True)  # find index of first occurrence of each label
         subarrays = np.split(sorted_array, indices[1:])  # split array at each first occurrence of a label
         return subarrays

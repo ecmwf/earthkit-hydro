@@ -244,3 +244,25 @@ def catchment_1():
 @fixture
 def catchment_2():
     return np.array([4, 2, 2, 0, 2, 2, 2, 2, 2, 2, 2, 2, 4, 2, 2, 2])
+
+
+# @fixture
+# def mask_2():
+#     return np.array(
+#         [
+#             [True, True, True, True],
+#             [True, True, False, True,],
+#             [True, True, True, True,],
+#             [True, False, True, True,],
+#         ]
+#     )
+
+
+@fixture
+def mask_2():
+    return np.array([True, True, True, True, True, True, False, True, True, True, True, True, True, False, True, True])
+
+
+@fixture
+def masked_unit_accuflux_2():
+    return np.array([2, 1, 2, 1, 1, 2, 3, 1, 1, 3, 6, 1, 1, 2])

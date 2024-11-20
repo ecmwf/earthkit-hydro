@@ -258,3 +258,21 @@ def test_catchment_2d(reader, map_name, query_field, catchment):
     print(network_catchment)
     np.testing.assert_array_equal(network_catchment[network.mask], catchment)
     np.testing.assert_array_equal(network_catchment[~network.mask], 0)
+
+
+@parametrize(
+    "reader,map_name,mask,accuflux",
+    [
+        ("d8_ldd", d8_ldd_2, mask_2, masked_unit_accuflux_2),
+        ("cama_downxy", cama_downxy_2, mask_2, masked_unit_accuflux_2),
+        ("cama_nextxy", cama_nextxy_2, mask_2, masked_unit_accuflux_2),
+    ],
+)
+def test_subnetwork(reader, map_name, mask, accuflux):
+    network = read_network(reader, map_name)
+    network = network.create_subnetwork(mask, on_domain=False)
+    field = np.ones(network.n_nodes)
+    accum = network.accuflux(field)
+    print(accum)
+    print(accuflux)
+    np.testing.assert_array_equal(accum, accuflux)

@@ -169,9 +169,7 @@ class RiverNetwork:
         self.sinks = (
             sinks if sinks is not None else self.nodes[self.downstream_nodes == self.n_nodes]
         )  # nodes with no downstreams
-        print("finding sources")
         self.sources = sources if sources is not None else self.get_sources()  # nodes with no upstreams
-        print("topological sorting")
         self.topological_labels = (
             topological_labels if topological_labels is not None else self.compute_topological_labels()
         )
@@ -213,7 +211,6 @@ class RiverNetwork:
             sinks = nodes[downstream == n_nodes]
             topological_labels = self.topological_labels[mask]
             topological_labels[sinks] = self.n_nodes
-
             return RiverNetwork(nodes, downstream, network_mask, sinks=sinks, topological_labels=topological_labels)
         else:
             return RiverNetwork(nodes, downstream, network_mask)

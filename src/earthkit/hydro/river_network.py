@@ -72,9 +72,9 @@ def check_missing(field, mv, accept_missing):
     return missing_values_present
 
 
-def mask_data(func):
+def mask_2d(func):
     """
-    Decorator to allow function to accept 2d inputs.
+    Decorator to allow function to mask 2d inputs to the river network.
 
     Parameters
     ----------
@@ -108,16 +108,58 @@ def mask_data(func):
             The processed field.
         """
         if field.shape[-2:] == self.mask.shape:
+            return func(self, field[..., self.mask].T, *args, **kwargs)
+        else:
+            return func(self, field.T, *args, **kwargs)
+
+    return wrapper
+
+
+def mask_and_unmask_data(func):
+    """
+    Decorator to convert masked 2d inputs back to 1d.
+
+    Parameters
+    ----------
+    func : callable
+        The function to be wrapped and executed with masking applied.
+
+    Returns
+    -------
+    callable
+        The wrapped function.
+    """
+
+    def wrapper(self, field, *args, **kwargs):
+        """
+        Wrapper masking 2d data fields to allow for processing along the river network, then undoing the masking.
+
+        Parameters
+        ----------
+        self : object
+            The RiverNetwork instance calling the method.
+        field : numpy.ndarray
+            The input data field to be processed.
+        *args : tuple
+            Positional arguments passed to the wrapped function.
+        **kwargs : dict
+            Keyword arguments passed to the wrapped function.
+
+        Returns
+        -------
+        numpy.ndarray
+            The processed field.
+        """
+        # gets the missing value from the keyword arguments if it is present, otherwise takes default value of mv from func
+        mv = kwargs.get("mv")
+        mv = mv if mv is not None else func.__defaults__[0]
+        if field.shape[-2:] == self.mask.shape:
             in_place = kwargs.get("in_place", False)
             if in_place:
                 out_field = field
             else:
                 out_field = np.empty(field.shape, dtype=field.dtype)
             out_field[..., self.mask] = func(self, field[..., self.mask].T, *args, **kwargs).T
-
-            # gets the missing value from the keyword arguments if it is present, otherwise takes default value of mv from func
-            mv = kwargs.get("mv")
-            mv = mv if mv is not None else func.__defaults__[0]
 
             out_field[..., ~self.mask] = mv
             return out_field
@@ -175,16 +217,15 @@ class RiverNetwork:
         )
         self.topological_groups = self.topological_groups_from_labels()
 
-    def create_subnetwork(self, mask, on_domain=True, recompute=False):
+    @mask_2d
+    def create_subnetwork(self, field, recompute=False, *args, **kwargs):
         """
         Creates a subnetwork from the river network based on a mask.
 
         Parameters
         ----------
-        mask : numpy.ndarray
+        field : numpy.ndarray
             A boolean mask to subset the river network.
-        on_domain : bool, optional
-            If True, the mask is applied to the domain, otherwise it is applied directly to the river network (default is True).
         recompute : bool, optional
             If True, recomputes the topological labels for the subnetwork (default is False).
 
@@ -193,27 +234,32 @@ class RiverNetwork:
         RiverNetwork
             A subnetwork of the river network.
         """
-        if on_domain:
-            network_mask = np.logical_and(self.mask, mask)
-            mask = mask[self.mask]
-        else:
-            network_mask = np.full(self.mask.shape, False)
-            temp_mask = np.full(self.n_nodes, False)
-            temp_mask[mask] = True
-            network_mask[self.mask] = temp_mask
-            del temp_mask
-        downstream = self.downstream_nodes[mask].copy()
-        n_nodes = len(downstream)
+        river_network_mask = field
+        valid_indices = np.where(self.mask)
+        print(valid_indices)
+        new_valid_indices = (valid_indices[0][river_network_mask], valid_indices[1][river_network_mask])
+        print(new_valid_indices)
+        domain_mask = self.mask[new_valid_indices]
+
+        downstream_indices = self.downstream_nodes[river_network_mask]
+        n_nodes = len(downstream_indices)  # number of nodes in the subnetwork
+        # create new array of network nodes, setting all nodes not in mask to n_nodes
+        subnetwork_nodes = np.full(self.n_nodes, n_nodes)
+        subnetwork_nodes[river_network_mask] = np.arange(n_nodes)
+        # get downstream nodes in the subnetwork
+        non_sinks = np.where(downstream_indices != self.n_nodes)
+        downstream = np.full(n_nodes, n_nodes)
+        downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
         nodes = np.arange(n_nodes)
-        mapping = dict(zip(self.nodes[mask], nodes))
-        downstream = np.vectorize(lambda x: mapping.get(x, n_nodes))(downstream)
+
         if not recompute:
             sinks = nodes[downstream == n_nodes]
-            topological_labels = self.topological_labels[mask]
+            topological_labels = self.topological_labels[river_network_mask]
             topological_labels[sinks] = self.n_nodes
-            return RiverNetwork(nodes, downstream, network_mask, sinks=sinks, topological_labels=topological_labels)
+
+            return RiverNetwork(nodes, downstream, domain_mask, sinks=sinks, topological_labels=topological_labels)
         else:
-            return RiverNetwork(nodes, downstream, network_mask)
+            return RiverNetwork(nodes, downstream, domain_mask)
 
     def get_sources(self):
         """
@@ -275,7 +321,7 @@ class RiverNetwork:
         subarrays = np.split(sorted_array, indices[1:])  # split array at each first occurrence of a label
         return subarrays
 
-    @mask_data
+    @mask_and_unmask_data
     def accuflux(self, field, mv=np.nan, in_place=False, operation=np.add, accept_missing=False):
         """
         Accumulate a field downstream along the river network.
@@ -316,7 +362,7 @@ class RiverNetwork:
                 field[nodes_to_update[missing_indices]] = mv
         return field
 
-    @mask_data
+    @mask_and_unmask_data
     def upstream(self, field, mv=np.nan, operation=np.add, accept_missing=False):
         """
         Sets each node to be the sum of its upstream nodes values, or a missing value.
@@ -349,7 +395,7 @@ class RiverNetwork:
             ups[nodes_to_update[missing_indices]] = mv
         return ups
 
-    @mask_data
+    @mask_and_unmask_data
     def downstream(self, field, mv=np.nan, accept_missing=False):
         """
         Sets each node to be its downstream node value, or a missing value.
@@ -375,7 +421,7 @@ class RiverNetwork:
         down[mask] = field[self.downstream_nodes[mask]]
         return down
 
-    @mask_data
+    @mask_and_unmask_data
     def catchment(self, field, mv=0, overwrite=True):
         """
         Propagates a field upstream to find catchments.
@@ -403,7 +449,7 @@ class RiverNetwork:
             field[valid_group] = field[self.downstream_nodes[valid_group]]
         return field
 
-    @mask_data
+    @mask_and_unmask_data
     def subcatchment(self, field, mv=0):
         """
         Propagates a field upstream to find subcatchments.

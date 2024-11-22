@@ -236,10 +236,9 @@ class RiverNetwork:
         """
         river_network_mask = field
         valid_indices = np.where(self.mask)
-        print(valid_indices)
         new_valid_indices = (valid_indices[0][river_network_mask], valid_indices[1][river_network_mask])
-        print(new_valid_indices)
-        domain_mask = self.mask[new_valid_indices]
+        domain_mask = np.full(self.mask.shape, False)
+        domain_mask[new_valid_indices] = True
 
         downstream_indices = self.downstream_nodes[river_network_mask]
         n_nodes = len(downstream_indices)  # number of nodes in the subnetwork

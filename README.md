@@ -108,6 +108,11 @@ Finds the subcatchments (all upstream nodes of specified nodes, without overwrit
 <img src="docs/images/subcatchment.gif" width="200px" height="160px" />
 
 ```
+network.create_subnetwork(mask)
+```
+Computes the river subnetwork defined by a mask of the domain.
+
+```
 network.export(filename)
 ```
 Exports the `RiverNetwork` as a joblib pickle.

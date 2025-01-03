@@ -96,7 +96,7 @@ def from_d8(data):
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
-def from_netcdf_cama(filename, type="downxy"):
+def from_netcdf_cama(filename, type="nextxy"):
     """
     Loads a river network from a CaMa-Flood style NetCDF file.
 
@@ -120,7 +120,7 @@ def from_netcdf_cama(filename, type="downxy"):
     data = xr.open_dataset(filename, mask_and_scale=False)
     if type == "downxy":
         dx, dy = data.downx.values, data.downy.values
-        return from_cama_downxy(dx, -dy)
+        return from_cama_downxy(dx, dy)
     elif type == "nextxy":
         x, y = data.nextx.values, data.nexty.values
         return from_cama_nextxy(x, y)
@@ -199,11 +199,11 @@ def from_cama_downxy(dx, dy):
     x_offsets = x_offsets[mask_upstream]
     y_offsets = y_offsets[mask_upstream]
 
-    upstream_indicies, downstream_indices = find_upstream_downstream_indices_from_offsets(
+    upstream_indices, downstream_indices = find_upstream_downstream_indices_from_offsets(
         x_offsets, y_offsets, missing_mask, mask_upstream, shape
     )
 
-    return create_network(upstream_indicies, downstream_indices, missing_mask, shape)
+    return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
 def from_cama_nextxy(x, y):

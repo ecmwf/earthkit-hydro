@@ -57,7 +57,7 @@ ekh.load_river_network(domain="efas", version="5")
 Loads a precomputed `RiverNetwork`. Current options are
 - domain: "efas", version: "5"
 - domain: "glofas", version: "4"
-
+- domain: "cama", version: "01min", "03min", "05min", "06min", "15min" [<sup>1</sup>](#1)
 
 ```
 ekh.from_netcdf_d8(filename)
@@ -116,6 +116,12 @@ Computes the river subnetwork defined by a mask of the domain.
 network.export(filename)
 ```
 Exports the `RiverNetwork` as a joblib pickle.
+
+---
+
+<a id="1"><sup>1</sup></a> 
+CaMa river networks are provided under a CC-BY 4.0 license and original versions are available via CaMa-Flood (Version 4.20; Yamazaki *et al.*, 2011) at [http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/index.html](http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/index.html).  
+    Yamazaki, D., Kanae, S., Kim, H., and Oki, T.: A physically based description of floodplain inundation dynamics in a global river routing model, Water Resour. Res., 47, 1–21, https://doi.org/10.1029/2010WR009726, 2011.
 
 ## License
 

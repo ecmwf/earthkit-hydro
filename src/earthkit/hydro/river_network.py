@@ -466,6 +466,61 @@ class RiverNetwork:
             The propagated subcatchment field.
         """
         return self.catchment(field, mv=mv, overwrite=False)
+    
+    @mask_and_unmask_data
+    def distance(self, field, mv=-1, allow_downstream=True, allow_upstream=True):
+        """
+        Computes the minimum distances to all nodes.
+
+        Parameters
+        ----------
+        field : numpy.ndarray
+            The input field used to calculate distances.
+        mv : int, optional
+            The missing value to use (default is -1).
+        allow_downstream : bool, optional
+            Allow downstream connections to be considered in distance calculation.
+        allow_upstream : bool, optional
+            Allow upstream connections to be considered in distance calculation.
+
+        Returns
+        -------
+        numpy.ndarray
+            The distance field.
+        """
+        
+        # due to assumption of no bifurcations,
+        # distance can be calculated by going downstream,
+        # then going upstream
+        
+        if allow_downstream:
+            for group in self.topological_groups[:-1]:  # exclude sinks
+                missing_downstream = is_missing(field[self.downstream_nodes[group]], mv)
+                missing_current = is_missing(field[group], mv)
+                replace_downstream = group[missing_downstream & ~missing_current]
+                check_shorter = group[~missing_downstream & ~missing_current]
+
+                # replace downstream with upstream + 1 (if downstream missing)
+                field[self.downstream_nodes[replace_downstream]] = np.max(field[replace_downstream]) + 1
+                np.minimum.at(field, self.downstream_nodes[replace_downstream], field[replace_downstream] + 1)
+                # replace downstream with min (downstream, upstream + 1)
+                np.minimum.at(field, self.downstream_nodes[check_shorter], field[check_shorter]+1)
+
+        if allow_upstream:
+            for group in self.topological_groups[:-1][::-1]:  # exclude sinks and invert topological ordering
+                missing_upstream = is_missing(field[group], mv)
+                missing_current = is_missing(field[self.downstream_nodes[group]], mv)
+                replace_upstream = group[missing_upstream &  ~missing_current]
+                check_shorter = group[~missing_upstream & ~missing_current]
+
+                # replace upstream with downstream + 1 (if upstream missing)
+                field[replace_upstream] = np.max(field[self.downstream_nodes[replace_upstream]]) + 1
+                np.minimum.at(field, replace_upstream, field[self.downstream_nodes[replace_upstream]] + 1)
+                # replace upstream with min (upstream, downstream + 1)
+                np.minimum.at(field, check_shorter, field[self.downstream_nodes[check_shorter]]+1)
+
+        return field
+
 
     def export(self, fname="river_network.joblib", compress=1):
         """

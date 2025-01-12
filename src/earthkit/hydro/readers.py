@@ -1,5 +1,4 @@
 import numpy as np
-import xarray as xr
 from .river_network import RiverNetwork
 import joblib
 from .caching import Cache
@@ -58,6 +57,14 @@ def from_netcdf_d8(filename):
     RiverNetwork
         The constructed river network object.
     """
+
+    try:
+        import xarray as xr
+    except:
+        raise ImportError(
+                "Xarray is required for netcdf support.\n"
+                "To install it, run `pip install xarray`"
+            )
     data = xr.open_dataset(filename, mask_and_scale=False)["Band1"].values
     return from_d8(data)
 
@@ -117,6 +124,13 @@ def from_netcdf_cama(filename, type="downxy"):
     Exception
         If an unknown type is specified.
     """
+    try:
+        import xarray as xr
+    except:
+        raise ImportError(
+                "Xarray is required for netcdf support.\n"
+                "To install it, run `pip install xarray`"
+            )
     data = xr.open_dataset(filename, mask_and_scale=False)
     if type == "downxy":
         dx, dy = data.downx.values, data.downy.values

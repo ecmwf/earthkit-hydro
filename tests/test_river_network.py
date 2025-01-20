@@ -71,6 +71,37 @@ def test_accuflux_missing(reader, map_name, input_field, accum_field):
         ("cama_nextxy", cama_nextxy_2),
     ],
 )
+@parametrize("N", range(1))
+def test_accuflux_missing_ND(reader, map_name, N):
+    network = read_network(reader, map_name)
+    extra_dims = [np.random.randint(10) for _ in range(N)]
+    field = np.ones((*extra_dims, network.n_nodes), dtype=int)
+    total_elements = np.prod(field.shape)
+    random_indices = np.random.choice(total_elements, size=int(total_elements * 0.5), replace=False)
+    multi_dim_indices = np.unravel_index(random_indices, field.shape)
+    field[multi_dim_indices] = 2
+
+    accum_use_missing = network.accuflux(field, mv=2, accept_missing=True)
+    accum_with_nans = network.accuflux(np.where(field == 2, np.nan, field), mv=100)
+    accum_with_nans = np.nan_to_num(accum_with_nans, nan=2)
+
+    print(accum_use_missing)
+    print(accum_with_nans)
+
+    np.testing.assert_array_equal(accum_use_missing, accum_with_nans)
+
+
+@parametrize(
+    "reader,map_name",
+    [
+        ("d8_ldd", d8_ldd_1),
+        ("cama_downxy", cama_downxy_1),
+        ("cama_nextxy", cama_nextxy_1),
+        ("d8_ldd", d8_ldd_2),
+        ("cama_downxy", cama_downxy_2),
+        ("cama_nextxy", cama_nextxy_2),
+    ],
+)
 @parametrize("N", range(4))
 def test_accuflux_2d(reader, map_name, N):
     network = read_network(reader, map_name)

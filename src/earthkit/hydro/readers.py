@@ -1,5 +1,5 @@
 import numpy as np
-import xarray as xr
+import earthkit.data as ekd
 from .river_network import RiverNetwork
 import joblib
 from .caching import Cache
@@ -58,7 +58,7 @@ def from_netcdf_d8(filename):
     RiverNetwork
         The constructed river network object.
     """
-    data = xr.open_dataset(filename, mask_and_scale=False)["Band1"].values
+    data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)["Band1"].values
     return from_d8(data)
 
 
@@ -117,7 +117,7 @@ def from_netcdf_cama(filename, type="downxy"):
     Exception
         If an unknown type is specified.
     """
-    data = xr.open_dataset(filename, mask_and_scale=False)
+    data = data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)
     if type == "downxy":
         dx, dy = data.downx.values, data.downy.values
         return from_cama_downxy(dx, -dy)

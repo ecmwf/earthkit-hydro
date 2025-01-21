@@ -1,5 +1,4 @@
 import numpy as np
-import earthkit.data as ekd
 from .river_network import RiverNetwork
 import joblib
 from .caching import Cache
@@ -14,7 +13,7 @@ def load_river_network(
     cache_fname="{ekh_version}_{domain}_{version}.joblib",
 ):
     """
-    Loads a river network from a specified.
+    Loads a precomputed river network.
     A cache is used to store the river network file locally.
 
     Parameters
@@ -43,6 +42,23 @@ def load_river_network(
 
     return network
 
+def load_saved_network(filepath):
+    """
+    Loads a saved river network from file.
+
+    Parameters
+    ----------
+    filepath : str
+        Path to the saved river network joblib file.
+
+    Returns
+    -------
+    RiverNetwork
+        The loaded river network object.
+    """
+    network = joblib.load(filepath)
+    return network
+
 
 def from_netcdf_d8(filename):
     """
@@ -58,6 +74,13 @@ def from_netcdf_d8(filename):
     RiverNetwork
         The constructed river network object.
     """
+    try:
+        import earthkit.data as ekd
+    except:
+        raise ImportError(
+                "earthkit-data is required for netcdf support.\n"
+                "To install it, run `pip install earthkit-data`"
+            )
     data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)["Band1"].values
     return from_d8(data)
 
@@ -96,7 +119,7 @@ def from_d8(data):
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
-def from_netcdf_cama(filename, type="downxy"):
+def from_netcdf_cama(filename, type="nextxy"):
     """
     Loads a river network from a CaMa-Flood style NetCDF file.
 
@@ -117,10 +140,17 @@ def from_netcdf_cama(filename, type="downxy"):
     Exception
         If an unknown type is specified.
     """
-    data = data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)
+    try:
+        import earthkit.data as ekd
+    except:
+        raise ImportError(
+                "earthkit-data is required for netcdf support.\n"
+                "To install it, run `pip install earthkit-data`"
+            )
+    data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)
     if type == "downxy":
         dx, dy = data.downx.values, data.downy.values
-        return from_cama_downxy(dx, -dy)
+        return from_cama_downxy(dx, dy)
     elif type == "nextxy":
         x, y = data.nextx.values, data.nexty.values
         return from_cama_nextxy(x, y)
@@ -199,11 +229,11 @@ def from_cama_downxy(dx, dy):
     x_offsets = x_offsets[mask_upstream]
     y_offsets = y_offsets[mask_upstream]
 
-    upstream_indicies, downstream_indices = find_upstream_downstream_indices_from_offsets(
+    upstream_indices, downstream_indices = find_upstream_downstream_indices_from_offsets(
         x_offsets, y_offsets, missing_mask, mask_upstream, shape
     )
 
-    return create_network(upstream_indicies, downstream_indices, missing_mask, shape)
+    return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
 def from_cama_nextxy(x, y):

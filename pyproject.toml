@@ -29,7 +29,6 @@ dynamic = ["version", "readme"]
 
 dependencies = [
     "numpy",
-    "xarray",
     "joblib"
 ]
 
@@ -39,6 +38,9 @@ dependencies = [
     issues = "https://github.com/ecmwf/earthkit-hydro/issues"
 
 [project.optional-dependencies]
+    netcdf = [
+        "xarray",
+    ]
     test = [
         "pytest",
         "pytest-cases",

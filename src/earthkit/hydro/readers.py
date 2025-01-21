@@ -14,7 +14,7 @@ def load_river_network(
     cache_fname="{ekh_version}_{domain}_{version}.joblib",
 ):
     """
-    Loads a river network from a specified.
+    Loads a precomputed river network.
     A cache is used to store the river network file locally.
 
     Parameters
@@ -41,6 +41,23 @@ def load_river_network(
     filepath = cache(ekh_version=ekh_version[0:3], domain=domain, version=version)
     network = joblib.load(filepath)
 
+    return network
+
+def load_saved_network(filepath):
+    """
+    Loads a saved river network from file.
+
+    Parameters
+    ----------
+    filepath : str
+        Path to the saved river network joblib file.
+
+    Returns
+    -------
+    RiverNetwork
+        The loaded river network object.
+    """
+    network = joblib.load(filepath)
     return network
 
 

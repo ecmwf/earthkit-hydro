@@ -74,15 +74,14 @@ def from_netcdf_d8(filename):
     RiverNetwork
         The constructed river network object.
     """
-
     try:
-        import xarray as xr
+        import earthkit.data as ekd
     except:
         raise ImportError(
-                "Xarray is required for netcdf support.\n"
-                "To install it, run `pip install xarray`"
+                "earthkit-data is required for netcdf support.\n"
+                "To install it, run `pip install earthkit-data`"
             )
-    data = xr.open_dataset(filename, mask_and_scale=False)["Band1"].values
+    data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)["Band1"].values
     return from_d8(data)
 
 
@@ -142,13 +141,13 @@ def from_netcdf_cama(filename, type="nextxy"):
         If an unknown type is specified.
     """
     try:
-        import xarray as xr
+        import earthkit.data as ekd
     except:
         raise ImportError(
-                "Xarray is required for netcdf support.\n"
-                "To install it, run `pip install xarray`"
+                "earthkit-data is required for netcdf support.\n"
+                "To install it, run `pip install earthkit-data`"
             )
-    data = xr.open_dataset(filename, mask_and_scale=False)
+    data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)
     if type == "downxy":
         dx, dy = data.downx.values, data.downy.values
         return from_cama_downxy(dx, dy)

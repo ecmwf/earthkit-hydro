@@ -79,7 +79,7 @@ def from_netcdf_d8(filename):
         import earthkit.data as ekd
     except ModuleNotFoundError:
         raise ModuleNotFoundError(
-            "earthkit-data is required for netcdf support.\n" "To install it, run `pip install earthkit-data`"
+            "earthkit-data is required for netcdf support.\nTo install it, run `pip install earthkit-data`"
         )
     data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)["Band1"].values
     return from_d8(data)
@@ -144,7 +144,7 @@ def from_netcdf_cama(filename, type="nextxy"):
         import earthkit.data as ekd
     except ModuleNotFoundError:
         raise ModuleNotFoundError(
-            "earthkit-data is required for netcdf support.\n" "To install it, run `pip install earthkit-data`"
+            "earthkit-data is required for netcdf support.\nTo install it, run `pip install earthkit-data`"
         )
     data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)
     if type == "downxy":

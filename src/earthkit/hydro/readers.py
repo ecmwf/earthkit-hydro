@@ -42,6 +42,7 @@ def load_river_network(
 
     return network
 
+
 def load_saved_network(filepath):
     """
     Loads a saved river network from file.
@@ -76,11 +77,10 @@ def from_netcdf_d8(filename):
     """
     try:
         import earthkit.data as ekd
-    except:
-        raise ImportError(
-                "earthkit-data is required for netcdf support.\n"
-                "To install it, run `pip install earthkit-data`"
-            )
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            "earthkit-data is required for netcdf support.\n" "To install it, run `pip install earthkit-data`"
+        )
     data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)["Band1"].values
     return from_d8(data)
 
@@ -142,11 +142,10 @@ def from_netcdf_cama(filename, type="nextxy"):
     """
     try:
         import earthkit.data as ekd
-    except:
-        raise ImportError(
-                "earthkit-data is required for netcdf support.\n"
-                "To install it, run `pip install earthkit-data`"
-            )
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            "earthkit-data is required for netcdf support.\n" "To install it, run `pip install earthkit-data`"
+        )
     data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)
     if type == "downxy":
         dx, dy = data.downx.values, data.downy.values

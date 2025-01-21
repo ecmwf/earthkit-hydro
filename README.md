@@ -49,6 +49,11 @@ import earthkit.hydro as ekh
 The package contains different ways of constructing or loading a `RiverNetwork` object. A `RiverNetwork` object is a representation of a river network on a grid.
 It can be used to compute basic hydrological functions, such as propagating a scalar along the river network or extract a catchment from the river network.
 
+### Mathematical Details
+Given a discretisation of a domain i.e. a set of points $\mathcal{D}=\{ (x_i, y_i)\}_{i=1}^N$, a river network is a directed acyclic graph $\mathcal{R}=(V,E)$ where the vertices $V \subseteq \mathcal{D}$. The out-degree of each vertex is at most 1 i.e. each point in the river network points to at most one downstream location.
+
+For ease of notation, if an edge exists from $(x_i, y_i)$ to $(x_j, y_j)$, we write $i \rightarrow j$.
+
 ### Readers
 
 ```
@@ -79,31 +84,36 @@ Creates a `RiverNetwork` from a CaMa-Flood bin format of type "downxy" or "nextx
 ```
 network.accuflux(field)
 ```
-Calculates the total accumulated flux down a river network.
+Calculates the total accumulated flux down a river network.\
+$$v_i^{\prime}=v_i+\sum_{j \rightarrow i}~v_j^{\prime}$$
 
 <img src="docs/images/accuflux.gif" width="200px" height="160px" />
 
 ```
 network.upstream(field)
 ```
-Updates each node with the sum of its upstream nodes.
+Updates each node with the sum of its upstream nodes.\
+$$v_i^{\prime}=\sum_{j \rightarrow i}~v_j$$
 
 ```
 network.downstream(field)
 ```
-Updates each node with its downstream node.
+Updates each node with its downstream node.\
+$$v_i^{\prime} = v_j, ~j ~ \text{s.t.} ~ i \rightarrow j$$
 
 ```
 network.catchment(field)
 ```
-Finds the catchments (all upstream nodes of specified nodes, with overwriting).
+Finds the catchments (all upstream nodes of specified nodes, with overwriting).\
+$$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  v_j^{\prime} \neq 0 ~ \text{else} ~ v_i, ~j ~ \text{s.t.} ~ i \rightarrow j$$
 
 <img src="docs/images/catchment.gif" width="200px" height="160px" />
 
 ```
 network.subcatchment(field)
 ```
-Finds the subcatchments (all upstream nodes of specified nodes, without overwriting).
+Finds the subcatchments (all upstream nodes of specified nodes, without overwriting).\
+$$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} ~ v_j = 0) ~ \text{else} ~ v_i, ~j ~ \text{s.t.} ~ i \rightarrow j$$
 
 <img src="docs/images/subcatchment.gif" width="200px" height="160px" />
 

@@ -379,6 +379,13 @@ class RiverNetwork:
         if not missing_values_present or np.isnan(mv):
             for grouping in self.topological_groups[:-1]:
                 operation.at(field, self.downstream_nodes[grouping], field[grouping])
+        elif len(field.shape) == 2:
+            for grouping in self.topological_groups[:-1]:
+                nodes_to_update = self.downstream_nodes[grouping]
+                values_to_add = field[grouping]
+                missing_indices = np.logical_or(is_missing(values_to_add, mv), is_missing(field[nodes_to_update], mv))
+                operation.at(field, nodes_to_update, values_to_add)
+                field[nodes_to_update[missing_indices]] = mv
         else:
             for grouping in self.topological_groups[:-1]:
                 nodes_to_update = self.downstream_nodes[grouping]
@@ -420,9 +427,12 @@ class RiverNetwork:
         operation.at(ups, nodes_to_update, values_to_add)
         if missing_values_present and not np.isnan(mv):
             missing_indices = is_missing(values_to_add, mv)
-            missing_indices = np.array(np.where(missing_indices))
-            missing_indices[0] = nodes_to_update[missing_indices[0]]
-            ups[tuple(missing_indices)] = mv
+            if len(field.shape) == 2:
+                ups[nodes_to_update[missing_indices]] = mv
+            else:
+                missing_indices = np.array(np.where(missing_indices))
+                missing_indices[0] = nodes_to_update[missing_indices[0]]
+                ups[tuple(missing_indices)] = mv
         return ups
 
     @mask_and_unmask_data

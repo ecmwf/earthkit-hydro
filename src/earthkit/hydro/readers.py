@@ -1,44 +1,70 @@
 import numpy as np
 from .river_network import RiverNetwork
 import joblib
-from .caching import Cache
 import tempfile
+import os
+from urllib.request import urlretrieve
 
 
 def load_river_network(
-    domain,
-    version,
+    name,
+    version=None,
+    use_cache=True,
     cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
-    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{domain}/{version}/river_network.joblib",
-    cache_fname="{ekh_version}_{domain}_{version}.joblib",
+    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{name}/{version}/river_network.joblib",
+    cache_fname="{ekh_version}_{name}_{version}.joblib",
 ):
-    """
-    Loads a precomputed river network.
-    A cache is used to store the river network file locally.
-
-    Parameters
-    ----------
-    domain : str
-        The domain identifier of the river network to load.
-    version : str
-        The version of the river network to load.
-    cache_dir : str, optional
-        Directory to store cached files (default is a temporary directory).
-    data_source : str, optional
-        URL template for downloading the river network file (default is a GitHub URL).
-    cache_fname : str, optional
-        Template for cache file name (default is "{ekh_version}_{domain}_{version}.joblib").
-
-    Returns
-    -------
-    RiverNetwork
-        The loaded river network object.
-    """
     from ._version import __version__ as ekh_version
 
-    cache = Cache(cache_dir, data_source, cache_fname)
-    filepath = cache(ekh_version=ekh_version[0:3], domain=domain, version=version)
-    network = joblib.load(filepath)
+    if not os.path.isdir(cache_dir.format(ekh_version=ekh_version[0:3], name=name, version=version)):
+        os.makedirs(cache_dir.format(ekh_version=ekh_version[0:3], name=name, version=version))
+
+    cache_filepath = os.path.join(
+        cache_dir.format(ekh_version=ekh_version[0:3], name=name.replace("/", ""), version=version),
+        cache_fname.format(ekh_version=ekh_version[0:3], name=name.replace("/", ""), version=version),
+    )
+
+    if not use_cache or not os.path.isfile(cache_filepath):
+        if version is None:
+            if name.endswith(".nc"):
+                try:
+                    import earthkit.data as ekd
+                except ModuleNotFoundError:
+                    raise ModuleNotFoundError(
+                        "earthkit-data is required for netcdf support.\nTo install it, run `pip install earthkit-data`"
+                    )
+                data = ekd.from_source("file", name).to_xarray(mask_and_scale=False)
+                if "Band1" in data:
+                    network = from_d8(data["Band1"].values)
+                elif "nextx" in data:
+                    x, y = data.nextx.values, data.nexty.values
+                    network = from_cama_nextxy(x, y)
+                elif "downx" in data:
+                    dx, dy = data.downx.values, data.downy.values
+                    network = from_cama_downxy(dx, dy)
+                else:
+                    raise OSError("Unknown filetype.")
+            elif name.endswith(".bin"):
+                data = load_bin(name)
+                if np.any((data < 0) & ((data != -9) & (data != -9999)) & (data != -10)):
+                    x = data[:, :, 0].T
+                    y = data[:, :, 1].T
+                    network = from_cama_nextxy(x, y)
+                else:
+                    dx = data[:, :, 0].T
+                    dy = data[:, :, 1].T
+                    network = from_cama_downxy(dx, dy)
+            elif name.endswith(".joblib") or name.endswith(".pkl"):
+                network = joblib.load(name)
+            else:
+                raise OSError("Unknown filetype.")
+            if use_cache:
+                network.export(cache_filepath)
+        else:
+            urlretrieve(data_source.format(ekh_version=ekh_version[0:3], name=name, version=version), cache_filepath)
+            network = joblib.load(cache_filepath)
+    else:
+        network = joblib.load(cache_filepath)
 
     return network
 
@@ -155,6 +181,23 @@ def from_netcdf_cama(filename, type="nextxy"):
         return from_cama_nextxy(x, y)
     else:
         raise Exception("Unknown type")
+
+
+def load_bin(filename):
+    f = open(f"{filename}.ctl", "r")
+    readfile = f.read()
+    f.close()
+    for line in readfile.splitlines():
+        if "xdef" in line:
+            split_line = line.split()
+            assert split_line[0] == "xdef"
+            nx = int(split_line[1])
+        elif "ydef" in line:
+            split_line = line.split()
+            assert split_line[0] == "ydef"
+            ny = int(split_line[1])
+    data = np.fromfile(f"{filename}.bin", dtype=np.int32).reshape((nx, ny, 2), order="F")
+    return data
 
 
 def from_bin_cama(filename, type="downxy"):

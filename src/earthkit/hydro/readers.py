@@ -93,7 +93,7 @@ def load_from_file(filename):
 
 
 def load_cama_binfile(filename):
-    f = open(f"{filename}.ctl", "r")
+    f = open(filename.replace(".bin", ".ctl"), "r")
     readfile = f.read()
     f.close()
     for line in readfile.splitlines():
@@ -105,7 +105,7 @@ def load_cama_binfile(filename):
             split_line = line.split()
             assert split_line[0] == "ydef"
             ny = int(split_line[1])
-    return np.fromfile(f"{filename}.bin", dtype=np.int32).reshape((nx, ny, 2), order="F")
+    return np.fromfile(filename, dtype=np.int32).reshape((nx, ny, 2), order="F")
 
 
 def from_cama_nextxy(x, y):
@@ -137,21 +137,6 @@ def from_cama_downxy(dx, dy):
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
-def find_upstream_downstream_indices_from_offsets(x_offsets, y_offsets, missing_mask, mask_upstream, shape):
-    ny, nx = shape
-    upstream_indices = np.arange(missing_mask.size)[mask_upstream]
-    del mask_upstream
-    x_coords = upstream_indices % nx
-    x_coords = (x_coords + x_offsets) % nx
-    downstream_indices = x_coords
-    del x_coords
-    y_coords = np.floor_divide(upstream_indices, nx)
-    y_coords = (y_coords + y_offsets) % ny
-    downstream_indices += y_coords * nx
-    del y_coords
-    return upstream_indices, downstream_indices
-
-
 def from_d8(data):
     shape = data.shape
     data_flat = data.flatten()
@@ -167,6 +152,21 @@ def from_d8(data):
         x_offsets, y_offsets, missing_mask, mask_upstream, shape
     )
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
+
+
+def find_upstream_downstream_indices_from_offsets(x_offsets, y_offsets, missing_mask, mask_upstream, shape):
+    ny, nx = shape
+    upstream_indices = np.arange(missing_mask.size)[mask_upstream]
+    del mask_upstream
+    x_coords = upstream_indices % nx
+    x_coords = (x_coords + x_offsets) % nx
+    downstream_indices = x_coords
+    del x_coords
+    y_coords = np.floor_divide(upstream_indices, nx)
+    y_coords = (y_coords + y_offsets) % ny
+    downstream_indices += y_coords * nx
+    del y_coords
+    return upstream_indices, downstream_indices
 
 
 def create_network(upstream_indices, downstream_indices, missing_mask, shape):

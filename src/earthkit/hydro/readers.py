@@ -1,111 +1,98 @@
-import numpy as np
-from .river_network import RiverNetwork
 import joblib
 import tempfile
 import os
-from urllib.request import urlretrieve, urlopen
+import numpy as np
+from urllib.request import urlopen
 from io import BytesIO
+from .river_network import RiverNetwork
+from ._version import __version__ as ekh_version
+
+
+# read in only up to second decimal point
+# i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1
+ekh_version = ".".join(ekh_version.split(".")[:2])
+
+
+def cache(func):
+    def wrapper(
+        path,
+        river_format,
+        source="file",
+        use_cache=True,
+        cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
+        cache_fname="{ekh_version}_{hash}.joblib",
+        cache_compression=1,
+    ):
+        if use_cache:
+            hashed_name = hash(path)
+            cache_dir = cache_dir.format(ekh_version=ekh_version[0:3], hash=hashed_name)
+            cache_fname = cache_fname.format(ekh_version=ekh_version[0:3], hash=hashed_name)
+            cache_filepath = os.path.join(cache_dir, cache_fname)
+
+            if os.path.isfile(cache_filepath):
+                print(f"Loading river network from cache ({cache_filepath}).")
+                return joblib.load(cache_filepath)
+            else:
+                print(f"River network not found in cache ({cache_filepath}).")
+                os.makedirs(cache_dir, exist_ok=True)
+        else:
+            print("Cache disabled.")
+
+        network = func(path, river_format, source)
+
+        if use_cache:
+            joblib.dump(network, cache_filepath, compress=cache_compression)
+            print(f"River network loaded, saving to cache ({cache_filepath}).")
+
+        return network
+
+    return wrapper
+
+
+def import_earthkit_or_prompt_install(river_format, source):
+    try:
+        import earthkit.data as ekd
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            f"earthkit-data is required for loading {river_format} from {source}.\nTo install it, run `pip install earthkit-data`"
+        )
+    return ekd
+
+
+@cache
+def create_river_network(path, river_format, source):
+    if river_format == "precomputed":
+        if source == "file":
+            return joblib.load(path)
+        elif source == "url":
+            return joblib.load(BytesIO(urlopen(path).read()))
+        else:
+            ekd = import_earthkit_or_prompt_install(river_format, source)
+            return joblib.load(ekd.from_source(source, path).path)
+    elif river_format == "cama":
+        ekd = import_earthkit_or_prompt_install(river_format, source)
+        data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
+        x, y = data.nextx.values, data.nexty.values
+        return from_cama_nextxy(x, y)
+    elif river_format == "pcr_d8":
+        ekd = import_earthkit_or_prompt_install(river_format, source)
+        data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
+        return from_d8(data["Band1"].values)
+    elif river_format == "esri_d8":
+        raise NotImplementedError(f"River network format {river_format} is not yet implemented.")
+    else:
+        raise OSError(f"Unknown river network format {river_format}.")
 
 
 def load_river_network(
-    name,
-    version=None,
-    use_cache=True,
-    cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
-    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{name}/{version}/river_network.joblib",
-    cache_fname="{ekh_version}_{name}_{version}.joblib",
-    cache_compression=1,
+    domain,
+    version,
+    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{domain}/{version}/river_network.joblib",
+    *args,
+    **kwargs,
 ):
-    from ._version import __version__ as ekh_version
-
-    if version is None:
-        sanitised_name = name.replace("/", "").replace(".", "")
-    else:
-        sanitised_name = name
-
-    if use_cache:
-        cache_dir = cache_dir.format(ekh_version=ekh_version[0:3], name=sanitised_name, version=version)
-        cache_fname = cache_fname.format(ekh_version=ekh_version[0:3], name=sanitised_name, version=version)
-        cache_filepath = os.path.join(cache_dir, cache_fname)
-
-        if os.path.isfile(cache_filepath):
-            print(f"Loading river network from cache ({cache_filepath}).")
-            return joblib.load(cache_filepath)
-        else:
-            print(f"River network not found in cache ({cache_filepath}).")
-            os.makedirs(cache_dir, exist_ok=True)
-            if version is None:
-                network = load_from_file(name)
-                joblib.dump(network, cache_filepath, compress=cache_compression)
-                print(f"River network loaded, saving to cache ({cache_filepath}).")
-                return network
-            else:
-                url = data_source.format(ekh_version=ekh_version[0:3], name=name, version=version)
-                urlretrieve(url, cache_filepath)
-                print(f"River network loaded, saving to cache ({cache_filepath}).")
-                return joblib.load(cache_filepath)
-    else:
-        print("Warning: cache disabled. Loading a river network may be slow.")
-        if version is None:
-            network = load_from_file(name)
-            print("River network loaded.")
-            return network
-        else:
-            url = data_source.format(ekh_version=ekh_version[0:3], name=name, version=version)
-            network = joblib.load(BytesIO(urlopen(url).read()))
-            print("River network loaded.")
-            return network
-
-
-def load_from_file(filename):
-    if filename.endswith(".joblib") or filename.endswith(".pkl") or filename.endswith(".pickle"):
-        return joblib.load(filename)
-    elif filename.endswith(".bin"):
-        data = load_cama_binfile(filename)
-        if np.any((data < 0) & ((data != -9) & (data != -9999)) & (data != -10)):
-            x = data[:, :, 0].T
-            y = data[:, :, 1].T
-            return from_cama_nextxy(x, y)
-        else:
-            dx = data[:, :, 0].T
-            dy = data[:, :, 1].T
-            return from_cama_downxy(dx, dy)
-    elif filename.endswith(".nc") or filename.endswith(".netcdf"):
-        try:
-            import earthkit.data as ekd
-        except ModuleNotFoundError:
-            raise ModuleNotFoundError(
-                "earthkit-data is required for netcdf support.\nTo install it, run `pip install earthkit-data`"
-            )
-        data = ekd.from_source("file", filename).to_xarray(mask_and_scale=False)
-        if "Band1" in data:
-            return from_d8(data["Band1"].values)
-        elif "nextx" in data:
-            x, y = data.nextx.values, data.nexty.values
-            return from_cama_nextxy(x, y)
-        elif "downx" in data:
-            dx, dy = data.downx.values, data.downy.values
-            return from_cama_downxy(dx, dy)
-        else:
-            raise OSError(f"Unknown filetype ({filename}).")
-    else:
-        raise OSError(f"Unknown filetype ({filename}).")
-
-
-def load_cama_binfile(filename):
-    f = open(filename.replace(".bin", ".ctl"), "r")
-    readfile = f.read()
-    f.close()
-    for line in readfile.splitlines():
-        if "xdef" in line:
-            split_line = line.split()
-            assert split_line[0] == "xdef"
-            nx = int(split_line[1])
-        elif "ydef" in line:
-            split_line = line.split()
-            assert split_line[0] == "ydef"
-            ny = int(split_line[1])
-    return np.fromfile(filename, dtype=np.int32).reshape((nx, ny, 2), order="F")
+    uri = data_source.format(ekh_version=ekh_version[0:3], domain=domain, version=version)
+    return create_river_network(uri, "precomputed", "url", *args, **kwargs)
 
 
 def from_cama_nextxy(x, y):

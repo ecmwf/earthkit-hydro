@@ -17,7 +17,7 @@ ekh_version = ".".join(ekh_version.split(".")[:2])
 def cache(func):
     def wrapper(
         path,
-        river_format,
+        river_network_format,
         source="file",
         use_cache=True,
         cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
@@ -39,7 +39,7 @@ def cache(func):
         else:
             print("Cache disabled.")
 
-        network = func(path, river_format, source)
+        network = func(path, river_network_format, source)
 
         if use_cache:
             joblib.dump(network, cache_filepath, compress=cache_compression)
@@ -50,12 +50,12 @@ def cache(func):
     return wrapper
 
 
-def import_earthkit_or_prompt_install(river_format, source):
+def import_earthkit_or_prompt_install(river_network_format, source):
     try:
         import earthkit.data as ekd
     except ModuleNotFoundError:
         raise ModuleNotFoundError(
-            f"earthkit-data is required for loading {river_format} from {source}.\nTo install it, run `pip install earthkit-data`"
+            f"earthkit-data is required for loading river network format {river_network_format} from source {source}.\nTo install it, run `pip install earthkit-data`"
         )
     return ekd
 
@@ -71,38 +71,38 @@ def find_main_var(ds, min_dim=2):
 
 
 @cache
-def create_river_network(path, river_format, source):
-    if river_format == "precomputed":
+def create_river_network(path, river_network_format, source):
+    if river_network_format == "precomputed":
         if source == "file":
             return joblib.load(path)
         elif source == "url":
             return joblib.load(BytesIO(urlopen(path).read()))
         else:
-            raise ValueError(f"Unsupported source for format {river_format}: {source}.")
-    elif river_format == "cama":
-        ekd = import_earthkit_or_prompt_install(river_format, source)
+            raise ValueError(f"Unsupported source for river network format {river_network_format}: {source}.")
+    elif river_network_format == "cama":
+        ekd = import_earthkit_or_prompt_install(river_network_format, source)
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
         x, y = data.nextx.values, data.nexty.values
         return from_cama_nextxy(x, y)
-    elif river_format == "pcr_d8":
-        ekd = import_earthkit_or_prompt_install(river_format, source)
+    elif river_network_format == "pcr_d8":
+        ekd = import_earthkit_or_prompt_install(river_network_format, source)
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
         var_name = find_main_var(data)
         return from_d8(data[var_name].values)
-    elif river_format == "esri_d8":
-        raise NotImplementedError(f"River network format {river_format} is not yet implemented.")
+    elif river_network_format == "esri_d8":
+        raise NotImplementedError(f"River network format {river_network_format} is not yet implemented.")
     else:
-        raise ValueError(f"Unsupported river network format: {river_format}.")
+        raise ValueError(f"Unsupported river network format: {river_network_format}.")
 
 
 def load_river_network(
     domain,
-    network_version,
-    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{domain}/{network_version}/river_network.joblib",
+    river_network_version,
+    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{domain}/{river_network_version}/river_network.joblib",
     *args,
     **kwargs,
 ):
-    uri = data_source.format(ekh_version=ekh_version[0:3], domain=domain, network_version=network_version)
+    uri = data_source.format(ekh_version=ekh_version, domain=domain, river_network_version=river_network_version)
     return create_river_network(uri, "precomputed", "url", *args, **kwargs)
 
 

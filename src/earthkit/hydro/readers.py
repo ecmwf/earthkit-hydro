@@ -25,8 +25,8 @@ def cache(func):
     ):
         if use_cache:
             hashed_name = hash(path)
-            cache_dir = cache_dir.format(ekh_version=ekh_version[0:3], hash=hashed_name)
-            cache_fname = cache_fname.format(ekh_version=ekh_version[0:3], hash=hashed_name)
+            cache_dir = cache_dir.format(ekh_version=ekh_version, hash=hashed_name)
+            cache_fname = cache_fname.format(ekh_version=ekh_version, hash=hashed_name)
             cache_filepath = os.path.join(cache_dir, cache_fname)
 
             if os.path.isfile(cache_filepath):

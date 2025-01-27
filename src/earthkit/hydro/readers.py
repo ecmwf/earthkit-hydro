@@ -60,6 +60,16 @@ def import_earthkit_or_prompt_install(river_format, source):
     return ekd
 
 
+def find_main_var(ds, min_dim=2):
+    variable_names = [k for k in ds.variables if len(ds.variables[k].dims) >= min_dim]
+    if len(variable_names) > 1:
+        raise ValueError("More than one variable of dimension >= {min_dim} in dataset.")
+    elif len(variable_names) == 0:
+        raise ValueError("No variable of dimension >= {min_dim} in dataset.")
+    else:
+        return variable_names[0]
+
+
 @cache
 def create_river_network(path, river_format, source):
     if river_format == "precomputed":
@@ -77,7 +87,8 @@ def create_river_network(path, river_format, source):
     elif river_format == "pcr_d8":
         ekd = import_earthkit_or_prompt_install(river_format, source)
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
-        return from_d8(data["Band1"].values)
+        var_name = find_main_var(data)
+        return from_d8(data[var_name].values)
     elif river_format == "esri_d8":
         raise NotImplementedError(f"River network format {river_format} is not yet implemented.")
     else:

@@ -3,6 +3,7 @@ import tempfile
 import os
 import numpy as np
 from urllib.request import urlopen
+from hashlib import sha256
 from io import BytesIO
 from .river_network import RiverNetwork
 from ._version import __version__ as ekh_version
@@ -24,7 +25,7 @@ def cache(func):
         cache_compression=1,
     ):
         if use_cache:
-            hashed_name = hash(path)
+            hashed_name = sha256(path.encode("utf-8")).hexdigest()
             cache_dir = cache_dir.format(ekh_version=ekh_version, hash=hashed_name)
             cache_fname = cache_fname.format(ekh_version=ekh_version, hash=hashed_name)
             cache_filepath = os.path.join(cache_dir, cache_fname)

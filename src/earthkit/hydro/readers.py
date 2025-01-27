@@ -97,12 +97,12 @@ def create_river_network(path, river_format, source):
 
 def load_river_network(
     domain,
-    version,
-    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{domain}/{version}/river_network.joblib",
+    network_version,
+    data_source="https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/{ekh_version}/{domain}/{network_version}/river_network.joblib",
     *args,
     **kwargs,
 ):
-    uri = data_source.format(ekh_version=ekh_version[0:3], domain=domain, version=version)
+    uri = data_source.format(ekh_version=ekh_version[0:3], domain=domain, network_version=network_version)
     return create_river_network(uri, "precomputed", "url", *args, **kwargs)
 
 

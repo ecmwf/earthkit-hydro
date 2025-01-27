@@ -68,8 +68,7 @@ def create_river_network(path, river_format, source):
         elif source == "url":
             return joblib.load(BytesIO(urlopen(path).read()))
         else:
-            ekd = import_earthkit_or_prompt_install(river_format, source)
-            return joblib.load(ekd.from_source(source, path).path)
+            raise ValueError(f"Unsupported source for format {river_format}: {source}.")
     elif river_format == "cama":
         ekd = import_earthkit_or_prompt_install(river_format, source)
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
@@ -82,7 +81,7 @@ def create_river_network(path, river_format, source):
     elif river_format == "esri_d8":
         raise NotImplementedError(f"River network format {river_format} is not yet implemented.")
     else:
-        raise OSError(f"Unknown river network format {river_format}.")
+        raise ValueError(f"Unsupported river network format: {river_format}.")
 
 
 def load_river_network(

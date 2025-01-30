@@ -34,7 +34,7 @@ def test_accuflux(reader, map_name, upstream_points, N):
     network = read_network(reader, map_name)
     extra_dims = [np.random.randint(10) for _ in range(N)]
     field = np.ones((*extra_dims, network.n_nodes), dtype=int)
-    accum = network.accuflux(field)
+    accum = ekh.accuflux(network, field)
     print(accum[..., :])
     print(upstream_points)
     extended_upstream_points = np.tile(upstream_points, extra_dims + [1])
@@ -54,7 +54,7 @@ def test_accuflux(reader, map_name, upstream_points, N):
 )
 def test_accuflux_missing(reader, map_name, input_field, accum_field):
     network = read_network(reader, map_name)
-    accum = network.accuflux(input_field, mv=-1, accept_missing=True)
+    accum = ekh.accuflux(network, input_field, mv=-1, accept_missing=True)
     print(accum)
     print(accum_field)
     np.testing.assert_array_equal(accum, accum_field)
@@ -76,9 +76,9 @@ def test_accuflux_2d(reader, map_name, N):
     network = read_network(reader, map_name)
     field = np.random.rand(*([np.random.randint(10)] * N), *network.mask.shape)
     field_1d = field[..., network.mask]
-    accum = network.accuflux(field_1d)
-    np.testing.assert_array_equal(accum, network.accuflux(field)[..., network.mask])
-    np.testing.assert_array_equal(network.accuflux(field)[..., ~network.mask], field[..., ~network.mask])
+    accum = ekh.accuflux(network, field_1d)
+    np.testing.assert_array_equal(accum, ekh.accuflux(network, field)[..., network.mask])
+    np.testing.assert_array_equal(ekh.accuflux(network, field)[..., ~network.mask], field[..., ~network.mask])
 
 
 @parametrize(
@@ -113,7 +113,7 @@ def test_downstream_nodes(reader, map_name, downstream_nodes):
 def test_upstream(reader, map_name, upstream):
     network = read_network(reader, map_name)
     field = np.arange(1, network.n_nodes + 1)
-    ups = network.upstream(field)
+    ups = ekh.upstream(network, field)
     np.testing.assert_array_equal(ups, upstream)
 
 
@@ -131,7 +131,7 @@ def test_upstream(reader, map_name, upstream):
 def test_downstream(reader, map_name, downstream):
     network = read_network(reader, map_name)
     field = np.arange(1, network.n_nodes + 1)
-    down = network.downstream(field)
+    down = ekh.downstream(network, field)
     print(down)
     print(downstream)
     np.testing.assert_array_equal(down, downstream)
@@ -151,7 +151,7 @@ def test_downstream(reader, map_name, downstream):
 def test_subcatchment_does_not_overwrite(reader, map_name):
     network = read_network(reader, map_name)
     field = np.arange(network.n_nodes) + 1
-    subcatchment = network.subcatchment(field)
+    subcatchment = ekh.subcatchment(network, field)
     print(subcatchment)
     print(field)
     np.testing.assert_array_equal(subcatchment, field)
@@ -172,7 +172,7 @@ def test_subcatchment_does_not_overwrite_2d(reader, map_name):
     network = read_network(reader, map_name)
     field = np.zeros(network.mask.shape, dtype="int")
     field[network.mask] = np.arange(network.n_nodes) + 1
-    subcatchment = network.subcatchment(field)
+    subcatchment = ekh.subcatchment(network, field)
     print(subcatchment)
     print(field)
     np.testing.assert_array_equal(subcatchment, field)
@@ -191,7 +191,7 @@ def test_subcatchment_does_not_overwrite_2d(reader, map_name):
 )
 def test_subcatchment(reader, map_name, query_field, subcatchment):
     network = read_network(reader, map_name)
-    network_subcatchment = network.subcatchment(query_field)
+    network_subcatchment = ekh.subcatchment(network, query_field)
     print(subcatchment)
     print(network_subcatchment)
     np.testing.assert_array_equal(network_subcatchment, subcatchment)
@@ -212,7 +212,7 @@ def test_subcatchment_2d(reader, map_name, query_field, subcatchment):
     network = read_network(reader, map_name)
     field = np.zeros(network.mask.shape, dtype="int")
     field[network.mask] = query_field
-    network_subcatchment = network.subcatchment(field)
+    network_subcatchment = ekh.subcatchment(network, field)
     print(subcatchment)
     print(network_subcatchment)
     np.testing.assert_array_equal(network_subcatchment[network.mask], subcatchment)
@@ -232,7 +232,7 @@ def test_subcatchment_2d(reader, map_name, query_field, subcatchment):
 )
 def test_catchment(reader, map_name, query_field, catchment):
     network = read_network(reader, map_name)
-    network_catchment = network.catchment(query_field)
+    network_catchment = ekh.catchment(network, query_field)
     print(catchment)
     print(network_catchment)
     np.testing.assert_array_equal(network_catchment, catchment)
@@ -253,7 +253,7 @@ def test_catchment_2d(reader, map_name, query_field, catchment):
     network = read_network(reader, map_name)
     field = np.zeros(network.mask.shape, dtype="int")
     field[network.mask] = query_field
-    network_catchment = network.catchment(field)
+    network_catchment = ekh.catchment(network, field)
     print(catchment)
     print(network_catchment)
     np.testing.assert_array_equal(network_catchment[network.mask], catchment)
@@ -272,7 +272,7 @@ def test_subnetwork(reader, map_name, mask, accuflux):
     network = read_network(reader, map_name)
     network = network.create_subnetwork(mask)
     field = np.ones(network.n_nodes)
-    accum = network.accuflux(field)
+    accum = ekh.accuflux(network, field)
     print(accum)
     print(accuflux)
     np.testing.assert_array_equal(accum, accuflux)

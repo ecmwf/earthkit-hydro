@@ -270,7 +270,7 @@ def test_catchment_2d(reader, map_name, query_field, catchment):
 )
 def test_subnetwork(reader, map_name, mask, accuflux):
     network = read_network(reader, map_name)
-    network = network.create_subnetwork(mask, on_domain=False)
+    network = network.create_subnetwork(mask)
     field = np.ones(network.n_nodes)
     accum = network.accuflux(field)
     print(accum)

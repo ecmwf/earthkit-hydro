@@ -1,18 +1,16 @@
 import numpy as np
 import earthkit.hydro as ekh
-
-# import pytest
 from pytest_cases import parametrize
 from conftest import *
 
 
 def read_network(reader, map_name):
     if "d8_ldd" in reader:
-        network = from_d8(map_name)
+        network = ekh.from_d8(map_name)
     elif "cama_downxy" in reader:
-        network = from_cama_downxy(*map_name)
+        network = ekh.from_cama_downxy(*map_name)
     elif "cama_nextxy" in reader:
-        network = from_cama_nextxy(*map_name)
+        network = ekh.from_cama_nextxy(*map_name)
     else:
         raise Exception("Unknown map type")
     return network

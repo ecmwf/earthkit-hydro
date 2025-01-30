@@ -46,4 +46,4 @@ def subcatchment(river_network, field, mv=0):
     numpy.ndarray
         The propagated subcatchment field.
     """
-    return river_network.catchment(field, mv=mv, overwrite=False)
+    return catchment(river_network, field, mv=mv, overwrite=False)

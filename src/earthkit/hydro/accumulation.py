@@ -3,7 +3,7 @@ from .utils import mask_and_unmask_data, check_missing, is_missing
 
 
 @mask_and_unmask_data
-def accuflux(river_network, field, mv=np.nan, in_place=False, operation=np.add, accept_missing=False):
+def accumulate_downstream(river_network, field, mv=np.nan, in_place=False, operation=np.add, accept_missing=False):
     """
     Accumulate a field downstream along the river network.
 
@@ -45,7 +45,7 @@ def accuflux(river_network, field, mv=np.nan, in_place=False, operation=np.add, 
 
 
 @mask_and_unmask_data
-def upstream(river_network, field, mv=np.nan, operation=np.add, accept_missing=False):
+def move_downstream(river_network, field, mv=np.nan, operation=np.add, accept_missing=False):
     """
     Sets each node to be the sum of its upstream nodes values, or a missing value.
 
@@ -79,7 +79,7 @@ def upstream(river_network, field, mv=np.nan, operation=np.add, accept_missing=F
 
 
 @mask_and_unmask_data
-def downstream(river_network, field, mv=np.nan, accept_missing=False):
+def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
     """
     Sets each node to be its downstream node value, or a missing value.
 

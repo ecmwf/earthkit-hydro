@@ -2,7 +2,7 @@ from .utils import mask_and_unmask_data, is_missing
 
 
 @mask_and_unmask_data
-def catchment(river_network, field, mv=0, overwrite=True):
+def find_catchments(river_network, field, mv=0, overwrite=True):
     """
     Propagates a field upstream to find catchments.
 
@@ -30,7 +30,7 @@ def catchment(river_network, field, mv=0, overwrite=True):
     return field
 
 
-def subcatchment(river_network, field, mv=0):
+def find_subcatchments(river_network, field, mv=0):
     """
     Propagates a field upstream to find subcatchments.
 
@@ -46,4 +46,4 @@ def subcatchment(river_network, field, mv=0):
     numpy.ndarray
         The propagated subcatchment field.
     """
-    return catchment(river_network, field, mv=mv, overwrite=False)
+    return find_catchments(river_network, field, mv=mv, overwrite=False)

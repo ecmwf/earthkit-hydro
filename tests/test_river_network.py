@@ -1,5 +1,5 @@
 import numpy as np
-from earthkit.hydro import from_d8, from_cama_downxy, from_cama_nextxy
+import earthkit.hydro as ekh
 
 # import pytest
 from pytest_cases import parametrize

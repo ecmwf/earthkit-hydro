@@ -1,49 +1,34 @@
-from .utils import mask_and_unmask_data, is_missing
-
+from .core import flow
+from .utils import mask_and_unmask_data
+from ._catchment import _find_catchments_2D, _find_catchments_ND
+import numpy as np
 
 @mask_and_unmask_data
-def find_catchments(river_network, field, mv=0, overwrite=True):
-    """
-    Propagates a field upstream to find catchments.
+def find_catchments(river_network, field, mv=0, in_place=False):
+    if not in_place:
+        field = field.copy()
 
-    Parameters
-    ----------
-    field : numpy.ndarray
-        The input field to propagate.
-    mv : int, optional
-        The missing value to use (default is 0).
-    overwrite : bool, optional
-        If True, overwrites existing values (default is True).
+    if len(field.shape)==1:
+        op = _find_catchments_2D
+    else:
+        op = _find_catchments_ND
+    
+    def operation(river_network, field, grouping, mv):
+        return op(river_network, field, grouping, mv, overwrite=True)
 
-    Returns
-    -------
-    numpy.ndarray
-        The catchment field.
-    """
-    for group in river_network.topological_groups[:-1][::-1]:  # exclude sinks and invert topological ordering
-        valid_group = group[
-            ~is_missing(field[river_network.downstream_nodes[group]], mv)
-        ]  # only update nodes where the downstream belongs to a catchment
-        if not overwrite:
-            valid_group = valid_group[is_missing(field[valid_group], mv)]
-        field[valid_group] = field[river_network.downstream_nodes[valid_group]]
-    return field
+    flow(river_network, field, True, operation, mv)
 
+@mask_and_unmask_data
+def find_subcatchments(river_network, field, mv=0, in_place=False):
+    if not in_place:
+        field = field.copy()
 
-def find_subcatchments(river_network, field, mv=0):
-    """
-    Propagates a field upstream to find subcatchments.
+    if len(field.shape)==1:
+        op = _find_catchments_2D
+    else:
+        op = _find_catchments_ND
+    
+    def operation(river_network, field, grouping, mv):
+        return op(river_network, field, grouping, mv, overwrite=False)
 
-    Parameters
-    ----------
-    field : numpy.ndarray
-        The input field to propagate.
-    mv : int, optional
-        The missing value to use (default is 0).
-
-    Returns
-    -------
-    numpy.ndarray
-        The propagated subcatchment field.
-    """
-    return find_catchments(river_network, field, mv=mv, overwrite=False)
+    flow(river_network, field, True, operation, mv)

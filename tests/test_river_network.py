@@ -32,7 +32,7 @@ def test_accumulate_downstream(reader, map_name, upstream_points, N):
     network = read_network(reader, map_name)
     extra_dims = [np.random.randint(10) for _ in range(N)]
     field = np.ones((*extra_dims, network.n_nodes), dtype=int)
-    accum = ekh.accumulate_downstream(network, field)
+    accum = ekh.flow_downstream(network, field)
     print(accum[..., :])
     print(upstream_points)
     extended_upstream_points = np.tile(upstream_points, extra_dims + [1])
@@ -52,7 +52,7 @@ def test_accumulate_downstream(reader, map_name, upstream_points, N):
 )
 def test_accumulate_downstream_missing(reader, map_name, input_field, accum_field):
     network = read_network(reader, map_name)
-    accum = ekh.accumulate_downstream(network, input_field, mv=-1, accept_missing=True)
+    accum = ekh.flow_downstream(network, input_field, mv=-1, accept_missing=True)
     print(accum)
     print(accum_field)
     np.testing.assert_array_equal(accum, accum_field)
@@ -74,10 +74,10 @@ def test_accumulate_downstream_2d(reader, map_name, N):
     network = read_network(reader, map_name)
     field = np.random.rand(*([np.random.randint(10)] * N), *network.mask.shape)
     field_1d = field[..., network.mask]
-    accum = ekh.accumulate_downstream(network, field_1d)
+    accum = ekh.flow_downstream(network, field_1d)
     np.testing.assert_array_equal(accum, ekh.accumulate_downstream(network, field)[..., network.mask])
     np.testing.assert_array_equal(
-        ekh.accumulate_downstream(network, field)[..., ~network.mask], field[..., ~network.mask]
+        ekh.flow_downstream(network, field)[..., ~network.mask], field[..., ~network.mask]
     )
 
 

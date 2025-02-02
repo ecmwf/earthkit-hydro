@@ -1,5 +1,6 @@
 import numpy as np
-from utils import is_missing
+from .utils import is_missing
+
 
 def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
     valid_group = grouping[
@@ -8,6 +9,7 @@ def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
     if not overwrite:
         valid_group = valid_group[is_missing(field[valid_group], mv)]
     field[valid_group] = field[river_network.downstream_nodes[valid_group]]
+
 
 def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
     valid_mask = ~is_missing(field[river_network.downstream_nodes[grouping]], mv)

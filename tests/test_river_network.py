@@ -75,10 +75,8 @@ def test_accumulate_downstream_2d(reader, map_name, N):
     field = np.random.rand(*([np.random.randint(10)] * N), *network.mask.shape)
     field_1d = field[..., network.mask]
     accum = ekh.flow_downstream(network, field_1d)
-    np.testing.assert_array_equal(accum, ekh.accumulate_downstream(network, field)[..., network.mask])
-    np.testing.assert_array_equal(
-        ekh.flow_downstream(network, field)[..., ~network.mask], field[..., ~network.mask]
-    )
+    np.testing.assert_array_equal(accum, ekh.flow_downstream(network, field)[..., network.mask])
+    np.testing.assert_array_equal(ekh.flow_downstream(network, field)[..., ~network.mask], field[..., ~network.mask])
 
 
 @parametrize(
@@ -272,7 +270,7 @@ def test_subnetwork(reader, map_name, mask, accumulate_downstream):
     network = read_network(reader, map_name)
     network = network.create_subnetwork(mask)
     field = np.ones(network.n_nodes)
-    accum = ekh.accumulate_downstream(network, field)
+    accum = ekh.flow_downstream(network, field)
     print(accum)
     print(accumulate_downstream)
     np.testing.assert_array_equal(accum, accumulate_downstream)

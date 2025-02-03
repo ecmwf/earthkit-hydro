@@ -1,6 +1,7 @@
 import numpy as np
 from .utils import mask_and_unmask_data, check_missing, is_missing
 
+
 @mask_and_unmask_data
 def move_downstream(river_network, field, mv=np.nan, ufunc=np.add, accept_missing=False):
     """
@@ -31,7 +32,7 @@ def move_downstream(river_network, field, mv=np.nan, ufunc=np.add, accept_missin
     ufunc.at(ups, nodes_to_update, values_to_add)
     if missing_values_present:
         missing_indices = is_missing(values_to_add, mv)
-        if len(field.shape)==1:
+        if len(field.shape) == 1:
             ups[nodes_to_update[missing_indices]] = mv
         else:
             missing_indices = np.array(np.where(missing_indices))

@@ -15,7 +15,7 @@ def flow_downstream(river_network, field, mv=np.nan, in_place=False, ufunc=np.ad
     if not in_place:
         field = field.copy()
 
-    if not missing_values_present:
+    if not missing_values_present or np.isnan(mv):
         op = _ufunc_to_downstream
     else:
         if len(field.shape) == 1:

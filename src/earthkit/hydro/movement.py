@@ -30,7 +30,7 @@ def move_downstream(river_network, field, mv=np.nan, ufunc=np.add, accept_missin
     nodes_to_update = river_network.downstream_nodes[mask]
     values_to_add = field[mask]
     ufunc.at(ups, nodes_to_update, values_to_add)
-    if missing_values_present:
+    if missing_values_present and not np.isnan(mv):
         missing_indices = is_missing(values_to_add, mv)
         if len(field.shape) == 1:
             ups[nodes_to_update[missing_indices]] = mv

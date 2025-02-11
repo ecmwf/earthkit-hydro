@@ -10,6 +10,29 @@ from .core import flow
 
 @mask_and_unmask_data
 def flow_downstream(river_network, field, mv=np.nan, in_place=False, ufunc=np.add, accept_missing=False):
+    """
+    Accumulates field values downstream.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    field : numpy.ndarray
+        The input field.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+    in_place : bool, optional
+        If True, modifies the input field in place. Default is False.
+    ufunc : numpy.ufunc, optional
+        The universal function (ufunc) to use for accumulation. Default is np.add.
+    accept_missing : bool, optional
+        If True, accepts missing values in the field. Default is False.
+    Returns
+    -------
+    numpy.ndarray
+        The field values accumulated downstream.
+    """
+
     missing_values_present = check_missing(field, mv, accept_missing)
 
     if not in_place:

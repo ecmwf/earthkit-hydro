@@ -21,6 +21,8 @@ class RiverNetwork:
         Nodes with no downstream connections.
     sources : numpy.ndarray
         Nodes with no upstream connections.
+    topological_labels : numpy.ndarray
+        A topological group label for each node.
     topological_groups : list of numpy.ndarray
         Groups of nodes sorted in topological order.
     """
@@ -152,7 +154,7 @@ class RiverNetwork:
         joblib.dump(self, fpath, compress=compression)
 
     @mask_2d
-    def create_subnetwork(river_network, field, recompute=False):
+    def create_subnetwork(self, field, recompute=False):
         """
         Creates a subnetwork from the river network based on a mask.
 
@@ -169,26 +171,26 @@ class RiverNetwork:
             A subnetwork of the river network.
         """
         river_network_mask = field
-        valid_indices = np.where(river_network.mask)
+        valid_indices = np.where(self.mask)
         new_valid_indices = (valid_indices[0][river_network_mask], valid_indices[1][river_network_mask])
-        domain_mask = np.full(river_network.mask.shape, False)
+        domain_mask = np.full(self.mask.shape, False)
         domain_mask[new_valid_indices] = True
 
-        downstream_indices = river_network.downstream_nodes[river_network_mask]
+        downstream_indices = self.downstream_nodes[river_network_mask]
         n_nodes = len(downstream_indices)  # number of nodes in the subnetwork
         # create new array of network nodes, setting all nodes not in mask to n_nodes
-        subnetwork_nodes = np.full(river_network.n_nodes, n_nodes)
+        subnetwork_nodes = np.full(self.n_nodes, n_nodes)
         subnetwork_nodes[river_network_mask] = np.arange(n_nodes)
         # get downstream nodes in the subnetwork
-        non_sinks = np.where(downstream_indices != river_network.n_nodes)
+        non_sinks = np.where(downstream_indices != self.n_nodes)
         downstream = np.full(n_nodes, n_nodes)
         downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
         nodes = np.arange(n_nodes)
 
         if not recompute:
             sinks = nodes[downstream == n_nodes]
-            topological_labels = river_network.topological_labels[river_network_mask]
-            topological_labels[sinks] = river_network.n_nodes
+            topological_labels = self.topological_labels[river_network_mask]
+            topological_labels[sinks] = self.n_nodes
 
             return RiverNetwork(nodes, downstream, domain_mask, sinks=sinks, topological_labels=topological_labels)
         else:

@@ -110,12 +110,12 @@ $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} 
 <img src="docs/images/subcatchment.gif" width="200px" height="160px" />
 
 ```
-network.create_subnetwork(field)
+river_network.create_subnetwork(field)
 ```
 Computes the river subnetwork defined by a field mask of the domain.
 
 ```
-network.export(filename)
+river_network.export(filename)
 ```
 Exports the `RiverNetwork` as a joblib pickle.
 

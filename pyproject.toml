@@ -9,9 +9,10 @@ authors = [
     {name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int"},
 ]
 maintainers = [
+    {name = "Oisín M. Morrison", email = "oisin.morrison@ecmwf.int"},
     {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"},
 ]
-description = "Earthkit hydrological module"
+description = "A Python library for common hydrological functions"
 license = {file = "LICENSE"}
 classifiers = [
     "Development Status :: 4 - Beta",
@@ -19,10 +20,13 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
     "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
     "Topic :: Scientific/Engineering",
 ]
 dynamic = ["version", "readme"]
@@ -38,7 +42,7 @@ dependencies = [
     issues = "https://github.com/ecmwf/earthkit-hydro/issues"
 
 [project.optional-dependencies]
-    netcdf = [
+    readers = [
         "earthkit-data",
     ]
     test = [

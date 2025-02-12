@@ -65,24 +65,16 @@ Loads a precomputed `RiverNetwork`. Current options are
 
 
 ```
-ekh.from_netcdf_d8(filename)
+ekh.create_river_network(path, river_network_format, source)
 ```
-Creates a `RiverNetwork` from a D8 (PCRaster LDD convention) NetCDF format.
+Creates a `RiverNetwork`. Current options are
+- river_network_format: "esri_d8", "pcr_d8", "cama" or "precomputed"
+- source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html)
+
+### Methods
 
 ```
-ekh.from_netcdf_cama(filename, type)
-```
-Creates a `RiverNetwork` from a CaMa-Flood NetCDF format of type "downxy" or "nextxy".
-
-```
-ekh.from_bin_cama(filename, type)
-```
-Creates a `RiverNetwork` from a CaMa-Flood bin format of type "downxy" or "nextxy".
-
-### RiverNetwork methods
-
-```
-network.accuflux(field)
+ekh.flow_downstream(river_network, field)
 ```
 Calculates the total accumulated flux down a river network.\
 $$v_i^{\prime}=v_i+\sum_{j \rightarrow i}~v_j^{\prime}$$
@@ -90,19 +82,19 @@ $$v_i^{\prime}=v_i+\sum_{j \rightarrow i}~v_j^{\prime}$$
 <img src="docs/images/accuflux.gif" width="200px" height="160px" />
 
 ```
-network.upstream(field)
+ekh.move_downstream(river_network, field)
 ```
 Updates each node with the sum of its upstream nodes.\
 $$v_i^{\prime}=\sum_{j \rightarrow i}~v_j$$
 
 ```
-network.downstream(field)
+ekh.move_upstream(river_network, field)
 ```
 Updates each node with its downstream node.\
 $$v_i^{\prime} = v_j, ~j ~ \text{s.t.} ~ i \rightarrow j$$
 
 ```
-network.catchment(field)
+ekh.find_catchments(river_network, field)
 ```
 Finds the catchments (all upstream nodes of specified nodes, with overwriting).\
 $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  v_j^{\prime} \neq 0 ~ \text{else} ~ v_i, ~j ~ \text{s.t.} ~ i \rightarrow j$$
@@ -110,7 +102,7 @@ $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  v_j^{\prime} \neq 0 ~ \text{else} 
 <img src="docs/images/catchment.gif" width="200px" height="160px" />
 
 ```
-network.subcatchment(field)
+ekh.find_subcatchments(river_network, field)
 ```
 Finds the subcatchments (all upstream nodes of specified nodes, without overwriting).\
 $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} ~ v_j = 0) ~ \text{else} ~ v_i, ~j ~ \text{s.t.} ~ i \rightarrow j$$
@@ -118,9 +110,9 @@ $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} 
 <img src="docs/images/subcatchment.gif" width="200px" height="160px" />
 
 ```
-network.create_subnetwork(mask)
+network.create_subnetwork(field)
 ```
-Computes the river subnetwork defined by a mask of the domain.
+Computes the river subnetwork defined by a field mask of the domain.
 
 ```
 network.export(filename)

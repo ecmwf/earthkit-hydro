@@ -1,6 +1,7 @@
 import numpy as np
-from .utils import mask_and_unmask_data, check_missing, is_missing
+
 from .core import flow
+from .utils import check_missing, is_missing, mask_and_unmask_data
 
 
 @mask_and_unmask_data

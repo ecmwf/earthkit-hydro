@@ -1,13 +1,14 @@
-import joblib
-import tempfile
 import os
-import numpy as np
-from urllib.request import urlopen
+import tempfile
 from hashlib import sha256
 from io import BytesIO
-from .river_network import RiverNetwork
-from ._version import __version__ as ekh_version
+from urllib.request import urlopen
 
+import joblib
+import numpy as np
+
+from ._version import __version__ as ekh_version
+from .river_network import RiverNetwork
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1

@@ -8,22 +8,14 @@ on:
 
 jobs:
 
-  quality_assurance:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - run: pip install ruff
-      - run: ruff check # check linting violations
-      - run: ruff format --check # check formatting
+  qa-pre-commit:
+    uses: ecmwf-actions/reusable-workflows/.github/workflows/qa-precommit-run.yml@v2
+    secrets: inherit
 
-  setup_and_test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v2
-      - name: install earthkit-hydro
-        shell: bash -l {0}
-        run: pip install .[test]
-      - name: run tests
-        shell: bash -l {0}
-        run: pytest
+  test:
+    uses: ecmwf-actions/reusable-workflows/.github/workflows/qa-pytest-pyproject@v2
+    secrets: inherit
+
+  qa-python:
+      uses: ecmwf-actions/reusable-workflows/.github/workflows/ci-python.yml@v2
+      secrets: inherit

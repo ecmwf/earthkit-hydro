@@ -55,6 +55,12 @@ dependencies = [
         "ruff",
         "pre-commit"
     ]
+    all = [
+        "earthkit-data"
+        "pytest",
+        "pytest-cases",
+        "ruff",
+        "pre-commit"]
 
 # Linting settings
 [tool.ruff]

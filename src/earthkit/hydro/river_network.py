@@ -29,7 +29,14 @@ class RiverNetwork:
     """
 
     def __init__(
-        self, nodes, downstream, mask, sinks=None, sources=None, topological_labels=None, check_for_cycles=False
+        self,
+        nodes,
+        downstream,
+        mask,
+        sinks=None,
+        sources=None,
+        topological_labels=None,
+        check_for_cycles=False,
     ) -> None:
         """
         Initialises the RiverNetwork with nodes, downstream nodes, and a mask.
@@ -173,7 +180,10 @@ class RiverNetwork:
         """
         river_network_mask = field
         valid_indices = np.where(self.mask)
-        new_valid_indices = (valid_indices[0][river_network_mask], valid_indices[1][river_network_mask])
+        new_valid_indices = (
+            valid_indices[0][river_network_mask],
+            valid_indices[1][river_network_mask],
+        )
         domain_mask = np.full(self.mask.shape, False)
         domain_mask[new_valid_indices] = True
 
@@ -193,6 +203,12 @@ class RiverNetwork:
             topological_labels = self.topological_labels[river_network_mask]
             topological_labels[sinks] = self.n_nodes
 
-            return RiverNetwork(nodes, downstream, domain_mask, sinks=sinks, topological_labels=topological_labels)
+            return RiverNetwork(
+                nodes,
+                downstream,
+                domain_mask,
+                sinks=sinks,
+                topological_labels=topological_labels,
+            )
         else:
             return RiverNetwork(nodes, downstream, domain_mask)

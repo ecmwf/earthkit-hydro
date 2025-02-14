@@ -77,7 +77,10 @@ def test_accumulate_downstream_2d(reader, map_name, N):
     field_1d = field[..., network.mask]
     accum = ekh.flow_downstream(network, field_1d)
     np.testing.assert_array_equal(accum, ekh.flow_downstream(network, field)[..., network.mask])
-    np.testing.assert_array_equal(ekh.flow_downstream(network, field)[..., ~network.mask], field[..., ~network.mask])
+    np.testing.assert_array_equal(
+        ekh.flow_downstream(network, field)[..., ~network.mask],
+        field[..., ~network.mask],
+    )
 
 
 @parametrize(

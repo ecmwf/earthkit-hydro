@@ -260,7 +260,26 @@ def catchment_2():
 
 @fixture
 def mask_2():
-    return np.array([True, True, True, True, True, True, False, True, True, True, True, True, True, False, True, True])
+    return np.array(
+        [
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+        ]
+    )
 
 
 @fixture

@@ -229,7 +229,11 @@ def load_river_network(
     earthkit.hydro.RiverNetwork
         The loaded river network.
     """
-    uri = data_source.format(ekh_version=ekh_version, domain=domain, river_network_version=river_network_version)
+    uri = data_source.format(
+        ekh_version=ekh_version,
+        domain=domain,
+        river_network_version=river_network_version,
+    )
     return create_river_network(uri, "precomputed", "url", *args, **kwargs)
 
 

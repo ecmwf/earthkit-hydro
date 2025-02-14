@@ -2,8 +2,7 @@ import numpy as np
 
 
 def is_missing(field, mv):
-    """
-    Finds a mask of missing values.
+    """Finds a mask of missing values.
 
     Parameters
     ----------
@@ -16,6 +15,7 @@ def is_missing(field, mv):
     -------
     numpy.ndarray
         A boolean mask of missing values.
+
     """
     if np.isnan(mv):
         return np.isnan(field)
@@ -26,8 +26,7 @@ def is_missing(field, mv):
 
 
 def are_missing_values_present(field, mv):
-    """
-    Finds if missing values are present in a field.
+    """Finds if missing values are present in a field.
 
     Parameters
     ----------
@@ -40,13 +39,13 @@ def are_missing_values_present(field, mv):
     -------
     bool
         True if missing values are present, False otherwise.
+
     """
     return np.any(is_missing(field, mv))
 
 
 def check_missing(field, mv, accept_missing):
-    """
-    Finds missing values and checks if they are allowed in the input field.
+    """Finds missing values and checks if they are allowed in the input field.
 
     Parameters
     ----------
@@ -61,19 +60,21 @@ def check_missing(field, mv, accept_missing):
     -------
     bool
         True if missing values are present, False otherwise.
+
     """
     missing_values_present = are_missing_values_present(field, mv)
     if missing_values_present:
         if not accept_missing:
-            raise ValueError("Missing values present in input field and accept_missing is False.")
+            raise ValueError(
+                "Missing values present in input field and accept_missing is False."
+            )
         else:
             print("Warning: missing values present in input field.")
     return missing_values_present
 
 
 def mask_2d(func):
-    """
-    Decorator to allow function to mask 2d inputs to the river network.
+    """Decorator to allow function to mask 2d inputs to the river network.
 
     Parameters
     ----------
@@ -84,11 +85,12 @@ def mask_2d(func):
     -------
     callable
         The wrapped function.
+
     """
 
     def wrapper(river_network, field, *args, **kwargs):
-        """
-        Wrapper masking 2d data fields to allow for processing along the river network, then undoing the masking.
+        """Wrapper masking 2d data fields to allow for processing along the
+        river network, then undoing the masking.
 
         Parameters
         ----------
@@ -105,9 +107,12 @@ def mask_2d(func):
         -------
         numpy.ndarray
             The processed field.
+
         """
         if field.shape[-2:] == river_network.mask.shape:
-            return func(river_network, field[..., river_network.mask].T, *args, **kwargs)
+            return func(
+                river_network, field[..., river_network.mask].T, *args, **kwargs
+            )
         else:
             return func(river_network, field.T, *args, **kwargs)
 
@@ -115,8 +120,7 @@ def mask_2d(func):
 
 
 def mask_and_unmask_data(func):
-    """
-    Decorator to convert masked 2d inputs back to 1d.
+    """Decorator to convert masked 2d inputs back to 1d.
 
     Parameters
     ----------
@@ -127,11 +131,12 @@ def mask_and_unmask_data(func):
     -------
     callable
         The wrapped function.
+
     """
 
     def wrapper(river_network, field, *args, **kwargs):
-        """
-        Wrapper masking 2d data fields to allow for processing along the river network, then undoing the masking.
+        """Wrapper masking 2d data fields to allow for processing along the
+        river network, then undoing the masking.
 
         Parameters
         ----------
@@ -148,8 +153,10 @@ def mask_and_unmask_data(func):
         -------
         numpy.ndarray
             The processed field.
+
         """
-        # gets the missing value from the keyword arguments if it is present, otherwise takes default value of mv from func
+        # gets the missing value from the keyword arguments if it is present,
+        # otherwise takes default value of mv from func
         mv = kwargs.get("mv")
         mv = mv if mv is not None else func.__defaults__[0]
         if field.shape[-2:] == river_network.mask.shape:

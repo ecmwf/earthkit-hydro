@@ -4,9 +4,10 @@ from .utils import check_missing, is_missing, mask_and_unmask_data
 
 
 @mask_and_unmask_data
-def move_downstream(river_network, field, mv=np.nan, ufunc=np.add, accept_missing=False):
-    """
-    Sets each node to be the sum of its upstream nodes values, or a missing value.
+def move_downstream(
+    river_network, field, mv=np.nan, ufunc=np.add, accept_missing=False
+):
+    """Sets each node to be the sum of its upstream nodes values, or a missing value.
 
     Parameters
     ----------
@@ -23,11 +24,14 @@ def move_downstream(river_network, field, mv=np.nan, ufunc=np.add, accept_missin
     -------
     numpy.ndarray
         The updated field with upstream contributions.
+
     """
     missing_values_present = check_missing(field, mv, accept_missing)
 
     ups = np.zeros(river_network.n_nodes, dtype=field.dtype)
-    mask = river_network.downstream_nodes != river_network.n_nodes  # remove sinks since they have no downstream
+    mask = (
+        river_network.downstream_nodes != river_network.n_nodes
+    )  # remove sinks since they have no downstream
     nodes_to_update = river_network.downstream_nodes[mask]
     values_to_add = field[mask]
     ufunc.at(ups, nodes_to_update, values_to_add)
@@ -44,8 +48,7 @@ def move_downstream(river_network, field, mv=np.nan, ufunc=np.add, accept_missin
 
 @mask_and_unmask_data
 def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
-    """
-    Sets each node to be its downstream node value, or a missing value.
+    """Sets each node to be its downstream node value, or a missing value.
 
     Parameters
     ----------
@@ -60,6 +63,7 @@ def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
     -------
     numpy.ndarray
         The updated field with downstream values.
+
     """
     _ = check_missing(field, mv, accept_missing)
 

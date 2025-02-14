@@ -6,8 +6,7 @@ from .utils import is_missing, mask_and_unmask_data
 
 @mask_and_unmask_data
 def find_catchments(river_network, field, mv=0, in_place=False):
-    """
-    Labels the catchments given a field of labelled sinks.
+    """Labels the catchments given a field of labelled sinks.
 
     Parameters
     ----------
@@ -19,10 +18,12 @@ def find_catchments(river_network, field, mv=0, in_place=False):
         The missing value indicator. Default is 0.
     in_place : bool, optional
         If True, modifies the input field in place. Default is False.
+
     Returns
     -------
     numpy.ndarray
         The field values accumulated downstream.
+
     """
     if not in_place:
         field = field.copy()
@@ -40,8 +41,7 @@ def find_catchments(river_network, field, mv=0, in_place=False):
 
 @mask_and_unmask_data
 def find_subcatchments(river_network, field, mv=0, in_place=False):
-    """
-    Labels the subcatchments given a field of labelled sinks.
+    """Labels the subcatchments given a field of labelled sinks.
 
     Parameters
     ----------
@@ -53,10 +53,12 @@ def find_subcatchments(river_network, field, mv=0, in_place=False):
         The missing value indicator. Default is 0.
     in_place : bool, optional
         If True, modifies the input field in place. Default is False.
+
     Returns
     -------
     numpy.ndarray
         The field values accumulated downstream.
+
     """
     if not in_place:
         field = field.copy()
@@ -73,8 +75,8 @@ def find_subcatchments(river_network, field, mv=0, in_place=False):
 
 
 def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
-    """
-    Updates field in-place with the value of its downstream nodes, dealing with missing values for 2D fields.
+    """Updates field in-place with the value of its downstream nodes, dealing
+    with missing values for 2D fields.
 
     Parameters
     ----------
@@ -92,6 +94,7 @@ def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
     Returns
     -------
     None
+
     """
     valid_group = grouping[
         ~is_missing(field[river_network.downstream_nodes[grouping]], mv)
@@ -102,8 +105,8 @@ def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
 
 
 def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
-    """
-    Updates field in-place with the value of its downstream nodes, dealing with missing values for ND fields.
+    """Updates field in-place with the value of its downstream nodes, dealing
+    with missing values for ND fields.
 
     Parameters
     ----------
@@ -121,6 +124,7 @@ def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
     Returns
     -------
     None
+
     """
     valid_mask = ~is_missing(field[river_network.downstream_nodes[grouping]], mv)
     valid_indices = np.array(np.where(valid_mask))

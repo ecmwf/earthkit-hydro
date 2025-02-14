@@ -45,7 +45,7 @@ dependencies = [
     readers = [
         "earthkit-data",
     ]
-    test = [
+    tests = [
         "pytest",
         "pytest-cases",
     ]
@@ -56,11 +56,12 @@ dependencies = [
         "pre-commit"
     ]
     all = [
-        "earthkit-data"
+        "earthkit-data",
         "pytest",
         "pytest-cases",
         "ruff",
-        "pre-commit"]
+        "pre-commit"
+        ]
 
 # Linting settings
 [tool.ruff]

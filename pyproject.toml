@@ -68,8 +68,6 @@ quote-style = "double"
 "tests/*" = [
     "F405", # variable may be undefined, or defined from star imports
     "F403", # use of wildcard imports
-    "D103", # no docstring
-    "D100" # docstring
     ]
 
 # Testing

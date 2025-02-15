@@ -5,12 +5,17 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "earthkit-hydro"
 requires-python = ">=3.8"
-authors = [{ name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int" }]
-maintainers = [{name = "Oisín M. Morrison", email = "oisin.morrison@ecmwf.int"},
-    {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}]
+authors = [
+    { name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int" }
+    ]
+maintainers = [
+    {name = "Oisín M. Morrison", email = "oisin.morrison@ecmwf.int"},
+    {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
+    ]
 description = "A Python library for common hydrological functions"
 license = {file = "LICENSE"}
-classifiers = ["Development Status :: 4 - Beta",
+classifiers = [
+    "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
     "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
@@ -22,7 +27,8 @@ classifiers = ["Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
-    "Topic :: Scientific/Engineering"]
+    "Topic :: Scientific/Engineering"
+    ]
 dynamic = ["version", "readme"]
 
 dependencies = ["numpy", "joblib"]
@@ -33,18 +39,26 @@ dependencies = ["numpy", "joblib"]
     issues = "https://github.com/ecmwf/earthkit-hydro/issues"
 
 [project.optional-dependencies]
-    readers = ["earthkit-data"]
-    tests = ["pytest",
-        "pytest-cases"]
-    dev = ["pytest",
-        "pytest-cases",
-        "ruff",
-        "pre-commit"]
-    all = ["earthkit-data",
+    readers = [
+        "earthkit-data"
+        ]
+    tests = [
+        "pytest",
+        "pytest-cases"
+        ]
+    dev = [
         "pytest",
         "pytest-cases",
         "ruff",
-        "pre-commit"]
+        "pre-commit"
+        ]
+    all = [
+        "earthkit-data",
+        "pytest",
+        "pytest-cases",
+        "ruff",
+        "pre-commit"
+        ]
 
 [tool.black]
 line-length = 88
@@ -88,6 +102,8 @@ exclude = ["tests"]
 
 [tool.setuptools_scm]
 write_to = "src/earthkit/hydro/_version.py"
-write_to_template = '# Do not change! Do not track in version control!\n__version__ = "{version}"'
+write_to_template = '''# Do not change! Do not track in version control!
+__version__ = "{version}"
+'''
 parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs
 fallback_version='0.1'

@@ -49,14 +49,12 @@ dependencies = ["numpy", "joblib"]
     dev = [
         "pytest",
         "pytest-cases",
-        "ruff",
         "pre-commit"
         ]
     all = [
         "earthkit-data",
         "pytest",
         "pytest-cases",
-        "ruff",
         "pre-commit"
         ]
 

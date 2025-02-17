@@ -1,6 +1,5 @@
 def flow(river_network, field, invert_graph, operation, mv):
-    """
-    Apply an operation to a field along a river network.
+    """Apply an operation to a field along a river network.
 
     Parameters
     ----------
@@ -16,14 +15,17 @@ def flow(river_network, field, invert_graph, operation, mv):
         take four arguments: river_network, field, grouping, and mv.
     mv : any
         The value representing missing data in the field.
+
     Returns
     -------
     ndarray
         The modified field after applying the operation along the river network.
-    """
 
+    """
     if invert_graph:
-        groupings = river_network.topological_groups[:-1][::-1]  # go from sinks to sources
+        groupings = river_network.topological_groups[:-1][
+            ::-1
+        ]  # go from sinks to sources
     else:
         groupings = river_network.topological_groups[:-1]  # go from sources to sinks
 

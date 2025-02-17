@@ -1,7 +1,8 @@
 import numpy as np
-import earthkit.hydro as ekh
-from pytest_cases import parametrize
 from conftest import *
+from pytest_cases import parametrize
+
+import earthkit.hydro as ekh
 
 
 def read_network(reader, map_name):
@@ -75,8 +76,13 @@ def test_accumulate_downstream_2d(reader, map_name, N):
     field = np.random.rand(*([np.random.randint(10)] * N), *network.mask.shape)
     field_1d = field[..., network.mask]
     accum = ekh.flow_downstream(network, field_1d)
-    np.testing.assert_array_equal(accum, ekh.flow_downstream(network, field)[..., network.mask])
-    np.testing.assert_array_equal(ekh.flow_downstream(network, field)[..., ~network.mask], field[..., ~network.mask])
+    np.testing.assert_array_equal(
+        accum, ekh.flow_downstream(network, field)[..., network.mask]
+    )
+    np.testing.assert_array_equal(
+        ekh.flow_downstream(network, field)[..., ~network.mask],
+        field[..., ~network.mask],
+    )
 
 
 @parametrize(
@@ -213,7 +219,9 @@ def test_find_subcatchments_2d(reader, map_name, query_field, find_subcatchments
     network_find_subcatchments = ekh.find_subcatchments(network, field)
     print(find_subcatchments)
     print(network_find_subcatchments)
-    np.testing.assert_array_equal(network_find_subcatchments[network.mask], find_subcatchments)
+    np.testing.assert_array_equal(
+        network_find_subcatchments[network.mask], find_subcatchments
+    )
     np.testing.assert_array_equal(network_find_subcatchments[~network.mask], 0)
 
 
@@ -254,7 +262,9 @@ def test_find_catchments_2d(reader, map_name, query_field, find_catchments):
     network_find_catchments = ekh.find_catchments(network, field)
     print(find_catchments)
     print(network_find_catchments)
-    np.testing.assert_array_equal(network_find_catchments[network.mask], find_catchments)
+    np.testing.assert_array_equal(
+        network_find_catchments[network.mask], find_catchments
+    )
     np.testing.assert_array_equal(network_find_catchments[~network.mask], 0)
 
 

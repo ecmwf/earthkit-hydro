@@ -188,7 +188,9 @@ def input_field_accuflux_2():
 
 @fixture
 def field_accuflux_1():
-    return np.array([1, 2, 3, -1, 5, 7, 9, -1, 14, 10, 8, 11, -1, 19, 5, 6, -1, -1, -1, -1])
+    return np.array(
+        [1, 2, 3, -1, 5, 7, 9, -1, 14, 10, 8, 11, -1, 19, 5, 6, -1, -1, -1, -1]
+    )
 
 
 @fixture
@@ -208,7 +210,9 @@ def upstream_2():
 
 @fixture
 def downstream_1():
-    return np.array([6, 7, 8, 8, 9, 11, 12, 13, 13, 14, 17, 17, 17, 13, 14, 17, 0, 17, 18, 19])
+    return np.array(
+        [6, 7, 8, 8, 9, 11, 12, 13, 13, 14, 17, 17, 17, 13, 14, 17, 0, 17, 18, 19]
+    )
 
 
 @fixture
@@ -218,7 +222,9 @@ def downstream_2():
 
 @fixture
 def catchment_query_field_1():
-    return np.array([0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5, 4, 2, 3, 0, 0, 0, 0, 0, 0], dtype="int")
+    return np.array(
+        [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 5, 4, 2, 3, 0, 0, 0, 0, 0, 0], dtype="int"
+    )
 
 
 @fixture
@@ -260,7 +266,26 @@ def catchment_2():
 
 @fixture
 def mask_2():
-    return np.array([True, True, True, True, True, True, False, True, True, True, True, True, True, False, True, True])
+    return np.array(
+        [
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+            True,
+            True,
+            True,
+            True,
+            False,
+            True,
+            True,
+        ]
+    )
 
 
 @fixture

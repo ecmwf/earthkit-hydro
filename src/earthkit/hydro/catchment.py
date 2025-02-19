@@ -29,8 +29,10 @@ def find_catchments(river_network, field, mv=0, in_place=False):
         field = field.copy()
 
     if len(field.shape) == 1:
+        print("2D")
         op = _find_catchments_2D
     else:
+        print("ND")
         op = _find_catchments_ND
 
     def operation(river_network, field, grouping, mv):
@@ -131,7 +133,11 @@ def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
     valid_indices[0] = grouping[valid_indices[0]]
     if not overwrite:
         temp_valid_indices = valid_indices[0]
-        valid_mask = is_missing(field[valid_indices], mv)
+        valid_mask = is_missing(field[tuple(valid_indices)], mv)
         valid_indices = np.array(np.where(valid_mask))
         valid_indices[0] = temp_valid_indices[valid_indices[0]]
-    field[tuple(valid_indices)] = field[river_network.downstream_nodes[valid_indices]]
+    downstream_valid_indices = valid_indices.copy()
+    downstream_valid_indices[0] = river_network.downstream_nodes[
+        downstream_valid_indices[0]
+    ]
+    field[tuple(valid_indices)] = field[tuple(downstream_valid_indices)]

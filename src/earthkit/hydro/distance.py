@@ -77,11 +77,13 @@ def _upstream_distance_ND(river_network, field, grouping, mv):
     downstream_check_shorter[0] = river_network.downstream_nodes[
         downstream_check_shorter[0]
     ]
-    field[replace_upstream_indices] = np.max(field[downstream_replace_upstream]) + 1
-    np.minimum.at(
-        field, replace_upstream_indices, field[downstream_replace_upstream] + 1
-    )
-    np.minimum.at(field, check_shorter_indices, field[downstream_check_shorter] + 1)
+    if replace_upstream_indices.size != 0:
+        field[replace_upstream_indices] = np.max(field[downstream_replace_upstream]) + 1
+        np.minimum.at(
+            field, replace_upstream_indices, field[downstream_replace_upstream] + 1
+        )
+    if check_shorter_indices.size != 0:
+        np.minimum.at(field, check_shorter_indices, field[downstream_check_shorter] + 1)
 
 
 def _downstream_distance_2D(river_network, field, grouping, mv):
@@ -125,8 +127,12 @@ def _downstream_distance_ND(river_network, field, grouping, mv):
     downstream_check_shorter[0] = river_network.downstream_nodes[
         downstream_check_shorter[0]
     ]
-    field[downstream_replace_downstream] = np.max(field[replace_downstream_indices]) + 1
-    np.minimum.at(
-        field, downstream_replace_downstream, field[replace_downstream_indices] + 1
-    )
-    np.minimum.at(field, downstream_check_shorter, field[check_shorter_indices] + 1)
+    if downstream_replace_downstream.size != 0:
+        field[downstream_replace_downstream] = (
+            np.max(field[replace_downstream_indices]) + 1
+        )
+        np.minimum.at(
+            field, downstream_replace_downstream, field[replace_downstream_indices] + 1
+        )
+    if downstream_check_shorter.size != 0:
+        np.minimum.at(field, downstream_check_shorter, field[check_shorter_indices] + 1)

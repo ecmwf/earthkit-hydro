@@ -29,10 +29,8 @@ def find_catchments(river_network, field, mv=0, in_place=False):
         field = field.copy()
 
     if len(field.shape) == 1:
-        print("2D")
         op = _find_catchments_2D
     else:
-        print("ND")
         op = _find_catchments_ND
 
     def operation(river_network, field, grouping, mv):

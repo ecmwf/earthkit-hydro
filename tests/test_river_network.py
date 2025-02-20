@@ -320,6 +320,24 @@ def test_subnetwork(reader, map_name, mask, accumulate_downstream):
 
 
 @parametrize(
+    "reader,map_name,mask,accumulate_downstream",
+    [
+        ("d8_ldd", d8_ldd_2, mask_2, masked_unit_accuflux_2),
+        ("cama_downxy", cama_downxy_2, mask_2, masked_unit_accuflux_2),
+        ("cama_nextxy", cama_nextxy_2, mask_2, masked_unit_accuflux_2),
+    ],
+)
+def test_subnetwork_recompute(reader, map_name, mask, accumulate_downstream):
+    network = read_network(reader, map_name)
+    network = network.create_subnetwork(mask, recompute=True)
+    field = np.ones(network.n_nodes)
+    accum = ekh.flow_downstream(network, field)
+    print(accum)
+    print(accumulate_downstream)
+    np.testing.assert_array_equal(accum, accumulate_downstream)
+
+
+@parametrize(
     "reader,map_name,distance_query,distance",
     [
         ("d8_ldd", d8_ldd_1, distance_query_field_1, distance_1),

@@ -1,6 +1,7 @@
 import joblib
 import numpy as np
 
+from .distance import _max_dist_downstream
 from .utils import mask_2d
 
 
@@ -216,11 +217,24 @@ class RiverNetwork:
         downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
         nodes = np.arange(n_nodes)
 
-        if not recompute:
-            sinks = nodes[downstream == n_nodes]
-            topological_labels = self.topological_labels[river_network_mask]
-            topological_labels[sinks] = self.n_nodes
+        sinks = nodes[downstream == n_nodes]
+        topological_labels = self.topological_labels[river_network_mask]
+        topological_labels[sinks] = self.n_nodes
 
+        network_no_recompute = RiverNetwork(
+            nodes,
+            downstream,
+            domain_mask,
+            sinks=sinks,
+            topological_labels=topological_labels,
+        )
+
+        if recompute:
+            distance_field = np.empty(network_no_recompute.n_nodes, dtype=int)
+            distance_field.fill(-1)
+            distance_field[network_no_recompute.sources] = 1
+            _max_dist_downstream(network_no_recompute, distance_field, in_place=True)
+            distance_field[network_no_recompute.sinks] = np.max(field)
             return RiverNetwork(
                 nodes,
                 downstream,
@@ -229,4 +243,4 @@ class RiverNetwork:
                 topological_labels=topological_labels,
             )
         else:
-            return RiverNetwork(nodes, downstream, domain_mask)
+            return network_no_recompute

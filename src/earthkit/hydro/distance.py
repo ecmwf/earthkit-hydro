@@ -136,3 +136,34 @@ def _downstream_distance_ND(river_network, field, grouping, mv):
         )
     if downstream_check_shorter.size != 0:
         np.minimum.at(field, downstream_check_shorter, field[check_shorter_indices] + 1)
+
+
+def _max_dist_downstream(river_network, field, in_place=False, mv=-1):
+    if not in_place:
+        field = field.copy()
+
+    flow(river_network, field, False, _max_dist_downstream_2D, mv)
+
+
+def _max_dist_downstream_2D(river_network, field, grouping, mv):
+    missing_downstream = is_missing(field[river_network.downstream_nodes[grouping]], mv)
+    missing_current = is_missing(field[grouping], mv)
+    replace_downstream = grouping[missing_downstream & ~missing_current]
+    check_shorter = grouping[~missing_downstream & ~missing_current]
+    if replace_downstream.size != 0:
+        # replace downstream with upstream + 1 (if downstream missing)
+        field[river_network.downstream_nodes[replace_downstream]] = (
+            np.min(field[replace_downstream]) + 1
+        )
+        np.maximum.at(
+            field,
+            river_network.downstream_nodes[replace_downstream],
+            field[replace_downstream] + 1,
+        )
+    if check_shorter.size != 0:
+        # replace downstream with min (downstream, upstream + 1)
+        np.maximum.at(
+            field,
+            river_network.downstream_nodes[check_shorter],
+            field[check_shorter] + 1,
+        )

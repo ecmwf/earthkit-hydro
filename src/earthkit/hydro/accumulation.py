@@ -44,10 +44,26 @@ def flow_downstream(
         else:
             op = _ufunc_to_downstream_missing_values_ND
 
-    def operation(river_network, field, grouping, mv):
-        return op(river_network, field, grouping, mv, ufunc=ufunc)
+    if ufunc is np.mean:
 
-    return flow(river_network, field, False, operation, mv)
+        def operation(river_network, field, grouping, mv):
+            return op(river_network, field, grouping, mv, ufunc=np.add)
+
+        flow(river_network, field, False, operation, mv)
+
+        counts = np.ones(field.shape)
+        flow(river_network, counts, False, operation, mv)
+
+        field /= counts
+
+        return field
+
+    else:
+
+        def operation(river_network, field, grouping, mv):
+            return op(river_network, field, grouping, mv, ufunc=ufunc)
+
+        return flow(river_network, field, False, operation, mv)
 
 
 def _ufunc_to_downstream(river_network, field, grouping, mv, ufunc):

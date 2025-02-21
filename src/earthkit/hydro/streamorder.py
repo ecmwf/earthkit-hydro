@@ -34,8 +34,11 @@ def compute_streamorder(
 
     if len(field.shape) == 1:
         flow(streamflow_river_network, field, False, _compute_streamflow_2D, mv)
-    # else:
-    #     flow(river_network, field, True, _compute_streamflow_ND, mv)
+    else:
+        ValueError(
+            "Streamorder is unique for a river network."
+            "Inputted field has extra dimensions."
+        )
 
     return field
 

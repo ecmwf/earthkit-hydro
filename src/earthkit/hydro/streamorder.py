@@ -17,7 +17,7 @@ def compute_streamorder(
         field = field.copy()
     field[river_network.sources] = 1
 
-    distance_field = np.empty(river_network.n_nodes)
+    distance_field = np.empty(river_network.n_nodes, dtype=int)
     distance_field.fill(-1)
     distance_field[river_network.sinks] = 0
     compute_distance(
@@ -31,6 +31,7 @@ def compute_streamorder(
         sources=river_network.sources,
         topological_labels=np.max(distance_field) - distance_field,
     )
+    del distance_field
 
     if len(field.shape) == 1:
         flow(streamflow_river_network, field, False, _compute_streamflow_2D, mv)
@@ -44,15 +45,14 @@ def compute_streamorder(
 
 
 def _compute_streamflow_2D(river_network, field, grouping, mv):
-    indices = river_network.downstream_nodes[grouping]
-    values = field[grouping]
+    unique_indices, unique_index_positions = np.unique(
+        river_network.downstream_nodes[grouping], return_inverse=True
+    )
 
-    unique_indices, unique_index_positions = np.unique(indices, return_inverse=True)
+    max_values_for_indices = np.zeros(len(unique_indices), dtype=int)
+    np.maximum.at(max_values_for_indices, unique_index_positions, field[grouping])
 
-    max_values_for_indices = np.zeros(len(unique_indices), dtype=np.float64)
-    np.maximum.at(max_values_for_indices, unique_index_positions, values)
-
-    mask = values == max_values_for_indices[unique_index_positions]
+    mask = field[grouping] == max_values_for_indices[unique_index_positions]
 
     count_max_value_for_indices = np.bincount(unique_index_positions, weights=mask)
 

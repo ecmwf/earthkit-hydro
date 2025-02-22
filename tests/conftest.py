@@ -303,3 +303,8 @@ def distance_query_field_1():
 @fixture
 def distance_1():
     return np.array([5, 1, 3, 3, 1, 4, 0, 2, 0, 3, 3, 1, 1, 2, 3, 3, 2, 3, 4, 5])
+
+
+@fixture
+def streamorder_1():
+    return np.array([1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 3, 2, 1, 1, 3, 1, 1, 1])

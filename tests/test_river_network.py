@@ -391,3 +391,19 @@ def test_distance_Nd(reader, map_name, distance_query, distance):
     print(network_dist)
     np.testing.assert_array_equal(network_dist[..., network.mask], distance)
     np.testing.assert_array_equal(network_dist[..., ~network.mask], -1)
+
+
+@parametrize(
+    "reader,map_name,streamorder",
+    [
+        ("d8_ldd", d8_ldd_1, streamorder_1),
+        ("cama_downxy", cama_downxy_1, streamorder_1),
+        ("cama_nextxy", cama_nextxy_1, streamorder_1),
+    ],
+)
+def test_streamorder(reader, map_name, streamorder):
+    network = read_network(reader, map_name)
+    streamorder_calc = ekh.compute_streamorder(network, np.empty(network.n_nodes))
+    print(streamorder)
+    print(streamorder_calc)
+    np.testing.assert_array_equal(streamorder, streamorder_calc)

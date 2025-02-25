@@ -9,16 +9,16 @@
 
 <p align="center">
   <a href="https://github.com/ecmwf/codex/raw/refs/heads/main/ESEE">
-    <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/ESEE/foundation_badge.svg" alt="Static Badge">
+    <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/ESEE/foundation_badge.svg" alt="ECMWF Software EnginE">
   </a>
-  <a href="https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity">
-    <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity/emerging_badge.svg" alt="Static Badge">
+  <a href="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity">
+    <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity/emerging_badge.svg" alt="Maturity Level">
   </a>
   <a href="https://codecov.io/gh/ecmwf/earthkit-hydro">
     <img src="https://codecov.io/gh/ecmwf/earthkit-hydro/branch/develop/graph/badge.svg" alt="Code Coverage">
   </a>
   <a href="https://opensource.org/licenses/apache-2-0">
-    <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License: Apache 2.0">
+    <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
   </a>
   <a href="https://github.com/ecmwf/earthkit-hydro/releases">
     <img src="https://img.shields.io/github/v/release/ecmwf/earthkit-hydro?color=blue&label=Release&style=flat-square" alt="Latest Release">

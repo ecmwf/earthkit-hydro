@@ -1,7 +1,44 @@
 import numpy as np
 
 from .core import flow
+from .metrics import metrics
 from .utils import check_missing, is_missing, mask_and_unmask_data
+
+
+@mask_and_unmask_data
+def calculate_upstream_metric(
+    river_network,
+    field,
+    metric,
+    weights=None,
+    mv=np.nan,
+    in_place=False,
+    accept_missing=False,
+):
+    if metric == metrics.mean:
+        field = flow_downstream(
+            river_network, field, mv, in_place, metric.func, accept_missing
+        )
+        weights = weights if weights is not None else np.ones(river_network.n_nodes)
+        counts = flow_downstream(
+            river_network, weights, mv, in_place, metric.func, accept_missing
+        )
+        field /= counts
+        return field
+    else:
+        if weights is None:
+            return flow_downstream(
+                river_network, field, mv, in_place, metric.func, accept_missing
+            )
+        else:
+            return flow_downstream(
+                river_network,
+                field * weights,
+                mv,
+                in_place,
+                metric.func,
+                accept_missing,
+            )
 
 
 @mask_and_unmask_data

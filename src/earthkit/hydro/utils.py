@@ -88,7 +88,7 @@ def mask_2d(func):
 
     """
 
-    def wrapper(river_network, field, *args, **kwargs):
+    def wrapper(river_network, *args, **kwargs):
         """Wrapper masking 2d data fields to allow for processing along the
         river network, then undoing the masking.
 
@@ -96,8 +96,6 @@ def mask_2d(func):
         ----------
         river_network : object
             The RiverNetwork instance calling the method.
-        field : numpy.ndarray
-            The input data field to be processed.
         *args : tuple
             Positional arguments passed to the wrapped function.
         **kwargs : dict
@@ -109,12 +107,27 @@ def mask_2d(func):
             The processed field.
 
         """
-        if field.shape[-2:] == river_network.mask.shape:
-            return func(
-                river_network, field[..., river_network.mask].T, *args, **kwargs
+        args = tuple(
+            (
+                arg[..., river_network.mask].T
+                if isinstance(arg, np.ndarray)
+                and arg.shape[-2:] == river_network.mask.shape
+                else arg.T if isinstance(arg, np.ndarray) else arg
             )
-        else:
-            return func(river_network, field.T, *args, **kwargs)
+            for arg in args
+        )
+
+        kwargs = {
+            key: (
+                value[..., river_network.mask].T
+                if isinstance(value, np.ndarray)
+                and value.shape[-2:] == river_network.mask.shape
+                else value.T if isinstance(value, np.ndarray) else value
+            )
+            for key, value in kwargs.items()
+        }
+
+        return func(river_network, *args, **kwargs)
 
     return wrapper
 
@@ -165,13 +178,13 @@ def mask_and_unmask_data(func):
                 out_field = field
             else:
                 out_field = np.empty(field.shape, dtype=field.dtype)
-            out_field[..., river_network.mask] = func(
-                river_network, field[..., river_network.mask].T, *args, **kwargs
+            out_field[..., river_network.mask] = mask_2d(func)(
+                river_network, field, *args, **kwargs
             ).T
 
             out_field[..., ~river_network.mask] = mv
             return out_field
         else:
-            return func(river_network, field.T, *args, **kwargs).T
+            return mask_2d(func)(river_network, field, *args, **kwargs).T
 
     return wrapper

@@ -2,9 +2,10 @@ import numpy as np
 
 
 class Metric:
-    def __init__(self, name, func):
+    def __init__(self, name, func, base_val):
         self.name = name
         self.func = func
+        self.base_val = base_val
 
     def __eq__(self, other):
         if isinstance(other, Metric):
@@ -16,10 +17,10 @@ class Metric:
 
 
 class Metrics:
-    sum = Metric("sum", np.add)
-    mean = Metric("mean", np.add)
-    max = Metric("max", np.maximum)
-    min = Metric("min", np.minimum)
+    sum = Metric("sum", np.add, 0)
+    mean = Metric("mean", np.add, 0)
+    max = Metric("max", np.maximum, -np.inf)
+    min = Metric("min", np.minimum, np.inf)
 
     def __getattr__(self, name):
         # Check if the requested attribute exists in the class

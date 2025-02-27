@@ -1,8 +1,9 @@
 import numpy as np
-from conftest import *
 from pytest_cases import parametrize
 
 import earthkit.hydro as ekh
+
+from .conftest import *
 
 
 def read_network(reader, map_name):

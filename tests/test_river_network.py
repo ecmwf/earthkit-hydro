@@ -317,3 +317,93 @@ def test_subnetwork(reader, map_name, mask, accumulate_downstream):
     print(accum)
     print(accumulate_downstream)
     np.testing.assert_array_equal(accum, accumulate_downstream)
+
+
+@parametrize(
+    "reader,map_name,mask,accumulate_downstream",
+    [
+        ("d8_ldd", d8_ldd_2, mask_2, masked_unit_accuflux_2),
+        ("cama_downxy", cama_downxy_2, mask_2, masked_unit_accuflux_2),
+        ("cama_nextxy", cama_nextxy_2, mask_2, masked_unit_accuflux_2),
+    ],
+)
+def test_subnetwork_recompute(reader, map_name, mask, accumulate_downstream):
+    network = read_network(reader, map_name)
+    network = network.create_subnetwork(mask, recompute=True)
+    field = np.ones(network.n_nodes)
+    accum = ekh.flow_downstream(network, field)
+    print(accum)
+    print(accumulate_downstream)
+    np.testing.assert_array_equal(accum, accumulate_downstream)
+
+
+@parametrize(
+    "reader,map_name,distance_query,distance",
+    [
+        ("d8_ldd", d8_ldd_1, distance_query_field_1, distance_1),
+        ("cama_downxy", cama_downxy_1, distance_query_field_1, distance_1),
+        ("cama_nextxy", cama_nextxy_1, distance_query_field_1, distance_1),
+    ],
+)
+def test_distance(reader, map_name, distance_query, distance):
+    network = read_network(reader, map_name)
+    dist = ekh.compute_distance(network, distance_query)
+    print(dist)
+    print(distance)
+    np.testing.assert_array_equal(dist, distance)
+
+
+@parametrize(
+    "reader,map_name,distance_query,distance",
+    [
+        ("d8_ldd", d8_ldd_1, distance_query_field_1, distance_1),
+        ("cama_downxy", cama_downxy_1, distance_query_field_1, distance_1),
+        ("cama_nextxy", cama_nextxy_1, distance_query_field_1, distance_1),
+    ],
+)
+def test_distance_2d(reader, map_name, distance_query, distance):
+    network = read_network(reader, map_name)
+    field = np.zeros(network.mask.shape, dtype="int") - 1
+    field[network.mask] = distance_query
+    network_dist = ekh.compute_distance(network, field)
+    print(distance)
+    print(network_dist)
+    np.testing.assert_array_equal(network_dist[network.mask], distance)
+    np.testing.assert_array_equal(network_dist[~network.mask], -1)
+
+
+@parametrize(
+    "reader,map_name,distance_query,distance",
+    [
+        ("d8_ldd", d8_ldd_1, distance_query_field_1, distance_1),
+        ("cama_downxy", cama_downxy_1, distance_query_field_1, distance_1),
+        ("cama_nextxy", cama_nextxy_1, distance_query_field_1, distance_1),
+    ],
+)
+def test_distance_Nd(reader, map_name, distance_query, distance):
+    network = read_network(reader, map_name)
+    field = np.zeros(network.mask.shape, dtype="int") - 1
+    field[network.mask] = distance_query
+    field = np.stack([field, field], axis=0)
+    network_dist = ekh.compute_distance(network, field)
+    distance = np.stack([distance, distance], axis=0)
+    print(distance)
+    print(network_dist)
+    np.testing.assert_array_equal(network_dist[..., network.mask], distance)
+    np.testing.assert_array_equal(network_dist[..., ~network.mask], -1)
+
+
+@parametrize(
+    "reader,map_name,streamorder",
+    [
+        ("d8_ldd", d8_ldd_1, streamorder_1),
+        ("cama_downxy", cama_downxy_1, streamorder_1),
+        ("cama_nextxy", cama_nextxy_1, streamorder_1),
+    ],
+)
+def test_streamorder(reader, map_name, streamorder):
+    network = read_network(reader, map_name)
+    streamorder_calc = ekh.compute_streamorder(network, np.empty(network.n_nodes))
+    print(streamorder)
+    print(streamorder_calc)
+    np.testing.assert_array_equal(streamorder, streamorder_calc)

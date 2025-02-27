@@ -1,7 +1,7 @@
 import numpy as np
 
 from .core import flow
-from .metrics import metrics
+from .metrics import metrics_dict
 from .utils import check_missing, is_missing, mask_and_unmask_data
 
 
@@ -15,20 +15,35 @@ def calculate_upstream_metric(
     in_place=False,
     accept_missing=False,
 ):
-    if metric == metrics.mean:
+    if metric == "mean":
         field = flow_downstream(
-            river_network, field, mv, in_place, metric.func, accept_missing
+            river_network,
+            field,
+            mv,
+            in_place,
+            metrics_dict[metric].func,
+            accept_missing,
         )
         weights = weights if weights is not None else np.ones(river_network.n_nodes)
         counts = flow_downstream(
-            river_network, weights, mv, in_place, metric.func, accept_missing
+            river_network,
+            weights,
+            mv,
+            in_place,
+            metrics_dict[metric].func,
+            accept_missing,
         )
         field /= counts
         return field
     else:
         if weights is None:
             return flow_downstream(
-                river_network, field, mv, in_place, metric.func, accept_missing
+                river_network,
+                field,
+                mv,
+                in_place,
+                metrics_dict[metric].func,
+                accept_missing,
             )
         else:
             return flow_downstream(
@@ -36,7 +51,7 @@ def calculate_upstream_metric(
                 field * weights,
                 mv,
                 in_place,
-                metric.func,
+                metrics_dict[metric].func,
                 accept_missing,
             )
 

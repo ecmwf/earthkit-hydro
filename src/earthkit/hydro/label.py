@@ -1,6 +1,6 @@
 import numpy as np
 
-from .metrics import metrics
+from .metrics import metrics_dict
 from .utils import check_missing, is_missing
 
 
@@ -43,17 +43,17 @@ def calculate_metric_for_labels(
 
     initial_field = np.full(
         (len(unique_labels), *field.T.shape[labels.ndim :]),
-        metric.base_val,
+        metrics_dict[metric].base_val,
         dtype=field.dtype,
     )
 
-    metric.func.at(
+    metrics_dict[metric].func.at(
         initial_field,
         (unique_label_positions, *[slice(None)] * (initial_field.ndim - 1)),
         relevant_field,
     )
 
-    if metric is metrics.mean:
+    if metric == "mean":
         count_values = np.bincount(
             unique_label_positions, minlength=len(unique_labels)
         ).astype(initial_field.dtype)

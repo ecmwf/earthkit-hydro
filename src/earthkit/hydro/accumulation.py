@@ -18,42 +18,42 @@ def calculate_upstream_metric(
     if metric == "mean":
         field = flow_downstream(
             river_network,
-            field,
+            field.T,
             mv,
             in_place,
             metrics_dict[metric].func,
             accept_missing,
-        )
+        ).T
         weights = weights if weights is not None else np.ones(river_network.n_nodes)
         counts = flow_downstream(
             river_network,
-            weights,
+            weights.T,
             mv,
             in_place,
             metrics_dict[metric].func,
             accept_missing,
-        )
+        ).T
         field /= counts
         return field
     else:
         if weights is None:
             return flow_downstream(
                 river_network,
-                field,
+                field.T,
                 mv,
                 in_place,
                 metrics_dict[metric].func,
                 accept_missing,
-            )
+            ).T
         else:
             return flow_downstream(
                 river_network,
-                field * weights,
+                (field * weights).T,
                 mv,
                 in_place,
                 metrics_dict[metric].func,
                 accept_missing,
-            )
+            ).T
 
 
 @mask_and_unmask_data
@@ -126,7 +126,11 @@ def _ufunc_to_downstream(river_network, field, grouping, mv, ufunc):
     None
 
     """
-    ufunc.at(field, river_network.downstream_nodes[grouping], field[grouping])
+    ufunc.at(
+        field,
+        (river_network.downstream_nodes[grouping], *[slice(None)] * (field.ndim - 1)),
+        field[grouping],
+    )
 
 
 def _ufunc_to_downstream_missing_values_2D(river_network, field, grouping, mv, ufunc):
@@ -158,7 +162,7 @@ def _ufunc_to_downstream_missing_values_2D(river_network, field, grouping, mv, u
     missing_indices = np.logical_or(
         is_missing(values_to_add, mv), is_missing(field[nodes_to_update], mv)
     )
-    ufunc.at(field, nodes_to_update, values_to_add)
+    ufunc.at(field, (nodes_to_update, *[slice(None)] * (field.ndim - 1)), values_to_add)
     field[nodes_to_update[missing_indices]] = mv
 
 
@@ -191,7 +195,7 @@ def _ufunc_to_downstream_missing_values_ND(river_network, field, grouping, mv, u
     missing_indices = np.logical_or(
         is_missing(values_to_add, mv), is_missing(field[nodes_to_update], mv)
     )
-    ufunc.at(field, nodes_to_update, values_to_add)
+    ufunc.at(field, (nodes_to_update, *[slice(None)] * (field.ndim - 1)), values_to_add)
     missing_indices = np.array(np.where(missing_indices))
     missing_indices[0] = nodes_to_update[missing_indices[0]]
     field[tuple(missing_indices)] = mv

@@ -168,6 +168,14 @@ def mask_and_unmask_data(func):
             The processed field.
 
         """
+
+        # skip! don't bother masking and unmasking
+        # (if it has already been done)
+        skip = kwargs.pop("skip", None)
+        skip = skip if skip is not None else False
+        if skip:
+            return func(river_network, field, *args, **kwargs)
+
         # gets the missing value from the keyword arguments if it is present,
         # otherwise takes default value of mv from func
         mv = kwargs.get("mv")

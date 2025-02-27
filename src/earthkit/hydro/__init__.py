@@ -2,7 +2,6 @@ from .accumulation import calculate_upstream_metric, flow_downstream
 from .catchment import find_catchments, find_subcatchments
 from .core import flow
 from .label import calculate_metric_for_labels
-from .metrics import metrics
 from .movement import move_downstream, move_upstream
 from .readers import (
     create_river_network,

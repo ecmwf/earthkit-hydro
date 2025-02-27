@@ -5,7 +5,12 @@ from .utils import check_missing, is_missing, mask_and_unmask_data
 
 @mask_and_unmask_data
 def move_downstream(
-    river_network, field, mv=np.nan, ufunc=np.add, accept_missing=False
+    river_network,
+    field,
+    mv=np.nan,
+    ufunc=np.add,
+    accept_missing=False,
+    missing_values_present=None,
 ):
     """Sets each node to be the sum of its upstream nodes values, or a missing value.
 
@@ -26,7 +31,9 @@ def move_downstream(
         The updated field with upstream contributions.
 
     """
-    missing_values_present = check_missing(field, mv, accept_missing)
+
+    if missing_values_present is None:
+        missing_values_present = check_missing(field, mv, accept_missing)
 
     ups = np.zeros(river_network.n_nodes, dtype=field.dtype)
     mask = (
@@ -47,7 +54,9 @@ def move_downstream(
 
 
 @mask_and_unmask_data
-def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
+def move_upstream(
+    river_network, field, mv=np.nan, accept_missing=False, missing_values_present=None
+):
     """Sets each node to be its downstream node value, or a missing value.
 
     Parameters
@@ -65,7 +74,9 @@ def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
         The updated field with downstream values.
 
     """
-    _ = check_missing(field, mv, accept_missing)
+
+    if missing_values_present:
+        missing_values_present = check_missing(field, mv, accept_missing)
 
     down = np.zeros(river_network.n_nodes, dtype=field.dtype)
     mask = river_network.downstream_nodes != river_network.n_nodes  # remove sinks

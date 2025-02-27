@@ -291,3 +291,15 @@ def mask_2():
 @fixture
 def masked_unit_accuflux_2():
     return np.array([2, 1, 2, 1, 1, 2, 3, 1, 1, 3, 6, 1, 1, 2])
+
+
+@fixture
+def distance_query_field_1():
+    return np.array(
+        [-1, -1, -1, -1, -1, -1, 0, -1, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1]
+    )
+
+
+@fixture
+def distance_1():
+    return np.array([5, 1, 3, 3, 1, 4, 0, 2, 0, 3, 3, 1, 1, 2, 3, 3, 2, 3, 4, 5])

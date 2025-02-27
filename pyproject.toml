@@ -82,10 +82,14 @@ quote-style = "double"
     "F403", # use of wildcard imports
     ]
 
-# Testing
-[tool.pytest]
-addopts = "--pdbcls=IPython.terminal.debugger:Pdb"
-testpaths = ["tests"]
+[tool.pytest.ini_options]
+minversion = "8.1"
+addopts = "-v --pdbcls=IPython.terminal.debugger:Pdb"
+testpaths = [
+    "src",
+    "tests",
+]
+consider_namespace_packages = true
 
 # Packaging/setuptools options
 [tool.setuptools]

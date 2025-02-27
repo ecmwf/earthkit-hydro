@@ -1,12 +1,84 @@
 import numpy as np
 
 from .core import flow
+from .metrics import metrics_dict
 from .utils import check_missing, is_missing, mask_and_unmask_data
 
 
 @mask_and_unmask_data
+def calculate_upstream_metric(
+    river_network,
+    field,
+    metric,
+    weights=None,
+    mv=np.nan,
+    in_place=False,
+    accept_missing=False,
+    missing_values_present_field=None,
+    missing_values_present_weights=None,
+):
+    missing_values_present_weights = (
+        False if weights is None else missing_values_present_weights
+    )
+
+    if metric == "mean":
+        field = flow_downstream(
+            river_network,
+            field,
+            mv,
+            in_place,
+            metrics_dict[metric].func,
+            accept_missing,
+            missing_values_present_field,
+            skip=True,
+        )
+        weights = weights if weights is not None else np.ones(river_network.n_nodes)
+        counts = flow_downstream(
+            river_network,
+            weights,
+            mv,
+            in_place,
+            metrics_dict[metric].func,
+            accept_missing,
+            missing_values_present_weights,
+            skip=True,
+        )
+        field /= counts
+        return field
+    else:
+        if weights is None:
+            return flow_downstream(
+                river_network,
+                field,
+                mv,
+                in_place,
+                metrics_dict[metric].func,
+                accept_missing,
+                missing_values_present_field,
+                skip=True,
+            )
+        else:
+            return flow_downstream(
+                river_network,
+                (field * weights),
+                mv,
+                in_place,
+                metrics_dict[metric].func,
+                accept_missing,
+                missing_values_present_weights or missing_values_present_field,
+                skip=True,
+            )
+
+
+@mask_and_unmask_data
 def flow_downstream(
-    river_network, field, mv=np.nan, in_place=False, ufunc=np.add, accept_missing=False
+    river_network,
+    field,
+    mv=np.nan,
+    in_place=False,
+    ufunc=np.add,
+    accept_missing=False,
+    missing_values_present=None,
 ):
     """Accumulates field values downstream.
 
@@ -31,7 +103,8 @@ def flow_downstream(
         The field values accumulated downstream.
 
     """
-    missing_values_present = check_missing(field, mv, accept_missing)
+    if missing_values_present is None:
+        missing_values_present = check_missing(field, mv, accept_missing)
 
     if not in_place:
         field = field.copy()
@@ -74,7 +147,11 @@ def _ufunc_to_downstream(river_network, field, grouping, mv, ufunc):
     None
 
     """
-    ufunc.at(field, river_network.downstream_nodes[grouping], field[grouping])
+    ufunc.at(
+        field,
+        (river_network.downstream_nodes[grouping], *[slice(None)] * (field.ndim - 1)),
+        field[grouping],
+    )
 
 
 def _ufunc_to_downstream_missing_values_2D(river_network, field, grouping, mv, ufunc):
@@ -106,7 +183,7 @@ def _ufunc_to_downstream_missing_values_2D(river_network, field, grouping, mv, u
     missing_indices = np.logical_or(
         is_missing(values_to_add, mv), is_missing(field[nodes_to_update], mv)
     )
-    ufunc.at(field, nodes_to_update, values_to_add)
+    ufunc.at(field, (nodes_to_update, *[slice(None)] * (field.ndim - 1)), values_to_add)
     field[nodes_to_update[missing_indices]] = mv
 
 
@@ -139,7 +216,7 @@ def _ufunc_to_downstream_missing_values_ND(river_network, field, grouping, mv, u
     missing_indices = np.logical_or(
         is_missing(values_to_add, mv), is_missing(field[nodes_to_update], mv)
     )
-    ufunc.at(field, nodes_to_update, values_to_add)
+    ufunc.at(field, (nodes_to_update, *[slice(None)] * (field.ndim - 1)), values_to_add)
     missing_indices = np.array(np.where(missing_indices))
     missing_indices[0] = nodes_to_update[missing_indices[0]]
     field[tuple(missing_indices)] = mv

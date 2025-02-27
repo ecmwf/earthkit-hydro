@@ -14,51 +14,71 @@ def calculate_upstream_metric(
     mv=np.nan,
     in_place=False,
     accept_missing=False,
+    missing_values_present_field=None,
+    missing_values_present_weights=None,
 ):
+    missing_values_present_weights = (
+        False if weights is None else missing_values_present_weights
+    )
+
     if metric == "mean":
         field = flow_downstream(
             river_network,
-            field.T,
+            field,
             mv,
             in_place,
             metrics_dict[metric].func,
             accept_missing,
-        ).T
+            missing_values_present_field,
+            skip=True,
+        )
         weights = weights if weights is not None else np.ones(river_network.n_nodes)
         counts = flow_downstream(
             river_network,
-            weights.T,
+            weights,
             mv,
             in_place,
             metrics_dict[metric].func,
             accept_missing,
-        ).T
+            missing_values_present_weights,
+            skip=True,
+        )
         field /= counts
         return field
     else:
         if weights is None:
             return flow_downstream(
                 river_network,
-                field.T,
+                field,
                 mv,
                 in_place,
                 metrics_dict[metric].func,
                 accept_missing,
-            ).T
+                missing_values_present_field,
+                skip=True,
+            )
         else:
             return flow_downstream(
                 river_network,
-                (field * weights).T,
+                (field * weights),
                 mv,
                 in_place,
                 metrics_dict[metric].func,
                 accept_missing,
-            ).T
+                missing_values_present_weights or missing_values_present_field,
+                skip=True,
+            )
 
 
 @mask_and_unmask_data
 def flow_downstream(
-    river_network, field, mv=np.nan, in_place=False, ufunc=np.add, accept_missing=False
+    river_network,
+    field,
+    mv=np.nan,
+    in_place=False,
+    ufunc=np.add,
+    accept_missing=False,
+    missing_values_present=None,
 ):
     """Accumulates field values downstream.
 
@@ -83,7 +103,8 @@ def flow_downstream(
         The field values accumulated downstream.
 
     """
-    missing_values_present = check_missing(field, mv, accept_missing)
+    if missing_values_present is None:
+        missing_values_present = check_missing(field, mv, accept_missing)
 
     if not in_place:
         field = field.copy()

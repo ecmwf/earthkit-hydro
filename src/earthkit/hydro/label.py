@@ -5,10 +5,18 @@ from .utils import check_missing, is_missing
 
 
 def calculate_metric_for_labels(
-    field, labels, metric, field_mv=np.nan, labels_mv=0, field_accept_missing=False
+    field,
+    labels,
+    metric,
+    field_mv=np.nan,
+    labels_mv=0,
+    field_accept_missing=False,
+    missing_values_present=None,
 ):
 
-    missing_values_present = check_missing(field, field_mv, field_accept_missing)
+    if missing_values_present is None:
+        missing_values_present = check_missing(field, field_mv, field_accept_missing)
+
     if missing_values_present and not np.isnan(field_mv):
         # TODO: handle missing values
         raise NotImplementedError(

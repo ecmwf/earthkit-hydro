@@ -43,8 +43,9 @@ def calculate_upstream_metric(
             missing_values_present_weights,
             skip=True,
         )
-        field /= counts
-        return field
+        field_T = field.T
+        field_T /= counts.T
+        return field_T.T
     else:
         if weights is None:
             return flow_downstream(

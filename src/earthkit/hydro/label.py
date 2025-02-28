@@ -8,19 +8,27 @@ def calculate_metric_for_labels(
     field,
     labels,
     metric,
+    weights=None,
     field_mv=np.nan,
     labels_mv=0,
     field_accept_missing=False,
-    missing_values_present=None,
+    missing_values_present_field=None,
+    missing_values_present_weights=None,
 ):
 
-    if missing_values_present is None:
+    missing_values_present_weights = (
+        False if weights is None else missing_values_present_weights
+    )
+
+    if missing_values_present_field is None:
+        missing_values_present = check_missing(field, field_mv, field_accept_missing)
+    if missing_values_present_weights is None:
         missing_values_present = check_missing(field, field_mv, field_accept_missing)
 
-    if missing_values_present and not np.isnan(field_mv):
+    if (missing_values_present and not np.isnan(field_mv)) or weights is not None:
         # TODO: handle missing values
         raise NotImplementedError(
-            "Support for generic missing values not yet implemented."
+            "Neither support for weights nor generic missing values is implemented yet."
         )
 
     labels_ndim = labels.ndim

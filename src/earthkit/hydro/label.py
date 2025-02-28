@@ -23,27 +23,26 @@ def calculate_metric_for_labels(
     if missing_values_present_field is None:
         missing_values_present = check_missing(field, field_mv, field_accept_missing)
     if missing_values_present_weights is None:
-        missing_values_present = check_missing(field, field_mv, field_accept_missing)
+        missing_values_present = (
+            check_missing(weights, field_mv, field_accept_missing)
+            or missing_values_present
+        )
 
-    if (missing_values_present and not np.isnan(field_mv)) or weights is not None:
+    if missing_values_present and not np.isnan(field_mv):
         # TODO: handle missing values
         raise NotImplementedError(
             "Neither support for weights nor generic missing values is implemented yet."
         )
-
-    labels_ndim = labels.ndim
-    fields_ndim = field.ndim  # fields_ndim = (extra_dims, *labels_ndim)
 
     labels = labels.T
 
     mask = ~is_missing(labels, labels_mv)
     not_missing_labels = labels[mask]
 
-    expanded_mask = mask
-    for _ in range(fields_ndim - labels_ndim):
-        expanded_mask = expanded_mask[..., np.newaxis]
+    relevant_field = field[..., mask].T
 
-    relevant_field = field.T[mask]
+    if weights is not None:
+        weights = weights[..., mask].T
 
     unique_labels, unique_label_positions = np.unique(
         not_missing_labels, return_inverse=True
@@ -58,13 +57,22 @@ def calculate_metric_for_labels(
     metrics_dict[metric].func.at(
         initial_field,
         (unique_label_positions, *[slice(None)] * (initial_field.ndim - 1)),
-        relevant_field,
+        relevant_field if weights is None else (relevant_field.T * weights.T).T,
     )
 
     if metric == "mean":
-        count_values = np.bincount(
-            unique_label_positions, minlength=len(unique_labels)
-        ).astype(initial_field.dtype)
+        if weights is None:
+            count_values = np.bincount(
+                unique_label_positions, minlength=len(unique_labels)
+            ).astype(initial_field.dtype)
+        else:
+            count_values = np.full(weights.shape, metrics_dict[metric].base_val)
+            metrics_dict[metric].func.at(
+                count_values,
+                (unique_label_positions, *[slice(None)] * (count_values.ndim - 1)),
+                weights,
+            )
+
         initial_field_T = initial_field.T
         initial_field_T /= count_values
         initial_field = initial_field_T.T

@@ -72,7 +72,15 @@ def calculate_subcatchment_metric(
         points[stations] = np.arange(stations.shape[0]) + 1
         labels = find_subcatchments(river_network, points, skip=True)
         return calculate_metric_for_labels(
-            field.T, labels, metric, weights
+            field.T,
+            labels,
+            metric,
+            weights,
+            mv,
+            0,
+            accept_missing,
+            missing_values_present_field,
+            missing_values_present_weights,
         )  # todo: allow weights and missing values
 
     node_numbers = np.cumsum(river_network.mask) - 1
@@ -83,7 +91,17 @@ def calculate_subcatchment_metric(
     unique_labels = np.arange(stations_1d.shape[0]) + 1
     points[stations_1d] = unique_labels
     labels = find_subcatchments(river_network, points, skip=True)
-    metric_at_stations = calculate_metric_for_labels(field.T, labels, metric, weights)
+    metric_at_stations = calculate_metric_for_labels(
+        field.T,
+        labels,
+        metric,
+        weights,
+        mv,
+        0,
+        accept_missing,
+        missing_values_present_field,
+        missing_values_present_weights,
+    )
     return {
         (x, y): metric_at_stations[z] for (x, y, z) in zip(*stations, unique_labels)
     }

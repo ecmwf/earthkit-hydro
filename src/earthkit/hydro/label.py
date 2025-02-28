@@ -42,7 +42,7 @@ def calculate_metric_for_labels(
     relevant_field = field[..., mask].T
 
     if weights is not None:
-        weights = weights[..., mask].T
+        relevant_weights = weights[..., mask].T
 
     unique_labels, unique_label_positions = np.unique(
         not_missing_labels, return_inverse=True
@@ -57,7 +57,11 @@ def calculate_metric_for_labels(
     metrics_dict[metric].func.at(
         initial_field,
         (unique_label_positions, *[slice(None)] * (initial_field.ndim - 1)),
-        relevant_field if weights is None else (relevant_field.T * weights.T).T,
+        (
+            relevant_field
+            if weights is None
+            else (relevant_field.T * relevant_weights.T).T
+        ),
     )
 
     if metric == "mean":
@@ -66,15 +70,18 @@ def calculate_metric_for_labels(
                 unique_label_positions, minlength=len(unique_labels)
             ).astype(initial_field.dtype)
         else:
-            count_values = np.full(weights.shape, metrics_dict[metric].base_val)
+            count_values = np.full(
+                (len(unique_labels), *weights.T.shape[labels.ndim :]),
+                metrics_dict[metric].base_val,
+                dtype=weights.dtype,
+            )
             metrics_dict[metric].func.at(
                 count_values,
                 (unique_label_positions, *[slice(None)] * (count_values.ndim - 1)),
-                weights,
+                relevant_weights,
             )
-
         initial_field_T = initial_field.T
-        initial_field_T /= count_values
+        initial_field_T /= count_values.T
         initial_field = initial_field_T.T
 
     initial_field = np.transpose(

@@ -17,82 +17,57 @@ def calculate_upstream_metric(
     missing_values_present_field=None,
     missing_values_present_weights=None,
 ):
-    missing_values_present_weights = (
-        False if weights is None else missing_values_present_weights
+
+    if weights is None:
+        missing_values_present_weights = False
+        weights = np.ones(river_network.n_nodes)
+    else:
+        field = (field.T * weights.T).T
+
+    if missing_values_present_field is None:
+        missing_values_present = check_missing(field, mv)
+    else:
+        missing_values_present = missing_values_present_field
+
+    if missing_values_present_weights is None:
+        missing_values_present_weights = check_missing(weights, mv)
+        missing_values_present = (
+            missing_values_present or missing_values_present_weights
+        )
+    else:
+        missing_values_present = (
+            missing_values_present or missing_values_present_weights
+        )
+
+    ufunc = metrics_dict[metric].func
+
+    field = flow_downstream(
+        river_network,
+        field,
+        mv,
+        in_place,
+        ufunc,
+        accept_missing,
+        missing_values_present,
+        skip=True,
     )
 
     if metric == "mean":
-        if weights is None:
-            field = flow_downstream(
-                river_network,
-                field,
-                mv,
-                in_place,
-                metrics_dict[metric].func,
-                accept_missing,
-                missing_values_present_field,
-                skip=True,
-            )
-            counts = flow_downstream(
-                river_network,
-                np.ones(river_network.n_nodes),
-                mv,
-                in_place,
-                metrics_dict[metric].func,
-                accept_missing,
-                missing_values_present_weights,
-                skip=True,
-            )
-            field_T = field.T
-            field_T /= counts.T
-            return field_T.T
-        else:
-            field = flow_downstream(
-                river_network,
-                (field.T * weights.T).T,
-                mv,
-                in_place,
-                metrics_dict[metric].func,
-                accept_missing,
-                missing_values_present_field or missing_values_present_weights,
-                skip=True,
-            )
-            counts = flow_downstream(
-                river_network,
-                weights,
-                mv,
-                in_place,
-                metrics_dict[metric].func,
-                accept_missing,
-                missing_values_present_weights,
-                skip=True,
-            )
-            field_T = field.T
-            field_T /= counts.T
-            return field_T.T
+        counts = flow_downstream(
+            river_network,
+            weights,
+            mv,
+            in_place,
+            ufunc,
+            accept_missing,
+            missing_values_present_weights,
+            skip=True,
+        )
+        field_T = field.T
+        field_T /= counts.T
+        return field_T.T
     else:
-        if weights is None:
-            return flow_downstream(
-                river_network,
-                field,
-                mv,
-                in_place,
-                metrics_dict[metric].func,
-                accept_missing,
-                missing_values_present_field,
-                skip=True,
-            )
-        else:
-            return flow_downstream(
-                river_network,
-                (field.T * weights.T).T,
-                mv,
-                in_place,
-                metrics_dict[metric].func,
-                accept_missing,
-                missing_values_present_weights or missing_values_present_field,
-                skip=True,
-            )
+        return field
 
 
 @mask_and_unmask_data

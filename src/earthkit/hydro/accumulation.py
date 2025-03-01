@@ -41,6 +41,12 @@ def calculate_upstream_metric(
 
     ufunc = metrics_dict[metric].func
 
+    if missing_values_present and not np.isnan(mv):
+        # TODO: handle missing values for mean
+        raise NotImplementedError(
+            "Support for generic missing values is not yet implemented."
+        )
+
     field = flow_downstream(
         river_network,
         field,
@@ -64,7 +70,7 @@ def calculate_upstream_metric(
             skip=True,
         )
         field_T = field.T
-        field_T /= counts.T
+        field_T /= counts.T  # TODO: this does not handle arbitrary missing value logic
         return field_T.T
     else:
         return field

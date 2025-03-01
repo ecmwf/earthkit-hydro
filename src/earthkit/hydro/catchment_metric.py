@@ -18,6 +18,13 @@ def calculate_catchment_metric(
     missing_values_present_field=None,
     missing_values_present_weights=None,
 ):
+    # TODO: Future idea could be to find all
+    # nodes relevant for computing upstream
+    # average, then creating a river subnetwork
+    # and calculating upstream metric only there
+    # (should be quicker, particularly for
+    # small numbers of stations)
+
     if isinstance(stations, np.ndarray):
         upstream_metric_field = calculate_upstream_metric(
             river_network,
@@ -25,7 +32,7 @@ def calculate_catchment_metric(
             metric,
             weights,
             mv,
-            False,
+            False,  # not in_place!
             accept_missing,
             missing_values_present_field,
             missing_values_present_weights,
@@ -44,7 +51,7 @@ def calculate_catchment_metric(
         metric,
         weights,
         mv,
-        False,
+        False,  # not in_place!
         accept_missing,
         missing_values_present_field,
         missing_values_present_weights,
@@ -77,11 +84,11 @@ def calculate_subcatchment_metric(
             metric,
             weights,
             mv,
-            0,
+            0,  # missing labels value
             accept_missing,
             missing_values_present_field,
             missing_values_present_weights,
-        )  # todo: allow weights and missing values
+        )
 
     node_numbers = np.cumsum(river_network.mask) - 1
     valid_stations = river_network.mask[stations]
@@ -97,7 +104,7 @@ def calculate_subcatchment_metric(
         metric,
         weights,
         mv,
-        0,
+        0,  # missing labels value
         accept_missing,
         missing_values_present_field,
         missing_values_present_weights,

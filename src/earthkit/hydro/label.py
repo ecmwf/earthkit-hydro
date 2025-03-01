@@ -16,23 +16,7 @@ def calculate_metric_for_labels(
     missing_values_present_weights=None,
 ):
 
-    missing_values_present_weights = (
-        False if weights is None else missing_values_present_weights
-    )
-
-    if missing_values_present_field is None:
-        missing_values_present = check_missing(field, field_mv, field_accept_missing)
-    if missing_values_present_weights is None:
-        missing_values_present = (
-            check_missing(weights, field_mv, field_accept_missing)
-            or missing_values_present
-        )
-
-    if missing_values_present and not np.isnan(field_mv):
-        # TODO: handle missing values
-        raise NotImplementedError(
-            "Neither support for weights nor generic missing values is implemented yet."
-        )
+    ufunc = metrics_dict[metric].func
 
     labels = labels.T
 
@@ -41,8 +25,32 @@ def calculate_metric_for_labels(
 
     relevant_field = field[..., mask].T
 
-    if weights is not None:
+    if weights is None:
+        missing_values_present_weights = False
+    else:
         relevant_weights = weights[..., mask].T
+        relevant_field = (relevant_field.T * relevant_weights.T).T
+
+    if missing_values_present_field is None:
+        missing_values_present = check_missing(field, field_mv)
+    else:
+        missing_values_present = missing_values_present_field
+
+    if missing_values_present_weights is None:
+        missing_values_present_weights = check_missing(weights, field_mv)
+        missing_values_present = (
+            missing_values_present or missing_values_present_weights
+        )
+    else:
+        missing_values_present = (
+            missing_values_present or missing_values_present_weights
+        )
+
+    if missing_values_present and not np.isnan(field_mv):
+        # TODO: handle missing values
+        raise NotImplementedError(
+            "Support for generic missing values is not yet implemented."
+        )
 
     unique_labels, unique_label_positions = np.unique(
         not_missing_labels, return_inverse=True
@@ -54,14 +62,10 @@ def calculate_metric_for_labels(
         dtype=field.dtype,
     )
 
-    metrics_dict[metric].func.at(
+    ufunc.at(
         initial_field,
         (unique_label_positions, *[slice(None)] * (initial_field.ndim - 1)),
-        (
-            relevant_field
-            if weights is None
-            else (relevant_field.T * relevant_weights.T).T
-        ),
+        relevant_field,
     )
 
     if metric == "mean":
@@ -75,7 +79,7 @@ def calculate_metric_for_labels(
                 metrics_dict[metric].base_val,
                 dtype=weights.dtype,
             )
-            metrics_dict[metric].func.at(
+            ufunc.at(
                 count_values,
                 (unique_label_positions, *[slice(None)] * (count_values.ndim - 1)),
                 relevant_weights,

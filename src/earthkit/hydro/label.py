@@ -15,7 +15,6 @@ def calculate_metric_for_labels(
     missing_values_present_field=None,
     missing_values_present_weights=None,
 ):
-
     ufunc = metrics_dict[metric].func
 
     labels = labels.T
@@ -24,6 +23,9 @@ def calculate_metric_for_labels(
     not_missing_labels = labels[mask]
 
     relevant_field = field[..., mask].T
+
+    if missing_values_present_field is None:
+        missing_values_present_field = check_missing(field, field_accept_missing)
 
     if weights is None:
         missing_values_present_weights = False

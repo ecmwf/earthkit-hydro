@@ -1,9 +1,9 @@
 import numpy as np
 
-from .utils import check_missing, is_missing, mask_and_unmask_data
+from .utils import check_missing, is_missing, mask_and_unmask
 
 
-@mask_and_unmask_data
+@mask_and_unmask
 def move_downstream(
     river_network,
     field,
@@ -53,7 +53,7 @@ def move_downstream(
     return ups
 
 
-@mask_and_unmask_data
+@mask_and_unmask
 def move_upstream(
     river_network, field, mv=np.nan, accept_missing=False, missing_values_present=None
 ):

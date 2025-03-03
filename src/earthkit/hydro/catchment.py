@@ -1,10 +1,10 @@
 import numpy as np
 
 from .core import flow
-from .utils import is_missing, mask_and_unmask_data
+from .utils import is_missing, mask_and_unmask
 
 
-@mask_and_unmask_data
+@mask_and_unmask
 def find_catchments(river_network, field, mv=0, in_place=False):
     """Labels the catchments given a field of labelled sinks.
 
@@ -39,7 +39,7 @@ def find_catchments(river_network, field, mv=0, in_place=False):
     return flow(river_network, field, True, operation, mv)
 
 
-@mask_and_unmask_data
+@mask_and_unmask
 def find_subcatchments(river_network, field, mv=0, in_place=False):
     """Labels the subcatchments given a field of labelled sinks.
 

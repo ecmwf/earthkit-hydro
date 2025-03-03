@@ -103,7 +103,7 @@ def nan_to_missing(out_field, field_dtype, mv):
         return out_field
 
     np.nan_to_num(out_field, copy=False, nan=mv)
-    out_field = out_field.astype(field_dtype, copy=False)
+    return out_field.astype(field_dtype, copy=False)
 
 
 def mask_2d(func):

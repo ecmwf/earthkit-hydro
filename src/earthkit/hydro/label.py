@@ -1,7 +1,7 @@
 import numpy as np
 
 from .metrics import metrics_dict
-from .utils import check_missing, is_missing
+from .utils import is_missing, missing_to_nan, nan_to_missing
 
 
 def calculate_metric_for_labels(
@@ -12,8 +12,7 @@ def calculate_metric_for_labels(
     field_mv=np.nan,
     labels_mv=0,
     field_accept_missing=False,
-    missing_values_present_field=None,
-    missing_values_present_weights=None,
+    skip_missing_check=False,
 ):
     ufunc = metrics_dict[metric].func
 
@@ -24,35 +23,17 @@ def calculate_metric_for_labels(
 
     relevant_field = field[..., mask].T
 
-    if missing_values_present_field is None:
-        missing_values_present_field = check_missing(field, field_accept_missing)
+    relevant_field, field_dtype = missing_to_nan(
+        relevant_field, field_mv, field_accept_missing, skip_missing_check
+    )
 
-    if weights is None:
-        missing_values_present_weights = False
-    else:
+    if weights is not None:
+        assert field_dtype == weights.dtype
         relevant_weights = weights[..., mask].T
+        relevant_weights, _ = missing_to_nan(
+            relevant_weights, field_mv, field_accept_missing, skip_missing_check
+        )
         relevant_field = (relevant_field.T * relevant_weights.T).T
-
-    if missing_values_present_field is None:
-        missing_values_present = check_missing(field, field_mv)
-    else:
-        missing_values_present = missing_values_present_field
-
-    if missing_values_present_weights is None:
-        missing_values_present_weights = check_missing(weights, field_mv)
-        missing_values_present = (
-            missing_values_present or missing_values_present_weights
-        )
-    else:
-        missing_values_present = (
-            missing_values_present or missing_values_present_weights
-        )
-
-    if missing_values_present and not np.isnan(field_mv):
-        # TODO: handle missing values
-        raise NotImplementedError(
-            "Support for generic missing values is not yet implemented."
-        )
 
     unique_labels, unique_label_positions = np.unique(
         not_missing_labels, return_inverse=True
@@ -61,7 +42,7 @@ def calculate_metric_for_labels(
     initial_field = np.full(
         (len(unique_labels), *field.T.shape[labels.ndim :]),
         metrics_dict[metric].base_val,
-        dtype=field.dtype,
+        dtype=float,
     )
 
     ufunc.at(
@@ -79,7 +60,7 @@ def calculate_metric_for_labels(
             count_values = np.full(
                 (len(unique_labels), *weights.T.shape[labels.ndim :]),
                 metrics_dict[metric].base_val,
-                dtype=weights.dtype,
+                dtype=relevant_weights.dtype,
             )
             ufunc.at(
                 count_values,
@@ -93,5 +74,7 @@ def calculate_metric_for_labels(
     initial_field = np.transpose(
         initial_field, axes=[0] + list(range(initial_field.ndim - 1, 0, -1))
     )
+
+    initial_field = nan_to_missing(initial_field, field_dtype, field_mv)
 
     return dict(zip(unique_labels, initial_field))

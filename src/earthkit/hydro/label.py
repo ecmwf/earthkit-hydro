@@ -16,10 +16,8 @@ def calculate_metric_for_labels(
 ):
     ufunc = metrics_dict[metric].func
 
-    labels = labels.T
-
     mask = ~is_missing(labels, labels_mv)
-    not_missing_labels = labels[mask]
+    not_missing_labels = labels[mask].T
 
     relevant_field = field[..., mask].T
 

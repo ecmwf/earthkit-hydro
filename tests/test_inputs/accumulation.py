@@ -73,13 +73,36 @@ flow_downstream_min_1g = np.array(
 
 # RIVER NETWORK TWO
 
-unit_field_accuflux_2 = np.array([2, 1, 2, 1, 1, 2, 7, 3, 1, 1, 10, 6, 1, 13, 1, 2])
+# 2a: unit field input
+input_field_2a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
 
-input_field_accuflux_2 = np.array(
-    [1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16]
+mv_2a = np.nan
+
+flow_downstream_sum_2a = np.array([2, 1, 2, 1, 1, 2, 7, 3, 1, 1, 10, 6, 1, 13, 1, 2])
+
+# 2b: non-missing integer field input
+input_field_2b = np.array([1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16])
+
+mv_2b = np.nan
+
+flow_downstream_sum_2b = np.array(
+    [0, 2, 1, 4, 5, 11, 59, 9, 9, 10, 81, 52, -1, 114, 15, 31]
 )
 
+# 2c: non-missing float field input
 
-field_accuflux_2 = np.array(
+# 2d: non-missing bool field input
+
+# 2e: missing float field input with mv=np.nan
+
+# 2f: missing float field input with mv=0
+
+# 2g: missing integer field input with mv=-1
+
+input_field_2g = np.array([1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16])
+
+mv_2g = -1
+
+flow_downstream_sum_2g = np.array(
     [-1, 2, -1, 4, 5, 11, -1, -1, 9, 10, -1, -1, -1, -1, 15, 31]
 )

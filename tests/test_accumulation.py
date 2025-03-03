@@ -180,12 +180,73 @@ import earthkit.hydro as ekh
             np.minimum,
             mv_1g,
         ),
+        (
+            ("d8_ldd", d8_ldd_2),
+            input_field_2a,
+            flow_downstream_sum_2a,
+            np.add,
+            mv_2a,
+        ),
+        (
+            ("cama_downxy", cama_downxy_2),
+            input_field_2a,
+            flow_downstream_sum_2a,
+            np.add,
+            mv_2a,
+        ),
+        (
+            ("cama_nextxy", cama_nextxy_2),
+            input_field_2a,
+            flow_downstream_sum_2a,
+            np.add,
+            mv_2a,
+        ),
+        (
+            ("d8_ldd", d8_ldd_2),
+            input_field_2b,
+            flow_downstream_sum_2b,
+            np.add,
+            mv_2b,
+        ),
+        (
+            ("cama_downxy", cama_downxy_2),
+            input_field_2b,
+            flow_downstream_sum_2b,
+            np.add,
+            mv_2b,
+        ),
+        (
+            ("cama_nextxy", cama_nextxy_2),
+            input_field_2b,
+            flow_downstream_sum_2b,
+            np.add,
+            mv_2b,
+        ),
+        (
+            ("d8_ldd", d8_ldd_2),
+            input_field_2g,
+            flow_downstream_sum_2g,
+            np.add,
+            mv_2g,
+        ),
+        (
+            ("cama_downxy", cama_downxy_2),
+            input_field_2g,
+            flow_downstream_sum_2g,
+            np.add,
+            mv_2g,
+        ),
+        (
+            ("cama_nextxy", cama_nextxy_2),
+            input_field_2g,
+            flow_downstream_sum_2g,
+            np.add,
+            mv_2g,
+        ),
     ],
     indirect=["river_network"],
 )
-@pytest.mark.parametrize("N", range(4))
-def test_flow_downstream(river_network, input_field, flow_downstream, metric, mv, N):
-    print("input", input_field)
+def test_flow_downstream(river_network, input_field, flow_downstream, metric, mv):
     output_field = ekh.flow_downstream(
         river_network,
         input_field,
@@ -194,7 +255,7 @@ def test_flow_downstream(river_network, input_field, flow_downstream, metric, mv
         ufunc=metric,
         accept_missing=True,
     )
-    print("output", output_field)
+    print(output_field)
     print(flow_downstream)
     np.testing.assert_array_equal(output_field, flow_downstream)
 
@@ -215,9 +276,9 @@ def test_flow_downstream(river_network, input_field, flow_downstream, metric, mv
         (("d8_ldd", d8_ldd_1), input_field_1b, flow_downstream_sum_1g),
         (("cama_downxy", cama_downxy_1), input_field_1b, flow_downstream_sum_1g),
         (("cama_nextxy", cama_nextxy_1), input_field_1b, flow_downstream_sum_1g),
-        (("d8_ldd", d8_ldd_2), input_field_accuflux_2, field_accuflux_2),
-        (("cama_downxy", cama_downxy_2), input_field_accuflux_2, field_accuflux_2),
-        (("cama_nextxy", cama_nextxy_2), input_field_accuflux_2, field_accuflux_2),
+        (("d8_ldd", d8_ldd_2), input_field_2b, flow_downstream_sum_2g),
+        (("cama_downxy", cama_downxy_2), input_field_2b, flow_downstream_sum_2g),
+        (("cama_nextxy", cama_nextxy_2), input_field_2b, flow_downstream_sum_2g),
     ],
     indirect=["river_network"],
 )

@@ -12,67 +12,73 @@ import earthkit.hydro as ekh
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1a,
-            flow_downstream_sum_1a,
+            upstream_metric_sum_1a,
             mv_1a,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1b,
-            flow_downstream_sum_1b,
+            upstream_metric_sum_1b,
             mv_1b,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1c,
-            flow_downstream_sum_1c,
+            upstream_metric_sum_1c,
             mv_1c,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1d,
-            flow_downstream_sum_1d,
+            upstream_metric_sum_1d,
             mv_1d,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1g,
-            flow_downstream_sum_1g,
+            upstream_metric_sum_1g,
             mv_1g,
         ),
         (
             ("cama_nextxy", cama_nextxy_2),
             input_field_2a,
-            flow_downstream_sum_2a,
+            upstream_metric_sum_2a,
             mv_2a,
         ),
         (
             ("cama_nextxy", cama_nextxy_2),
             input_field_2b,
-            flow_downstream_sum_2b,
+            upstream_metric_sum_2b,
             mv_2b,
         ),
         (
             ("cama_nextxy", cama_nextxy_2),
             input_field_2g,
-            flow_downstream_sum_2g,
+            upstream_metric_sum_2g,
             mv_2g,
         ),
     ],
     indirect=["river_network"],
 )
-def test_flow_downstream_sum(river_network, input_field, flow_downstream, mv):
-    output_field = ekh.flow_downstream(
-        river_network,
-        input_field,
-        mv,
-        in_place=False,
-        ufunc=np.add,
-        accept_missing=True,
+def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
+    output_field = ekh.calculate_upstream_metric(
+        river_network, input_field, "sum", weights=None, mv=mv, accept_missing=True
     )
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
-    np.testing.assert_allclose(output_field, flow_downstream, atol=1e-10)
+    np.testing.assert_allclose(output_field, flow_downstream)
+    np.testing.assert_allclose(
+        output_field,
+        ekh.flow_downstream(
+            river_network,
+            input_field,
+            mv,
+            in_place=False,
+            ufunc=np.add,
+            accept_missing=True,
+        ),
+    )
 
 
 @pytest.mark.parametrize(
@@ -81,49 +87,55 @@ def test_flow_downstream_sum(river_network, input_field, flow_downstream, mv):
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1a,
-            flow_downstream_max_1a,
+            upstream_metric_max_1a,
             mv_1a,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1b,
-            flow_downstream_max_1b,
+            upstream_metric_max_1b,
             mv_1b,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1c,
-            flow_downstream_max_1c,
+            upstream_metric_max_1c,
             mv_1c,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1d,
-            flow_downstream_max_1d,
+            upstream_metric_max_1d,
             mv_1d,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1g,
-            flow_downstream_max_1g,
+            upstream_metric_max_1g,
             mv_1g,
         ),
     ],
     indirect=["river_network"],
 )
-def test_flow_downstream_max(river_network, input_field, flow_downstream, mv):
-    output_field = ekh.flow_downstream(
-        river_network,
-        input_field,
-        mv,
-        in_place=False,
-        ufunc=np.maximum,
-        accept_missing=True,
+def test_calculate_upstream_metric_max(river_network, input_field, flow_downstream, mv):
+    output_field = ekh.calculate_upstream_metric(
+        river_network, input_field, "max", weights=None, mv=mv, accept_missing=True
     )
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
-    np.testing.assert_allclose(output_field, flow_downstream, atol=1e-10)
+    np.testing.assert_allclose(output_field, flow_downstream)
+    np.testing.assert_allclose(
+        output_field,
+        ekh.flow_downstream(
+            river_network,
+            input_field,
+            mv,
+            in_place=False,
+            ufunc=np.maximum,
+            accept_missing=True,
+        ),
+    )
 
 
 @pytest.mark.parametrize(
@@ -132,60 +144,90 @@ def test_flow_downstream_max(river_network, input_field, flow_downstream, mv):
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1a,
-            flow_downstream_min_1a,
+            upstream_metric_min_1a,
             mv_1a,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1b,
-            flow_downstream_min_1b,
+            upstream_metric_min_1b,
             mv_1b,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1c,
-            flow_downstream_min_1c,
+            upstream_metric_min_1c,
             mv_1c,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1d,
-            flow_downstream_min_1d,
+            upstream_metric_min_1d,
             mv_1d,
         ),
         (
             ("cama_nextxy", cama_nextxy_1),
             input_field_1g,
-            flow_downstream_min_1g,
+            upstream_metric_min_1g,
             mv_1g,
         ),
     ],
     indirect=["river_network"],
 )
-def test_flow_downstream_min(river_network, input_field, flow_downstream, mv):
-    output_field = ekh.flow_downstream(
-        river_network,
-        input_field,
-        mv,
-        in_place=False,
-        ufunc=np.minimum,
-        accept_missing=True,
+def test_calculate_upstream_metric_min(river_network, input_field, flow_downstream, mv):
+    output_field = ekh.calculate_upstream_metric(
+        river_network, input_field, "min", weights=None, mv=mv, accept_missing=True
     )
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
-    np.testing.assert_allclose(output_field, flow_downstream, atol=1e-10)
+    np.testing.assert_allclose(output_field, flow_downstream)
+    np.testing.assert_allclose(
+        output_field,
+        ekh.flow_downstream(
+            river_network,
+            input_field,
+            mv,
+            in_place=False,
+            ufunc=np.minimum,
+            accept_missing=True,
+        ),
+    )
+
+
+@pytest.mark.parametrize(
+    "river_network, input_field, flow_downstream, mv",
+    [
+        (
+            ("cama_nextxy", cama_nextxy_1),
+            input_field_1a,
+            upstream_metric_mean_1a,
+            mv_1a,
+        ),
+    ],
+    indirect=["river_network"],
+)
+def test_calculate_upstream_metric_mean(
+    river_network, input_field, flow_downstream, mv
+):
+    output_field = ekh.calculate_upstream_metric(
+        river_network, input_field, "mean", weights=None, mv=mv, accept_missing=True
+    )
+    print(output_field)
+    print(flow_downstream)
+    assert output_field.dtype == flow_downstream.dtype
+    np.testing.assert_allclose(output_field, flow_downstream)
 
 
 @pytest.mark.parametrize(
     "river_network, input_field, accum_field",
     [
-        (("d8_ldd", d8_ldd_1), input_field_1b, flow_downstream_sum_1g),
-        (("cama_downxy", cama_downxy_1), input_field_1b, flow_downstream_sum_1g),
-        (("cama_nextxy", cama_nextxy_1), input_field_1b, flow_downstream_sum_1g),
-        (("d8_ldd", d8_ldd_2), input_field_2b, flow_downstream_sum_2g),
-        (("cama_downxy", cama_downxy_2), input_field_2b, flow_downstream_sum_2g),
-        (("cama_nextxy", cama_nextxy_2), input_field_2b, flow_downstream_sum_2g),
+        (("d8_ldd", d8_ldd_1), input_field_1b, upstream_metric_sum_1g),
+        (("cama_downxy", cama_downxy_1), input_field_1b, upstream_metric_sum_1g),
+        (("cama_nextxy", cama_nextxy_1), input_field_1b, upstream_metric_sum_1g),
+        (("d8_ldd", d8_ldd_2), input_field_2b, upstream_metric_sum_2g),
+        (("cama_downxy", cama_downxy_2), input_field_2b, upstream_metric_sum_2g),
+        (("cama_nextxy", cama_nextxy_2), input_field_2b, upstream_metric_sum_2g),
     ],
     indirect=["river_network"],
 )

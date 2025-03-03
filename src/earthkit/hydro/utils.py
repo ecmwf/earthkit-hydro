@@ -87,23 +87,21 @@ def missing_to_nan(field, mv, accept_missing, skip=False):
         else:
             print("Warning: missing values present in input field.")
 
-    if np.isnan(mv):
-        return field, field.dtype
-
     field_dtype = field.dtype
-    field = field.astype(float, copy=False)  # convert to float64
+    if not field_dtype == np.float64:
+        field = field.astype(np.float64, copy=False)  # convert to float64
+    if np.isnan(mv):
+        return field, field_dtype
     field[missing_mask] = np.nan
     return field, field_dtype
 
 
 def nan_to_missing(out_field, field_dtype, mv):
-    if np.isnan(mv):
-        # TODO: potentially should check if we
-        # converted from e.g. float32 to float64
-        return out_field
-
-    np.nan_to_num(out_field, copy=False, nan=mv)
-    return out_field.astype(field_dtype, copy=False)
+    if not np.isnan(mv):
+        np.nan_to_num(out_field, copy=False, nan=mv)
+    if not field_dtype == np.float64:
+        out_field = out_field.astype(field_dtype, copy=False)
+    return out_field
 
 
 def mask_2d(func):

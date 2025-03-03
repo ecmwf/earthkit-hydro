@@ -18,7 +18,7 @@ def calculate_upstream_metric(
 
     field, field_dtype = missing_to_nan(field, mv, accept_missing)
     if weights is None:
-        weights = np.ones(river_network.n_nodes, dtype=field_dtype)
+        weights = np.ones(river_network.n_nodes, dtype=np.float64)
     else:
         assert field_dtype == weights.dtype
         weights, _ = missing_to_nan(weights, mv, accept_missing)

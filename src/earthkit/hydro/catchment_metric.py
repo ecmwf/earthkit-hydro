@@ -15,8 +15,6 @@ def calculate_catchment_metric(
     weights=None,
     mv=np.nan,
     accept_missing=False,
-    missing_values_present_field=None,
-    missing_values_present_weights=None,
 ):
     # TODO: Future idea could be to find all
     # nodes relevant for computing upstream
@@ -34,8 +32,6 @@ def calculate_catchment_metric(
             mv,
             False,  # not in_place!
             accept_missing,
-            missing_values_present_field,
-            missing_values_present_weights,
             skip=True,
         )
         return dict(zip(stations, upstream_metric_field))
@@ -53,8 +49,6 @@ def calculate_catchment_metric(
         mv,
         False,  # not in_place!
         accept_missing,
-        missing_values_present_field,
-        missing_values_present_weights,
         skip=True,
     )
     metric_at_stations = upstream_metric_field[stations_1d]
@@ -71,8 +65,6 @@ def calculate_subcatchment_metric(
     weights=None,
     mv=np.nan,
     accept_missing=False,
-    missing_values_present_field=None,
-    missing_values_present_weights=None,
 ):
     if isinstance(stations, np.ndarray):
         points = np.zeros(river_network.n_nodes, dtype=int)
@@ -86,8 +78,6 @@ def calculate_subcatchment_metric(
             mv,
             0,  # missing labels value
             accept_missing,
-            missing_values_present_field,
-            missing_values_present_weights,
         )
 
     node_numbers = np.cumsum(river_network.mask) - 1
@@ -106,8 +96,6 @@ def calculate_subcatchment_metric(
         mv,
         0,  # missing labels value
         accept_missing,
-        missing_values_present_field,
-        missing_values_present_weights,
     )
     return {
         (x, y): metric_at_stations[z] for (x, y, z) in zip(*stations, unique_labels)

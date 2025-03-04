@@ -16,6 +16,32 @@ def calculate_catchment_metric(
     mv=np.nan,
     accept_missing=False,
 ):
+    """
+    Calculates the metric over the catchments defined by stations.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    field : numpy.ndarray
+        The input field.
+    stations : tuple
+        Tuple of indices of the stations.
+    metric : str
+        Metric to compute. Options are "mean", "max", "min", "sum"
+    weights : ndarray, optional
+        Used to weight the field when computing the metric. Default is None.
+    mv : scalar, optional
+        Missing value for the input field. Default is np.nan.
+    accept_missing : bool, optional
+        Whether or not to accept missing values in the input field. Default is False.
+
+    Returns
+    -------
+    dict
+        Dictionary with (station, catchment_metric) pairs.
+
+    """
     # TODO: Future idea could be to find all
     # nodes relevant for computing upstream
     # average, then creating a river subnetwork
@@ -72,6 +98,31 @@ def calculate_subcatchment_metric(
     mv=np.nan,
     accept_missing=False,
 ):
+    """
+    Calculates the metric over the subcatchments defined by stations.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    field : numpy.ndarray
+        The input field.
+    stations : tuple
+        Tuple of indices of the stations.
+    metric : str
+        Metric to compute. Options are "mean", "max", "min", "sum"
+    weights : ndarray
+        Used to weight the field when computing the metric. Default is None.
+    mv : scalar
+        Missing value for the input field. Default is np.nan.
+    accept_missing : bool
+        Whether or not to accept missing values in the input field. Default is False.
+
+    Returns
+    -------
+    dict
+        Dictionary with (station, catchment_metric) pairs.
+    """
     if isinstance(stations, np.ndarray):
         points = np.zeros(river_network.n_nodes, dtype=int)
         points[stations] = np.arange(stations.shape[0]) + 1

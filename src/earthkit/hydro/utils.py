@@ -74,6 +74,29 @@ def check_missing(field, mv, accept_missing):
 
 
 def missing_to_nan(field, mv, accept_missing, skip=False):
+    """
+    Converts a field with arbitrary missing values to a field of type float with nans.
+
+        Parameters
+    ----------
+    field : numpy.ndarray
+       The input field.
+    mv : scalar
+        Missing values for the input field.
+    accept_missing : bool
+        If True, missing values are allowed in the input field.
+    skip : bool, optional
+        Skip this function. Default is False.
+
+    Returns
+    -------
+    numpy.ndarray
+        Output field.
+    numpy.dtype
+        dtype of the original field.
+
+
+    """
     if skip:
         return field, field.dtype
 
@@ -97,6 +120,25 @@ def missing_to_nan(field, mv, accept_missing, skip=False):
 
 
 def nan_to_missing(out_field, field_dtype, mv):
+    """
+    Converts a floating field with np.nans back to original field
+    with original missing values.
+
+        Parameters
+    ----------
+    out_field : numpy.ndarray
+       Field of type float with np.nans.
+    field_dtype : numpy.dtype
+        dtype to convert to.
+    mv : scalar
+        Original missing values.
+
+    Returns
+    -------
+    numpy.ndarray
+        Output field.
+
+    """
     if not np.isnan(mv):
         np.nan_to_num(out_field, copy=False, nan=mv)
     if not field_dtype == np.float64:

@@ -14,6 +14,33 @@ def calculate_metric_for_labels(
     field_accept_missing=False,
     skip_missing_check=False,
 ):
+    """
+    Calculate a metric for each label.
+
+    Parameters
+    ----------
+    field : ndarray
+        The field data.
+    labels : ndarray
+        The labels for the field.
+    metric : str
+        Metric to compute. Options are "mean", "max", "min", "sum"
+    weights : ndarray, optional
+        Used to weight the field when computing the metric. Default is None.
+    field_mv : scalar, optional
+        The missing value for the input fields. Default is np.nan.
+    labels_mv : scalar, optional
+        The missing values for the labels. Default is 0.
+    field_accept_missing : bool, optional
+        Whether or not to accept missing values in the input fields. Default is False.
+    skip_missing_check : bool, optional
+        Whether or not to skip checking for missing values. Default is False.
+
+    Returns
+    -------
+    dict
+        Dictionary with (label, metric) pairs.
+    """
     ufunc = metrics_dict[metric].func
 
     mask = ~is_missing(labels, labels_mv)

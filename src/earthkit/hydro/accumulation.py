@@ -15,7 +15,32 @@ def calculate_upstream_metric(
     in_place=False,
     accept_missing=False,
 ):
+    """
+    Calculates a metric for the field over all upstream values.
 
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    field : numpy.ndarray
+        The input field.
+    metric : str
+        Metric to compute. Options are "mean", "max", "min", "sum"
+    weights : ndarray, optional
+        Used to weight the field when computing the metric. Default is None.
+    mv : scalar, optional
+        Missing value for the input field. Default is np.nan.
+    in_place : bool, optional
+        Whether to conduct the operation in-place. Default is False.
+    accept_missing : bool, optional
+        Whether or not to accept missing values in the input field. Default is False.
+
+    Returns
+    -------
+    numpy.ndarray
+        Output field.
+
+    """
     field, field_dtype = missing_to_nan(field, mv, accept_missing)
     if weights is None:
         weights = np.ones(river_network.n_nodes, dtype=np.float64)
@@ -83,6 +108,8 @@ def flow_downstream(
         The universal function (ufunc) to use for accumulation. Default is np.add.
     accept_missing : bool, optional
         If True, accepts missing values in the field. Default is False.
+    skip_missing_check : bool, optional
+        Whether to skip checking for missing values. Default is False.
 
     Returns
     -------

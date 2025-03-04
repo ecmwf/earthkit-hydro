@@ -15,6 +15,8 @@ def move_downstream(
 
     Parameters
     ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field representing node values.
     mv : scalar, optional
@@ -52,6 +54,8 @@ def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
 
     Parameters
     ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field representing node values.
     mv : scalar, optional

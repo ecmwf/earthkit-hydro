@@ -278,3 +278,83 @@ def test_accumulate_downstream_2d(river_network, N):
         ekh.flow_downstream(river_network, field)[..., ~river_network.mask],
         field[..., ~river_network.mask],
     )
+
+
+@pytest.mark.parametrize(
+    "river_network",
+    [
+        ("d8_ldd", d8_ldd_1),
+        ("cama_downxy", cama_downxy_1),
+        ("cama_nextxy", cama_nextxy_1),
+        ("d8_ldd", d8_ldd_2),
+        ("cama_downxy", cama_downxy_2),
+        ("cama_nextxy", cama_nextxy_2),
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean"])
+def test_calculate_catchment(river_network, metric):
+    field = np.random.rand(3, 4, river_network.n_nodes)
+    weights = np.random.rand(3, 4, river_network.n_nodes)
+    catchment_metric = ekh.calculate_catchment_metric(
+        river_network, field, river_network.nodes, metric, weights
+    )
+    upstream_field = ekh.calculate_upstream_metric(
+        river_network, field, metric, weights
+    )
+    print(catchment_metric[0].shape, upstream_field.shape)
+    for i in catchment_metric.keys():
+        assert catchment_metric[i].dtype == upstream_field.dtype
+        np.testing.assert_allclose(catchment_metric[i], upstream_field[..., i])
+
+
+@pytest.mark.parametrize(
+    "river_network",
+    [
+        ("d8_ldd", d8_ldd_1),
+        ("cama_downxy", cama_downxy_1),
+        ("cama_nextxy", cama_nextxy_1),
+        ("d8_ldd", d8_ldd_2),
+        ("cama_downxy", cama_downxy_2),
+        ("cama_nextxy", cama_nextxy_2),
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize("metric", ["sum"])
+def test_calculate_subcatchment(river_network, metric):
+    field = np.random.rand(3, 4, river_network.n_nodes)
+    weights = np.random.rand(3, 4, river_network.n_nodes)
+    subcatchment_metric = ekh.calculate_subcatchment_metric(
+        river_network, field, river_network.sinks, metric, weights
+    )
+    catchment_metric = ekh.calculate_catchment_metric(
+        river_network, field, river_network.sinks, metric, weights
+    )
+    for i in catchment_metric.keys():
+        assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
+        np.testing.assert_allclose(subcatchment_metric[i], catchment_metric[i])
+
+    subcatchment_metric = ekh.calculate_subcatchment_metric(
+        river_network, field, river_network.nodes, metric, weights
+    )
+    catchment_metric = ekh.calculate_catchment_metric(
+        river_network,
+        field,
+        np.array(
+            [
+                i
+                for i in river_network.nodes
+                if i not in river_network.sinks and i not in river_network.sources
+            ]
+        ),
+        metric,
+        weights,
+    )
+    for i in catchment_metric.keys():
+        assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
+        np.testing.assert_raises(
+            AssertionError,
+            np.testing.assert_array_equal,
+            subcatchment_metric[i],
+            catchment_metric[i],
+        )

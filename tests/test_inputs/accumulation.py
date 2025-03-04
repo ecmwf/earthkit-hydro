@@ -22,7 +22,7 @@ upstream_metric_min_1a = np.array(
 )
 
 upstream_metric_mean_1a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=float
 )
 
 # 1b: non-missing integer field input
@@ -42,6 +42,32 @@ upstream_metric_max_1b = np.array(
 
 upstream_metric_min_1b = np.array(
     [1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, -1, 4, 5, 6, -1, -1, -1, -1], dtype=int
+)
+
+upstream_metric_mean_1b = np.array(
+    [
+        1.0,
+        2.0,
+        3.0,
+        -1.0,
+        5.0,
+        3.5,
+        4.5,
+        3.333333333,
+        7.0,
+        10.0,
+        2.666666667,
+        3.666666667,
+        5.111111111,
+        6.333333333,
+        5.0,
+        6.0,
+        4.7,
+        5.333333333,
+        4.0,
+        -1.0,
+    ],
+    dtype=float,
 )
 
 # 1c: non-missing float field input
@@ -146,6 +172,32 @@ upstream_metric_min_1c = np.array(
         -8.9,
         1.1,
         1.1,
+        1.1,
+    ],
+    dtype=float,
+)
+
+upstream_metric_mean_1c = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        3.3,
+        9.2,
+        3.76666667,
+        2.8,
+        1.5,
+        3.26666667,
+        7.66666667,
+        2.62222222,
+        0.1,
+        -4.5,
+        -8.9,
+        2.805,
+        3.56666667,
+        2.75,
         1.1,
     ],
     dtype=float,
@@ -256,6 +308,32 @@ upstream_metric_min_1d = np.array(
         False,
     ],
     dtype=bool,
+)
+
+upstream_metric_mean_1d = np.array(
+    [
+        1.0,
+        0.0,
+        1.0,
+        1.0,
+        0.0,
+        0.5,
+        0.0,
+        0.666666666667,
+        0.0,
+        1.0,
+        0.666666666667,
+        0.0,
+        0.555555555556,
+        1.0,
+        1.0,
+        1.0,
+        0.45,
+        0.333333333333,
+        0.5,
+        0.0,
+    ],
+    dtype=float,
 )
 
 # 1e: missing float field input with mv=np.nan

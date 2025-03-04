@@ -50,7 +50,9 @@ def calculate_upstream_metric(
         )
         field_T = field.T
         field_T /= counts.T
-        return nan_to_missing(field_T.T, field_dtype, mv)
+        return nan_to_missing(
+            field_T.T, np.float64, mv
+        )  # if we compute means, we change dtype for int fields etc.
     else:
         return nan_to_missing(field, field_dtype, mv)
 

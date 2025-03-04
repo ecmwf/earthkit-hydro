@@ -204,6 +204,24 @@ def test_calculate_upstream_metric_min(river_network, input_field, flow_downstre
             upstream_metric_mean_1a,
             mv_1a,
         ),
+        (
+            ("cama_nextxy", cama_nextxy_1),
+            input_field_1b,
+            upstream_metric_mean_1b,
+            mv_1b,
+        ),
+        (
+            ("cama_nextxy", cama_nextxy_1),
+            input_field_1c,
+            upstream_metric_mean_1c,
+            mv_1c,
+        ),
+        (
+            ("cama_nextxy", cama_nextxy_1),
+            input_field_1d,
+            upstream_metric_mean_1d,
+            mv_1d,
+        ),
     ],
     indirect=["river_network"],
 )
@@ -213,8 +231,6 @@ def test_calculate_upstream_metric_mean(
     output_field = ekh.calculate_upstream_metric(
         river_network, input_field, "mean", weights=None, mv=mv, accept_missing=True
     )
-    print(output_field)
-    print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
     np.testing.assert_allclose(output_field, flow_downstream)
 

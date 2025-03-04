@@ -255,13 +255,23 @@ def mask_and_unmask(func):
         mv = mv if mv is not None else func.__defaults__[0]
         if field.shape[-2:] == river_network.mask.shape:
             in_place = kwargs.get("in_place", False)
+
+            values_on_river_network = mask_2d(func)(
+                river_network, field, *args, **kwargs
+            ).T
+
             if in_place:
                 out_field = field
             else:
-                out_field = np.empty(field.shape, dtype=field.dtype)
-            out_field[..., river_network.mask] = mask_2d(func)(
-                river_network, field, *args, **kwargs
-            ).T
+                out_field = np.empty(field.shape, dtype=values_on_river_network.dtype)
+
+            out_field[..., river_network.mask] = values_on_river_network
+
+            if np.result_type(mv, field) != field.dtype:
+                raise ValueError(
+                    f"Missing value of type {type(mv)} is not compatible"
+                    f" with field of dtype {field.dtype}"
+                )
 
             out_field[..., ~river_network.mask] = mv
             return out_field

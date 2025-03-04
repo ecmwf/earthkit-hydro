@@ -203,7 +203,7 @@ upstream_metric_mean_1c = np.array(
     dtype=float,
 )
 
-# 1d: non-missing bool field input
+# 1d: bool field input
 input_field_1d = np.array(
     [
         True,
@@ -230,7 +230,7 @@ input_field_1d = np.array(
     dtype=bool,
 )
 
-mv_1d = 2
+mv_1d = False
 
 upstream_metric_sum_1d = np.array(
     [
@@ -239,58 +239,6 @@ upstream_metric_sum_1d = np.array(
         True,
         True,
         False,
-        True,
-        False,
-        True,
-        False,
-        True,
-        True,
-        False,
-        True,
-        True,
-        True,
-        True,
-        True,
-        True,
-        True,
-        False,
-    ],
-    dtype=bool,
-)
-
-upstream_metric_max_1d = np.array(
-    [
-        True,
-        False,
-        True,
-        True,
-        False,
-        True,
-        False,
-        True,
-        False,
-        True,
-        True,
-        False,
-        True,
-        True,
-        True,
-        True,
-        True,
-        True,
-        True,
-        False,
-    ],
-    dtype=bool,
-)
-
-upstream_metric_min_1d = np.array(
-    [
-        True,
-        False,
-        True,
-        True,
-        False,
         False,
         False,
         False,
@@ -310,31 +258,11 @@ upstream_metric_min_1d = np.array(
     dtype=bool,
 )
 
-upstream_metric_mean_1d = np.array(
-    [
-        1.0,
-        0.0,
-        1.0,
-        1.0,
-        0.0,
-        0.5,
-        0.0,
-        0.666666666667,
-        0.0,
-        1.0,
-        0.666666666667,
-        0.0,
-        0.555555555556,
-        1.0,
-        1.0,
-        1.0,
-        0.45,
-        0.333333333333,
-        0.5,
-        0.0,
-    ],
-    dtype=float,
-)
+upstream_metric_max_1d = upstream_metric_sum_1d
+
+upstream_metric_min_1d = upstream_metric_sum_1d
+
+upstream_metric_mean_1d = upstream_metric_sum_1d.astype("float")
 
 # 1e: missing float field input with mv=np.nan
 

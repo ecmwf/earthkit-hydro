@@ -83,9 +83,6 @@ def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
 
     input_field = convert_to_2d(river_network, input_field, 0)
     flow_downstream = convert_to_2d(river_network, flow_downstream, 0)
-    print(input_field)
-    print(flow_downstream)
-    print(mv)
     output_field = ekh.calculate_upstream_metric(
         river_network, input_field, "sum", weights=None, mv=mv, accept_missing=True
     )
@@ -256,6 +253,16 @@ def test_calculate_upstream_metric_mean(
     output_field = ekh.calculate_upstream_metric(
         river_network, input_field, "mean", weights=None, mv=mv, accept_missing=True
     )
+    assert output_field.dtype == flow_downstream.dtype
+    np.testing.assert_allclose(output_field, flow_downstream)
+
+    input_field = convert_to_2d(river_network, input_field, 0)
+    flow_downstream = convert_to_2d(river_network, flow_downstream, 0)
+    output_field = ekh.calculate_upstream_metric(
+        river_network, input_field, "mean", weights=None, mv=mv, accept_missing=True
+    )
+    print(output_field)
+    print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
     np.testing.assert_allclose(output_field, flow_downstream)
 

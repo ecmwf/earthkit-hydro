@@ -15,6 +15,3 @@ def river_network(request):
     # TODO: add ESRI
 
     return river_network
-
-
-atol = 1e-10

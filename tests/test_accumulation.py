@@ -2,6 +2,7 @@ import numpy as np
 import pytest
 from test_inputs.accumulation import *
 from test_inputs.readers import *
+from utils import convert_to_2d
 
 import earthkit.hydro as ekh
 
@@ -73,7 +74,31 @@ def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
         ekh.flow_downstream(
             river_network,
             input_field,
-            mv,
+            mv=mv,
+            in_place=False,
+            ufunc=np.add,
+            accept_missing=True,
+        ),
+    )
+
+    input_field = convert_to_2d(river_network, input_field, 0)
+    flow_downstream = convert_to_2d(river_network, flow_downstream, 0)
+    print(input_field)
+    print(flow_downstream)
+    print(mv)
+    output_field = ekh.calculate_upstream_metric(
+        river_network, input_field, "sum", weights=None, mv=mv, accept_missing=True
+    )
+    print(output_field)
+    print(flow_downstream)
+    assert output_field.dtype == flow_downstream.dtype
+    np.testing.assert_allclose(output_field, flow_downstream)
+    np.testing.assert_allclose(
+        output_field,
+        ekh.flow_downstream(
+            river_network,
+            input_field,
+            mv=mv,
             in_place=False,
             ufunc=np.add,
             accept_missing=True,

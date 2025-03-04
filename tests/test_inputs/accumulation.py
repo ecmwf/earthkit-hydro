@@ -7,7 +7,7 @@ input_field_1a = np.array(
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
 )
 
-mv_1a = np.nan
+mv_1a = np.iinfo(np.int64).max
 
 upstream_metric_sum_1a = np.array(
     [1, 1, 1, 1, 1, 2, 2, 3, 2, 1, 3, 3, 9, 3, 1, 1, 20, 3, 2, 1], dtype=int
@@ -30,7 +30,7 @@ input_field_1b = np.array(
     [1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1], dtype=int
 )
 
-mv_1b = np.nan
+mv_1b = np.iinfo(np.int64).max
 
 upstream_metric_sum_1b = np.array(
     [1, 2, 3, -1, 5, 7, 9, 10, 14, 10, 8, 11, 46, 19, 5, 6, 94, 16, 8, -1], dtype=int
@@ -230,7 +230,7 @@ input_field_1d = np.array(
     dtype=bool,
 )
 
-mv_1d = np.nan
+mv_1d = 2
 
 upstream_metric_sum_1d = np.array(
     [
@@ -368,7 +368,7 @@ upstream_metric_min_1g = np.array(
 # 2a: unit field input
 input_field_2a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int)
 
-mv_2a = np.nan
+mv_2a = np.iinfo(np.int64).max
 
 upstream_metric_sum_2a = np.array(
     [2, 1, 2, 1, 1, 2, 7, 3, 1, 1, 10, 6, 1, 13, 1, 2], dtype=int
@@ -379,7 +379,7 @@ input_field_2b = np.array(
     [1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16], dtype=int
 )
 
-mv_2b = np.nan
+mv_2b = np.iinfo(np.int64).max
 
 upstream_metric_sum_2b = np.array(
     [0, 2, 1, 4, 5, 11, 59, 9, 9, 10, 81, 52, -1, 114, 15, 31], dtype=int

@@ -35,7 +35,7 @@ def move_downstream(
 
     field, field_dtype = missing_to_nan(field, mv, accept_missing)
 
-    ups = np.zeros((river_network.n_nodes, *field.T.shape[1:]), dtype=field_dtype)
+    ups = np.zeros(field.shape, dtype=field_dtype)
     mask = (
         river_network.downstream_nodes != river_network.n_nodes
     )  # remove sinks since they have no downstream
@@ -72,9 +72,9 @@ def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
 
     field, field_dtype = missing_to_nan(field, mv, accept_missing)
 
-    down = np.zeros((river_network.n_nodes, *field.T.shape[1:]), dtype=field_dtype)
+    down = np.zeros(field.shape, dtype=field_dtype)
     mask = river_network.downstream_nodes != river_network.n_nodes  # remove sinks
-    down[mask] = field[river_network.downstream_nodes[mask]]
+    down[mask] = field[river_network.downstream_nodes[mask], ...]
 
     down = nan_to_missing(down, field_dtype, mv)
 

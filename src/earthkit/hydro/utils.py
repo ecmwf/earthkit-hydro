@@ -77,7 +77,7 @@ def missing_to_nan(field, mv, accept_missing, skip=False):
     """
     Converts a field with arbitrary missing values to a field of type float with nans.
 
-        Parameters
+    Parameters
     ----------
     field : numpy.ndarray
        The input field.
@@ -124,7 +124,7 @@ def nan_to_missing(out_field, field_dtype, mv):
     Converts a floating field with np.nans back to original field
     with original missing values.
 
-        Parameters
+    Parameters
     ----------
     out_field : numpy.ndarray
        Field of type float with np.nans.

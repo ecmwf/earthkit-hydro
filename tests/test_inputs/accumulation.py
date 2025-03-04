@@ -288,8 +288,6 @@ upstream_metric_min_1g = np.array(
     [1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, -1, 4, 5, 6, -1, -1, -1, -1], dtype=int
 )
 
-# 1h: missing bool field input with mv=False
-
 
 # RIVER NETWORK TWO
 
@@ -315,7 +313,7 @@ upstream_metric_sum_2b = np.array(
 
 # 2c: non-missing float field input
 
-# 2d: non-missing bool field input
+# 2d: bool field input
 
 # 2e: missing float field input with mv=np.nan
 

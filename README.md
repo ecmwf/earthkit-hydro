@@ -182,16 +182,16 @@ Exports the `RiverNetwork` as a joblib pickle.
 
 ## Migrating from PCRaster
 
-earthkit-hydro provides many functons with pcraster equivalents, summarised below:
+earthkit-hydro provides many functions with PCRaster equivalents, summarised below:
 
 | PCRaster | earthkit-hydro |  Note |
 |---|---|---|
 | accuflux | calculate_upstream_metric | metric="sum" |
 | catchmenttotal | calculate_upstream_metric | metric="sum"  |
-| areatotal | calculate_metric_for_labels | metric="sum". Returns dictionary, not full field |
-| areaaverage | calculate_metric_for_labels | metric="mean". Returns dictionary, not full field |
-| areamaximum | calculate_metric_for_labels | metric="max". Returns dictionary, not full field |
-| areaminimum | calculate_metric_for_labels | metric="min". Returns dictionary, not full field |
+| areatotal | calculate_metric_for_labels | metric="sum". Returns dictionary, not a field |
+| areaaverage | calculate_metric_for_labels | metric="mean". Returns dictionary, not a field |
+| areamaximum | calculate_metric_for_labels | metric="max". Returns dictionary, not a field |
+| areaminimum | calculate_metric_for_labels | metric="min". Returns dictionary, not a field |
 | downstream | move_upstream | |
 | upstream | move_downstream | |
 | catchment | find_catchments | |

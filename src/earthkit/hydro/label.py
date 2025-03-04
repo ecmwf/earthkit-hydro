@@ -11,6 +11,7 @@ def calculate_metric_for_labels(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
+    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -67,7 +68,7 @@ def calculate_metric_for_labels(
     initial_field = np.full(
         (len(unique_labels), *field.T.shape[labels.ndim :]),
         metrics_dict[metric].base_val,
-        dtype=float,
+        dtype=np.float64,
     )
 
     ufunc.at(
@@ -96,10 +97,18 @@ def calculate_metric_for_labels(
         initial_field_T /= count_values.T
         initial_field = initial_field_T.T
 
+        field_dtype = np.float64
+
     initial_field = np.transpose(
         initial_field, axes=[0] + list(range(initial_field.ndim - 1, 0, -1))
     )
 
     initial_field = nan_to_missing(initial_field, field_dtype, field_mv)
 
-    return dict(zip(unique_labels, initial_field))
+    if return_field:
+        out_field = np.empty(field.T.shape)
+        out_field[(~mask).T] = field_mv
+        out_field[mask.T] = initial_field[unique_label_positions]
+        return out_field.T
+    else:
+        return dict(zip(unique_labels, initial_field))

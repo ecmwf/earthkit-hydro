@@ -182,13 +182,13 @@ Exports the `RiverNetwork` as a joblib pickle.
 
 ## Migrating from PCRaster
 
-earthkit-hydro provides many functons with pcraster equivalents, summarised below.
+earthkit-hydro provides many functons with pcraster equivalents, summarised below:
 
 | PCRaster | earthkit-hydro |  Note |
 |---|---|---|
 | accuflux | calculate_upstream_metric | metric="sum" |
 | catchmenttotal | calculate_upstream_metric | metric="sum"  |
-| areatotal | calculate_metric_for_labels | metric="suma". Returns dictionary, not full field |
+| areatotal | calculate_metric_for_labels | metric="sum". Returns dictionary, not full field |
 | areaaverage | calculate_metric_for_labels | metric="mean". Returns dictionary, not full field |
 | areamaximum | calculate_metric_for_labels | metric="max". Returns dictionary, not full field |
 | areaminimum | calculate_metric_for_labels | metric="min". Returns dictionary, not full field |
@@ -198,7 +198,7 @@ earthkit-hydro provides many functons with pcraster equivalents, summarised belo
 | subcatchment | find_subcatchments | |
 | abs, sin, cos, tan, ...  | np.abs, np.sin, np.cos, np.tan, ... | any numpy operations can be directly used |
 
-Points of difference
+_Points of difference_
 - earthkit-hydro treats missing values as np.nans i.e. any arithmetic involving a missing value will return a missing value. PCRaster does not always handle missing values exactly the same.
 - earthkit-hydro can handle vector fields and fields of integers, floats, bools. PCRaster supports a restricted subset of this.
 

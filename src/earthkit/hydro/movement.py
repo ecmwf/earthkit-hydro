@@ -1,6 +1,6 @@
 import numpy as np
 
-from .utils import check_missing, is_missing, mask_and_unmask
+from .utils import mask_and_unmask, missing_to_nan, nan_to_missing
 
 
 @mask_and_unmask
@@ -10,7 +10,6 @@ def move_downstream(
     mv=np.nan,
     ufunc=np.add,
     accept_missing=False,
-    missing_values_present=None,
 ):
     """Sets each node to be the sum of its upstream nodes values, or a missing value.
 
@@ -32,31 +31,23 @@ def move_downstream(
 
     """
 
-    if missing_values_present is None:
-        missing_values_present = check_missing(field, mv, accept_missing)
+    field, field_dtype = missing_to_nan(field, mv, accept_missing)
 
-    ups = np.zeros(river_network.n_nodes, dtype=field.dtype)
+    ups = np.zeros((river_network.n_nodes, *field.T.shape[1:]), dtype=field_dtype)
     mask = (
         river_network.downstream_nodes != river_network.n_nodes
     )  # remove sinks since they have no downstream
     nodes_to_update = river_network.downstream_nodes[mask]
     values_to_add = field[mask]
-    ufunc.at(ups, nodes_to_update, values_to_add)
-    if missing_values_present and not np.isnan(mv):
-        missing_indices = is_missing(values_to_add, mv)
-        if len(field.shape) == 1:
-            ups[nodes_to_update[missing_indices]] = mv
-        else:
-            missing_indices = np.array(np.where(missing_indices))
-            missing_indices[0] = nodes_to_update[missing_indices[0]]
-            ups[tuple(missing_indices)] = mv
+    ufunc.at(ups, (nodes_to_update, *[slice(None)] * (ups.ndim - 1)), values_to_add)
+
+    ups = nan_to_missing(ups, field_dtype, mv)
+
     return ups
 
 
 @mask_and_unmask
-def move_upstream(
-    river_network, field, mv=np.nan, accept_missing=False, missing_values_present=None
-):
+def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
     """Sets each node to be its downstream node value, or a missing value.
 
     Parameters
@@ -75,10 +66,12 @@ def move_upstream(
 
     """
 
-    if missing_values_present:
-        missing_values_present = check_missing(field, mv, accept_missing)
+    field, field_dtype = missing_to_nan(field, mv, accept_missing)
 
-    down = np.zeros(river_network.n_nodes, dtype=field.dtype)
+    down = np.zeros((river_network.n_nodes, *field.T.shape[1:]), dtype=field_dtype)
     mask = river_network.downstream_nodes != river_network.n_nodes  # remove sinks
     down[mask] = field[river_network.downstream_nodes[mask]]
+
+    down = nan_to_missing(down, field_dtype, mv)
+
     return down

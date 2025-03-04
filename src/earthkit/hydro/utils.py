@@ -141,7 +141,7 @@ def nan_to_missing(out_field, field_dtype, mv):
     """
     if not np.isnan(mv):
         np.nan_to_num(out_field, copy=False, nan=mv)
-    if not field_dtype == np.float64:
+    if field_dtype != np.float64:
         out_field = out_field.astype(field_dtype, copy=False)
     return out_field
 

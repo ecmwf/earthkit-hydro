@@ -105,8 +105,14 @@ def calculate_metric_for_labels(
 
     initial_field = nan_to_missing(initial_field, field_dtype, field_mv)
 
+    if np.result_type(field_mv, initial_field) != initial_field.dtype:
+        raise ValueError(
+            f"Missing value of type {type(field_mv)} is not compatible"
+            f" with field of dtype {initial_field.dtype}"
+        )
+
     if return_field:
-        out_field = np.empty(field.T.shape)
+        out_field = np.empty(field.T.shape, dtype=initial_field.dtype)
         out_field[(~mask).T] = field_mv
         out_field[mask.T] = initial_field[unique_label_positions]
         return out_field.T

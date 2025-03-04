@@ -34,6 +34,15 @@
 
 > This project is in the **BETA** stage of development. Please be aware that interfaces and functionality may change as the project develops. If this software is to be used in operational systems you are **strongly advised to use a released tag in your system configuration**, and you should be willing to accept incoming changes and bug fixes that require adaptations on your part. ECMWF **does use** this software in operations and abides by the same caveats.
 
+## Main Features
+
+- Support for PCRaster, CaMa-Flood and HydroSHEDS river networks
+- Computing statistics over catchments and subcatchments
+- Finding catchments and subcatchments
+- Calculation of upstream or downstream fields
+- Handle arbitrary missing values
+- Handle N-dimensional fields
+
 ## Installation
 Clone source code repository
 
@@ -99,27 +108,35 @@ Creates a `RiverNetwork`. Current options are
 - river_network_format: "esri_d8", "pcr_d8", "cama" or "precomputed"
 - source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html)
 
-### Methods
+### Computing Metrics Over River Networks
+
+```
+ekh.calculate_catchment_metric(river_network, field, stations, metric, weights)
+```
+Calculates the metric over each catchment defined by stations. Current options are
+- metric: "sum", "max", "min", "mean"
+
+```
+ekh.calculate_subcatchment_metric(river_network, field, stations, metric, weights)
+```
+Calculates the metric over each subcatchment defined by stations. Current options are
+- metric: "sum", "max", "min", "mean"
+
+```
+ekh.calculate_upstream_metric(river_network, field, metric, weights)
+```
+Calculates a metric over all upstream nodes for a river network. If weights is provided, it is used to weight the field in the calculation. Options are
+- metric: "sum", "mean", "max", "min"
 
 ```
 ekh.flow_downstream(river_network, field)
 ```
-Calculates the total accumulated flux down a river network.\
+_(for advanced users)_ Calculates the total accumulated flux down a river network.\
 $$v_i^{\prime}=v_i+\sum_{j \rightarrow i}~v_j^{\prime}$$
 
 <img src="docs/images/accuflux.gif" width="200px" height="160px" />
 
-```
-ekh.move_downstream(river_network, field)
-```
-Updates each node with the sum of its upstream nodes.\
-$$v_i^{\prime}=\sum_{j \rightarrow i}~v_j$$
-
-```
-ekh.move_upstream(river_network, field)
-```
-Updates each node with its downstream node.\
-$$v_i^{\prime} = v_j, ~j ~ \text{s.t.} ~ i \rightarrow j$$
+### Finding Catchments and Subcatchments
 
 ```
 ekh.find_catchments(river_network, field)
@@ -137,6 +154,22 @@ $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} 
 
 <img src="docs/images/subcatchment.gif" width="200px" height="160px" />
 
+### Calculating Upstream or Downstream Fields
+
+```
+ekh.move_downstream(river_network, field)
+```
+Updates each node with the sum of its upstream nodes.\
+$$v_i^{\prime}=\sum_{j \rightarrow i}~v_j$$
+
+```
+ekh.move_upstream(river_network, field)
+```
+Updates each node with its downstream node.\
+$$v_i^{\prime} = v_j, ~j ~ \text{s.t.} ~ i \rightarrow j$$
+
+### Exporting or Masking a River Network
+
 ```
 river_network.create_subnetwork(field)
 ```
@@ -146,6 +179,28 @@ Computes the river subnetwork defined by a field mask of the domain.
 river_network.export(filename)
 ```
 Exports the `RiverNetwork` as a joblib pickle.
+
+## Migrating from PCRaster
+
+earthkit-hydro provides many functons with pcraster equivalents, summarised below.
+
+| PCRaster | earthkit-hydro |  Note |
+|---|---|---|
+| accuflux | calculate_upstream_metric | metric="sum" |
+| catchmenttotal | calculate_upstream_metric | metric="sum"  |
+| areatotal | calculate_metric_for_labels | metric="suma". Returns dictionary, not full field |
+| areaaverage | calculate_metric_for_labels | metric="mean". Returns dictionary, not full field |
+| areamaximum | calculate_metric_for_labels | metric="max". Returns dictionary, not full field |
+| areaminimum | calculate_metric_for_labels | metric="min". Returns dictionary, not full field |
+| downstream | move_upstream | |
+| upstream | move_downstream | |
+| catchment | find_catchments | |
+| subcatchment | find_subcatchments | |
+| abs, sin, cos, tan, ...  | np.abs, np.sin, np.cos, np.tan, ... | any numpy operations can be directly used |
+
+Points of difference
+- earthkit-hydro treats missing values as np.nans i.e. any arithmetic involving a missing value will return a missing value. PCRaster does not always handle missing values exactly the same.
+- earthkit-hydro can handle vector fields and fields of integers, floats, bools. PCRaster supports a restricted subset of this.
 
 ## License
 

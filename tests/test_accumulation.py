@@ -320,7 +320,7 @@ def test_calculate_catchment(river_network, metric):
     ],
     indirect=True,
 )
-@pytest.mark.parametrize("metric", ["sum"])
+@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean"])
 def test_calculate_subcatchment(river_network, metric):
     field = np.random.rand(3, 4, river_network.n_nodes)
     weights = np.random.rand(3, 4, river_network.n_nodes)
@@ -334,27 +334,28 @@ def test_calculate_subcatchment(river_network, metric):
         assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
         np.testing.assert_allclose(subcatchment_metric[i], catchment_metric[i])
 
-    subcatchment_metric = ekh.calculate_subcatchment_metric(
-        river_network, field, river_network.nodes, metric, weights
-    )
-    catchment_metric = ekh.calculate_catchment_metric(
-        river_network,
-        field,
-        np.array(
-            [
-                i
-                for i in river_network.nodes
-                if i not in river_network.sinks and i not in river_network.sources
-            ]
-        ),
-        metric,
-        weights,
-    )
-    for i in catchment_metric.keys():
-        assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
-        np.testing.assert_raises(
-            AssertionError,
-            np.testing.assert_array_equal,
-            subcatchment_metric[i],
-            catchment_metric[i],
+    if metric == "sum":
+        subcatchment_metric = ekh.calculate_subcatchment_metric(
+            river_network, field, river_network.nodes, metric, weights
         )
+        catchment_metric = ekh.calculate_catchment_metric(
+            river_network,
+            field,
+            np.array(
+                [
+                    i
+                    for i in river_network.nodes
+                    if i not in river_network.sinks and i not in river_network.sources
+                ]
+            ),
+            metric,
+            weights,
+        )
+        for i in catchment_metric.keys():
+            assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
+            np.testing.assert_raises(
+                AssertionError,
+                np.testing.assert_array_equal,
+                subcatchment_metric[i],
+                catchment_metric[i],
+            )

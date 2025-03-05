@@ -3,8 +3,8 @@ def flow(river_network, field, invert_graph, operation, mv):
 
     Parameters
     ----------
-    river_network : RiverNetwork
-        The river network object containing topological groups.
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
     field : ndarray
         The field data to be modified in place.
     invert_graph : bool

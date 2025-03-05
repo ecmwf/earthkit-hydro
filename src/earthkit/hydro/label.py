@@ -99,10 +99,6 @@ def calculate_metric_for_labels(
 
         field_dtype = np.float64
 
-    initial_field = np.transpose(
-        initial_field, axes=[0] + list(range(initial_field.ndim - 1, 0, -1))
-    )
-
     initial_field = nan_to_missing(initial_field, field_dtype, field_mv)
 
     if np.result_type(field_mv, initial_field) != initial_field.dtype:
@@ -112,9 +108,14 @@ def calculate_metric_for_labels(
         )
 
     if return_field:
-        out_field = np.empty(field.T.shape, dtype=initial_field.dtype)
-        out_field[(~mask).T] = field_mv
-        out_field[mask.T] = initial_field[unique_label_positions]
-        return out_field.T
+
+        mask = labels != 0
+        out_field = np.empty(field.shape, dtype=np.float64)
+        out_field[..., ~mask] = np.nan  # works correctly
+        out_field[..., mask] = initial_field[unique_label_positions].T
+        return out_field
     else:
+        initial_field = np.transpose(
+            initial_field, axes=[0] + list(range(initial_field.ndim - 1, 0, -1))
+        )
         return dict(zip(unique_labels, initial_field))

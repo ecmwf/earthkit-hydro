@@ -131,7 +131,7 @@ def calculate_subcatchment_metric(
             field.T,
             labels,
             metric,
-            weights.T,
+            weights.T if weights is not None else None,
             mv,
             0,  # missing labels value
             accept_missing,
@@ -150,7 +150,7 @@ def calculate_subcatchment_metric(
         field.T,
         labels,
         metric,
-        weights.T,
+        weights.T if weights is not None else None,
         mv,
         0,  # missing labels value
         accept_missing,

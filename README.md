@@ -105,30 +105,27 @@ Creates a `RiverNetwork`. Current options are
 - source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html)
 
 ### Computing Metrics Over River Networks
+_Currently supported metrics are "sum", "mean", "max", "min" and "product". If weights is provided, it is used to weight the field in the calculation._
 
 ```
 ekh.calculate_catchment_metric(river_network, field, stations, metric, weights=None)
 ```
-Calculates the metric over each catchment defined by stations. Current options are
-- metric: "sum", "max", "min", "mean"
+Calculates the metric over each catchment defined by stations.
 
 ```
 ekh.calculate_subcatchment_metric(river_network, field, stations, metric, weights=None)
 ```
-Calculates the metric over each subcatchment defined by stations. Current options are
-- metric: "sum", "max", "min", "mean"
+Calculates the metric over each subcatchment defined by stations.
 
 ```
 ekh.calculate_upstream_metric(river_network, field, metric, weights=None)
 ```
-Calculates a metric over all upstream nodes for a river network. If weights is provided, it is used to weight the field in the calculation. Options are
-- metric: "sum", "mean", "max", "min"
+Calculates a metric over all upstream nodes for a river network.
 
 ```
 ekh.calculate_metric_for_labels(field, labels, metric, weights=None)
 ```
-_(for advanced users)_ Calculates a metric over field for each label in the labels field. If weights is provided, it is used to weight the field in the calculation. Options are
-- metric: "sum", "mean", "max", "min"
+_(for advanced users)_ Calculates a metric over field for each label in the labels field.
 
 ```
 ekh.flow_downstream(river_network, field)

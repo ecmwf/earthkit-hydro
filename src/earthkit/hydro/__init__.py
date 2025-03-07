@@ -4,6 +4,7 @@ from .catchment_metric import calculate_catchment_metric, calculate_subcatchment
 from .core import flow
 from .label import calculate_metric_for_labels
 from .movement import move_downstream, move_upstream
+from .plot import plot
 from .readers import (
     create_river_network,
     from_cama_downxy,

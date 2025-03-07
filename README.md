@@ -94,11 +94,13 @@ For ease of notation, if an edge exists from $(x_i, y_i)$ to $(x_j, y_j)$, we wr
 ### Readers
 
 ```
-ekh.load_river_network(domain="efas", version="5")
+ekh.load_river_network(domain="efas", version="5", resolution="1arcmin")
 ```
 Loads a precomputed `RiverNetwork`. Current options are
-- domain: "efas", version: "5"
-- domain: "glofas", version: "4"
+| `domain` | `version` | Details | Note |
+| --- | --- | --- | --- |
+| "efas" | "5" | 1arcmin European | [<sup>1</sup>](#attrib1) |
+| "glofas" | "4" | 3arcmin global | [<sup>2</sup>](#attrib2) |
 
 
 ```
@@ -201,6 +203,17 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 _Points of difference_
 - earthkit-hydro treats missing values as np.nans i.e. any arithmetic involving a missing value will return a missing value. PCRaster does not always handle missing values exactly the same.
 - earthkit-hydro can handle vector fields and fields of integers, floats, bools. PCRaster supports a restricted subset of this.
+
+## Attributions
+<a id="attrib1"><sup>1</sup></a>
+The EFAS river network is available under the conditions set out in the [European Commission Reuse and Copyright Notice](https://data.jrc.ec.europa.eu/licence/com_reuse) and is available at [https://data.jrc.ec.europa.eu/dataset/f572c443-7466-4adf-87aa-c0847a169f23](https://data.jrc.ec.europa.eu/dataset/f572c443-7466-4adf-87aa-c0847a169f23).
+
+    Margarita Choulga; Francesca Moschini; Cinzia Mazzetti; Grimaldi, Stefania; Disperati, Juliana; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for Europe. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/f572c443-7466-4adf-87aa-c0847a169f23
+
+<a id="attrib2"><sup>2</sup></a>
+The GloFAS river network is available under the conditions set out in the [European Commission Reuse and Copyright Notice](https://data.jrc.ec.europa.eu/licence/com_reuse) and is available at [https://data.jrc.ec.europa.eu/dataset/68050d73-9c06-499c-a441-dc5053cb0c86](https://data.jrc.ec.europa.eu/dataset/68050d73-9c06-499c-a441-dc5053cb0c86).
+
+    Margarita Choulga; Francesca Moschini; Cinzia Mazzetti; Disperati, Juliana; Grimaldi, Stefania; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
 
 ## License
 

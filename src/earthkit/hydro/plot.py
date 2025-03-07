@@ -1,8 +1,15 @@
-import matplotlib.pyplot as plt
 import numpy as np
 
 
 def plot(river_network, field, ax=None):
+
+    try:
+        import matplotlib.pyplot as plt
+    except ModuleNotFoundError:
+        raise ModuleNotFoundError(
+            "matplotlib.pyplot is required for plotting."
+            "\nTo install it, run `pip install matplotlib`"
+        )
 
     x = np.arange(river_network.mask.shape[1])
     y = np.arange(river_network.mask.shape[0])[::-1]

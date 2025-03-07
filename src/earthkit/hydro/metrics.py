@@ -21,4 +21,9 @@ class Min:
     base_val = np.inf
 
 
-metrics_dict = {"sum": Sum, "mean": Mean, "max": Max, "min": Min}
+class Product:
+    func = np.multiply
+    base_val = 1
+
+
+metrics_dict = {"sum": Sum, "mean": Mean, "max": Max, "min": Min, "product": Product}

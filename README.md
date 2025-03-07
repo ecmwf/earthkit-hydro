@@ -88,7 +88,7 @@ For ease of notation, if an edge exists from $(x_i, y_i)$ to $(x_j, y_j)$, we wr
 ### Readers
 
 ```
-ekh.load_river_network(domain="efas", version="5")
+ekh.load_river_network(domain, version)
 ```
 Loads a precomputed `RiverNetwork`. Current options are
 | `domain` | `version` | Details | Note |
@@ -98,7 +98,7 @@ Loads a precomputed `RiverNetwork`. Current options are
 
 
 ```
-ekh.create_river_network(path, river_network_format, source)
+ekh.create_river_network(path, river_network_format, source="file")
 ```
 Creates a `RiverNetwork`. Current options are
 - river_network_format: "esri_d8", "pcr_d8", "cama" or "precomputed"
@@ -107,21 +107,27 @@ Creates a `RiverNetwork`. Current options are
 ### Computing Metrics Over River Networks
 
 ```
-ekh.calculate_catchment_metric(river_network, field, stations, metric, weights)
+ekh.calculate_catchment_metric(river_network, field, stations, metric, weights=None)
 ```
 Calculates the metric over each catchment defined by stations. Current options are
 - metric: "sum", "max", "min", "mean"
 
 ```
-ekh.calculate_subcatchment_metric(river_network, field, stations, metric, weights)
+ekh.calculate_subcatchment_metric(river_network, field, stations, metric, weights=None)
 ```
 Calculates the metric over each subcatchment defined by stations. Current options are
 - metric: "sum", "max", "min", "mean"
 
 ```
-ekh.calculate_upstream_metric(river_network, field, metric, weights)
+ekh.calculate_upstream_metric(river_network, field, metric, weights=None)
 ```
 Calculates a metric over all upstream nodes for a river network. If weights is provided, it is used to weight the field in the calculation. Options are
+- metric: "sum", "mean", "max", "min"
+
+```
+ekh.calculate_metric_for_labels(field, labels, metric, weights=None)
+```
+_(for advanced users)_ Calculates a metric over field for each label in the labels field. If weights is provided, it is used to weight the field in the calculation. Options are
 - metric: "sum", "mean", "max", "min"
 
 ```
@@ -184,10 +190,10 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 |---|---|---|
 | accuflux | calculate_upstream_metric | metric="sum" |
 | catchmenttotal | calculate_upstream_metric | metric="sum"  |
-| areatotal | calculate_metric_for_labels | metric="sum". Returns dictionary, not a field |
-| areaaverage | calculate_metric_for_labels | metric="mean". Returns dictionary, not a field |
-| areamaximum | calculate_metric_for_labels | metric="max". Returns dictionary, not a field |
-| areaminimum | calculate_metric_for_labels | metric="min". Returns dictionary, not a field |
+| areatotal | calculate_metric_for_labels | metric="sum", return_field=True |
+| areaaverage | calculate_metric_for_labels | metric="mean", return_field=True |
+| areamaximum | calculate_metric_for_labels | metric="max", return_field=True |
+| areaminimum | calculate_metric_for_labels | metric="min", return_field=True |
 | downstream | move_upstream | |
 | upstream | move_downstream | |
 | catchment | find_catchments | |

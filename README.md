@@ -71,12 +71,6 @@ pip install -e .[dev]
 pre-commit install
 ```
 
-If you only plan to run the tests, instead run
-
-```
-pip install -e .[test]
-```
-
 ## Documentation
 Earthkit-hydro can be imported as following:
 ```
@@ -94,7 +88,7 @@ For ease of notation, if an edge exists from $(x_i, y_i)$ to $(x_j, y_j)$, we wr
 ### Readers
 
 ```
-ekh.load_river_network(domain="efas", version="5", resolution="1arcmin")
+ekh.load_river_network(domain="efas", version="5")
 ```
 Loads a precomputed `RiverNetwork`. Current options are
 | `domain` | `version` | Details | Note |

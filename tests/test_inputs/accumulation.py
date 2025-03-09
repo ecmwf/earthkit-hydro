@@ -557,6 +557,22 @@ upstream_metric_sum_2a = np.array(
     [2, 1, 2, 1, 1, 2, 7, 3, 1, 1, 10, 6, 1, 13, 1, 2], dtype=int
 )
 
+upstream_metric_max_2a = np.array(
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
+)
+
+upstream_metric_min_2a = np.array(
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
+)
+
+upstream_metric_mean_2a = np.array(
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=float
+)
+
+upstream_metric_product_2a = np.array(
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
+)
+
 # 2b: non-missing integer field input
 input_field_2b = np.array(
     [1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16], dtype=int
@@ -566,6 +582,58 @@ mv_2b = np.iinfo(np.int64).max
 
 upstream_metric_sum_2b = np.array(
     [0, 2, 1, 4, 5, 11, 59, 9, 9, 10, 81, 52, -1, 114, 15, 31], dtype=int
+)
+
+upstream_metric_max_2b = np.array(
+    [1, 2, 2, 4, 5, 6, 16, 8, 9, 10, 16, 16, -1, 16, 15, 16], dtype=int
+)
+
+upstream_metric_min_2b = np.array(
+    [-1, 2, -1, 4, 5, 5, -1, -1, 9, 10, -1, -1, -1, -1, 15, 15], dtype=int
+)
+
+upstream_metric_mean_2b = np.array(
+    [
+        0.0,
+        2.0,
+        0.5,
+        4.0,
+        5.0,
+        5.5,
+        8.428571,
+        3.0,
+        9.0,
+        10.0,
+        8.1,
+        8.666667,
+        -1.0,
+        8.769231,
+        15.0,
+        15.5,
+    ],
+    dtype=float,
+)
+
+upstream_metric_product_2b = np.array(
+    [
+        -1,
+        2,
+        -2,
+        4,
+        5,
+        30,
+        -322560,
+        -16,
+        9,
+        10,
+        -106444800,
+        -46080,
+        -1,
+        -134120448000,
+        15,
+        240,
+    ],
+    dtype=int,
 )
 
 # 2c: non-missing float field input

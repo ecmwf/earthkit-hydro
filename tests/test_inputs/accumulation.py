@@ -25,6 +25,10 @@ upstream_metric_mean_1a = np.array(
     [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=float
 )
 
+upstream_metric_product_1a = np.array(
+    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
+)
+
 # 1b: non-missing integer field input
 input_field_1b = np.array(
     [1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1], dtype=int
@@ -68,6 +72,32 @@ upstream_metric_mean_1b = np.array(
         -1.0,
     ],
     dtype=float,
+)
+
+upstream_metric_product_1b = np.array(
+    [
+        1,
+        2,
+        3,
+        -1,
+        5,
+        6,
+        14,
+        -24,
+        45,
+        10,
+        6,
+        28,
+        -648000,
+        200,
+        5,
+        6,
+        329204736000,
+        -72,
+        -9,
+        -1,
+    ],
+    dtype=int,
 )
 
 # 1c: non-missing float field input
@@ -203,6 +233,32 @@ upstream_metric_mean_1c = np.array(
     dtype=float,
 )
 
+upstream_metric_product_1c = np.array(
+    [
+        1.50000000e00,
+        7.30000000e00,
+        5.60000000e00,
+        -3.20000000e00,
+        1.00000000e-01,
+        7.65000000e00,
+        8.10300000e01,
+        -1.59488000e02,
+        5.50000000e-01,
+        1.50000000e00,
+        2.44800000e01,
+        3.72738000e02,
+        1.25051351e04,
+        -2.22750000e01,
+        -4.50000000e00,
+        -8.90000000e00,
+        5.36736931e10,
+        2.51680000e01,
+        4.84000000e00,
+        1.10000000e00,
+    ],
+    dtype=float,
+)
+
 # 1d: bool field input
 input_field_1d = np.array(
     [
@@ -264,12 +320,184 @@ upstream_metric_min_1d = upstream_metric_sum_1d
 
 upstream_metric_mean_1d = upstream_metric_sum_1d.astype("float")
 
+upstream_metric_product_1d = upstream_metric_sum_1d
+
 # 1e: missing float field input with mv=np.nan
+input_field_1e = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        5.1,
+        11.1,
+        np.nan,
+        5.5,
+        1.5,
+        3.2,
+        4.6,
+        6.4,
+        3.3,
+        -4.5,
+        -8.9,
+        -2.1,
+        5.2,
+        np.nan,
+        1.1,
+    ],
+    dtype=float,
+)
+
+mv_1e = np.nan
+
+upstream_metric_sum_1e = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        6.6,
+        18.4,
+        np.nan,
+        5.6,
+        1.5,
+        9.8,
+        23.0,
+        np.nan,
+        0.3,
+        -4.5,
+        -8.9,
+        np.nan,
+        np.nan,
+        np.nan,
+        1.1,
+    ],
+    dtype=float,
+)
+
+upstream_metric_max_1e = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        5.1,
+        11.1,
+        np.nan,
+        5.5,
+        1.5,
+        5.1,
+        11.1,
+        np.nan,
+        3.3,
+        -4.5,
+        -8.9,
+        np.nan,
+        np.nan,
+        np.nan,
+        1.1,
+    ],
+    dtype=float,
+)
+
+upstream_metric_min_1e = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        1.5,
+        7.3,
+        np.nan,
+        0.1,
+        1.5,
+        1.5,
+        4.6,
+        np.nan,
+        -4.5,
+        -4.5,
+        -8.9,
+        np.nan,
+        np.nan,
+        np.nan,
+        1.1,
+    ],
+    dtype=float,
+)
+
+upstream_metric_mean_1e = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        3.3,
+        9.2,
+        np.nan,
+        2.8,
+        1.5,
+        3.266666666666667,
+        7.666666666666667,
+        np.nan,
+        0.1,
+        -4.5,
+        -8.9,
+        np.nan,
+        np.nan,
+        np.nan,
+        1.1,
+    ],
+    dtype=float,
+)
+
+upstream_metric_product_1e = np.array(
+    [
+        1.50000e00,
+        7.30000e00,
+        5.60000e00,
+        -3.20000e00,
+        1.00000e-01,
+        7.65000e00,
+        8.10300e01,
+        np.nan,
+        5.50000e-01,
+        1.50000e00,
+        2.44800e01,
+        3.72738e02,
+        np.nan,
+        -2.22750e01,
+        -4.50000e00,
+        -8.90000e00,
+        np.nan,
+        np.nan,
+        np.nan,
+        1.10000e00,
+    ],
+    dtype=float,
+)
 
 # 1f: missing float field input with mv=0
+input_field_1f = np.nan_to_num(input_field_1e, nan=0)
+
+mv_1f = 0
+
+upstream_metric_sum_1f = np.nan_to_num(upstream_metric_sum_1e, nan=0)
+
+upstream_metric_max_1f = np.nan_to_num(upstream_metric_max_1e, nan=0)
+
+upstream_metric_min_1f = np.nan_to_num(upstream_metric_min_1e, nan=0)
+
+upstream_metric_mean_1f = np.nan_to_num(upstream_metric_mean_1e, nan=0)
+
+upstream_metric_product_1f = np.nan_to_num(upstream_metric_product_1e, nan=0)
+
 
 # 1g: missing integer field input with mv=-1
-
 input_field_1g = np.array(
     [1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1], dtype=int
 )
@@ -288,6 +516,35 @@ upstream_metric_min_1g = np.array(
     [1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, -1, 4, 5, 6, -1, -1, -1, -1], dtype=int
 )
 
+upstream_metric_mean_1g = np.array(
+    [
+        1.0,
+        2.0,
+        3.0,
+        -1.0,
+        5.0,
+        3.5,
+        4.5,
+        -1.0,
+        7.0,
+        10.0,
+        2.6666666666666665,
+        3.6666666666666665,
+        -1.0,
+        6.333333,
+        5.0,
+        6.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+    ],
+    dtype=float,
+)
+
+upstream_metric_product_1g = np.array(
+    [1, 2, 3, -1, 5, 6, 14, -1, 45, 10, 6, 28, -1, 200, 5, 6, -1, -1, -1, -1], dtype=int
+)
 
 # RIVER NETWORK TWO
 

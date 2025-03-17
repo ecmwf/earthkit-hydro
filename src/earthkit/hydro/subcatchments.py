@@ -2,9 +2,9 @@ import numpy as np
 
 from .catchments import _find_catchments_2D, _find_catchments_ND
 from .core import flow
-from .label import calculate_metric_for_labels
 from .metrics import metrics_dict
 from .utils import mask_2d, mask_and_unmask
+from .zonal import calculate_zonal_metric
 
 
 @mask_2d
@@ -46,7 +46,7 @@ def calculate_subcatchment_metric(
         points = np.zeros(river_network.n_nodes, dtype=int)
         points[stations] = np.arange(stations.shape[0]) + 1
         labels = find(river_network, points, skip=True)
-        metric_at_stations = calculate_metric_for_labels(
+        metric_at_stations = calculate_zonal_metric(
             field.T,
             labels,
             metric,
@@ -65,7 +65,7 @@ def calculate_subcatchment_metric(
     unique_labels = np.arange(stations_1d.shape[0]) + 1
     points[stations_1d] = unique_labels
     labels = find(river_network, points, skip=True)
-    metric_at_stations = calculate_metric_for_labels(
+    metric_at_stations = calculate_zonal_metric(
         field.T,
         labels,
         metric,

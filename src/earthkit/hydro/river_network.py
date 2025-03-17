@@ -11,6 +11,7 @@ from .readers import (
     from_d8,
     import_earthkit_or_prompt_install,
 )
+from .network_class import RiverNetwork
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1
@@ -119,7 +120,3 @@ def available():
         '`ekh.load("efas", "5")`',
         '`ekh.load("glofas", "4")`',
     )
-
-
-def export(river_network, fpath="river_network.joblib", compression=1):
-    river_network.export(fpath, compression)

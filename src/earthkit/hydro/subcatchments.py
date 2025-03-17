@@ -1,8 +1,10 @@
 import numpy as np
 
-from ..catchments import find_subcatchments
-from ..label import calculate_metric_for_labels
-from ..utils import mask_2d
+from .catchments import _find_catchments_2D, _find_catchments_ND
+from .core import flow
+from .label import calculate_metric_for_labels
+from .metrics import metrics_dict
+from .utils import mask_2d, mask_and_unmask
 
 
 @mask_2d
@@ -43,7 +45,7 @@ def calculate_subcatchment_metric(
     if isinstance(stations, np.ndarray):
         points = np.zeros(river_network.n_nodes, dtype=int)
         points[stations] = np.arange(stations.shape[0]) + 1
-        labels = find_subcatchments(river_network, points, skip=True)
+        labels = find(river_network, points, skip=True)
         metric_at_stations = calculate_metric_for_labels(
             field.T,
             labels,
@@ -62,7 +64,7 @@ def calculate_subcatchment_metric(
     points = np.zeros(river_network.n_nodes, dtype=int)
     unique_labels = np.arange(stations_1d.shape[0]) + 1
     points[stations_1d] = unique_labels
-    labels = find_subcatchments(river_network, points, skip=True)
+    labels = find(river_network, points, skip=True)
     metric_at_stations = calculate_metric_for_labels(
         field.T,
         labels,
@@ -77,101 +79,46 @@ def calculate_subcatchment_metric(
     }
 
 
-def sum(
-    river_network,
-    field,
-    stations,
-    weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
+@mask_and_unmask
+def find(river_network, field, mv=0, in_place=False):
+    """Labels the catchments given a field of labelled sinks.
 
-    return calculate_subcatchment_metric(
-        river_network,
-        field,
-        stations,
-        "sum",
-        weights,
-        mv,
-        accept_missing,
-    )
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    field : numpy.ndarray
+        The input field.
+    mv : scalar, optional
+        The missing value indicator. Default is 0.
+    in_place : bool, optional
+        If True, modifies the input field in place. Default is False.
 
+    Returns
+    -------
+    numpy.ndarray
+        The field values accumulated downstream.
 
-def max(
-    river_network,
-    field,
-    stations,
-    weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
+    """
+    if not in_place:
+        field = field.copy()
 
-    return calculate_subcatchment_metric(
-        river_network,
-        field,
-        stations,
-        "max",
-        weights,
-        mv,
-        accept_missing,
-    )
+    if len(field.shape) == 1:
+        op = _find_catchments_2D
+    else:
+        op = _find_catchments_ND
+
+    def operation(river_network, field, grouping, mv):
+        return op(river_network, field, grouping, mv, overwrite=False)
+
+    return flow(river_network, field, True, operation, mv)
 
 
-def min(
-    river_network,
-    field,
-    stations,
-    weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
+for metric in metrics_dict.keys():
 
-    return calculate_subcatchment_metric(
-        river_network,
-        field,
-        stations,
-        "min",
-        weights,
-        mv,
-        accept_missing,
-    )
+    def func(river_network, field, stations, *args, **kwargs):
+        return calculate_subcatchment_metric(
+            river_network, field, stations, metric, *args, **kwargs
+        )
 
-
-def mean(
-    river_network,
-    field,
-    stations,
-    weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
-
-    return calculate_subcatchment_metric(
-        river_network,
-        field,
-        stations,
-        "mean",
-        weights,
-        mv,
-        accept_missing,
-    )
-
-
-def product(
-    river_network,
-    field,
-    stations,
-    weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
-
-    return calculate_subcatchment_metric(
-        river_network,
-        field,
-        stations,
-        "product",
-        weights,
-        mv,
-        accept_missing,
-    )
+    globals()[metric] = func

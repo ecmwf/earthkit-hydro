@@ -1,8 +1,8 @@
 import numpy as np
 
-from ..accumulation import flow_downstream
-from ..metrics import metrics_dict
-from ..utils import mask_and_unmask, missing_to_nan, nan_to_missing
+from .accumulation import flow_downstream
+from .metrics import metrics_dict
+from .utils import mask_and_unmask, missing_to_nan, nan_to_missing
 
 
 @mask_and_unmask
@@ -82,76 +82,9 @@ def calculate_upstream_metric(
         return nan_to_missing(field, field_dtype, mv)
 
 
-def sum(
-    river_network, field, weights=None, mv=np.nan, in_place=False, accept_missing=False
-):
+for metric in metrics_dict.keys():
 
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "sum",
-        weights,
-        mv,
-        in_place,
-        accept_missing,
-    )
+    def func(river_network, field, *args, **kwargs):
+        return calculate_upstream_metric(river_network, field, metric, *args, **kwargs)
 
-
-def max(
-    river_network, field, weights=None, mv=np.nan, in_place=False, accept_missing=False
-):
-
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "max",
-        weights,
-        mv,
-        in_place,
-        accept_missing,
-    )
-
-
-def min(
-    river_network, field, weights=None, mv=np.nan, in_place=False, accept_missing=False
-):
-
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "min",
-        weights,
-        mv,
-        in_place,
-        accept_missing,
-    )
-
-
-def mean(
-    river_network, field, weights=None, mv=np.nan, in_place=False, accept_missing=False
-):
-
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "mean",
-        weights,
-        mv,
-        in_place,
-        accept_missing,
-    )
-
-
-def product(
-    river_network, field, weights=None, mv=np.nan, in_place=False, accept_missing=False
-):
-
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "product",
-        weights,
-        mv,
-        in_place,
-        accept_missing,
-    )
+    globals()[metric] = func

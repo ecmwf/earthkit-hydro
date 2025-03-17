@@ -68,6 +68,8 @@ pre-commit install
 ```
 
 ## Documentation
+**An [example notebook](docs/notebooks/example.ipynb) showing how to use the earthkit-hydro is provided in addition to the documentation below.**
+
 Earthkit-hydro can be imported as following:
 ```
 import earthkit.hydro as ekh
@@ -119,7 +121,7 @@ ekh.calculate_upstream_metric(river_network, field, metric, weights=None)
 Calculates a metric over all upstream nodes for a river network.
 
 ```
-ekh.calculate_metric_for_labels(field, labels, metric, weights=None)
+ekh.calculate_zonal_metric(field, labels, metric, weights=None)
 ```
 _(for advanced users)_ Calculates a metric over field for each label in the labels field.
 

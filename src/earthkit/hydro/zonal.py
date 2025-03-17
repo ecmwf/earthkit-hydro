@@ -4,7 +4,7 @@ from .metrics import metrics_dict
 from .utils import is_missing, missing_to_nan, nan_to_missing
 
 
-def calculate_metric_for_labels(
+def calculate_zonal_metric(
     field,
     labels,
     metric,
@@ -119,3 +119,11 @@ def calculate_metric_for_labels(
             initial_field, axes=[0] + list(range(initial_field.ndim - 1, 0, -1))
         )
         return dict(zip(unique_labels, initial_field))
+
+
+for metric in metrics_dict.keys():
+
+    def func(field, labels, *args, **kwargs):
+        return calculate_zonal_metric(field, labels, metric, *args, **kwargs)
+
+    globals()[metric] = func

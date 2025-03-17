@@ -119,3 +119,7 @@ def available():
         '`ekh.load("efas", "5")`',
         '`ekh.load("glofas", "4")`',
     )
+
+
+def export(river_network, fpath="river_network.joblib", compression=1):
+    river_network.export(fpath, compression)

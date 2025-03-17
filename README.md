@@ -185,10 +185,10 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 |---|---|---|
 | accuflux | calculate_upstream_metric | metric="sum" |
 | catchmenttotal | calculate_upstream_metric | metric="sum"  |
-| areatotal | calculate_metric_for_labels | metric="sum", return_field=True |
-| areaaverage | calculate_metric_for_labels | metric="mean", return_field=True |
-| areamaximum | calculate_metric_for_labels | metric="max", return_field=True |
-| areaminimum | calculate_metric_for_labels | metric="min", return_field=True |
+| areatotal | calculate_zonal_metric | metric="sum", return_field=True |
+| areaaverage | calculate_zonal_metric | metric="mean", return_field=True |
+| areamaximum | calculate_zonal_metric | metric="max", return_field=True |
+| areaminimum | calculate_zonal_metric | metric="min", return_field=True |
 | downstream | move_upstream | |
 | upstream | move_downstream | |
 | catchment | find_catchments | |

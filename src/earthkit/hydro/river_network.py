@@ -122,7 +122,9 @@ def available():
     print(
         "Available precomputed networks are:",
         '`ekh.river_network.load("efas", "5")`',
+        '`ekh.river_network.load("efas", "4")`',
         '`ekh.river_network.load("glofas", "4")`',
+        '`ekh.river_network.load("glofas", "3")`',
         '`ekh.river_network.load("cama_15min", "4")`',
         '`ekh.river_network.load("cama_06min", "4")`',
         '`ekh.river_network.load("cama_05min", "4")`',

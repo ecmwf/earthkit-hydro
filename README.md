@@ -92,7 +92,9 @@ Loads a precomputed `RiverNetwork`. Current options can be listed with `ekh.rive
 | `domain` | `version` | Details | Note |
 | --- | --- | --- | --- |
 | "efas" | "5" | 1arcmin European | [<sup>1</sup>](#attrib1) |
+| "efas" | "4" | 5km European | [<sup>1</sup>](#attrib1) Smaller domain than v5 |
 | "glofas" | "4" | 3arcmin global | [<sup>2</sup>](#attrib2) |
+| "glofas" | "3" | 6arcmin global | [<sup>2</sup>](#attrib2) |
 | "cama_03min" | "4" | 3arcmin global | [<sup>3</sup>](#attrib3) |
 | "cama_05min" | "4" | 5arcmin global | [<sup>3</sup>](#attrib3) |
 | "cama_06min" | "4" | 6arcmin global | [<sup>3</sup>](#attrib3) |

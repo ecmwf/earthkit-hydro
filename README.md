@@ -89,16 +89,16 @@ For ease of notation, if an edge exists from $(x_i, y_i)$ to $(x_j, y_j)$, we wr
 ekh.river_network.load(domain, version)
 ```
 Loads a precomputed `RiverNetwork`. Current options can be listed with `ekh.river_network.available()` and are:
-| `domain` | `version` | Details | Note |
-| --- | --- | --- | --- |
-| "efas" | "5" | 1arcmin European | [<sup>1</sup>](#attrib1) |
-| "efas" | "4" | 5km European | [<sup>1</sup>](#attrib1) Smaller domain than v5 |
-| "glofas" | "4" | 3arcmin global | [<sup>2</sup>](#attrib2) |
-| "glofas" | "3" | 6arcmin global | [<sup>2</sup>](#attrib2) |
-| "cama_03min" | "4" | 3arcmin global | [<sup>3</sup>](#attrib3) |
-| "cama_05min" | "4" | 5arcmin global | [<sup>3</sup>](#attrib3) |
-| "cama_06min" | "4" | 6arcmin global | [<sup>3</sup>](#attrib3) |
-| "cama_15min" | "4" | 15arcmin global | [<sup>3</sup>](#attrib3) |
+| `domain` | `version` | Details | Note | Attribution |
+| --- | --- | --- | --- | --- |
+| "efas" | "5" | 1arcmin European |  | [<sup>1</sup>](#attrib1) |
+| "efas" | "4" | 5km European | Smaller domain than v5 | [<sup>1</sup>](#attrib1) |
+| "glofas" | "4" | 3arcmin global |  | [<sup>2</sup>](#attrib2) |
+| "glofas" | "3" | 6arcmin global |  | [<sup>2</sup>](#attrib2) |
+| "cama_03min" | "4" | 3arcmin global |  | [<sup>3</sup>](#attrib3) |
+| "cama_05min" | "4" | 5arcmin global |  | [<sup>3</sup>](#attrib3) |
+| "cama_06min" | "4" | 6arcmin global |  | [<sup>3</sup>](#attrib3) |
+| "cama_15min" | "4" | 15arcmin global |  | [<sup>3</sup>](#attrib3) |
 
 
 ```
@@ -109,8 +109,6 @@ Creates a `RiverNetwork`. Current options are
 - source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html).
 
 ### Computing Metrics Over River Networks
-_Currently supported metrics are "sum", "mean", "max", "min" and "product". If weights is provided, it is used to weight the field in the calculation._
-
 There are four high-level ways to compute metrics depending on the use-case.
 
 #### Metrics Over Upstream Nodes

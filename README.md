@@ -18,7 +18,7 @@
     <img src="https://codecov.io/gh/ecmwf/earthkit-hydro/branch/develop/graph/badge.svg" alt="Code Coverage">
   </a>
   <a href="https://opensource.org/licenses/apache-2-0">
-    <img src="https://img.shields.io/badge/License-Apache%202.0-blue.svg" alt="License">
+    <img src="https://img.shields.io/badge/Licence-Apache 2.0-blue.svg" alt="Licence">
   </a>
   <a href="https://github.com/ecmwf/earthkit-hydro/releases">
     <img src="https://img.shields.io/github/v/release/ecmwf/earthkit-hydro?color=blue&label=Release&style=flat-square" alt="Latest Release">
@@ -86,57 +86,88 @@ For ease of notation, if an edge exists from $(x_i, y_i)$ to $(x_j, y_j)$, we wr
 ### Readers
 
 ```
-ekh.load_river_network(domain, version)
+ekh.river_network.load(domain, version)
 ```
-Loads a precomputed `RiverNetwork`. Current options are
+Loads a precomputed `RiverNetwork`. Current options can be listed with `ekh.river_network.available()` and are:
 | `domain` | `version` | Details | Note |
 | --- | --- | --- | --- |
 | "efas" | "5" | 1arcmin European | [<sup>1</sup>](#attrib1) |
 | "glofas" | "4" | 3arcmin global | [<sup>2</sup>](#attrib2) |
+| "cama_03min" | "4" | 3arcmin global | [<sup>3</sup>](#attrib3) |
+| "cama_05min" | "4" | 5arcmin global | [<sup>3</sup>](#attrib3) |
+| "cama_06min" | "4" | 6arcmin global | [<sup>3</sup>](#attrib3) |
+| "cama_15min" | "4" | 15arcmin global | [<sup>3</sup>](#attrib3) |
 
 
 ```
-ekh.create_river_network(path, river_network_format, source="file")
+ekh.river_network.create(path, river_network_format, source="file")
 ```
 Creates a `RiverNetwork`. Current options are
 - river_network_format: "esri_d8", "pcr_d8", "cama" or "precomputed"
-- source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html)
+- source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html).
 
 ### Computing Metrics Over River Networks
 _Currently supported metrics are "sum", "mean", "max", "min" and "product". If weights is provided, it is used to weight the field in the calculation._
 
-```
-ekh.calculate_catchment_metric(river_network, field, stations, metric, weights=None)
-```
-Calculates the metric over each catchment defined by stations.
+There are four high-level ways to compute metrics depending on the use-case.
 
+#### Metrics Over Upstream Nodes
 ```
-ekh.calculate_subcatchment_metric(river_network, field, stations, metric, weights=None)
+ekh.upstream.sum(river_network, field, stations, weights=None)
+ekh.upstream.max(river_network, field, stations, weights=None)
+ekh.upstream.min(river_network, field, stations, weights=None)
+ekh.upstream.mean(river_network, field, stations, weights=None)
+ekh.upstream.product(river_network, field, stations, weights=None)
 ```
-Calculates the metric over each subcatchment defined by stations.
+Given an input field, returns as output a new field with the upstream metric calculated for each cell.
 
+#### Metrics Over Catchments
+```
+ekh.catchments.sum(river_network, field, stations, weights=None)
+ekh.catchments.max(river_network, field, stations, weights=None)
+ekh.catchments.min(river_network, field, stations, weights=None)
+ekh.catchments.mean(river_network, field, stations, weights=None)
+ekh.catchments.product(river_network, field, stations, weights=None)
+```
+Given a field and a list of points defining stations, calculates the metric over all upstream nodes for each of the stations.
+
+#### Metrics Over Subcatchments
+```
+ekh.subcatchments.sum(river_network, field, stations, weights=None)
+ekh.subcatchments.max(river_network, field, stations, weights=None)
+ekh.subcatchments.min(river_network, field, stations, weights=None)
+ekh.subcatchments.mean(river_network, field, stations, weights=None)
+ekh.subcatchments.product(river_network, field, stations, weights=None)
+```
+Given a field and a list of points defining stations, finds the subcatchments defined by the stations and computes the metric for each subcatchment.
+
+#### Metrics Over Arbitrary Zones
+```
+ekh.zonal.sum(field, stations, weights=None, return_field=False)
+ekh.zonal.max(field, stations, weights=None, return_field=False)
+ekh.zonal.min(field, stations, weights=None, return_field=False)
+ekh.zonal.mean(field, stations, weights=None, return_field=False)
+ekh.zonal.product(field, labels, weights=None, return_field=False)
+```
+Calculates a metric over the input field for each zone defined by the labels field. If return_field is True, returns a field otherwise returns a dictionary of {label: metric} pairs.
+
+_(for advanced users)_
+Similarly, one can also use a low-level API via
 ```
 ekh.calculate_upstream_metric(river_network, field, metric, weights=None)
-```
-Calculates a metric over all upstream nodes for a river network.
-
-```
+ekh.calculate_catchment_metric(river_network, field, stations, metric, weights=None)
+ekh.calculate_subcatchment_metric(river_network, field, stations, metric, weights=None)
 ekh.calculate_zonal_metric(field, labels, metric, weights=None)
-```
-_(for advanced users)_ Calculates a metric over field for each label in the labels field.
 
+# applies the ufunc on the field starting from the sources all the way down to the sinks
+ekh.flow_downstream(river_network, field, ufunc=np.add)
 ```
-ekh.flow_downstream(river_network, field)
-```
-_(for advanced users)_ Calculates the total accumulated flux down a river network.\
-$$v_i^{\prime}=v_i+\sum_{j \rightarrow i}~v_j^{\prime}$$
-
-<img src="docs/images/accuflux.gif" width="200px" height="160px" />
+These are analagous to above.
 
 ### Finding Catchments and Subcatchments
 
 ```
-ekh.find_catchments(river_network, field)
+ekh.catchments.find(river_network, field)
 ```
 Finds the catchments (all upstream nodes of specified nodes, with overwriting).\
 $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  v_j^{\prime} \neq 0 ~ \text{else} ~ v_i, ~j ~ \text{s.t.} ~ i \rightarrow j$$
@@ -144,7 +175,7 @@ $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  v_j^{\prime} \neq 0 ~ \text{else} 
 <img src="docs/images/catchment.gif" width="200px" height="160px" />
 
 ```
-ekh.find_subcatchments(river_network, field)
+ekh.subcatchments.find(river_network, field)
 ```
 Finds the subcatchments (all upstream nodes of specified nodes, without overwriting).\
 $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} ~ v_j = 0) ~ \text{else} ~ v_i, ~j ~ \text{s.t.} ~ i \rightarrow j$$
@@ -183,16 +214,16 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 
 | PCRaster | earthkit-hydro |  Note |
 |---|---|---|
-| accuflux | calculate_upstream_metric | metric="sum" |
-| catchmenttotal | calculate_upstream_metric | metric="sum"  |
-| areatotal | calculate_zonal_metric | metric="sum", return_field=True |
-| areaaverage | calculate_zonal_metric | metric="mean", return_field=True |
-| areamaximum | calculate_zonal_metric | metric="max", return_field=True |
-| areaminimum | calculate_zonal_metric | metric="min", return_field=True |
+| accuflux | upstream.sum | |
+| catchmenttotal | upstream.sum |  |
+| areatotal | zonal.sum | return_field=True |
+| areaaverage | zonal.mean | return_field=True |
+| areamaximum | zonal.max | return_field=True |
+| areaminimum | zonal.min | return_field=True |
 | downstream | move_upstream | |
 | upstream | move_downstream | |
-| catchment | find_catchments | |
-| subcatchment | find_subcatchments | |
+| catchment | catchments.find | |
+| subcatchment | subcatchments.find | |
 | abs, sin, cos, tan, ...  | np.abs, np.sin, np.cos, np.tan, ... | any numpy operations can be directly used |
 
 _Points of difference_
@@ -203,9 +234,14 @@ _Points of difference_
 <a id="attrib1"><sup>1</sup></a>
 The EFAS river network is available under the conditions set out in the [European Commission Reuse and Copyright Notice](https://data.jrc.ec.europa.eu/licence/com_reuse) and is available at [https://data.jrc.ec.europa.eu/dataset/f572c443-7466-4adf-87aa-c0847a169f23](https://data.jrc.ec.europa.eu/dataset/f572c443-7466-4adf-87aa-c0847a169f23).
 
-    Margarita Choulga; Francesca Moschini; Cinzia Mazzetti; Grimaldi, Stefania; Disperati, Juliana; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for Europe. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/f572c443-7466-4adf-87aa-c0847a169f23
+    Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Grimaldi, Stefania; Disperati, Juliana; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for Europe. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/f572c443-7466-4adf-87aa-c0847a169f23
 
 <a id="attrib2"><sup>2</sup></a>
 The GloFAS river network is available under the conditions set out in the [European Commission Reuse and Copyright Notice](https://data.jrc.ec.europa.eu/licence/com_reuse) and is available at [https://data.jrc.ec.europa.eu/dataset/68050d73-9c06-499c-a441-dc5053cb0c86](https://data.jrc.ec.europa.eu/dataset/68050d73-9c06-499c-a441-dc5053cb0c86).
 
-    Margarita Choulga; Francesca Moschini; Cinzia Mazzetti; Disperati, Juliana; Grimaldi, Stefania; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
+    Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Disperati, Juliana; Grimaldi, Stefania; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
+
+<a id="attrib3"><sup>3</sup></a>
+The CaMa river networks are available under [CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/) and are available at [http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/](http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/).
+
+    Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M. (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets. Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873

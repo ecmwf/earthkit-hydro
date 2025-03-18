@@ -28,7 +28,7 @@ def calculate_catchment_metric(
     stations : tuple
         Tuple of indices of the stations.
     metric : str
-        Metric to compute. Options are "mean", "max", "min", "sum"
+        Metric to compute. Options are "mean", "max", "min", "sum", "product"
     weights : ndarray, optional
         Used to weight the field when computing the metric. Default is None.
     mv : scalar, optional

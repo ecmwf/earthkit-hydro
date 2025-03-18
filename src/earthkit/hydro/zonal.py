@@ -25,7 +25,7 @@ def calculate_zonal_metric(
     labels : ndarray
         The labels for the field.
     metric : str
-        Metric to compute. Options are "mean", "max", "min", "sum"
+        Metric to compute. Options are "mean", "max", "min", "sum", "product"
     weights : ndarray, optional
         Used to weight the field when computing the metric. Default is None.
     field_mv : scalar, optional

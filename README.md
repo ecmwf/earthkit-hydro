@@ -70,7 +70,7 @@ pre-commit install
 ## Documentation
 **An [example notebook](docs/notebooks/example.ipynb) showing how to use the earthkit-hydro is provided in addition to the documentation below.**
 
-Earthkit-hydro can be imported as following:
+earthkit-hydro can be imported as following:
 ```
 import earthkit.hydro as ekh
 ```
@@ -113,11 +113,11 @@ There are four high-level ways to compute metrics depending on the use-case.
 
 #### Metrics Over Upstream Nodes
 ```
-ekh.upstream.sum(river_network, field, stations, weights=None)
-ekh.upstream.max(river_network, field, stations, weights=None)
-ekh.upstream.min(river_network, field, stations, weights=None)
-ekh.upstream.mean(river_network, field, stations, weights=None)
-ekh.upstream.product(river_network, field, stations, weights=None)
+ekh.upstream.sum(river_network, field, weights=None)
+ekh.upstream.max(river_network, field, weights=None)
+ekh.upstream.min(river_network, field, weights=None)
+ekh.upstream.mean(river_network, field, weights=None)
+ekh.upstream.product(river_network, field, weights=None)
 ```
 Given an input field, returns as output a new field with the upstream metric calculated for each cell.
 
@@ -143,10 +143,10 @@ Given a field and a list of points defining stations, finds the subcatchments de
 
 #### Metrics Over Arbitrary Zones
 ```
-ekh.zonal.sum(field, stations, weights=None, return_field=False)
-ekh.zonal.max(field, stations, weights=None, return_field=False)
-ekh.zonal.min(field, stations, weights=None, return_field=False)
-ekh.zonal.mean(field, stations, weights=None, return_field=False)
+ekh.zonal.sum(field, labels, weights=None, return_field=False)
+ekh.zonal.max(field, labels, weights=None, return_field=False)
+ekh.zonal.min(field, labels, weights=None, return_field=False)
+ekh.zonal.mean(field, labels, weights=None, return_field=False)
 ekh.zonal.product(field, labels, weights=None, return_field=False)
 ```
 Calculates a metric over the input field for each zone defined by the labels field. If return_field is True, returns a field otherwise returns a dictionary of {label: metric} pairs.

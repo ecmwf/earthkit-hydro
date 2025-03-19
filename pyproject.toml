@@ -40,7 +40,7 @@ dependencies = ["numpy", "joblib"]
 
 [project.optional-dependencies]
     readers = [
-        "earthkit-data"
+        "earthkit-data>=0.13.0"
         ]
     tests = [
         "pytest",
@@ -50,7 +50,7 @@ dependencies = ["numpy", "joblib"]
         "pre-commit"
         ]
     all = [
-        "earthkit-data",
+        "earthkit-data>=0.13.0",
         "pytest",
         "pre-commit"
         ]

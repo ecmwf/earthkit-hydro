@@ -60,15 +60,11 @@ def create(path, river_network_format, source):
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
         x, y = data.nextx.values, data.nexty.values
         return from_cama_nextxy(x, y)
-    elif river_network_format == "pcr_d8":
+    elif river_network_format == "pcr_d8" or river_network_format == "esri_d8":
         ekd = import_earthkit_or_prompt_install(river_network_format, source)
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
         var_name = find_main_var(data)
-        return from_d8(data[var_name].values)
-    elif river_network_format == "esri_d8":
-        raise NotImplementedError(
-            f"River network format {river_network_format} is not yet implemented."
-        )
+        return from_d8(data[var_name].values, river_network_format=river_network_format)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
 
@@ -120,13 +116,13 @@ def available():
     """
 
     print(
-        "Available precomputed networks are:",
-        '`ekh.river_network.load("efas", "5")`',
-        '`ekh.river_network.load("efas", "4")`',
-        '`ekh.river_network.load("glofas", "4")`',
-        '`ekh.river_network.load("glofas", "3")`',
-        '`ekh.river_network.load("cama_15min", "4")`',
-        '`ekh.river_network.load("cama_06min", "4")`',
-        '`ekh.river_network.load("cama_05min", "4")`',
+        "Available precomputed networks are:\n",
+        '`ekh.river_network.load("efas", "5")`\n',
+        '`ekh.river_network.load("efas", "4")`\n',
+        '`ekh.river_network.load("glofas", "4")`\n',
+        '`ekh.river_network.load("glofas", "3")`\n',
+        '`ekh.river_network.load("cama_15min", "4")`\n',
+        '`ekh.river_network.load("cama_06min", "4")`\n',
+        '`ekh.river_network.load("cama_05min", "4")`\n',
         '`ekh.river_network.load("cama_03min", "4")`',
     )

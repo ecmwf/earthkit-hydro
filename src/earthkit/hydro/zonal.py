@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 
 from .metrics import metrics_dict
@@ -123,7 +125,6 @@ def calculate_zonal_metric(
 
 for metric in metrics_dict.keys():
 
-    def func(field, labels, *args, **kwargs):
-        return calculate_zonal_metric(field, labels, metric, *args, **kwargs)
+    func = partial(calculate_zonal_metric, metric=metric)
 
     globals()[metric] = func

@@ -99,6 +99,8 @@ Loads a precomputed `RiverNetwork`. Current options can be listed with `ekh.rive
 | "cama_05min" | "4" | 5arcmin global |  | [<sup>3</sup>](#attrib3) |
 | "cama_06min" | "4" | 6arcmin global |  | [<sup>3</sup>](#attrib3) |
 | "cama_15min" | "4" | 15arcmin global |  | [<sup>3</sup>](#attrib3) |
+| "hydrosheds_05min" | "1" | 5arcmin global | 56° South to 84° North | [<sup>4</sup>](#attrib4) |
+| "hydrosheds_06min" | "1" | 6arcmin global | 56° South to 84° North | [<sup>4</sup>](#attrib4) |
 
 
 ```
@@ -245,3 +247,8 @@ The GloFAS river network is available under the conditions set out in the [Europ
 The CaMa river networks are available under [CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/) and are available at [http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/](http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/).
 
     Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M. (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets. Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873
+
+<a id="attrib4"><sup>4</sup></a>
+The HydroSHEDS river networks are available under the conditions set out in the [HydroSHEDS Version One Licence Agreement](https://data.hydrosheds.org/file/technical-documentation/HydroSHEDS_TechDoc_v1_4.pdf) and are available at [https://www.hydrosheds.org](https://www.hydrosheds.org).
+
+    Lehner, Bernhard; Verdin, Kristine; Jarvis, Andy (2008): New global hydrography derived from spaceborne elevation data. Eos, Transactions, 89(10): 93-94. Data available at https://www.hydrosheds.org.

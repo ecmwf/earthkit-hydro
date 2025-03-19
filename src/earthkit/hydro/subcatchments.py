@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 
 from .catchments import _find_catchments_2D, _find_catchments_ND
@@ -29,7 +31,7 @@ def calculate_subcatchment_metric(
     stations : tuple
         Tuple of indices of the stations.
     metric : str
-        Metric to compute. Options are "mean", "max", "min", "sum"
+        Metric to compute. Options are "mean", "max", "min", "sum", "product"
     weights : ndarray
         Used to weight the field when computing the metric. Default is None.
     mv : scalar
@@ -116,9 +118,6 @@ def find(river_network, field, mv=0, in_place=False):
 
 for metric in metrics_dict.keys():
 
-    def func(river_network, field, stations, *args, **kwargs):
-        return calculate_subcatchment_metric(
-            river_network, field, stations, metric, *args, **kwargs
-        )
+    func = partial(calculate_subcatchment_metric, metric=metric)
 
     globals()[metric] = func

@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 
 from .accumulation import flow_downstream
@@ -25,7 +27,7 @@ def calculate_upstream_metric(
     field : numpy.ndarray
         The input field.
     metric : str
-        Metric to compute. Options are "mean", "max", "min", "sum"
+        Metric to compute. Options are "mean", "max", "min", "sum", "product"
     weights : ndarray, optional
         Used to weight the field when computing the metric. Default is None.
     mv : scalar, optional
@@ -84,7 +86,6 @@ def calculate_upstream_metric(
 
 for metric in metrics_dict.keys():
 
-    def func(river_network, field, *args, **kwargs):
-        return calculate_upstream_metric(river_network, field, metric, *args, **kwargs)
+    func = partial(calculate_upstream_metric, metric=metric)
 
     globals()[metric] = func

@@ -1,3 +1,5 @@
+from functools import partial
+
 import numpy as np
 
 from .metrics import metrics_dict
@@ -25,7 +27,7 @@ def calculate_zonal_metric(
     labels : ndarray
         The labels for the field.
     metric : str
-        Metric to compute. Options are "mean", "max", "min", "sum"
+        Metric to compute. Options are "mean", "max", "min", "sum", "product"
     weights : ndarray, optional
         Used to weight the field when computing the metric. Default is None.
     field_mv : scalar, optional
@@ -123,7 +125,6 @@ def calculate_zonal_metric(
 
 for metric in metrics_dict.keys():
 
-    def func(field, labels, *args, **kwargs):
-        return calculate_zonal_metric(field, labels, metric, *args, **kwargs)
+    func = partial(calculate_zonal_metric, metric=metric)
 
     globals()[metric] = func

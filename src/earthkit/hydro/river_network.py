@@ -11,7 +11,6 @@ from .readers import (
     from_d8,
     import_earthkit_or_prompt_install,
 )
-from .network_class import RiverNetwork
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1
@@ -78,7 +77,7 @@ def load(
     domain,
     river_network_version,
     data_source=(
-        "https://github.com/Oisin-M/river_network_store/raw/refs/heads/develop/"
+        "https://github.com/ecmwf/earthkit-hydro-store/raw/refs/heads/main/"
         "{ekh_version}/{domain}/{river_network_version}/river_network.joblib"
     ),
     *args,
@@ -90,7 +89,8 @@ def load(
     Parameters
     ----------
     domain : str
-        The domain of the river network. Supported domains are "efas", "glofas", "cama".
+        The domain of the river network. Supported domains are "efas", "glofas",
+        "cama_15min", "cama_06min", "cama_05min", "cama_03min".
     river_network_version : str
         The version of the river network on the specified domain.
     data_source : str, optional
@@ -115,8 +115,18 @@ def load(
 
 
 def available():
+    """
+    Prints the available precomputed networks.
+    """
+
     print(
         "Available precomputed networks are:",
-        '`ekh.load("efas", "5")`',
-        '`ekh.load("glofas", "4")`',
+        '`ekh.river_network.load("efas", "5")`',
+        '`ekh.river_network.load("efas", "4")`',
+        '`ekh.river_network.load("glofas", "4")`',
+        '`ekh.river_network.load("glofas", "3")`',
+        '`ekh.river_network.load("cama_15min", "4")`',
+        '`ekh.river_network.load("cama_06min", "4")`',
+        '`ekh.river_network.load("cama_05min", "4")`',
+        '`ekh.river_network.load("cama_03min", "4")`',
     )

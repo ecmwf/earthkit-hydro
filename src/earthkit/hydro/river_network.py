@@ -124,5 +124,7 @@ def available():
         '`ekh.river_network.load("cama_15min", "4")`\n',
         '`ekh.river_network.load("cama_06min", "4")`\n',
         '`ekh.river_network.load("cama_05min", "4")`\n',
-        '`ekh.river_network.load("cama_03min", "4")`',
+        '`ekh.river_network.load("cama_03min", "4")`\n',
+        '`ekh.river_network.load("hydrosheds_0gmin", "1")`\n',
+        '`ekh.river_network.load("hydrosheds_05min", "4")`',
     )

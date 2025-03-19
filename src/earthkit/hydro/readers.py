@@ -234,8 +234,15 @@ def from_d8(data, river_network_format="pcr_d8"):
     shape = data.shape
     data_flat = data.flatten()
     del data
-    mask_upstream = (data_flat != 255) & (data_flat != 5) & (data_flat != 0)
-    missing_mask = data_flat != 255
+    if river_network_format == "pcr_d8":
+        missing_mask = np.isin(data_flat, range(1, 10))
+        mask_upstream = data_flat != 5
+    elif river_network_format == "esri_d8":
+        missing_mask = data_flat != 255
+        mask_upstream = (data_flat != 0) & (data_flat != -1)
+    else:
+        raise ValueError(f"Unsupported river network format: {river_network_format}.")
+    mask_upstream = (mask_upstream) & (missing_mask)
     directions = data_flat[mask_upstream].astype("int")
     del data_flat
     if river_network_format == "pcr_d8":
@@ -246,8 +253,6 @@ def from_d8(data, river_network_format="pcr_d8"):
         y_mapping = {32: 1, 64: 1, 128: 1, 16: 0, 0: 0, 1: 0, 8: -1, 4: -1, 2: -1}
         x_offsets = np.vectorize(x_mapping.get)(directions)
         y_offsets = -np.vectorize(y_mapping.get)(directions)
-    else:
-        raise ValueError(f"Unsupported river network format: {river_network_format}.")
     del directions
     upstream_indices, downstream_indices = (
         find_upstream_downstream_indices_from_offsets(

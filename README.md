@@ -163,6 +163,8 @@ ekh.calculate_zonal_metric(field, labels, metric, weights=None)
 
 # applies the ufunc on the field starting from the sources all the way down to the sinks
 ekh.flow_downstream(river_network, field, ufunc=np.add)
+# applies the ufunc on the field starting from the sinks all the way up to the sources
+ekh.flow_upstream(river_network, field, ufunc=np.add)
 ```
 These are analagous to above.
 

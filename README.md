@@ -189,7 +189,7 @@ $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} 
 ### Calculating Upstream or Downstream Fields
 
 ```
-ekh.move_downstream(river_network, field)
+ekh.move_downstream(river_network, field, ufunc=np.add)
 ```
 Updates each node with the sum of its upstream nodes.\
 $$v_i^{\prime}=\sum_{j \rightarrow i}~v_j$$

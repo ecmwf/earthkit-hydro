@@ -80,6 +80,10 @@ class RiverNetwork:
         )
         self.topological_groups = self.topological_groups_from_labels()
 
+    @property
+    def shape(self):
+        return self.mask.shape
+
     def get_sources(self):
         """Identifies the source nodes in the river network (nodes with no
         upstream nodes).

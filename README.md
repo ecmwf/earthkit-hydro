@@ -40,24 +40,10 @@
 - Handle N-dimensional fields
 
 ## Installation
-Clone source code repository
-
-```
-git clone https://github.com/ecmwf/earthkit-hydro.git
-cd earthkit-hydro
-```
-
-Create and activate conda environment
-
-```
-conda create -n hydro python=3.10
-conda activate hydro
-```
-
 For default installation, run
 
 ```
-pip install .
+pip install earthkit-hydro
 ```
 
 For a developer installation (includes linting and test libraries), run

@@ -28,8 +28,8 @@ def calculate_subcatchment_metric(
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.
-    stations : tuple
-        Tuple of indices of the stations.
+    stations : list of tuples
+        List of tuple indices of the stations.
     metric : str
         Metric to compute. Options are "mean", "max", "min", "sum", "product"
     weights : ndarray
@@ -58,6 +58,10 @@ def calculate_subcatchment_metric(
             accept_missing,
         )
         return {x: metric_at_stations[y] for (x, y) in zip(stations, labels[stations])}
+
+    # transform here list of tuples (indices) into a tuple of lists
+    # (easier to manipulate)
+    stations = tuple(zip(*stations))
 
     node_numbers = np.cumsum(river_network.mask) - 1
     valid_stations = river_network.mask[stations]

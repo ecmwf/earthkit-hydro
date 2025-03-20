@@ -72,7 +72,8 @@ def calculate_catchment_metric(
 
     # transform here list of tuples (indices) into a tuple of lists
     # (easier to manipulate)
-    stations = tuple(zip(*stations))
+    stations = np.array(stations)
+    stations = (stations[:, 0], stations[:, 1])
 
     node_numbers = np.cumsum(river_network.mask) - 1
     valid_stations = river_network.mask[stations]

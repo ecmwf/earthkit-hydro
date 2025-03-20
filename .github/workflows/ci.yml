@@ -1,0 +1,22 @@
+name: ci
+
+on:
+  push:
+    branches: [ "main", "develop" ]
+  pull_request:
+    branches: [ "main", "develop" ]
+
+jobs:
+
+  qa-pre-commit:
+    uses: ecmwf/reusable-workflows/.github/workflows/qa-precommit-run.yml@v2
+    secrets: inherit
+
+  test:
+    uses: ecmwf/reusable-workflows/.github/workflows/qa-pytest-pyproject.yml@v2
+    secrets: inherit
+
+  # TODO: add back
+  # qa-python:
+  #     uses: ecmwf-actions/reusable-workflows/.github/workflows/ci-python.yml@v2
+  #     secrets: inherit

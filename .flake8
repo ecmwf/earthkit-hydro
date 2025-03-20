@@ -1,0 +1,14 @@
+[flake8]
+# Example to set max line length
+max-line-length = 88
+ignore = E203, W503
+
+# Per-file ignore settings
+per-file-ignores =
+    # Ignore F401 (unused import) in __init__.py files
+    __init__.py: F401
+
+    # Ignore specific errors in the tests folder
+    # - F405: Undefined variable
+    # - F403: Wildcard import usage
+    tests/*: F405,F403

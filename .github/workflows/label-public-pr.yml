@@ -1,0 +1,9 @@
+name: label-public-pr
+
+on:
+  pull_request_target:
+    types: [opened, synchronize]
+
+jobs:
+  label:
+    uses: ecmwf/reusable-workflows/.github/workflows/label-pr.yml@v2

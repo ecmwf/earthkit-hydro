@@ -1,0 +1,12 @@
+name: cd
+
+on:
+  push:
+    tags:
+      - '**'
+
+jobs:
+
+  pypi:
+    uses: ecmwf/reusable-workflows/.github/workflows/cd-pypi.yml@v2
+    secrets: inherit

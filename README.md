@@ -254,3 +254,10 @@ The CaMa river networks are available under [CC-BY 4.0 licence](https://creative
 The HydroSHEDS river networks are available under the conditions set out in the [HydroSHEDS Version One Licence Agreement](https://data.hydrosheds.org/file/technical-documentation/HydroSHEDS_TechDoc_v1_4.pdf) and are available at [https://www.hydrosheds.org](https://www.hydrosheds.org).
 
     Lehner, Bernhard; Verdin, Kristine; Jarvis, Andy (2008): New global hydrography derived from spaceborne elevation data. Eos, Transactions, 89(10): 93-94. Data available at https://www.hydrosheds.org.
+
+## Licence
+
+[Apache Licence 2.0](LICENSE)
+
+In applying this license, ECMWF does not waive the privileges and immunities
+granted to it by virtue of its status as an intergovernmental organisation nor does it submit to any jurisdiction.

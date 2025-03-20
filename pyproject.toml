@@ -101,4 +101,4 @@ write_to_template = '''# Do not change! Do not track in version control!
 __version__ = "{version}"
 '''
 parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs
-fallback_version='0.1'
+fallback_version='0.1.0'

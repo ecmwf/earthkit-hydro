@@ -14,3 +14,5 @@ from earthkit.hydro.subcatchments import calculate_subcatchment_metric
 from earthkit.hydro.subcatchments import find as find_subcatchments
 from earthkit.hydro.upstream import calculate_upstream_metric
 from earthkit.hydro.zonal import calculate_zonal_metric
+
+from ._version import __version__

@@ -92,8 +92,8 @@ include-package-data = true
 readme = {file = ["README.md"], content-type = "text/markdown"}
 
 [tool.setuptools.packages.find]
-where = ["src"]
-exclude = ["tests"]
+include = [ "earthkit.hydro" ]
+where = [ "src/" ]
 
 [tool.setuptools_scm]
 write_to = "src/earthkit/hydro/_version.py"

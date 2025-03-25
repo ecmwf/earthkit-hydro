@@ -49,6 +49,8 @@ pip install earthkit-hydro
 For a developer installation (includes linting and test libraries), run
 
 ```
+git clone https://github.com/ecmwf/earthkit-hydro.git
+cd earthkit-hydro
 pip install -e .[dev]
 pre-commit install
 ```
@@ -243,7 +245,7 @@ The HydroSHEDS river networks are available under the conditions set out in the 
 
 ## Licence
 
-[Apache Licence 2.0](LICENSE)
+[Apache Licence 2.0](LICENCE)
 
 In applying this license, ECMWF does not waive the privileges and immunities
 granted to it by virtue of its status as an intergovernmental organisation nor does it submit to any jurisdiction.

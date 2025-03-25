@@ -13,7 +13,7 @@ maintainers = [
     {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
     ]
 description = "A Python library for common hydrological functions"
-license = {file = "LICENSE"}
+license = {file = "LICENCE"}
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
@@ -92,8 +92,8 @@ include-package-data = true
 readme = {file = ["README.md"], content-type = "text/markdown"}
 
 [tool.setuptools.packages.find]
-where = ["src"]
-exclude = ["tests"]
+include = [ "earthkit.hydro" ]
+where = [ "src/" ]
 
 [tool.setuptools_scm]
 write_to = "src/earthkit/hydro/_version.py"
@@ -101,4 +101,4 @@ write_to_template = '''# Do not change! Do not track in version control!
 __version__ = "{version}"
 '''
 parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs
-fallback_version='0.1'
+fallback_version='0.1.0'

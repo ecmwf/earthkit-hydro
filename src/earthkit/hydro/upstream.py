@@ -2,7 +2,7 @@ from functools import partial
 
 import numpy as np
 
-from .accumulation import flow_downstream
+from .flow import flow_downstream
 from .metrics import metrics_dict
 from .utils import mask_and_unmask, missing_to_nan, nan_to_missing
 

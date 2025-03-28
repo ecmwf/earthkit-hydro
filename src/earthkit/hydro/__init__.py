@@ -4,9 +4,9 @@ import earthkit.hydro.river_network
 import earthkit.hydro.subcatchments  # for dynamic function creation
 import earthkit.hydro.upstream  # for dynamic function creation
 import earthkit.hydro.zonal  # for dynamic function creation
-from earthkit.hydro.accumulation import flow_downstream, flow_upstream
 from earthkit.hydro.catchments import calculate_catchment_metric
 from earthkit.hydro.catchments import find as find_catchments
+from earthkit.hydro.flow import flow_downstream, flow_upstream
 from earthkit.hydro.movement import move_downstream, move_upstream
 from earthkit.hydro.river_network import create as create_river_network
 from earthkit.hydro.river_network import load as load_river_network

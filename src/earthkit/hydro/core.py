@@ -1,4 +1,4 @@
-def flow(river_network, field, invert_graph, operation, mv):
+def flow(river_network, field, invert_graph, operation, *args, **kwargs):
     """Apply an operation to a field along a river network.
 
     Parameters
@@ -33,6 +33,6 @@ def flow(river_network, field, invert_graph, operation, mv):
         # modify field in_place with desired operation
         # NB: this function needs to handle missing values
         # mv if they are allowed in input
-        operation(river_network, field, grouping, mv)
+        operation(river_network, field, grouping, *args, **kwargs)
 
     return field

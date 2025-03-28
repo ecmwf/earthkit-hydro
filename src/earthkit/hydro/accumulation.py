@@ -13,6 +13,8 @@ def flow_downstream(
     ufunc=np.add,
     accept_missing=False,
     skip_missing_check=False,
+    additive_weight=None,
+    multiplicative_weight=None,
 ):
     """Accumulates field values downstream.
 
@@ -47,15 +49,35 @@ def flow_downstream(
 
     op = _ufunc_to_downstream
 
-    def operation(river_network, field, grouping, mv):
-        return op(river_network, field, grouping, mv, ufunc=ufunc)
+    def operation(
+        river_network, field, grouping, mv, additive_weight, multiplicative_weight
+    ):
+        return op(
+            river_network,
+            field,
+            grouping,
+            mv,
+            additive_weight,
+            multiplicative_weight,
+            ufunc=ufunc,
+        )
 
-    field = flow(river_network, field, False, operation, mv)
+    field = flow(
+        river_network,
+        field,
+        False,
+        operation,
+        mv,
+        additive_weight,
+        multiplicative_weight,
+    )
 
     return nan_to_missing(field, field_dtype, mv)
 
 
-def _ufunc_to_downstream(river_network, field, grouping, mv, ufunc):
+def _ufunc_to_downstream(
+    river_network, field, grouping, mv, additive_weight, multiplicative_weight, ufunc
+):
     """Updates field in-place by applying a ufunc at the downstream nodes of
     the grouping.
 
@@ -79,10 +101,24 @@ def _ufunc_to_downstream(river_network, field, grouping, mv, ufunc):
     None
 
     """
+    if additive_weight is None:
+        if multiplicative_weight is None:
+            modifier_field = field[grouping]
+        else:
+            modifier_field = field[grouping] * multiplicative_weight[grouping]
+    else:
+        if multiplicative_weight is None:
+            modifier_field = field[grouping] + additive_weight[grouping]
+        else:
+            modifier_field = (
+                field[grouping] * multiplicative_weight[grouping]
+                + additive_weight[grouping]
+            )
+
     ufunc.at(
         field,
         (river_network.downstream_nodes[grouping], *[slice(None)] * (field.ndim - 1)),
-        field[grouping],
+        modifier_field,
     )
 
 
@@ -95,6 +131,8 @@ def flow_upstream(
     ufunc=np.add,
     accept_missing=False,
     skip_missing_check=False,
+    additive_weight=None,
+    multiplicative_weight=None,
 ):
     """Accumulates field values upstream.
 
@@ -129,15 +167,35 @@ def flow_upstream(
 
     op = _ufunc_to_upstream
 
-    def operation(river_network, field, grouping, mv):
-        return op(river_network, field, grouping, mv, ufunc=ufunc)
+    def operation(
+        river_network, field, grouping, mv, additive_weight, multiplicative_weight
+    ):
+        return op(
+            river_network,
+            field,
+            grouping,
+            mv,
+            additive_weight,
+            multiplicative_weight,
+            ufunc=ufunc,
+        )
 
-    field = flow(river_network, field, True, operation, mv)
+    field = flow(
+        river_network,
+        field,
+        True,
+        operation,
+        mv,
+        additive_weight,
+        multiplicative_weight,
+    )
 
     return nan_to_missing(field, field_dtype, mv)
 
 
-def _ufunc_to_upstream(river_network, field, grouping, mv, ufunc):
+def _ufunc_to_upstream(
+    river_network, field, grouping, mv, additive_weight, multiplicative_weight, ufunc
+):
     """Updates field in-place by applying a ufunc at the nodes of
     the grouping.
 
@@ -161,8 +219,23 @@ def _ufunc_to_upstream(river_network, field, grouping, mv, ufunc):
     None
 
     """
+    down_group = river_network.downstream_nodes[grouping]
+    if additive_weight is None:
+        if multiplicative_weight is None:
+            modifier_field = field[down_group]
+        else:
+            modifier_field = field[down_group] * multiplicative_weight[down_group]
+    else:
+        if multiplicative_weight is None:
+            modifier_field = field[down_group] + additive_weight[down_group]
+        else:
+            modifier_field = (
+                field[down_group] * multiplicative_weight[down_group]
+                + additive_weight[down_group]
+            )
+
     ufunc.at(
         field,
         (grouping, *[slice(None)] * (field.ndim - 1)),
-        field[river_network.downstream_nodes[grouping]],
+        modifier_field,
     )

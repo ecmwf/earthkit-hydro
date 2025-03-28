@@ -1,10 +1,10 @@
-def flow(river_network, field, invert_graph, operation, mv):
+def flow(river_network, field, invert_graph, operation, *args, **kwargs):
     """Apply an operation to a field along a river network.
 
     Parameters
     ----------
-    river_network : RiverNetwork
-        The river network object containing topological groups.
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
     field : ndarray
         The field data to be modified in place.
     invert_graph : bool
@@ -33,6 +33,6 @@ def flow(river_network, field, invert_graph, operation, mv):
         # modify field in_place with desired operation
         # NB: this function needs to handle missing values
         # mv if they are allowed in input
-        operation(river_network, field, grouping, mv)
+        operation(river_network, field, grouping, *args, **kwargs)
 
     return field

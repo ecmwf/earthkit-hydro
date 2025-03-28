@@ -1,246 +1,130 @@
+from io import BytesIO
+from urllib.request import urlopen
+
 import joblib
-import numpy as np
 
-from .distance import _max_dist_downstream
-from .utils import mask_2d
+from ._version import __version__ as ekh_version
+from .readers import (
+    cache,
+    find_main_var,
+    from_cama_nextxy,
+    from_d8,
+    import_earthkit_or_prompt_install,
+)
+
+# read in only up to second decimal point
+# i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1
+ekh_version = ".".join(ekh_version.split(".")[:2])
 
 
-class RiverNetwork:
-    """A class representing a river network for hydrological processing.
+@cache
+def create(path, river_network_format, source):
+    """Creates a river network from the given path, format, and source.
 
-    Attributes
+    Parameters
     ----------
-    nodes : numpy.ndarray
-        Array containing the node ids of the river network.
-    n_nodes : int
-        The number of nodes in the river network.
-    downstream_nodes : numpy.ndarray
-        Array of downstream node ids corresponding to each node.
-    mask : numpy.ndarray
-        A boolean mask converting from the domain to the river network.
-    sinks : numpy.ndarray
-        Nodes with no downstream connections.
-    sources : numpy.ndarray
-        Nodes with no upstream connections.
-    topological_labels : numpy.ndarray
-        A topological group label for each node.
-    topological_groups : list of numpy.ndarray
-        Groups of nodes sorted in topological order.
+    path : str
+        The path to the river network data.
+    river_network_format : str
+        The format of the river network data.
+        Supported formats are "precomputed", "cama", "pcr_d8", and "esri_d8".
+    source : str
+        The source of the river network data.
+        For possible sources see:
+        https://earthkit-data.readthedocs.io/en/latest/guide/sources.html.
+
+    Returns
+    -------
+    object
+        The river network object created from the given data.
+
+    Raises
+    ------
+    ValueError
+        If the river network format or source is unsupported.
+    NotImplementedError
+        If the river network format is "esri_d8".
+    """
+    if river_network_format == "precomputed":
+        if source == "file":
+            return joblib.load(path)
+        elif source == "url":
+            return joblib.load(BytesIO(urlopen(path).read()))
+        else:
+            raise ValueError(
+                "Unsupported source for river network format"
+                f"{river_network_format}: {source}."
+            )
+    elif river_network_format == "cama":
+        ekd = import_earthkit_or_prompt_install(river_network_format, source)
+        data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
+        x, y = data.nextx.values, data.nexty.values
+        return from_cama_nextxy(x, y)
+    elif river_network_format == "pcr_d8" or river_network_format == "esri_d8":
+        ekd = import_earthkit_or_prompt_install(river_network_format, source)
+        data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
+        var_name = find_main_var(data)
+        return from_d8(data[var_name].values, river_network_format=river_network_format)
+    else:
+        raise ValueError(f"Unsupported river network format: {river_network_format}.")
+
+
+def load(
+    domain,
+    river_network_version,
+    data_source=(
+        "https://github.com/ecmwf/earthkit-hydro-store/raw/refs/heads/main/"
+        "{ekh_version}/{domain}/{river_network_version}/river_network.joblib"
+    ),
+    *args,
+    **kwargs,
+):
+    """Load a precomputed river network from a named domain and
+    river_network_version.
+
+    Parameters
+    ----------
+    domain : str
+        The domain of the river network. Supported domains are "efas", "glofas",
+        "cama_15min", "cama_06min", "cama_05min", "cama_03min".
+    river_network_version : str
+        The version of the river network on the specified domain.
+    data_source : str, optional
+        The data source URL template for the river network.
+    *args : tuple
+        Additional positional arguments to pass to `create_river_network`.
+    **kwargs : dict
+        Additional keyword arguments to pass to `create_river_network`.
+
+    Returns
+    -------
+    earthkit.hydro.RiverNetwork
+        The loaded river network.
 
     """
+    uri = data_source.format(
+        ekh_version=ekh_version,
+        domain=domain,
+        river_network_version=river_network_version,
+    )
+    return create(uri, "precomputed", "url", *args, **kwargs)
 
-    def __init__(
-        self,
-        nodes,
-        downstream,
-        mask,
-        sinks=None,
-        sources=None,
-        topological_labels=None,
-        check_for_cycles=False,
-    ) -> None:
-        """Initialises the RiverNetwork with nodes, downstream nodes, and a
-        mask.
 
-        Parameters
-        ----------
-        nodes : numpy.ndarray
-            Array containing the node ids of the river network.
-        downstream : numpy.ndarray
-            Array of downstream node ids corresponding to each node.
-        mask : numpy.ndarray
-            A mask converting from the domain to the river network.
-        sinks : numpy.ndarray, optional
-            Array of sinks of the river network.
-        sources :  numpy.ndarray, optional
-            Array of sources of the river network.
-        topological_labels : numpy.ndarray, optional
-            Array of precomputed topological distance labels.
-        check_for_cycles : bool, optional
-            Whether to check for cycles when instantiating the river network.
+def available():
+    """
+    Prints the available precomputed networks.
+    """
 
-        """
-        self.nodes = nodes
-        self.n_nodes = len(nodes)
-        self.downstream_nodes = downstream
-        self.mask = mask
-        self.sinks = (
-            sinks
-            if sinks is not None
-            else self.nodes[self.downstream_nodes == self.n_nodes]
-        )  # nodes with no downstreams
-        self.sources = (
-            sources if sources is not None else self.get_sources()
-        )  # nodes with no upstreams
-        if check_for_cycles:
-            self.check_for_cycles()
-        self.topological_labels = (
-            topological_labels
-            if topological_labels is not None
-            else self.compute_topological_labels()
-        )
-        self.topological_groups = self.topological_groups_from_labels()
-
-    def get_sources(self):
-        """Identifies the source nodes in the river network (nodes with no
-        upstream nodes).
-
-        Returns
-        -------
-        numpy.ndarray
-            Array of source nodes.
-
-        """
-        tmp_nodes = self.nodes.copy()
-        downstream_no_sinks = self.downstream_nodes[
-            self.downstream_nodes != self.n_nodes
-        ]  # get all downstream nodes
-        tmp_nodes[downstream_no_sinks] = -1  # downstream nodes that aren't sinks = -1
-        inlets = tmp_nodes[
-            tmp_nodes != -1
-        ]  # sources are nodes that are not downstream nodes
-        return inlets
-
-    def check_for_cycles(self):
-        """Checks if the river network contains any cycles and raises an
-        Exception if it does.
-        """
-        nodes = self.downstream_nodes.copy()
-        while True:
-            if np.any(nodes == self.nodes):
-                Exception("River Network contains a cycle.")
-            elif np.all(nodes == self.n_nodes):
-                break
-            not_sinks = nodes != self.n_nodes
-            nodes[not_sinks] = self.downstream_nodes[nodes[not_sinks]].copy()
-
-    def compute_topological_labels(self):
-        """Finds the topological distance labels for each node in the river
-        network.
-
-        Returns
-        -------
-        numpy.ndarray
-            Array of topological distance labels for each node.
-
-        """
-        inlets = self.sources
-        labels = np.zeros(self.n_nodes, dtype=int)
-        old_sum = -1
-        current_sum = 0  # sum of labels
-        n = 1  # distance from source
-        while current_sum > old_sum:
-            if n > self.n_nodes:
-                raise Exception("River Network contains a cycle.")
-            old_sum = current_sum
-            inlets = inlets[inlets != self.n_nodes]  # subset to valid nodes
-            labels[inlets] = n  # update furthest distance from source
-            inlets = self.downstream_nodes[inlets]
-            n += 1
-            current_sum = np.sum(labels)
-        labels[self.sinks] = n  # put all sinks in last group in topological ordering
-        return labels
-
-    def topological_groups_from_labels(self):
-        """Groups nodes by their topological distance labels.
-
-        Parameters
-        ----------
-        labels : numpy.ndarray
-            Array of labels representing the topological distances of nodes.
-
-        Returns
-        -------
-        list of numpy.ndarray
-            A list of subarrays, each containing nodes with the same label.
-
-        """
-        sorted_indices = np.argsort(self.topological_labels)  # sort by labels
-        sorted_array = self.nodes[sorted_indices]
-        sorted_labels = self.topological_labels[sorted_indices]
-        _, indices = np.unique(
-            sorted_labels, return_index=True
-        )  # find index of first occurrence of each label
-        subarrays = np.split(
-            sorted_array, indices[1:]
-        )  # split array at each first occurrence of a label
-        return subarrays
-
-    def export(self, fpath="river_network.joblib", compression=1):
-        """Exports the river network instance to a file.
-
-        Parameters
-        ----------
-        fpath : str, optional
-            The filepath to save the instance (default is "river_network.joblib").
-        compression : int, optional
-            Compression level for joblib (default is 1).
-
-        """
-        joblib.dump(self, fpath, compress=compression)
-
-    @mask_2d
-    def create_subnetwork(self, field, recompute=False):
-        """Creates a subnetwork from the river network based on a mask.
-
-        Parameters
-        ----------
-        field : numpy.ndarray
-            A boolean mask to subset the river network.
-        recompute : bool, optional
-            If True, recomputes the topological labels for the subnetwork.
-            Default is False.
-
-        Returns
-        -------
-        RiverNetwork
-            A subnetwork of the river network.
-
-        """
-        river_network_mask = field
-        valid_indices = np.where(self.mask)
-        new_valid_indices = (
-            valid_indices[0][river_network_mask],
-            valid_indices[1][river_network_mask],
-        )
-        domain_mask = np.full(self.mask.shape, False)
-        domain_mask[new_valid_indices] = True
-
-        downstream_indices = self.downstream_nodes[river_network_mask]
-        n_nodes = len(downstream_indices)  # number of nodes in the subnetwork
-        # create new array of network nodes, setting all nodes not in mask to n_nodes
-        subnetwork_nodes = np.full(self.n_nodes, n_nodes)
-        subnetwork_nodes[river_network_mask] = np.arange(n_nodes)
-        # get downstream nodes in the subnetwork
-        non_sinks = np.where(downstream_indices != self.n_nodes)
-        downstream = np.full(n_nodes, n_nodes)
-        downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
-        nodes = np.arange(n_nodes)
-
-        sinks = nodes[downstream == n_nodes]
-        topological_labels = self.topological_labels[river_network_mask]
-        topological_labels[sinks] = self.n_nodes
-
-        network_no_recompute = RiverNetwork(
-            nodes,
-            downstream,
-            domain_mask,
-            sinks=sinks,
-            topological_labels=topological_labels,
-        )
-
-        if recompute:
-            distance_field = np.empty(network_no_recompute.n_nodes, dtype=int)
-            distance_field.fill(-1)
-            distance_field[network_no_recompute.sources] = 1
-            _max_dist_downstream(network_no_recompute, distance_field, in_place=True)
-            distance_field[network_no_recompute.sinks] = np.max(field)
-            return RiverNetwork(
-                nodes,
-                downstream,
-                domain_mask,
-                sinks=sinks,
-                topological_labels=topological_labels,
-            )
-        else:
-            return network_no_recompute
+    print(
+        "Available precomputed networks are:\n",
+        '`ekh.river_network.load("efas", "5")`\n',
+        '`ekh.river_network.load("efas", "4")`\n',
+        '`ekh.river_network.load("glofas", "4")`\n',
+        '`ekh.river_network.load("glofas", "3")`\n',
+        '`ekh.river_network.load("cama_15min", "4")`\n',
+        '`ekh.river_network.load("cama_06min", "4")`\n',
+        '`ekh.river_network.load("cama_05min", "4")`\n',
+        '`ekh.river_network.load("cama_03min", "4")`\n',
+        '`ekh.river_network.load("hydrosheds_06min", "1")`\n',
+        '`ekh.river_network.load("hydrosheds_05min", "1")`',
+    )

@@ -17,18 +17,33 @@ def min(
 
     points = points_to_numpy(points)
 
-    points_1d = points_to_1d_indices(points)
+    points_1d = points_to_1d_indices(river_network, points)
 
     field[points_1d] = 0
     if downstream:
         field = flow_downstream(
-            river_network, field, mv, ufunc=np.minimum, additive_weight=weights
+            river_network,
+            field,
+            mv,
+            ufunc=np.minimum,
+            additive_weight=weights,
+            modifier_use_upstream=True,
         )
     if upstream:
         field = flow_upstream(
-            river_network, field, mv, ufunc=np.minimum, additive_weight=weights
+            river_network,
+            field,
+            mv,
+            ufunc=np.minimum,
+            additive_weight=weights,
+            modifier_use_upstream=True,
         )
-    return field
+
+    out_field = np.empty(river_network.shape, dtype=field.dtype)
+    out_field[..., river_network.mask] = field
+    out_field[..., ~river_network.mask] = mv
+
+    return out_field
 
 
 def max(
@@ -55,16 +70,32 @@ def max(
 
     points = points_to_numpy(points)
 
-    points_1d = points_to_1d_indices(points)
+    points_1d = points_to_1d_indices(river_network, points)
     field[points_1d] = 0
 
     if downstream:
         field = flow_downstream(
-            river_network, field, mv, ufunc=np.maximum, additive_weight=weights
+            river_network,
+            field,
+            mv,
+            ufunc=np.maximum,
+            additive_weight=weights,
+            modifier_use_upstream=True,
         )
     if upstream:
         field = flow_upstream(
-            river_network, field, mv, ufunc=np.maximum, additive_weight=weights
+            river_network,
+            field,
+            mv,
+            ufunc=np.maximum,
+            additive_weight=weights,
+            modifier_use_upstream=True,
         )
 
-    return np.nan_to_num(field, neginf=np.inf)
+    field = np.nan_to_num(field, neginf=np.inf)
+
+    out_field = np.empty(river_network.shape, dtype=field.dtype)
+    out_field[..., river_network.mask] = field
+    out_field[..., ~river_network.mask] = mv
+
+    return out_field

@@ -279,3 +279,18 @@ def mask_and_unmask(func):
             return mask_2d(func)(river_network, field, *args, **kwargs).T
 
     return wrapper
+
+
+def points_to_numpy(points):
+    # transform here list of tuples (indices) into a tuple of lists
+    # (easier to manipulate)
+    points = np.array(points)
+    return (points[:, 0], points[:, 1])
+
+
+def points_to_1d_indices(river_network, stations):
+    node_numbers = np.cumsum(river_network.mask) - 1
+    valid_stations = river_network.mask[stations]
+    stations = tuple(station_index[valid_stations] for station_index in stations)
+    stations_1d = node_numbers.reshape(river_network.mask.shape)[stations]
+    return stations_1d

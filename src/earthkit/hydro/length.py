@@ -38,7 +38,7 @@ def min(
             mv,
             ufunc=np.minimum,
             additive_weight=weights,
-            modifier_use_upstream=False,
+            modifier_use_upstream=True,
         )
 
     out_field = np.empty(river_network.shape, dtype=field.dtype)
@@ -92,7 +92,7 @@ def max(
             mv,
             ufunc=np.maximum,
             additive_weight=weights,
-            modifier_use_upstream=False,
+            modifier_use_upstream=True,
         )
 
     field = np.nan_to_num(field, neginf=np.inf)

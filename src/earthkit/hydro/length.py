@@ -20,7 +20,8 @@ def min(
 
     points_1d = points_to_1d_indices(river_network, points)
 
-    field[points_1d] = 0
+    field[points_1d] = weights[points_1d]
+
     if downstream:
         field = flow_downstream(
             river_network,
@@ -28,7 +29,7 @@ def min(
             mv,
             ufunc=np.minimum,
             additive_weight=weights,
-            modifier_use_upstream=True,
+            modifier_use_upstream=False,
         )
     if upstream:
         field = flow_upstream(
@@ -37,7 +38,7 @@ def min(
             mv,
             ufunc=np.minimum,
             additive_weight=weights,
-            modifier_use_upstream=True,
+            modifier_use_upstream=False,
         )
 
     out_field = np.empty(river_network.shape, dtype=field.dtype)
@@ -73,7 +74,7 @@ def max(
     points = points_to_numpy(points)
 
     points_1d = points_to_1d_indices(river_network, points)
-    field[points_1d] = 0
+    field[points_1d] = weights[points_1d]
 
     if downstream:
         field = flow_downstream(
@@ -82,7 +83,7 @@ def max(
             mv,
             ufunc=np.maximum,
             additive_weight=weights,
-            modifier_use_upstream=True,
+            modifier_use_upstream=False,
         )
     if upstream:
         field = flow_upstream(
@@ -91,7 +92,7 @@ def max(
             mv,
             ufunc=np.maximum,
             additive_weight=weights,
-            modifier_use_upstream=True,
+            modifier_use_upstream=False,
         )
 
     field = np.nan_to_num(field, neginf=np.inf)

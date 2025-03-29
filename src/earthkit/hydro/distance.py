@@ -36,17 +36,28 @@ def max(
 ):
     if upstream and downstream:
         # TODO: define how this should work
-        # can one overwrite a startiing station's distance?
+        # can one overwrite a starting station's distance?
+        #
+        # NB: there is no nice way to do this as downstream
+        # and then upstream like for min
+        # because we would need to know the paths
+        # to avoid looping over each other
+        # Only way I think can think is doing each station
+        # separately, but this will be very slow...
         raise NotImplementedError(
             "Max distance both upstream and downstream is not yet implemented."
         )
 
     weights = np.ones(river_network.n_nodes) if weights is None else weights
-    field = np.empty(river_network.shape)
+
+    field = np.empty(river_network.n_nodes)
     field.fill(-np.inf)
-    points = np.array(points)
-    points = (points[:, 0], points[:, 1])
-    field[points] = 0
+
+    points = points_to_numpy(points)
+
+    points_1d = points_to_1d_indices(points)
+    field[points_1d] = 0
+
     if downstream:
         field = flow_downstream(
             river_network, field, mv, ufunc=np.maximum, additive_weight=weights
@@ -55,4 +66,5 @@ def max(
         field = flow_upstream(
             river_network, field, mv, ufunc=np.maximum, additive_weight=weights
         )
+
     return np.nan_to_num(field, neginf=np.inf)

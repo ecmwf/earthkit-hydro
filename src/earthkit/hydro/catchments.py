@@ -5,7 +5,13 @@ import numpy as np
 from .core import flow
 from .metrics import metrics_dict
 from .upstream import calculate_upstream_metric
-from .utils import is_missing, mask_2d, mask_and_unmask
+from .utils import (
+    is_missing,
+    mask_2d,
+    mask_and_unmask,
+    points_to_1d_indices,
+    points_to_numpy,
+)
 
 
 @mask_2d
@@ -70,15 +76,9 @@ def calculate_catchment_metric(
 
         return dict(zip(stations, upstream_metric_field[stations]))
 
-    # transform here list of tuples (indices) into a tuple of lists
-    # (easier to manipulate)
-    stations = np.array(stations)
-    stations = (stations[:, 0], stations[:, 1])
+    stations = points_to_numpy(stations)
 
-    node_numbers = np.cumsum(river_network.mask) - 1
-    valid_stations = river_network.mask[stations]
-    stations = tuple(station_index[valid_stations] for station_index in stations)
-    stations_1d = node_numbers.reshape(river_network.mask.shape)[stations]
+    stations_1d = points_to_1d_indices(river_network, stations)
 
     upstream_metric_field = calculate_upstream_metric(
         river_network,

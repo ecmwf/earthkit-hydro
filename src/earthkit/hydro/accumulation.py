@@ -224,14 +224,14 @@ def _ufunc_to_upstream(
         if multiplicative_weight is None:
             modifier_field = field[down_group]
         else:
-            modifier_field = field[down_group] * multiplicative_weight[down_group]
+            modifier_field = field[down_group] * multiplicative_weight[grouping]
     else:
         if multiplicative_weight is None:
-            modifier_field = field[down_group] + additive_weight[down_group]
+            modifier_field = field[down_group] + additive_weight[grouping]
         else:
             modifier_field = (
-                field[down_group] * multiplicative_weight[down_group]
-                + additive_weight[down_group]
+                field[down_group] * multiplicative_weight[grouping]
+                + additive_weight[grouping]
             )
 
     ufunc.at(

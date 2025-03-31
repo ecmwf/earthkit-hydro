@@ -85,6 +85,7 @@ def calculate_catchment_metric(
         accept_missing,
         skip=True,
     )
+
     metric_at_stations = upstream_metric_field[..., stations_1d]
 
     return {

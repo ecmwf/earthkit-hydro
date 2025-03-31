@@ -81,7 +81,7 @@ def calculate_zonal_metric(
         weighted_field,
     )
 
-    if metric == "mean" or metric == "var" or metric == "stdev":
+    if metric == "mean" or metric == "var" or metric == "std":
         if weights is None:
             count_values = np.bincount(
                 unique_label_positions, minlength=len(unique_labels)
@@ -103,7 +103,7 @@ def calculate_zonal_metric(
 
         field_dtype = np.float64
 
-        if metric == "var" or metric == "stdev":
+        if metric == "var" or metric == "std":
             out_field = np.full(
                 (len(unique_labels), *field.T.shape[labels.ndim :]),
                 metrics_dict[metric].base_val,
@@ -120,7 +120,7 @@ def calculate_zonal_metric(
                 ),
             )
             initial_field = (out_field.T / count_values.T).T
-            if metric == "stdev":
+            if metric == "std":
                 initial_field = np.sqrt(initial_field)
 
     initial_field = nan_to_missing(initial_field, field_dtype, field_mv)

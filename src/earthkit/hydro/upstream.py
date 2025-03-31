@@ -46,13 +46,13 @@ def calculate_upstream_metric(
     field, field_dtype = missing_to_nan(field.copy(), mv, accept_missing)
 
     if weights is None:
-        if metric == "mean" or metric == "stdev" or metric == "var":
-            weights = np.ones(river_network.n_nodes, dtype=np.float64)
+        if metric == "mean" or metric == "std" or metric == "var":
+            weightings = np.ones(river_network.n_nodes, dtype=np.float64)
         weighted_field = field.copy()
     else:
         assert field_dtype == weights.dtype
-        weights, _ = missing_to_nan(weights.copy(), mv, accept_missing)
-        weighted_field = field * weights  # this isn't in_place !
+        weightings, _ = missing_to_nan(weights.copy(), mv, accept_missing)
+        weighted_field = field * weightings  # this isn't in_place !
 
     ufunc = metrics_dict[metric].func
 
@@ -67,26 +67,27 @@ def calculate_upstream_metric(
         skip=True,
     )
 
-    if metric == "mean" or metric == "stdev" or metric == "var":
+    if metric == "mean" or metric == "std" or metric == "var":
         counts = flow_downstream(
             river_network,
-            weights,
+            weightings,
             np.nan,  # mv replaced by nan
-            True,  # do in-place on field copy
+            False,
             ufunc,
             accept_missing,
             skip_missing_check=True,
             skip=True,
         )
-        weighted_field /= counts
+
         if metric == "mean":
+            weighted_field /= counts  # weighted mean
             return nan_to_missing(
                 weighted_field, np.float64, mv
             )  # if we compute means, we change dtype for int fields etc.
-        else:
+        elif metric == "var" or metric == "std":
             weighted_sum_of_squares = flow_downstream(
                 river_network,
-                weights * (field - weighted_field) ** 2,
+                field**2 * weightings if weights is not None else field**2,
                 np.nan,  # mv replaced by nan
                 True,  # do in-place on field copy
                 ufunc,
@@ -94,10 +95,17 @@ def calculate_upstream_metric(
                 skip_missing_check=True,
                 skip=True,
             )
+            mean = weighted_field / counts
+            weighted_sum_of_squares = (
+                mean**2 * counts - 2 * mean * weighted_field + weighted_sum_of_squares
+            )
+            weighted_sum_of_squares[weighted_sum_of_squares < 0] = (
+                0  # can occur for numerical issues
+            )
             weighted_sum_of_squares /= counts
             if metric == "var":
                 return nan_to_missing(weighted_sum_of_squares, np.float64, mv)
-            elif metric == "stdev":
+            elif metric == "std":
                 return nan_to_missing(np.sqrt(weighted_sum_of_squares), np.float64, mv)
 
     else:

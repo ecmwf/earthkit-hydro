@@ -497,7 +497,7 @@ def test_accumulate_downstream_2d(river_network, N):
     ],
     indirect=True,
 )
-@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean"])
+@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean", "std", "var"])
 def test_calculate_catchment(river_network, metric):
     field = np.random.rand(3, 4, river_network.n_nodes)
     weights = np.random.rand(3, 4, river_network.n_nodes)
@@ -525,10 +525,11 @@ def test_calculate_catchment(river_network, metric):
     ],
     indirect=True,
 )
-@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean"])
+@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean", "std", "var"])
 def test_calculate_subcatchment(river_network, metric):
-    field = np.random.rand(3, 4, river_network.n_nodes)
-    weights = np.random.rand(3, 4, river_network.n_nodes)
+    shape = (3, 4)
+    field = np.random.rand(*shape, river_network.n_nodes)
+    weights = np.random.rand(*shape, river_network.n_nodes)
     subcatchment_metric = ekh.calculate_subcatchment_metric(
         river_network, field, river_network.sinks, metric, weights
     )
@@ -537,8 +538,11 @@ def test_calculate_subcatchment(river_network, metric):
     )
     for i in catchment_metric.keys():
         assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
-        np.testing.assert_allclose(subcatchment_metric[i], catchment_metric[i])
-
+        # the two methods don't match always because of numerical instabilities in the
+        # variance computation arising from the different scales
+        np.testing.assert_allclose(
+            subcatchment_metric[i], catchment_metric[i], atol=5e-8
+        )
     if metric == "sum":
         subcatchment_metric = ekh.calculate_subcatchment_metric(
             river_network, field, river_network.nodes, metric, weights

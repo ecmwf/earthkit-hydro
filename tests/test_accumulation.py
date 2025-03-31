@@ -337,11 +337,11 @@ def test_calculate_upstream_metric_min(river_network, input_field, flow_downstre
     ],
     indirect=["river_network"],
 )
-def test_calculate_upstream_metric_product(
+def test_calculate_upstream_metric_prod(
     river_network, input_field, flow_downstream, mv
 ):
     output_field = ekh.calculate_upstream_metric(
-        river_network, input_field, "product", weights=None, mv=mv, accept_missing=True
+        river_network, input_field, "prod", weights=None, mv=mv, accept_missing=True
     )
     print(output_field)
     print(flow_downstream)

@@ -61,7 +61,9 @@ def calculate_zonal_metric(
         relevant_weights, _ = missing_to_nan(
             relevant_weights, field_mv, field_accept_missing, skip_missing_check
         )
-        relevant_field = (relevant_field.T * relevant_weights.T).T
+        weighted_field = (relevant_field.T * relevant_weights.T).T
+    else:
+        weighted_field = relevant_field
 
     unique_labels, unique_label_positions = np.unique(
         not_missing_labels, return_inverse=True
@@ -76,10 +78,10 @@ def calculate_zonal_metric(
     ufunc.at(
         initial_field,
         (unique_label_positions, *[slice(None)] * (initial_field.ndim - 1)),
-        relevant_field,
+        weighted_field,
     )
 
-    if metric == "mean":
+    if metric == "mean" or metric == "var" or metric == "stdev":
         if weights is None:
             count_values = np.bincount(
                 unique_label_positions, minlength=len(unique_labels)
@@ -100,6 +102,26 @@ def calculate_zonal_metric(
         initial_field = initial_field_T.T
 
         field_dtype = np.float64
+
+        if metric == "var" or metric == "stdev":
+            out_field = np.full(
+                (len(unique_labels), *field.T.shape[labels.ndim :]),
+                metrics_dict[metric].base_val,
+                dtype=np.float64,
+            )
+            ufunc.at(
+                out_field,
+                (unique_label_positions, *[slice(None)] * (out_field.ndim - 1)),
+                (
+                    (initial_field[unique_label_positions] - relevant_field) ** 2
+                    if weights is None
+                    else relevant_weights
+                    * (initial_field[unique_label_positions] - relevant_field) ** 2
+                ),
+            )
+            initial_field = (out_field.T / count_values.T).T
+            if metric == "stdev":
+                initial_field = np.sqrt(initial_field)
 
     initial_field = nan_to_missing(initial_field, field_dtype, field_mv)
 

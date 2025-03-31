@@ -58,17 +58,11 @@ def calculate_catchment_metric(
             metric,
             weights,
             mv,
-            False,  # not in_place!
             accept_missing,
             skip=True,
         )
         upstream_field_at_stations = upstream_metric_field[..., stations]
         upstream_field_at_stations = np.moveaxis(upstream_field_at_stations, -1, 0)
-
-        # upstream_metric_field = np.transpose(
-        #     upstream_metric_field,
-        #     axes=[0] + list(range(upstream_metric_field.ndim - 1, 0, -1)),
-        # )
 
         return dict(zip(stations, upstream_field_at_stations))
 
@@ -88,7 +82,6 @@ def calculate_catchment_metric(
         metric,
         weights,
         mv,
-        False,  # not in_place!
         accept_missing,
         skip=True,
     )

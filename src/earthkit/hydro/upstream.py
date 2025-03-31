@@ -14,7 +14,6 @@ def calculate_upstream_metric(
     metric,
     weights=None,
     mv=np.nan,
-    in_place=False,
     accept_missing=False,
 ):
     """
@@ -43,45 +42,66 @@ def calculate_upstream_metric(
         Output field.
 
     """
-    assert in_place is False  # TODO: figure out
-    field, field_dtype = missing_to_nan(field, mv, accept_missing)
+
+    field, field_dtype = missing_to_nan(field.copy(), mv, accept_missing)
+
     if weights is None:
-        weights = np.ones(river_network.n_nodes, dtype=np.float64)
+        if metric == "mean" or metric == "stdev" or metric == "var":
+            weights = np.ones(river_network.n_nodes, dtype=np.float64)
+        weighted_field = field.copy()
     else:
         assert field_dtype == weights.dtype
-        weights, _ = missing_to_nan(weights, mv, accept_missing)
-        field = field * weights  # this isn't in_place !
+        weights, _ = missing_to_nan(weights.copy(), mv, accept_missing)
+        weighted_field = field * weights  # this isn't in_place !
 
     ufunc = metrics_dict[metric].func
 
-    field = flow_downstream(
+    weighted_field = flow_downstream(
         river_network,
-        field,
+        weighted_field,
         np.nan,  # mv replaced by nan
-        in_place,
+        True,  # do in-place on field copy
         ufunc,
         accept_missing,
         skip_missing_check=True,
         skip=True,
     )
 
-    if metric == "mean":
+    if metric == "mean" or metric == "stdev" or metric == "var":
         counts = flow_downstream(
             river_network,
             weights,
             np.nan,  # mv replaced by nan
-            in_place,
+            True,  # do in-place on field copy
             ufunc,
             accept_missing,
             skip_missing_check=True,
             skip=True,
         )
-        field /= counts
-        return nan_to_missing(
-            field, np.float64, mv
-        )  # if we compute means, we change dtype for int fields etc.
+        weighted_field /= counts
+        if metric == "mean":
+            return nan_to_missing(
+                weighted_field, np.float64, mv
+            )  # if we compute means, we change dtype for int fields etc.
+        else:
+            weighted_sum_of_squares = flow_downstream(
+                river_network,
+                weights * (field - weighted_field) ** 2,
+                np.nan,  # mv replaced by nan
+                True,  # do in-place on field copy
+                ufunc,
+                accept_missing,
+                skip_missing_check=True,
+                skip=True,
+            )
+            weighted_sum_of_squares /= counts
+            if metric == "var":
+                return nan_to_missing(weighted_sum_of_squares, np.float64, mv)
+            elif metric == "stdev":
+                return nan_to_missing(np.sqrt(weighted_sum_of_squares), np.float64, mv)
+
     else:
-        return nan_to_missing(field, field_dtype, mv)
+        return nan_to_missing(weighted_field, field_dtype, mv)
 
 
 for metric in metrics_dict.keys():

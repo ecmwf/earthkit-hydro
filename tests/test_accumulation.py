@@ -525,7 +525,7 @@ def test_calculate_catchment(river_network, metric):
     ],
     indirect=True,
 )
-@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean", "std", "var"])
+@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean", "prod", "std", "var"])
 def test_calculate_subcatchment(river_network, metric):
     shape = (3, 4)
     field = np.random.rand(*shape, river_network.n_nodes)

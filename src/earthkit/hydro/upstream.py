@@ -96,13 +96,10 @@ def calculate_upstream_metric(
                 skip=True,
             )
             mean = weighted_field / counts
-            weighted_sum_of_squares = (
-                mean**2 * counts - 2 * mean * weighted_field + weighted_sum_of_squares
-            )
+            weighted_sum_of_squares = weighted_sum_of_squares / counts - mean**2
             weighted_sum_of_squares[weighted_sum_of_squares < 0] = (
                 0  # can occur for numerical issues
             )
-            weighted_sum_of_squares /= counts
             if metric == "var":
                 return nan_to_missing(weighted_sum_of_squares, np.float64, mv)
             elif metric == "std":

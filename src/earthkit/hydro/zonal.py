@@ -47,7 +47,7 @@ def calculate_zonal_metric(
     ufunc = metrics_dict[metric].func
 
     mask = ~is_missing(labels, labels_mv)
-    not_missing_labels = labels[mask].T
+    not_missing_labels = labels[..., mask].T
 
     relevant_field = field[..., mask].T
 

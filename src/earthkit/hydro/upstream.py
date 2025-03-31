@@ -43,13 +43,14 @@ def calculate_upstream_metric(
         Output field.
 
     """
+    assert in_place is False  # TODO: figure out
     field, field_dtype = missing_to_nan(field, mv, accept_missing)
     if weights is None:
         weights = np.ones(river_network.n_nodes, dtype=np.float64)
     else:
         assert field_dtype == weights.dtype
         weights, _ = missing_to_nan(weights, mv, accept_missing)
-        field = (field.T * weights.T).T
+        field = field * weights  # this isn't in_place !
 
     ufunc = metrics_dict[metric].func
 
@@ -75,10 +76,9 @@ def calculate_upstream_metric(
             skip_missing_check=True,
             skip=True,
         )
-        field_T = field.T
-        field_T /= counts.T
+        field /= counts
         return nan_to_missing(
-            field_T.T, np.float64, mv
+            field, np.float64, mv
         )  # if we compute means, we change dtype for int fields etc.
     else:
         return nan_to_missing(field, field_dtype, mv)

@@ -26,7 +26,7 @@ metrics_dict = {
     "mean": SumBased,
     "max": MaxBased,
     "min": MinBased,
-    "product": ProductBased,
+    "prod": ProductBased,
     "std": SumBased,
     "var": SumBased,
 }

@@ -7,6 +7,10 @@ from utils import convert_to_2d
 import earthkit.hydro as ekh
 
 
+def get_numpy_function(function_name):
+    return getattr(np, function_name)
+
+
 @pytest.mark.parametrize(
     "river_network, input_field, flow_downstream, mv",
     [
@@ -543,28 +547,91 @@ def test_calculate_subcatchment(river_network, metric):
         np.testing.assert_allclose(
             subcatchment_metric[i], catchment_metric[i], atol=5e-8
         )
-    if metric == "sum":
-        subcatchment_metric = ekh.calculate_subcatchment_metric(
-            river_network, field, river_network.nodes, metric, weights
+
+    subcatchment_metric = ekh.calculate_subcatchment_metric(
+        river_network, field, river_network.nodes, metric, weights
+    )
+    catchment_metric = ekh.calculate_catchment_metric(
+        river_network,
+        field,
+        np.array(
+            [
+                i
+                for i in river_network.nodes
+                if i not in river_network.sinks and i not in river_network.sources
+            ]
+        ),
+        metric,
+        weights,
+    )
+    for i in catchment_metric.keys():
+        assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
+        np.testing.assert_raises(
+            AssertionError,
+            np.testing.assert_array_equal,
+            subcatchment_metric[i],
+            catchment_metric[i],
         )
-        catchment_metric = ekh.calculate_catchment_metric(
-            river_network,
-            field,
-            np.array(
-                [
-                    i
-                    for i in river_network.nodes
-                    if i not in river_network.sinks and i not in river_network.sources
-                ]
-            ),
-            metric,
-            weights,
-        )
-        for i in catchment_metric.keys():
-            assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
-            np.testing.assert_raises(
-                AssertionError,
-                np.testing.assert_array_equal,
-                subcatchment_metric[i],
-                catchment_metric[i],
-            )
+
+
+@pytest.mark.parametrize(
+    "river_network",
+    [
+        ("d8_ldd", d8_ldd_1),
+        ("cama_downxy", cama_downxy_1),
+        ("cama_nextxy", cama_nextxy_1),
+        ("d8_ldd", d8_ldd_2),
+        ("cama_downxy", cama_downxy_2),
+        ("cama_nextxy", cama_nextxy_2),
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean", "prod", "std", "var"])
+def test_calculate_catchment_numpy(river_network, metric):
+    shape = (3, 4)
+    field = np.random.rand(*shape, river_network.n_nodes)
+    weights = None
+    nodes = np.random.choice(river_network.n_nodes, 5)
+    catchment_metric = ekh.calculate_catchment_metric(
+        river_network, field, nodes, metric, weights
+    )
+    numpy_func = get_numpy_function(metric)
+    for i in catchment_metric.keys():
+        mask = np.zeros(river_network.n_nodes, dtype=bool)
+        mask[i] = True
+        mask = ekh.catchments.find(river_network, mask)
+        numpy_answer = numpy_func(field[..., mask], axis=-1)
+
+        np.testing.assert_allclose(catchment_metric[i], numpy_answer)
+
+
+@pytest.mark.parametrize(
+    "river_network",
+    [
+        ("d8_ldd", d8_ldd_1),
+        ("cama_downxy", cama_downxy_1),
+        ("cama_nextxy", cama_nextxy_1),
+        ("d8_ldd", d8_ldd_2),
+        ("cama_downxy", cama_downxy_2),
+        ("cama_nextxy", cama_nextxy_2),
+    ],
+    indirect=True,
+)
+@pytest.mark.parametrize("metric", ["sum", "max", "min", "mean", "prod", "std", "var"])
+def test_calculate_subcatchment_numpy(river_network, metric):
+    shape = (3, 4)
+    field = np.random.rand(*shape, river_network.n_nodes)
+    weights = None
+    nodes = np.random.choice(river_network.n_nodes, 5)
+    subcatchment_metric = ekh.calculate_subcatchment_metric(
+        river_network, field, nodes, metric, weights
+    )
+    numpy_func = get_numpy_function(metric)
+    labels = np.zeros(river_network.n_nodes, dtype=int)
+    labels[nodes] = nodes + 1
+    labels = ekh.subcatchments.find(river_network, labels)
+    for i in subcatchment_metric.keys():
+        mask = labels == (i + 1)
+        numpy_answer = numpy_func(field[..., mask], axis=-1)
+
+        np.testing.assert_allclose(subcatchment_metric[i], numpy_answer)

@@ -1,4 +1,6 @@
 import earthkit.hydro.catchments  # for dynamic function creation
+import earthkit.hydro.distance
+import earthkit.hydro.length
 import earthkit.hydro.readers  # for tests
 import earthkit.hydro.river_network
 import earthkit.hydro.subcatchments  # for dynamic function creation

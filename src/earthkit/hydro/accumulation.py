@@ -124,7 +124,7 @@ def _ufunc_to_downstream(
 
     if additive_weight is None:
         if multiplicative_weight is None:
-            modifier_field = field[grouping]
+            modifier_field = field[..., grouping]
         else:
             modifier_field = field[grouping] * multiplicative_weight[modifier_group]
     else:
@@ -138,7 +138,7 @@ def _ufunc_to_downstream(
 
     ufunc.at(
         field,
-        (river_network.downstream_nodes[grouping], *[slice(None)] * (field.ndim - 1)),
+        (*[slice(None)] * (field.ndim - 1), river_network.downstream_nodes[grouping]),
         modifier_field,
     )
 
@@ -262,20 +262,24 @@ def _ufunc_to_upstream(
     )
     if additive_weight is None:
         if multiplicative_weight is None:
-            modifier_field = field[down_group]
-        else:
-            modifier_field = field[down_group] * multiplicative_weight[modifier_group]
-    else:
-        if multiplicative_weight is None:
-            modifier_field = field[down_group] + additive_weight[modifier_group]
+            modifier_field = field[..., down_group]
         else:
             modifier_field = (
-                field[down_group] * multiplicative_weight[modifier_group]
-                + additive_weight[modifier_group]
+                field[..., down_group] * multiplicative_weight[..., modifier_group]
+            )
+    else:
+        if multiplicative_weight is None:
+            modifier_field = (
+                field[..., down_group] + additive_weight[..., modifier_group]
+            )
+        else:
+            modifier_field = (
+                field[..., down_group] * multiplicative_weight[..., modifier_group]
+                + additive_weight[..., modifier_group]
             )
 
     ufunc.at(
         field,
-        (grouping, *[slice(None)] * (field.ndim - 1)),
+        (*[slice(None)] * (field.ndim - 1), grouping),
         modifier_field,
     )

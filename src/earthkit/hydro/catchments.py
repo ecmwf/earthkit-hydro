@@ -64,17 +64,13 @@ def calculate_catchment_metric(
             metric,
             weights,
             mv,
-            False,  # not in_place!
             accept_missing,
             skip=True,
         )
+        upstream_field_at_stations = upstream_metric_field[..., stations]
+        upstream_field_at_stations = np.moveaxis(upstream_field_at_stations, -1, 0)
 
-        upstream_metric_field = np.transpose(
-            upstream_metric_field,
-            axes=[0] + list(range(upstream_metric_field.ndim - 1, 0, -1)),
-        )
-
-        return dict(zip(stations, upstream_metric_field[stations]))
+        return dict(zip(stations, upstream_field_at_stations))
 
     stations = points_to_numpy(stations)
 
@@ -86,13 +82,15 @@ def calculate_catchment_metric(
         metric,
         weights,
         mv,
-        False,  # not in_place!
         accept_missing,
         skip=True,
     )
-    metric_at_stations = upstream_metric_field[stations_1d]
 
-    return {(x, y): metric_at_stations[i].T for i, (x, y) in enumerate(zip(*stations))}
+    metric_at_stations = upstream_metric_field[..., stations_1d]
+
+    return {
+        (x, y): metric_at_stations[..., i] for i, (x, y) in enumerate(zip(*stations))
+    }
 
 
 @mask_and_unmask
@@ -160,11 +158,11 @@ def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
 
     """
     valid_group = grouping[
-        ~is_missing(field[river_network.downstream_nodes[grouping]], mv)
+        ~is_missing(field[..., river_network.downstream_nodes[grouping]], mv)
     ]  # only update nodes where the downstream belongs to a catchment
     if not overwrite:
-        valid_group = valid_group[is_missing(field[valid_group], mv)]
-    field[valid_group] = field[river_network.downstream_nodes[valid_group]]
+        valid_group = valid_group[is_missing(field[..., valid_group], mv)]
+    field[..., valid_group] = field[..., river_network.downstream_nodes[valid_group]]
 
 
 def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
@@ -189,6 +187,7 @@ def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
     None
 
     """
+    field = field.T
     valid_mask = ~is_missing(field[river_network.downstream_nodes[grouping]], mv)
     valid_indices = np.array(np.where(valid_mask))
     valid_indices[0] = grouping[valid_indices[0]]
@@ -202,3 +201,4 @@ def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
         downstream_valid_indices[0]
     ]
     field[tuple(valid_indices)] = field[tuple(downstream_valid_indices)]
+    return field.T

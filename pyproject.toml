@@ -13,7 +13,7 @@ maintainers = [
     {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
     ]
 description = "A Python library for common hydrological functions"
-license = {file = "LICENCE"}
+license = { text = "Apache License Version 2.0" }
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",

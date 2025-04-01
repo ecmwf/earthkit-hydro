@@ -182,20 +182,20 @@ def mask_2d(func):
         """
         args = tuple(
             (
-                arg[..., river_network.mask].T
+                arg[..., river_network.mask]
                 if isinstance(arg, np.ndarray)
                 and arg.shape[-2:] == river_network.mask.shape
-                else arg.T if isinstance(arg, np.ndarray) else arg
+                else arg if isinstance(arg, np.ndarray) else arg
             )
             for arg in args
         )
 
         kwargs = {
             key: (
-                value[..., river_network.mask].T
+                value[..., river_network.mask]
                 if isinstance(value, np.ndarray)
                 and value.shape[-2:] == river_network.mask.shape
-                else value.T if isinstance(value, np.ndarray) else value
+                else value if isinstance(value, np.ndarray) else value
             )
             for key, value in kwargs.items()
         }
@@ -258,7 +258,7 @@ def mask_and_unmask(func):
 
             values_on_river_network = mask_2d(func)(
                 river_network, field, *args, **kwargs
-            ).T
+            )
 
             if in_place:
                 out_field = field
@@ -276,7 +276,7 @@ def mask_and_unmask(func):
             out_field[..., ~river_network.mask] = mv
             return out_field
         else:
-            return mask_2d(func)(river_network, field, *args, **kwargs).T
+            return mask_2d(func)(river_network, field, *args, **kwargs)
 
     return wrapper
 

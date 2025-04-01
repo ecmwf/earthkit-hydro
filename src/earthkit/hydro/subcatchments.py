@@ -49,10 +49,10 @@ def calculate_subcatchment_metric(
         points[stations] = np.arange(stations.shape[0]) + 1
         labels = find(river_network, points, skip=True)
         metric_at_stations = calculate_zonal_metric(
-            field.T,
+            field,
             labels,
             metric,
-            weights.T if weights is not None else None,
+            weights if weights is not None else None,
             mv,
             0,  # missing labels value
             accept_missing,
@@ -68,10 +68,10 @@ def calculate_subcatchment_metric(
     points[stations_1d] = unique_labels
     labels = find(river_network, points, skip=True)
     metric_at_stations = calculate_zonal_metric(
-        field.T,
+        field,
         labels,
         metric,
-        weights.T if weights is not None else None,
+        weights if weights is not None else None,
         mv,
         0,  # missing labels value
         accept_missing,

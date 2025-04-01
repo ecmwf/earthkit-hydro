@@ -1,29 +1,32 @@
 import numpy as np
 
 
-class Sum:
+class SumBased:
     func = np.add
     base_val = 0
 
 
-class Mean:
-    func = np.add
-    base_val = 0
-
-
-class Max:
+class MaxBased:
     func = np.maximum
     base_val = -np.inf
 
 
-class Min:
+class MinBased:
     func = np.minimum
     base_val = np.inf
 
 
-class Product:
+class ProductBased:
     func = np.multiply
     base_val = 1
 
 
-metrics_dict = {"sum": Sum, "mean": Mean, "max": Max, "min": Min, "product": Product}
+metrics_dict = {
+    "sum": SumBased,
+    "mean": SumBased,
+    "max": MaxBased,
+    "min": MinBased,
+    "prod": ProductBased,
+    "std": SumBased,
+    "var": SumBased,
+}

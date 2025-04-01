@@ -107,7 +107,9 @@ ekh.upstream.sum(river_network, field, weights=None)
 ekh.upstream.max(river_network, field, weights=None)
 ekh.upstream.min(river_network, field, weights=None)
 ekh.upstream.mean(river_network, field, weights=None)
-ekh.upstream.product(river_network, field, weights=None)
+ekh.upstream.prod(river_network, field, weights=None)
+ekh.upstream.std(river_network, field, weights=None)
+ekh.upstream.var(river_network, field, weights=None)
 ```
 Given an input field, returns as output a new field with the upstream metric calculated for each cell.
 
@@ -117,7 +119,9 @@ ekh.catchments.sum(river_network, field, stations, weights=None)
 ekh.catchments.max(river_network, field, stations, weights=None)
 ekh.catchments.min(river_network, field, stations, weights=None)
 ekh.catchments.mean(river_network, field, stations, weights=None)
-ekh.catchments.product(river_network, field, stations, weights=None)
+ekh.catchments.prod(river_network, field, stations, weights=None)
+ekh.catchments.std(river_network, field, stations, weights=None)
+ekh.catchments.var(river_network, field, stations, weights=None)
 ```
 Given a field and a list of points defining stations, calculates the metric over all upstream nodes for each of the stations.
 
@@ -127,7 +131,9 @@ ekh.subcatchments.sum(river_network, field, stations, weights=None)
 ekh.subcatchments.max(river_network, field, stations, weights=None)
 ekh.subcatchments.min(river_network, field, stations, weights=None)
 ekh.subcatchments.mean(river_network, field, stations, weights=None)
-ekh.subcatchments.product(river_network, field, stations, weights=None)
+ekh.subcatchments.prod(river_network, field, stations, weights=None)
+ekh.subcatchments.std(river_network, field, stations, weights=None)
+ekh.subcatchments.var(river_network, field, stations, weights=None)
 ```
 Given a field and a list of points defining stations, finds the subcatchments defined by the stations and computes the metric for each subcatchment.
 
@@ -137,7 +143,9 @@ ekh.zonal.sum(field, labels, weights=None, return_field=False)
 ekh.zonal.max(field, labels, weights=None, return_field=False)
 ekh.zonal.min(field, labels, weights=None, return_field=False)
 ekh.zonal.mean(field, labels, weights=None, return_field=False)
-ekh.zonal.product(field, labels, weights=None, return_field=False)
+ekh.zonal.prod(field, labels, weights=None, return_field=False)
+ekh.zonal.std(field, labels, weights=None, return_field=False)
+ekh.zonal.var(field, labels, weights=None, return_field=False)
 ```
 Calculates a metric over the input field for each zone defined by the labels field. If return_field is True, returns a field otherwise returns a dictionary of {label: metric} pairs.
 

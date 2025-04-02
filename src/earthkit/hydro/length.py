@@ -71,9 +71,11 @@ def max(
     field = np.empty(river_network.n_nodes)
     field.fill(-np.inf)
 
-    points = points_to_numpy(points)
-
-    points_1d = points_to_1d_indices(river_network, points)
+    if isinstance(points, np.ndarray):
+        points_1d = points
+    else:
+        points = points_to_numpy(points)
+        points_1d = points_to_1d_indices(river_network, points)
     field[points_1d] = weights[points_1d]
 
     if downstream:
@@ -102,3 +104,49 @@ def max(
     out_field[..., ~river_network.mask] = mv
 
     return out_field
+
+
+def to_sink(river_network, weights=None, path="shortest", mv=np.nan):
+    if path == "shortest":
+        return min(
+            river_network,
+            river_network.sinks,
+            weights,
+            upstream=True,
+            downstream=False,
+            mv=mv,
+        )
+    elif path == "longest":
+        return max(
+            river_network,
+            river_network.sinks,
+            weights,
+            upstream=True,
+            downstream=False,
+            mv=mv,
+        )
+    else:
+        raise ValueError("Path must be one of 'shortest' or 'longest'.")
+
+
+def to_source(river_network, weights=None, path="shortest", mv=np.nan):
+    if path == "shortest":
+        return min(
+            river_network,
+            river_network.sources,
+            weights,
+            upstream=False,
+            downstream=True,
+            mv=mv,
+        )
+    elif path == "longest":
+        return max(
+            river_network,
+            river_network.sources,
+            weights,
+            upstream=False,
+            downstream=True,
+            mv=mv,
+        )
+    else:
+        raise ValueError("Path must be one of 'shortest' or 'longest'.")

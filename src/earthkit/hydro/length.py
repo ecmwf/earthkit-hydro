@@ -63,7 +63,7 @@ def max(
         # Only way I think can think is doing each station
         # separately, but this will be very slow...
         raise NotImplementedError(
-            "Max distance both upstream and downstream is not yet implemented."
+            "Max length both upstream and downstream is not yet implemented."
         )
 
     weights = np.ones(river_network.n_nodes) if weights is None else weights

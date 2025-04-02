@@ -197,8 +197,8 @@ ekh.distance.max(river_network, points, weights=None, upstream=False, downstream
 Given a set of input points, computes the min or max distance (upstream and/or downstream depending on input) from those points for all cells in the field. Unreachable points are given a value np.inf. Weights represents the distance to a downstream cell (weights at sinks are ignored). By default, it is assumed the distance to any downstream cell is 1 regardless if the connection is diagonal or not.
 
 ```
-ekh.distance.min(river_network, points, weights=None, upstream=False, downstream=True)
-ekh.distance.max(river_network, points, weights=None, upstream=False, downstream=True)
+ekh.length.min(river_network, points, weights=None, upstream=False, downstream=True)
+ekh.length.max(river_network, points, weights=None, upstream=False, downstream=True)
 ```
 Given a set of input points, computes the min or max length (upstream and/or downstream depending on input) of the network starting from those points for all cells in the field. Unreachable points are given a value np.inf. Weights represents the length of the river in the grid cell. By default, this is assumed to be one.
 

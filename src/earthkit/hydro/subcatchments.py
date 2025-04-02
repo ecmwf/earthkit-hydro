@@ -13,7 +13,7 @@ from .zonal import calculate_zonal_metric
 def calculate_subcatchment_metric(
     river_network,
     field,
-    stations,
+    points,
     metric,
     weights=None,
     mv=np.nan,
@@ -44,10 +44,10 @@ def calculate_subcatchment_metric(
     dict
         Dictionary with (station, catchment_metric) pairs.
     """
-    if isinstance(stations, np.ndarray):
-        points = np.zeros(river_network.n_nodes, dtype=int)
-        points[stations] = np.arange(stations.shape[0]) + 1
-        labels = find(river_network, points, skip=True)
+    if isinstance(points, np.ndarray):
+        initial_field = np.zeros(river_network.n_nodes, dtype=int)
+        initial_field[points] = np.arange(points.shape[0]) + 1
+        labels = find(river_network, initial_field, skip=True)
         metric_at_stations = calculate_zonal_metric(
             field,
             labels,
@@ -57,16 +57,16 @@ def calculate_subcatchment_metric(
             0,  # missing labels value
             accept_missing,
         )
-        return {x: metric_at_stations[y] for (x, y) in zip(stations, labels[stations])}
+        return {x: metric_at_stations[y] for (x, y) in zip(points, labels[points])}
 
-    stations = points_to_numpy(stations)
+    points = points_to_numpy(points)
 
-    stations_1d = points_to_1d_indices(river_network, stations)
+    stations_1d = points_to_1d_indices(river_network, points)
 
-    points = np.zeros(river_network.n_nodes, dtype=int)
+    initial_field = np.zeros(river_network.n_nodes, dtype=int)
     unique_labels = np.arange(stations_1d.shape[0]) + 1
-    points[stations_1d] = unique_labels
-    labels = find(river_network, points, skip=True)
+    initial_field[stations_1d] = unique_labels
+    labels = find(river_network, initial_field, skip=True)
     metric_at_stations = calculate_zonal_metric(
         field,
         labels,
@@ -76,9 +76,7 @@ def calculate_subcatchment_metric(
         0,  # missing labels value
         accept_missing,
     )
-    return {
-        (x, y): metric_at_stations[z] for (x, y, z) in zip(*stations, unique_labels)
-    }
+    return {(x, y): metric_at_stations[z] for (x, y, z) in zip(*points, unique_labels)}
 
 
 @mask_and_unmask

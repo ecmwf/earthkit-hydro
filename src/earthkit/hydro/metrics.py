@@ -21,9 +21,8 @@ class ProductBased:
     base_val = 1
 
 
-class MiscBased:
-    func = None
-    base_val = None
+class Percentile:
+    func = np.percentile
 
 
 metrics_dict = {
@@ -34,5 +33,5 @@ metrics_dict = {
     "prod": ProductBased,
     "std": SumBased,
     "var": SumBased,
-    "percentile": MiscBased,
+    "percentile": Percentile,
 }

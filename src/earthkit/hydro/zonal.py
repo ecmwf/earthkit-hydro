@@ -132,8 +132,6 @@ def calculate_zonal_metric(
         )
 
     if return_field:
-
-        mask = labels != 0
         out_field = np.empty(field.shape, dtype=np.float64)
         out_field[..., ~mask] = np.nan  # works correctly
         out_field[..., mask] = initial_field[unique_label_positions].T

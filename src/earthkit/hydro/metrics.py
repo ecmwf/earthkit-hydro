@@ -21,6 +21,11 @@ class ProductBased:
     base_val = 1
 
 
+class MiscBased:
+    func = None
+    base_val = None
+
+
 metrics_dict = {
     "sum": SumBased,
     "mean": SumBased,
@@ -29,4 +34,5 @@ metrics_dict = {
     "prod": ProductBased,
     "std": SumBased,
     "var": SumBased,
+    "percentile": MiscBased,
 }

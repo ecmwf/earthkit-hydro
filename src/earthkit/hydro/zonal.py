@@ -55,73 +55,87 @@ def calculate_zonal_metric(
         relevant_field, field_mv, field_accept_missing, skip_missing_check
     )
 
-    if weights is not None:
-        assert field_dtype == weights.dtype
-        relevant_weights = weights[..., mask].T
-        relevant_weights, _ = missing_to_nan(
-            relevant_weights, field_mv, field_accept_missing, skip_missing_check
+    if metric == "percentile":
+        assert weights is None
+        unique_labels, unique_label_positions = np.unique(
+            not_missing_labels, return_inverse=True
         )
-        weighted_field = (relevant_field.T * relevant_weights.T).T
+
+        initial_field = np.array(
+            [
+                np.percentile(relevant_field[not_missing_labels == label], 50, axis=0)
+                for label in unique_labels
+            ]
+        )
     else:
-        weighted_field = relevant_field
 
-    unique_labels, unique_label_positions = np.unique(
-        not_missing_labels, return_inverse=True
-    )
-
-    initial_field = np.full(
-        (len(unique_labels), *field.T.shape[labels.ndim :]),
-        metrics_dict[metric].base_val,
-        dtype=np.float64,
-    )
-
-    ufunc.at(
-        initial_field,
-        (unique_label_positions, *[slice(None)] * (initial_field.ndim - 1)),
-        weighted_field,
-    )
-
-    if metric == "mean" or metric == "var" or metric == "std":
-        if weights is None:
-            count_values = np.bincount(
-                unique_label_positions, minlength=len(unique_labels)
-            ).astype(initial_field.dtype)
+        if weights is not None:
+            assert field_dtype == weights.dtype
+            relevant_weights = weights[..., mask].T
+            relevant_weights, _ = missing_to_nan(
+                relevant_weights, field_mv, field_accept_missing, skip_missing_check
+            )
+            weighted_field = (relevant_field.T * relevant_weights.T).T
         else:
-            count_values = np.full(
-                (len(unique_labels), *weights.T.shape[labels.ndim :]),
-                metrics_dict[metric].base_val,
-                dtype=relevant_weights.dtype,
-            )
-            ufunc.at(
-                count_values,
-                (unique_label_positions, *[slice(None)] * (count_values.ndim - 1)),
-                relevant_weights,
-            )
-        initial_field_T = initial_field.T
-        initial_field_T /= count_values.T
-        initial_field = initial_field_T.T
+            weighted_field = relevant_field
 
-        field_dtype = np.float64
+        unique_labels, unique_label_positions = np.unique(
+            not_missing_labels, return_inverse=True
+        )
 
-        if metric == "var" or metric == "std":
-            out_field = np.full(
-                (len(unique_labels), *field.T.shape[labels.ndim :]),
-                metrics_dict[metric].base_val,
-                dtype=np.float64,
-            )
-            ufunc.at(
-                out_field,
-                (unique_label_positions, *[slice(None)] * (out_field.ndim - 1)),
-                (
-                    (initial_field[unique_label_positions] - relevant_field) ** 2
-                    if weights is None
-                    else relevant_weights
-                    * (initial_field[unique_label_positions] - relevant_field) ** 2
-                ),
-            )
-            initial_field = (out_field.T / count_values.T).T
-            if metric == "std":
-                initial_field = np.sqrt(initial_field)
+        initial_field = np.full(
+            (len(unique_labels), *field.T.shape[labels.ndim :]),
+            metrics_dict[metric].base_val,
+            dtype=np.float64,
+        )
+
+        ufunc.at(
+            initial_field,
+            (unique_label_positions, *[slice(None)] * (initial_field.ndim - 1)),
+            weighted_field,
+        )
+
+        if metric == "mean" or metric == "var" or metric == "std":
+            if weights is None:
+                count_values = np.bincount(
+                    unique_label_positions, minlength=len(unique_labels)
+                ).astype(initial_field.dtype)
+            else:
+                count_values = np.full(
+                    (len(unique_labels), *weights.T.shape[labels.ndim :]),
+                    metrics_dict[metric].base_val,
+                    dtype=relevant_weights.dtype,
+                )
+                ufunc.at(
+                    count_values,
+                    (unique_label_positions, *[slice(None)] * (count_values.ndim - 1)),
+                    relevant_weights,
+                )
+            initial_field_T = initial_field.T
+            initial_field_T /= count_values.T
+            initial_field = initial_field_T.T
+
+            field_dtype = np.float64
+
+            if metric == "var" or metric == "std":
+                out_field = np.full(
+                    (len(unique_labels), *field.T.shape[labels.ndim :]),
+                    metrics_dict[metric].base_val,
+                    dtype=np.float64,
+                )
+                ufunc.at(
+                    out_field,
+                    (unique_label_positions, *[slice(None)] * (out_field.ndim - 1)),
+                    (
+                        (initial_field[unique_label_positions] - relevant_field) ** 2
+                        if weights is None
+                        else relevant_weights
+                        * (initial_field[unique_label_positions] - relevant_field) ** 2
+                    ),
+                )
+                initial_field = (out_field.T / count_values.T).T
+                if metric == "std":
+                    initial_field = np.sqrt(initial_field)
 
     initial_field = nan_to_missing(initial_field, field_dtype, field_mv)
 
@@ -132,8 +146,7 @@ def calculate_zonal_metric(
         )
 
     if return_field:
-
-        mask = labels != 0
+        mask = labels != labels_mv
         out_field = np.empty(field.shape, dtype=np.float64)
         out_field[..., ~mask] = np.nan  # works correctly
         out_field[..., mask] = initial_field[unique_label_positions].T

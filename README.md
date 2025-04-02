@@ -188,6 +188,20 @@ $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} 
 
 <img src="docs/images/subcatchment.gif" width="200px" height="160px" />
 
+### Calculating Distances or Lengths
+
+```
+ekh.distance.min(river_network, points, weights=None, upstream=False, downstream=True)
+ekh.distance.max(river_network, points, weights=None, upstream=False, downstream=True)
+```
+Given a set of input points, computes the min or max distance (upstream and/or downstream depending on input) from those points for all cells in the field. Unreachable points are given a value np.inf. Weights represents the distance to a downstream cell (weights at sinks are ignored). By default, it is assumed the distance to any downstream cell is 1 regardless if the connection is diagonal or not.
+
+```
+ekh.distance.min(river_network, points, weights=None, upstream=False, downstream=True)
+ekh.distance.max(river_network, points, weights=None, upstream=False, downstream=True)
+```
+Given a set of input points, computes the min or max length (upstream and/or downstream depending on input) of the network starting from those points for all cells in the field. Unreachable points are given a value np.inf. Weights represents the length of the river in the grid cell. By default, this is assumed to be one.
+
 ### Calculating Upstream or Downstream Fields
 
 ```
@@ -230,6 +244,7 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 | upstream | move_downstream | |
 | catchment | catchments.find | |
 | subcatchment | subcatchments.find | |
+| ldddist | distance.min | friction input is slightly different to weights, and by default ekh takes distance between two nodes to be one regardless if on diagonal or not |
 | abs, sin, cos, tan, ...  | np.abs, np.sin, np.cos, np.tan, ... | any numpy operations can be directly used |
 
 _Points of difference_

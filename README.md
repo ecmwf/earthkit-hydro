@@ -121,27 +121,27 @@ Given an input field, returns as output a new field with the upstream metric cal
 
 #### Metrics Over Catchments
 ```
-ekh.catchments.sum(river_network, field, stations, weights=None)
-ekh.catchments.max(river_network, field, stations, weights=None)
-ekh.catchments.min(river_network, field, stations, weights=None)
-ekh.catchments.mean(river_network, field, stations, weights=None)
-ekh.catchments.prod(river_network, field, stations, weights=None)
-ekh.catchments.std(river_network, field, stations, weights=None)
-ekh.catchments.var(river_network, field, stations, weights=None)
+ekh.catchments.sum(river_network, field, points, weights=None)
+ekh.catchments.max(river_network, field, points, weights=None)
+ekh.catchments.min(river_network, field, points, weights=None)
+ekh.catchments.mean(river_network, field, points, weights=None)
+ekh.catchments.prod(river_network, field, points, weights=None)
+ekh.catchments.std(river_network, field, points, weights=None)
+ekh.catchments.var(river_network, field, points, weights=None)
 ```
-Given a field and a list of points defining stations, calculates the metric over all upstream nodes for each of the stations.
+Given a field and a series of points, calculates the metric over all upstream nodes for each of the points.
 
 #### Metrics Over Subcatchments
 ```
-ekh.subcatchments.sum(river_network, field, stations, weights=None)
-ekh.subcatchments.max(river_network, field, stations, weights=None)
-ekh.subcatchments.min(river_network, field, stations, weights=None)
-ekh.subcatchments.mean(river_network, field, stations, weights=None)
-ekh.subcatchments.prod(river_network, field, stations, weights=None)
-ekh.subcatchments.std(river_network, field, stations, weights=None)
-ekh.subcatchments.var(river_network, field, stations, weights=None)
+ekh.subcatchments.sum(river_network, field, points, weights=None)
+ekh.subcatchments.max(river_network, field, points, weights=None)
+ekh.subcatchments.min(river_network, field, points, weights=None)
+ekh.subcatchments.mean(river_network, field, points, weights=None)
+ekh.subcatchments.prod(river_network, field, points, weights=None)
+ekh.subcatchments.std(river_network, field, points, weights=None)
+ekh.subcatchments.var(river_network, field, points, weights=None)
 ```
-Given a field and a list of points defining stations, finds the subcatchments defined by the stations and computes the metric for each subcatchment.
+Given a field and a series of points, finds the subcatchments defined by the points and computes the metric for each subcatchment.
 
 #### Metrics Over Arbitrary Zones
 ```
@@ -159,8 +159,8 @@ _(for advanced users)_
 Similarly, one can also use a low-level API via
 ```
 ekh.calculate_upstream_metric(river_network, field, metric, weights=None)
-ekh.calculate_catchment_metric(river_network, field, stations, metric, weights=None)
-ekh.calculate_subcatchment_metric(river_network, field, stations, metric, weights=None)
+ekh.calculate_catchment_metric(river_network, field, points, metric, weights=None)
+ekh.calculate_subcatchment_metric(river_network, field, points, metric, weights=None)
 ekh.calculate_zonal_metric(field, labels, metric, weights=None)
 
 # applies the ufunc on the field starting from the sources all the way down to the sinks
@@ -201,6 +201,15 @@ ekh.length.min(river_network, points, weights=None, upstream=False, downstream=T
 ekh.length.max(river_network, points, weights=None, upstream=False, downstream=True)
 ```
 Given a set of input points, computes the min or max length (upstream and/or downstream depending on input) of the network starting from those points for all cells in the field. Unreachable points are given a value np.inf. Weights represents the length of the river in the grid cell. By default, this is assumed to be one.
+
+We also provide some analagous convenience functions for calculating distances/lengths to sources or sinks.
+```
+ekh.distance.to_source(river_network, weights, path='shortest')
+ekh.distance.to_sink(river_network, weights, path='shortest')
+
+ekh.length.to_source(river_network, weights, path='shortest')
+ekh.length.to_sink(river_network, weights, path='shortest')
+```
 
 ### Calculating Upstream or Downstream Fields
 

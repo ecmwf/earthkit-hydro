@@ -31,8 +31,6 @@ def calculate_upstream_metric(
         Used to weight the field when computing the metric. Default is None.
     mv : scalar, optional
         Missing value for the input field. Default is np.nan.
-    in_place : bool, optional
-        Whether to conduct the operation in-place. Default is False.
     accept_missing : bool, optional
         Whether or not to accept missing values in the input field. Default is False.
 

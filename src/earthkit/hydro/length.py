@@ -8,10 +8,39 @@ from .utils import mask_2d, points_to_1d_indices, points_to_numpy
 def min(
     river_network, points, weights=None, upstream=False, downstream=True, mv=np.nan
 ):
+    """
+    Calculate the minimum length to a set of points in a river network.
+    The length is calculated along the river network, and can be
+    computed in both/either upstream and downstream directions.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    points : list of tuples
+        List of tuple indices of the points.
+    weights : numpy.ndarray, optional
+        length to the downstream point. Default is None, which
+        corresponds to a unit length for all points.
+    upstream : bool, optional
+        If True, calculates the length in the upstream direction.
+        Default is False.
+    downstream : bool, optional
+        If True, calculate the length in the downstream direction.
+        Default is True.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+
+    Returns
+    -------
+    numpy.ndarray
+        The length to the points in the river network.
+    """
+
     if weights is None:
         weights = np.ones(river_network.n_nodes)
     else:
-        # maybe check sinks are all zero or nan distance
+        # maybe check sinks are all zero or nan length
         pass
     field = np.empty(river_network.n_nodes)
     field.fill(np.inf)
@@ -52,9 +81,38 @@ def min(
 def max(
     river_network, points, weights=None, upstream=False, downstream=True, mv=np.nan
 ):
+    """
+    Calculate the maximum length to a set of points in a river network.
+    The length is calculated along the river network, and can be
+    computed in both/either upstream and downstream directions.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    points : list of tuples
+        List of tuple indices of the points.
+    weights : numpy.ndarray, optional
+        length to the downstream point. Default is None, which
+        corresponds to a unit length for all points.
+    upstream : bool, optional
+        If True, calculates the length in the upstream direction.
+        Default is False.
+    downstream : bool, optional
+        If True, calculate the length in the downstream direction.
+        Default is True.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+
+    Returns
+    -------
+    numpy.ndarray
+        The length to the points in the river network.
+    """
+
     if upstream and downstream:
         # TODO: define how this should work
-        # can one overwrite a starting station's distance?
+        # can one overwrite a starting station's length?
         #
         # NB: there is no nice way to do this as downstream
         # and then upstream like for min
@@ -107,6 +165,29 @@ def max(
 
 
 def to_sink(river_network, weights=None, path="shortest", mv=np.nan):
+    """
+    Calculate the minimum or maximum length to the sinks of a river network.
+    The length is calculated along the river network.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    weights : numpy.ndarray, optional
+        length to the downstream point. Default is None, which
+        corresponds to a unit length for all points.
+    path : str, optional
+        Whether to find the length of the shortest or longest path.
+        Default is 'shortest'.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+
+    Returns
+    -------
+    numpy.ndarray
+        The length to the points in the river network.
+    """
+
     if path == "shortest":
         return min(
             river_network,
@@ -130,6 +211,29 @@ def to_sink(river_network, weights=None, path="shortest", mv=np.nan):
 
 
 def to_source(river_network, weights=None, path="shortest", mv=np.nan):
+    """
+    Calculate the minimum or maximum length to the sources of a river network.
+    The length is calculated along the river network.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    weights : numpy.ndarray, optional
+        length to the downstream point. Default is None, which
+        corresponds to a unit length for all points.
+    path : str, optional
+        Whether to find the length of the shortest or longest path.
+        Default is 'shortest'.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+
+    Returns
+    -------
+    numpy.ndarray
+        The length to the points in the river network.
+    """
+
     if path == "shortest":
         return min(
             river_network,

@@ -31,7 +31,8 @@ def calculate_subcatchment_metric(
     stations : list of tuples
         List of tuple indices of the stations.
     metric : str
-        Metric to compute. Options are "mean", "max", "min", "sum", "product"
+        Metric to compute. Options are "mean", "max", "min", "sum", "prod",
+        "std", "var".
     weights : ndarray
         Used to weight the field when computing the metric. Default is None.
     mv : scalar

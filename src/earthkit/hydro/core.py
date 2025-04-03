@@ -13,8 +13,8 @@ def flow(river_network, field, invert_graph, operation, *args, **kwargs):
     operation : callable
         The operation to apply to the field. This function should
         take four arguments: river_network, field, grouping, and mv.
-    mv : any
-        The value representing missing data in the field.
+    *args, **kwargs : additional arguments
+        Additional arguments to pass to the operation function.
 
     Returns
     -------

@@ -25,7 +25,7 @@ def calculate_catchment_metric(
     accept_missing=False,
 ):
     """
-    Calculates the metric over the catchments defined by stations.
+    Calculates the metric over the catchments defined by the points.
 
     Parameters
     ----------
@@ -33,10 +33,11 @@ def calculate_catchment_metric(
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.
-    stations : list of tuples
-        List of tuple indices of the stations.
+    points : list of tuples
+        List of tuple indices of the points.
     metric : str
-        Metric to compute. Options are "mean", "max", "min", "sum", "product"
+        Metric to compute. Options are "mean", "max", "min", "sum", "prod",
+        "std", "var".
     weights : ndarray, optional
         Used to weight the field when computing the metric. Default is None.
     mv : scalar, optional
@@ -55,7 +56,7 @@ def calculate_catchment_metric(
     # average, then creating a river subnetwork
     # and calculating upstream metric only there
     # (should be quicker, particularly for
-    # small numbers of stations)
+    # small numbers of points)
 
     if isinstance(points, np.ndarray):
         upstream_metric_field = calculate_upstream_metric(

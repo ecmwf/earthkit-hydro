@@ -8,6 +8,35 @@ from .utils import mask_2d, points_to_1d_indices, points_to_numpy
 def min(
     river_network, points, weights=None, upstream=False, downstream=True, mv=np.nan
 ):
+    """
+    Calculate the minimum distance to a set of points in a river network.
+    The distance is calculated along the river network, and can be
+    computed in both/either upstream and downstream directions.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    points : list of tuples
+        List of tuple indices of the points.
+    weights : numpy.ndarray, optional
+        Distance to the downstream point. Default is None, which
+        corresponds to a unit distance for all points.
+    upstream : bool, optional
+        If True, calculates the distance in the upstream direction.
+        Default is False.
+    downstream : bool, optional
+        If True, calculate the distance in the downstream direction.
+        Default is True.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+
+    Returns
+    -------
+    numpy.ndarray
+        The distance to the points in the river network.
+    """
+
     if weights is None:
         weights = np.ones(river_network.n_nodes)
     else:
@@ -53,6 +82,35 @@ def min(
 def max(
     river_network, points, weights=None, upstream=False, downstream=True, mv=np.nan
 ):
+    """
+    Calculate the maximum distance to a set of points in a river network.
+    The distance is calculated along the river network, and can be
+    computed in both/either upstream and downstream directions.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    points : list of tuples
+        List of tuple indices of the points.
+    weights : numpy.ndarray, optional
+        Distance to the downstream point. Default is None, which
+        corresponds to a unit distance for all points.
+    upstream : bool, optional
+        If True, calculates the distance in the upstream direction.
+        Default is False.
+    downstream : bool, optional
+        If True, calculate the distance in the downstream direction.
+        Default is True.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+
+    Returns
+    -------
+    numpy.ndarray
+        The distance to the points in the river network.
+    """
+
     if upstream and downstream:
         # TODO: define how this should work
         # can one overwrite a starting station's distance?
@@ -109,6 +167,29 @@ def max(
 
 
 def to_sink(river_network, weights=None, path="shortest", mv=np.nan):
+    """
+    Calculate the minimum or maximum distance to the sinks of a river network.
+    The distance is calculated along the river network.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    weights : numpy.ndarray, optional
+        Distance to the downstream point. Default is None, which
+        corresponds to a unit distance for all points.
+    path : str, optional
+        Whether to find the distance of the shortest or longest path.
+        Default is 'shortest'.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+
+    Returns
+    -------
+    numpy.ndarray
+        The distance to the points in the river network.
+    """
+
     if path == "shortest":
         return min(
             river_network,
@@ -132,6 +213,29 @@ def to_sink(river_network, weights=None, path="shortest", mv=np.nan):
 
 
 def to_source(river_network, weights=None, path="shortest", mv=np.nan):
+    """
+    Calculate the minimum or maximum distance to the sources of a river network.
+    The distance is calculated along the river network.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        An earthkit-hydro river network object.
+    weights : numpy.ndarray, optional
+        Distance to the downstream point. Default is None, which
+        corresponds to a unit distance for all points.
+    path : str, optional
+        Whether to find the distance of the shortest or longest path.
+        Default is 'shortest'.
+    mv : scalar, optional
+        The missing value indicator. Default is np.nan.
+
+    Returns
+    -------
+    numpy.ndarray
+        The distance to the points in the river network.
+    """
+
     if path == "shortest":
         return min(
             river_network,

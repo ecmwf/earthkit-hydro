@@ -34,6 +34,8 @@ def calculate_zonal_metric(
         The missing value for the input fields. Default is np.nan.
     labels_mv : scalar, optional
         The missing values for the labels. Default is 0.
+    return_field : bool, optional
+        If True, return as a full field. If False, return as dict. Default is False.
     field_accept_missing : bool, optional
         Whether or not to accept missing values in the input fields. Default is False.
     skip_missing_check : bool, optional
@@ -41,8 +43,8 @@ def calculate_zonal_metric(
 
     Returns
     -------
-    dict
-        Dictionary with (label, metric) pairs.
+    np.array or dict
+        Field if return_field, else dictionary with (label, metric) pairs.
     """
     ufunc = metrics_dict[metric].func
 

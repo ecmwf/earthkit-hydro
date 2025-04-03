@@ -35,6 +35,13 @@ def flow_downstream(
         If True, accepts missing values in the field. Default is False.
     skip_missing_check : bool, optional
         Whether to skip checking for missing values. Default is False.
+    additive_weight : numpy.ndarray, optional
+        A weight to be added to the field values. Default is None.
+    multiplicative_weight : numpy.ndarray, optional
+        A weight to be multiplied with the field values. Default is None.
+    modifier_use_upstream : bool, optional
+        If True, the modifiers are used on the upstream nodes instead of downstream.
+        Default is True.
 
     Returns
     -------
@@ -108,6 +115,13 @@ def _ufunc_to_downstream(
         An array of indices.
     mv : scalar
         A missing value indicator (not used in the function but kept for consistency).
+    additive_weight : numpy.ndarray, optional
+        A weight to be added to the field values. Default is None.
+    multiplicative_weight : numpy.ndarray, optional
+        A weight to be multiplied with the field values. Default is None.
+    modifier_use_upstream : bool, optional
+        If True, the modifiers are used on the upstream nodes instead of downstream.
+        Default is True.
     ufunc : numpy.ufunc
         A universal function from the numpy library to be applied to the field data.
         Available ufuncs: https://numpy.org/doc/2.2/reference/ufuncs.html.
@@ -174,6 +188,13 @@ def flow_upstream(
         If True, accepts missing values in the field. Default is False.
     skip_missing_check : bool, optional
         Whether to skip checking for missing values. Default is False.
+    additive_weight : numpy.ndarray, optional
+        A weight to be added to the field values. Default is None.
+    multiplicative_weight : numpy.ndarray, optional
+        A weight to be multiplied with the field values. Default is None.
+    modifier_use_upstream : bool, optional
+        If True, the modifiers are used on the upstream nodes instead of downstream.
+        Default is True.
 
     Returns
     -------
@@ -246,6 +267,13 @@ def _ufunc_to_upstream(
         An array of indices.
     mv : scalar
         A missing value indicator (not used in the function but kept for consistency).
+    additive_weight : numpy.ndarray, optional
+        A weight to be added to the field values. Default is None.
+    multiplicative_weight : numpy.ndarray, optional
+        A weight to be multiplied with the field values. Default is None.
+    modifier_use_upstream : bool, optional
+        If True, the modifiers are used on the upstream nodes instead of downstream.
+        Default is True.
     ufunc : numpy.ufunc
         A universal function from the numpy library to be applied to the field data.
         Available ufuncs: https://numpy.org/doc/2.2/reference/ufuncs.html.

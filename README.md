@@ -202,7 +202,7 @@ ekh.length.max(river_network, points, weights=None, upstream=False, downstream=T
 ```
 Given a set of input points, computes the min or max length (upstream and/or downstream depending on input) of the network starting from those points for all cells in the field. Unreachable points are given a value np.inf. Weights represents the length of the river in the grid cell. By default, this is assumed to be one.
 
-We also provide some analagous convenience functions for calculating distances/lengths to sources or sinks.
+We also provide some analagous convenience functions for calculating shortest/longest distances/lengths to sources or sinks.
 ```
 ekh.distance.to_source(river_network, weights, path='shortest')
 ekh.distance.to_sink(river_network, weights, path='shortest')

@@ -34,6 +34,8 @@ def calculate_zonal_metric(
         The missing value for the input fields. Default is np.nan.
     labels_mv : scalar, optional
         The missing values for the labels. Default is 0.
+    return_field : bool, optional
+        If True, return as a full field. If False, return as dict. Default is False.
     field_accept_missing : bool, optional
         Whether or not to accept missing values in the input fields. Default is False.
     skip_missing_check : bool, optional
@@ -41,13 +43,13 @@ def calculate_zonal_metric(
 
     Returns
     -------
-    dict
-        Dictionary with (label, metric) pairs.
+    np.array or dict
+        Field if return_field, else dictionary with (label, metric) pairs.
     """
     ufunc = metrics_dict[metric].func
 
     mask = ~is_missing(labels, labels_mv)
-    not_missing_labels = labels[mask].T
+    not_missing_labels = labels[..., mask].T
 
     relevant_field = field[..., mask].T
 
@@ -61,7 +63,9 @@ def calculate_zonal_metric(
         relevant_weights, _ = missing_to_nan(
             relevant_weights, field_mv, field_accept_missing, skip_missing_check
         )
-        relevant_field = (relevant_field.T * relevant_weights.T).T
+        weighted_field = (relevant_field.T * relevant_weights.T).T
+    else:
+        weighted_field = relevant_field
 
     unique_labels, unique_label_positions = np.unique(
         not_missing_labels, return_inverse=True
@@ -76,10 +80,10 @@ def calculate_zonal_metric(
     ufunc.at(
         initial_field,
         (unique_label_positions, *[slice(None)] * (initial_field.ndim - 1)),
-        relevant_field,
+        weighted_field,
     )
 
-    if metric == "mean":
+    if metric == "mean" or metric == "var" or metric == "std":
         if weights is None:
             count_values = np.bincount(
                 unique_label_positions, minlength=len(unique_labels)
@@ -101,6 +105,26 @@ def calculate_zonal_metric(
 
         field_dtype = np.float64
 
+        if metric == "var" or metric == "std":
+            out_field = np.full(
+                (len(unique_labels), *field.T.shape[labels.ndim :]),
+                metrics_dict[metric].base_val,
+                dtype=np.float64,
+            )
+            ufunc.at(
+                out_field,
+                (unique_label_positions, *[slice(None)] * (out_field.ndim - 1)),
+                (
+                    (initial_field[unique_label_positions] - relevant_field) ** 2
+                    if weights is None
+                    else relevant_weights
+                    * (initial_field[unique_label_positions] - relevant_field) ** 2
+                ),
+            )
+            initial_field = (out_field.T / count_values.T).T
+            if metric == "std":
+                initial_field = np.sqrt(initial_field)
+
     initial_field = nan_to_missing(initial_field, field_dtype, field_mv)
 
     if np.result_type(field_mv, initial_field) != initial_field.dtype:
@@ -110,8 +134,6 @@ def calculate_zonal_metric(
         )
 
     if return_field:
-
-        mask = labels != 0
         out_field = np.empty(field.shape, dtype=np.float64)
         out_field[..., ~mask] = np.nan  # works correctly
         out_field[..., mask] = initial_field[unique_label_positions].T

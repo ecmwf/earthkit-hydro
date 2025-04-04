@@ -182,20 +182,20 @@ def mask_2d(func):
         """
         args = tuple(
             (
-                arg[..., river_network.mask].T
+                arg[..., river_network.mask]
                 if isinstance(arg, np.ndarray)
                 and arg.shape[-2:] == river_network.mask.shape
-                else arg.T if isinstance(arg, np.ndarray) else arg
+                else arg if isinstance(arg, np.ndarray) else arg
             )
             for arg in args
         )
 
         kwargs = {
             key: (
-                value[..., river_network.mask].T
+                value[..., river_network.mask]
                 if isinstance(value, np.ndarray)
                 and value.shape[-2:] == river_network.mask.shape
-                else value.T if isinstance(value, np.ndarray) else value
+                else value if isinstance(value, np.ndarray) else value
             )
             for key, value in kwargs.items()
         }
@@ -258,7 +258,7 @@ def mask_and_unmask(func):
 
             values_on_river_network = mask_2d(func)(
                 river_network, field, *args, **kwargs
-            ).T
+            )
 
             if in_place:
                 out_field = field
@@ -276,6 +276,51 @@ def mask_and_unmask(func):
             out_field[..., ~river_network.mask] = mv
             return out_field
         else:
-            return mask_2d(func)(river_network, field, *args, **kwargs).T
+            return mask_2d(func)(river_network, field, *args, **kwargs)
 
     return wrapper
+
+
+def points_to_numpy(points):
+    """
+    Converts a list of tuples (indices) into a tuple of lists
+    for use in numpy indexing.
+
+    Parameters
+    ----------
+    points : list
+        List of tuple indices of the points.
+
+    Returns
+    -------
+    tuple
+        Tuple of points suitable for numpy indexing.
+    """
+    # transform here list of tuples (indices) into a tuple of lists
+    # (easier to manipulate)
+    points = np.array(points)
+    return (points[:, 0], points[:, 1])
+
+
+def points_to_1d_indices(river_network, stations):
+    """ "
+    Converts a numpy index into a 1D index suitable
+    for use with the flattened river representation.
+
+    Parameters
+    ----------
+    river_network : earthkit.hydro.RiverNetwork
+        The RiverNetwork instance calling the method.
+    stations : tuple
+        Tuple of numpy arrays defining the points.
+
+    Returns
+    -------
+    numpy.ndarray
+        1D array of indices.
+    """
+    node_numbers = np.cumsum(river_network.mask) - 1
+    valid_stations = river_network.mask[stations]
+    stations = tuple(station_index[valid_stations] for station_index in stations)
+    stations_1d = node_numbers.reshape(river_network.mask.shape)[stations]
+    return stations_1d

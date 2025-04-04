@@ -1,11 +1,9 @@
-<a href="https://github.com/ecmwf/earthkit-hydro">
-  <p align="center">
-    <picture>
-      <source srcset="https://github.com/ecmwf/logos/raw/refs/heads/main/logos/earthkit/earthkit-hydro-dark.svg" media="(prefers-color-scheme: dark)">
-      <img src="https://github.com/ecmwf/logos/raw/refs/heads/main/logos/earthkit/earthkit-hydro-light.svg" height="120">
-    </picture>
-  </p>
-</a>
+<p align="center">
+  <picture>
+    <source srcset="https://github.com/ecmwf/logos/raw/refs/heads/main/logos/earthkit/earthkit-hydro-dark.svg" media="(prefers-color-scheme: dark)">
+    <img src="https://github.com/ecmwf/logos/raw/refs/heads/main/logos/earthkit/earthkit-hydro-light.svg" height="120">
+  </picture>
+</p>
 
 <p align="center">
   <a href="https://github.com/ecmwf/codex/raw/refs/heads/main/ESEE">
@@ -14,21 +12,29 @@
   <a href="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity">
     <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity/emerging_badge.svg" alt="Maturity Level">
   </a>
-  <a href="https://codecov.io/gh/ecmwf/earthkit-hydro">
+  <!-- <a href="https://codecov.io/gh/ecmwf/earthkit-hydro">
     <img src="https://codecov.io/gh/ecmwf/earthkit-hydro/branch/develop/graph/badge.svg" alt="Code Coverage">
-  </a>
+  </a> -->
   <a href="https://opensource.org/licenses/apache-2-0">
     <img src="https://img.shields.io/badge/Licence-Apache 2.0-blue.svg" alt="Licence">
   </a>
   <a href="https://github.com/ecmwf/earthkit-hydro/releases">
-    <img src="https://img.shields.io/github/v/release/ecmwf/earthkit-hydro?color=blue&label=Release&style=flat-square" alt="Latest Release">
+    <img src="https://img.shields.io/github/v/release/ecmwf/earthkit-hydro?color=purple&label=Release" alt="Latest Release">
   </a>
+</p>
+
+<p align="center">
+  <!-- <a href="#quick-start">Quick Start</a>
+  • -->
+  <a href="#installation">Installation</a>
+  •
+  <a href="#documentation">Documentation</a>
 </p>
 
 > \[!IMPORTANT\]
 > This software is **Emerging** and subject to ECMWF's guidelines on [Software Maturity](https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity).
 
-**earthkit-hydro** is a Python library for common hydrological functions.
+**earthkit-hydro** is a Python library for common hydrological functions. It is the hydrological component of [earthkit](https://github.com/ecmwf/earthkit).
 
 ## Main Features
 
@@ -40,7 +46,7 @@
 - Handle N-dimensional fields
 
 ## Installation
-For default installation, run
+For a default installation, run
 
 ```
 pip install earthkit-hydro
@@ -81,8 +87,8 @@ Loads a precomputed `RiverNetwork`. Current options can be listed with `ekh.rive
 | --- | --- | --- | --- | --- |
 | "efas" | "5" | 1arcmin European |  | [<sup>1</sup>](#attrib1) |
 | "efas" | "4" | 5km European | Smaller domain than v5 | [<sup>1</sup>](#attrib1) |
-| "glofas" | "4" | 3arcmin global |  | [<sup>2</sup>](#attrib2) |
-| "glofas" | "3" | 6arcmin global |  | [<sup>2</sup>](#attrib2) |
+| "glofas" | "4" | 3arcmin global | 60° South to 90° North | [<sup>2</sup>](#attrib2) |
+| "glofas" | "3" | 6arcmin global | 60° South to 90° North | [<sup>2</sup>](#attrib2) |
 | "cama_03min" | "4" | 3arcmin global |  | [<sup>3</sup>](#attrib3) |
 | "cama_05min" | "4" | 5arcmin global |  | [<sup>3</sup>](#attrib3) |
 | "cama_06min" | "4" | 6arcmin global |  | [<sup>3</sup>](#attrib3) |
@@ -107,29 +113,35 @@ ekh.upstream.sum(river_network, field, weights=None)
 ekh.upstream.max(river_network, field, weights=None)
 ekh.upstream.min(river_network, field, weights=None)
 ekh.upstream.mean(river_network, field, weights=None)
-ekh.upstream.product(river_network, field, weights=None)
+ekh.upstream.prod(river_network, field, weights=None)
+ekh.upstream.std(river_network, field, weights=None)
+ekh.upstream.var(river_network, field, weights=None)
 ```
 Given an input field, returns as output a new field with the upstream metric calculated for each cell.
 
 #### Metrics Over Catchments
 ```
-ekh.catchments.sum(river_network, field, stations, weights=None)
-ekh.catchments.max(river_network, field, stations, weights=None)
-ekh.catchments.min(river_network, field, stations, weights=None)
-ekh.catchments.mean(river_network, field, stations, weights=None)
-ekh.catchments.product(river_network, field, stations, weights=None)
+ekh.catchments.sum(river_network, field, points, weights=None)
+ekh.catchments.max(river_network, field, points, weights=None)
+ekh.catchments.min(river_network, field, points, weights=None)
+ekh.catchments.mean(river_network, field, points, weights=None)
+ekh.catchments.prod(river_network, field, points, weights=None)
+ekh.catchments.std(river_network, field, points, weights=None)
+ekh.catchments.var(river_network, field, points, weights=None)
 ```
-Given a field and a list of points defining stations, calculates the metric over all upstream nodes for each of the stations.
+Given a field and a series of points, calculates the metric over all upstream nodes for each of the points.
 
 #### Metrics Over Subcatchments
 ```
-ekh.subcatchments.sum(river_network, field, stations, weights=None)
-ekh.subcatchments.max(river_network, field, stations, weights=None)
-ekh.subcatchments.min(river_network, field, stations, weights=None)
-ekh.subcatchments.mean(river_network, field, stations, weights=None)
-ekh.subcatchments.product(river_network, field, stations, weights=None)
+ekh.subcatchments.sum(river_network, field, points, weights=None)
+ekh.subcatchments.max(river_network, field, points, weights=None)
+ekh.subcatchments.min(river_network, field, points, weights=None)
+ekh.subcatchments.mean(river_network, field, points, weights=None)
+ekh.subcatchments.prod(river_network, field, points, weights=None)
+ekh.subcatchments.std(river_network, field, points, weights=None)
+ekh.subcatchments.var(river_network, field, points, weights=None)
 ```
-Given a field and a list of points defining stations, finds the subcatchments defined by the stations and computes the metric for each subcatchment.
+Given a field and a series of points, finds the subcatchments defined by the points and computes the metric for each subcatchment.
 
 #### Metrics Over Arbitrary Zones
 ```
@@ -137,7 +149,9 @@ ekh.zonal.sum(field, labels, weights=None, return_field=False)
 ekh.zonal.max(field, labels, weights=None, return_field=False)
 ekh.zonal.min(field, labels, weights=None, return_field=False)
 ekh.zonal.mean(field, labels, weights=None, return_field=False)
-ekh.zonal.product(field, labels, weights=None, return_field=False)
+ekh.zonal.prod(field, labels, weights=None, return_field=False)
+ekh.zonal.std(field, labels, weights=None, return_field=False)
+ekh.zonal.var(field, labels, weights=None, return_field=False)
 ```
 Calculates a metric over the input field for each zone defined by the labels field. If return_field is True, returns a field otherwise returns a dictionary of {label: metric} pairs.
 
@@ -145,8 +159,8 @@ _(for advanced users)_
 Similarly, one can also use a low-level API via
 ```
 ekh.calculate_upstream_metric(river_network, field, metric, weights=None)
-ekh.calculate_catchment_metric(river_network, field, stations, metric, weights=None)
-ekh.calculate_subcatchment_metric(river_network, field, stations, metric, weights=None)
+ekh.calculate_catchment_metric(river_network, field, points, metric, weights=None)
+ekh.calculate_subcatchment_metric(river_network, field, points, metric, weights=None)
 ekh.calculate_zonal_metric(field, labels, metric, weights=None)
 
 # applies the ufunc on the field starting from the sources all the way down to the sinks
@@ -173,6 +187,29 @@ Finds the subcatchments (all upstream nodes of specified nodes, without overwrit
 $$v_i^{\prime} = v_j^{\prime}  ~ \text{if} ~  (v_j^{\prime} \neq 0 ~ \text{and} ~ v_j = 0) ~ \text{else} ~ v_i, ~j ~ \text{s.t.} ~ i \rightarrow j$$
 
 <img src="docs/images/subcatchment.gif" width="200px" height="160px" />
+
+### Calculating Distances or Lengths
+
+```
+ekh.distance.min(river_network, points, weights=None, upstream=False, downstream=True)
+ekh.distance.max(river_network, points, weights=None, upstream=False, downstream=True)
+```
+Given a set of input points, computes the min or max distance (upstream and/or downstream depending on input) from those points for all cells in the field. Unreachable points are given a value np.inf. Weights represents the distance to a downstream cell (weights at sinks are ignored). By default, it is assumed the distance to any downstream cell is 1 regardless if the connection is diagonal or not.
+
+```
+ekh.length.min(river_network, points, weights=None, upstream=False, downstream=True)
+ekh.length.max(river_network, points, weights=None, upstream=False, downstream=True)
+```
+Given a set of input points, computes the min or max length (upstream and/or downstream depending on input) of the network starting from those points for all cells in the field. Unreachable points are given a value np.inf. Weights represents the length of the river in the grid cell. By default, this is assumed to be one.
+
+We also provide some analagous convenience functions for calculating shortest/longest distances/lengths to sources or sinks.
+```
+ekh.distance.to_source(river_network, weights, path='shortest')
+ekh.distance.to_sink(river_network, weights, path='shortest')
+
+ekh.length.to_source(river_network, weights, path='shortest')
+ekh.length.to_sink(river_network, weights, path='shortest')
+```
 
 ### Calculating Upstream or Downstream Fields
 
@@ -216,6 +253,7 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 | upstream | move_downstream | |
 | catchment | catchments.find | |
 | subcatchment | subcatchments.find | |
+| ldddist | distance.min | friction input is slightly different to weights, and by default ekh takes distance between two nodes to be one regardless if on diagonal or not |
 | abs, sin, cos, tan, ...  | np.abs, np.sin, np.cos, np.tan, ... | any numpy operations can be directly used |
 
 _Points of difference_
@@ -245,7 +283,22 @@ The HydroSHEDS river networks are available under the conditions set out in the 
 
 ## Licence
 
-[Apache Licence 2.0](LICENCE)
+```
+Copyright 2024, European Centre for Medium Range Weather Forecasts.
 
-In applying this license, ECMWF does not waive the privileges and immunities
-granted to it by virtue of its status as an intergovernmental organisation nor does it submit to any jurisdiction.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+In applying this licence, ECMWF does not waive the privileges and immunities
+granted to it by virtue of its status as an intergovernmental organisation
+nor does it submit to any jurisdiction.
+```

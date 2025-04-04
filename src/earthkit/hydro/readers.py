@@ -190,9 +190,9 @@ def from_cama_downxy(dx, dy):
 
     Parameters
     ----------
-    x : numpy.ndarray
+    dx : numpy.ndarray
         The x-offsets of the next downstream cell.
-    y : numpy.ndarray
+    dy : numpy.ndarray
         The y-offsets of the next downstream cell.
 
     Returns

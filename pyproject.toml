@@ -102,3 +102,4 @@ __version__ = "{version}"
 '''
 parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs
 fallback_version='0.1.0'
+local_scheme = "no-local-version"

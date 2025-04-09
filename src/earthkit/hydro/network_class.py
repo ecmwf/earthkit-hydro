@@ -60,17 +60,22 @@ class RiverNetwork:
 
         """
         self.nodes = nodes
-        self.n_nodes = len(nodes)
+        del nodes
+        self.n_nodes = len(self.nodes)
         self.downstream_nodes = downstream
+        del downstream
         self.mask = mask
+        del mask
         self.sinks = (
             sinks
             if sinks is not None
             else self.nodes[self.downstream_nodes == self.n_nodes]
         )  # nodes with no downstreams
+        del sinks
         self.sources = (
             sources if sources is not None else self.get_sources()
         )  # nodes with no upstreams
+        del sources
         if check_for_cycles:
             self.check_for_cycles()
         self.topological_labels = (
@@ -78,6 +83,7 @@ class RiverNetwork:
             if topological_labels is not None
             else self.compute_topological_labels()
         )
+        del topological_labels
         self.topological_groups = self.topological_groups_from_labels()
 
     @property

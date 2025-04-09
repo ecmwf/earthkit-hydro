@@ -336,4 +336,5 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     del upstream_indices, downstream_indices, nodes_matrix
     downstream = np.ones(n_nodes, dtype=int) * n_nodes
     downstream[upstream_nodes] = downstream_nodes
+    del downstream_nodes, upstream_nodes, n_nodes
     return RiverNetwork(nodes, downstream, missing_mask.reshape(shape))

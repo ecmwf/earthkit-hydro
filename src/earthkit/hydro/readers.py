@@ -238,10 +238,14 @@ def from_d8(data, river_network_format="pcr_d8"):
         missing_mask = np.isin(data_flat, range(1, 10))
         mask_upstream = data_flat != 5
     elif river_network_format == "esri_d8":
-        missing_mask = data_flat != 255
+        missing_mask = np.isin(data_flat, np.append(0, 2 ** np.arange(8))) & (
+            data_flat != 255
+        )
         mask_upstream = (data_flat != 0) & (data_flat != -1)
     elif river_network_format == "merit_d8":
-        missing_mask = data_flat != 247
+        missing_mask = np.isin(data_flat, np.append(0, 2 ** np.arange(8))) & (
+            data_flat != 247
+        )
         mask_upstream = (data_flat != 0) & (data_flat != 255)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")

@@ -122,6 +122,7 @@ class RiverNetwork:
                 break
             not_sinks = nodes != self.n_nodes
             nodes[not_sinks] = self.downstream_nodes[nodes[not_sinks]].copy()
+        print("No cycles found in the river network.")
 
     def compute_topological_labels(self):
         """Finds the topological distance labels for each node in the river

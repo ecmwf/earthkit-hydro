@@ -40,7 +40,8 @@ dependencies = ["numpy", "joblib"]
 
 [project.optional-dependencies]
     readers = [
-        "earthkit-data[geotiff]>=0.13.0"
+        "earthkit-data[geotiff]>=0.13.8",
+        "tqdm"
         ]
     tests = [
         "pytest",
@@ -50,7 +51,8 @@ dependencies = ["numpy", "joblib"]
         "pre-commit"
         ]
     all = [
-        "earthkit-data[geotiff]>=0.13.0",
+        "earthkit-data[geotiff]>=0.13.8",
+        "tqdm",
         "pytest",
         "pre-commit"
         ]

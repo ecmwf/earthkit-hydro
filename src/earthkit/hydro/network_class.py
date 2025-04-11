@@ -134,21 +134,23 @@ class RiverNetwork:
             Array of topological distance labels for each node.
 
         """
+        from tqdm import tqdm
+
         inlets = self.sources
         labels = np.zeros(self.n_nodes, dtype=int)
-        old_sum = -1
-        current_sum = 0  # sum of labels
-        n = 1  # distance from source
-        while current_sum > old_sum:
-            if n > self.n_nodes:
-                raise Exception("River Network contains a cycle.")
-            old_sum = current_sum
+
+        for n in tqdm(range(1, self.n_nodes + 1)):
             inlets = inlets[inlets != self.n_nodes]  # subset to valid nodes
+            if inlets.shape[0] == 0:
+                break
             labels[inlets] = n  # update furthest distance from source
             inlets = self.downstream_nodes[inlets]
-            n += 1
-            current_sum = np.sum(labels)
+
+        if inlets.shape[0] > 0:
+            raise Exception("River Network contains a cycle.")
+
         labels[self.sinks] = n  # put all sinks in last group in topological ordering
+
         return labels
 
     def topological_groups_from_labels(self):

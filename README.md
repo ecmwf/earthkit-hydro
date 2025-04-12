@@ -70,7 +70,7 @@ import earthkit.hydro as ekh
 ```
 
 The package contains different ways of constructing or loading a `RiverNetwork` object. A `RiverNetwork` object is a representation of a river network on a grid.
-It can be used to compute basic hydrological functions, such as propagating a scalar field along the river network or extract a catchment from the river network.
+It can be used to compute basic hydrological functions, such as propagating a scalar field along the river network or extracting a catchment from the river network.
 
 ### Mathematical Details
 Given a discretisation of a domain i.e. a set of points $\mathcal{D}=\{ (x_i, y_i)\}_{i=1}^N$, a river network is a directed acyclic graph $\mathcal{R}=(V,E)$ where the vertices $V \subseteq \mathcal{D}$. The out-degree of each vertex is at most 1 i.e. each point in the river network points to at most one downstream location.

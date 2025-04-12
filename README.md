@@ -41,6 +41,7 @@
 - Support for PCRaster, CaMa-Flood and HydroSHEDS river networks
 - Computing statistics over catchments and subcatchments
 - Finding catchments and subcatchments
+- Calculating distances along river networks
 - Calculation of upstream or downstream fields
 - Handle arbitrary missing values
 - Handle N-dimensional fields

@@ -255,6 +255,7 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 | catchment | catchments.find | |
 | subcatchment | subcatchments.find | |
 | ldddist | distance.min | friction input is slightly different to weights, and by default ekh takes distance between two nodes to be one regardless if on diagonal or not |
+| downstreamdist | distance.to_sink | Same caveats as for ldddist |
 | abs, sin, cos, tan, ...  | np.abs, np.sin, np.cos, np.tan, ... | any numpy operations can be directly used |
 
 _Points of difference_

@@ -136,10 +136,10 @@ class RiverNetwork:
         """
         from tqdm import tqdm
 
-        inlets = self.sources
+        inlets = self.downstream_nodes[self.sources]
         labels = np.zeros(self.n_nodes, dtype=int)
 
-        for n in tqdm(range(1, self.n_nodes + 2)):
+        for n in tqdm(range(1, self.n_nodes + 1)):
             inlets = inlets[inlets != self.n_nodes]  # subset to valid nodes
             if inlets.shape[0] == 0:
                 break

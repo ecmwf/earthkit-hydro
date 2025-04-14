@@ -36,15 +36,8 @@ def create(path, river_network_format, source):
 
     Returns
     -------
-    object
+    earthkit.hydro.RiverNetwork
         The river network object created from the given data.
-
-    Raises
-    ------
-    ValueError
-        If the river network format or source is unsupported.
-    NotImplementedError
-        If the river network format is "esri_d8".
     """
     if river_network_format == "precomputed":
         if source == "file":

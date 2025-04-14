@@ -60,17 +60,22 @@ class RiverNetwork:
 
         """
         self.nodes = nodes
-        self.n_nodes = len(nodes)
+        del nodes
+        self.n_nodes = len(self.nodes)
         self.downstream_nodes = downstream
+        del downstream
         self.mask = mask
+        del mask
         self.sinks = (
             sinks
             if sinks is not None
             else self.nodes[self.downstream_nodes == self.n_nodes]
         )  # nodes with no downstreams
+        del sinks
         self.sources = (
             sources if sources is not None else self.get_sources()
         )  # nodes with no upstreams
+        del sources
         if check_for_cycles:
             self.check_for_cycles()
         self.topological_labels = (
@@ -78,6 +83,7 @@ class RiverNetwork:
             if topological_labels is not None
             else self.compute_topological_labels()
         )
+        del topological_labels
         self.topological_groups = self.topological_groups_from_labels()
 
     @property
@@ -116,6 +122,7 @@ class RiverNetwork:
                 break
             not_sinks = nodes != self.n_nodes
             nodes[not_sinks] = self.downstream_nodes[nodes[not_sinks]].copy()
+        print("No cycles found in the river network.")
 
     def compute_topological_labels(self):
         """Finds the topological distance labels for each node in the river
@@ -127,21 +134,25 @@ class RiverNetwork:
             Array of topological distance labels for each node.
 
         """
-        inlets = self.sources
+        from tqdm import tqdm
+
+        inlets = self.downstream_nodes[self.sources]
         labels = np.zeros(self.n_nodes, dtype=int)
-        old_sum = -1
-        current_sum = 0  # sum of labels
-        n = 1  # distance from source
-        while current_sum > old_sum:
-            if n > self.n_nodes:
-                raise Exception("River Network contains a cycle.")
-            old_sum = current_sum
+
+        for n in tqdm(range(1, self.n_nodes + 1)):
             inlets = inlets[inlets != self.n_nodes]  # subset to valid nodes
+            if inlets.shape[0] == 0:
+                break
             labels[inlets] = n  # update furthest distance from source
             inlets = self.downstream_nodes[inlets]
-            n += 1
-            current_sum = np.sum(labels)
-        labels[self.sinks] = n  # put all sinks in last group in topological ordering
+
+        if inlets.shape[0] > 0:
+            raise Exception("River Network contains a cycle.")
+
+        labels[self.sinks] = (
+            n - 1
+        )  # put all sinks in last group in topological ordering
+
         return labels
 
     def topological_groups_from_labels(self):

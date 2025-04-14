@@ -238,8 +238,15 @@ def from_d8(data, river_network_format="pcr_d8"):
         missing_mask = np.isin(data_flat, range(1, 10))
         mask_upstream = data_flat != 5
     elif river_network_format == "esri_d8":
-        missing_mask = data_flat != 255
+        missing_mask = np.isin(data_flat, np.append(0, 2 ** np.arange(8))) & (
+            data_flat != 255
+        )
         mask_upstream = (data_flat != 0) & (data_flat != -1)
+    elif river_network_format == "merit_d8":
+        missing_mask = np.isin(data_flat, np.append(0, 2 ** np.arange(8))) & (
+            data_flat != 247
+        )
+        mask_upstream = (data_flat != 0) & (data_flat != 255)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
     mask_upstream = (mask_upstream) & (missing_mask)
@@ -248,9 +255,9 @@ def from_d8(data, river_network_format="pcr_d8"):
     if river_network_format == "pcr_d8":
         x_offsets = np.array([0, -1, 0, +1, -1, 0, +1, -1, 0, +1])[directions]
         y_offsets = -np.array([0, -1, -1, -1, 0, 0, 0, 1, 1, 1])[directions]
-    elif river_network_format == "esri_d8":
-        x_mapping = {32: -1, 64: 0, 128: +1, 16: -1, 0: 0, 1: +1, 8: -1, 4: 0, 2: +1}
-        y_mapping = {32: 1, 64: 1, 128: 1, 16: 0, 0: 0, 1: 0, 8: -1, 4: -1, 2: -1}
+    elif river_network_format == "esri_d8" or river_network_format == "merit_d8":
+        x_mapping = {32: -1, 64: 0, 128: +1, 16: -1, 1: +1, 8: -1, 4: 0, 2: +1}
+        y_mapping = {32: 1, 64: 1, 128: 1, 16: 0, 1: 0, 8: -1, 4: -1, 2: -1}
         x_offsets = np.vectorize(x_mapping.get)(directions)
         y_offsets = -np.vectorize(y_mapping.get)(directions)
     del directions
@@ -329,4 +336,5 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     del upstream_indices, downstream_indices, nodes_matrix
     downstream = np.ones(n_nodes, dtype=int) * n_nodes
     downstream[upstream_nodes] = downstream_nodes
+    del downstream_nodes, upstream_nodes, n_nodes
     return RiverNetwork(nodes, downstream, missing_mask.reshape(shape))

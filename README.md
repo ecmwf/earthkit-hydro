@@ -102,7 +102,7 @@ Loads a precomputed `RiverNetwork`. Current options can be listed with `ekh.rive
 ekh.river_network.create(path, river_network_format, source="file")
 ```
 Creates a `RiverNetwork`. Current options are
-- river_network_format: "esri_d8", "pcr_d8", "cama" or "precomputed"
+- river_network_format: "esri_d8", "pcr_d8", , "merit_d8", "cama" or "precomputed"
 - source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html).
 
 ### Computing Metrics Over River Networks

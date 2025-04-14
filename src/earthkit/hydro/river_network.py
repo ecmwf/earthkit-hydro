@@ -27,7 +27,8 @@ def create(path, river_network_format, source):
         The path to the river network data.
     river_network_format : str
         The format of the river network data.
-        Supported formats are "precomputed", "cama", "pcr_d8", and "esri_d8".
+        Supported formats are "precomputed", "cama", "pcr_d8", "esri_d8"
+        and "merit_d8".
     source : str
         The source of the river network data.
         For possible sources see:

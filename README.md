@@ -266,7 +266,7 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 | upstream | move_downstream | |
 | catchment | catchments.find | |
 | subcatchment | subcatchments.find | |
-| path | downstream.max | |
+| path | upstream.max | |
 | ldddist | distance.min | friction input is slightly different to weights, and by default ekh takes distance between two nodes to be one regardless if on diagonal or not |
 | downstreamdist | distance.to_sink | Same caveats as for ldddist |
 | slopelength | distance.to_source | path="longest", same caveats as for ldddist |

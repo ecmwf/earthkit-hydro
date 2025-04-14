@@ -316,13 +316,7 @@ def _ufunc_to_upstream(
 
 @mask_and_unmask
 def calculate_online_metric(
-    river_network,
-    field,
-    metric,
-    weights=None,
-    mv=np.nan,
-    accept_missing=False,
-    flow_direction="up",
+    river_network, field, metric, weights, mv, accept_missing, flow_direction
 ):
 
     if flow_direction == "up":
@@ -341,15 +335,14 @@ def calculate_online_metric(
         The input field.
     metric : str
         Metric to compute. Options are "mean", "max", "min", "sum", "product"
-    weights : ndarray, optional
-        Used to weight the field when computing the metric. Default is None.
-    mv : scalar, optional
-        Missing value for the input field. Default is np.nan.
-    accept_missing : bool, optional
-        Whether or not to accept missing values in the input field. Default is False.
-    flow_direction : str, optional
+    weights : ndarray
+        Used to weight the field when computing the metric.
+    mv : scalar
+        Missing value for the input field.
+    accept_missing : bool
+        Whether or not to accept missing values in the input field.
+    flow_direction : str
         The direction of flow for the metric calculation. Options are "up" or "down".
-        Default is "up".
 
     Returns
     -------

@@ -38,6 +38,7 @@ def create(path, river_network_format, source):
     -------
     earthkit.hydro.RiverNetwork
         The river network object created from the given data.
+
     """
     if river_network_format == "precomputed":
         if source == "file":

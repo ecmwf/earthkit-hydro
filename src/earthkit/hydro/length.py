@@ -45,9 +45,11 @@ def min(
     field = np.empty(river_network.n_nodes)
     field.fill(np.inf)
 
-    points = points_to_numpy(points)
-
-    points_1d = points_to_1d_indices(river_network, points)
+    if isinstance(points, np.ndarray):
+        points_1d = points
+    else:
+        points = points_to_numpy(points)
+        points_1d = points_to_1d_indices(river_network, points)
 
     field[points_1d] = weights[points_1d]
 
@@ -134,6 +136,7 @@ def max(
     else:
         points = points_to_numpy(points)
         points_1d = points_to_1d_indices(river_network, points)
+
     field[points_1d] = weights[points_1d]
 
     if downstream:

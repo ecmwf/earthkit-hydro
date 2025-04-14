@@ -139,7 +139,7 @@ class RiverNetwork:
         inlets = self.sources
         labels = np.zeros(self.n_nodes, dtype=int)
 
-        for n in tqdm(range(1, self.n_nodes + 1)):
+        for n in tqdm(range(1, self.n_nodes + 2)):
             inlets = inlets[inlets != self.n_nodes]  # subset to valid nodes
             if inlets.shape[0] == 0:
                 break
@@ -149,7 +149,9 @@ class RiverNetwork:
         if inlets.shape[0] > 0:
             raise Exception("River Network contains a cycle.")
 
-        labels[self.sinks] = n  # put all sinks in last group in topological ordering
+        labels[self.sinks] = (
+            n - 1
+        )  # put all sinks in last group in topological ordering
 
         return labels
 

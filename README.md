@@ -120,6 +120,18 @@ ekh.upstream.var(river_network, field, weights=None)
 ```
 Given an input field, returns as output a new field with the upstream metric calculated for each cell.
 
+#### Metrics Over Downstream Nodes
+```
+ekh.downstream.sum(river_network, field, weights=None)
+ekh.downstream.max(river_network, field, weights=None)
+ekh.downstream.min(river_network, field, weights=None)
+ekh.downstream.mean(river_network, field, weights=None)
+ekh.downstream.prod(river_network, field, weights=None)
+ekh.downstream.std(river_network, field, weights=None)
+ekh.downstream.var(river_network, field, weights=None)
+```
+Given an input field, returns as output a new field with the downstream metric calculated for each cell.
+
 #### Metrics Over Catchments
 ```
 ekh.catchments.sum(river_network, field, points, weights=None)
@@ -254,6 +266,7 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 | upstream | move_downstream | |
 | catchment | catchments.find | |
 | subcatchment | subcatchments.find | |
+| path | downstream.max | |
 | ldddist | distance.min | friction input is slightly different to weights, and by default ekh takes distance between two nodes to be one regardless if on diagonal or not |
 | downstreamdist | distance.to_sink | Same caveats as for ldddist |
 | slopelength | distance.to_source | path="longest", same caveats as for ldddist |

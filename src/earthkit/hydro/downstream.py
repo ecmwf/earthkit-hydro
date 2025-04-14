@@ -4,8 +4,10 @@ import numpy as np
 
 from .accumulation import calculate_online_metric
 from .metrics import metrics_dict
+from .utils import mask_and_unmask
 
 
+@mask_and_unmask
 def calculate_downstream_metric(
     river_network,
     field,

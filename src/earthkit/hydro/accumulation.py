@@ -314,7 +314,6 @@ def _ufunc_to_upstream(
     )
 
 
-@mask_and_unmask
 def calculate_online_metric(
     river_network, field, metric, weights, mv, accept_missing, flow_direction
 ):

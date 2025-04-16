@@ -33,9 +33,10 @@ dynamic = ["version", "readme"]
 
 dependencies = ["numpy", "joblib"]
 
-repository = "https://github.com/ecmwf/earthkit-hydro"
-documentation = "https://github.com/ecmwf/earthkit-hydro"
-issues = "https://github.com/ecmwf/earthkit-hydro/issues"
+[project.urls]
+    repository = "https://github.com/ecmwf/earthkit-hydro"
+    documentation = "https://github.com/ecmwf/earthkit-hydro"
+    issues = "https://github.com/ecmwf/earthkit-hydro/issues"
 
 [project.optional-dependencies]
     readers = [

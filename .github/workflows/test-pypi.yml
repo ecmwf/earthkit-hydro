@@ -6,7 +6,7 @@ on:
 
 jobs:
   deploy:
-    uses: ecmwf/reusable-workflows/.github/workflows/cd-pypi.yml@allowTestPypi
+    uses: ecmwf/reusable-workflows/.github/workflows/cd-pypi.yml@v2
     secrets: inherit
     with:
       testpypi: true

@@ -26,6 +26,8 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           toolchain: stable
+      - run: rustc --version
+      - run: cargo --version
 
   # Run CI including downstream packages on self-hosted runners
   downstream-ci:

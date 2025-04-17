@@ -26,8 +26,6 @@ fn propagate_labels<'py>(
     let mut next = Vec::with_capacity(current.len());
 
     for n in 1..=n_nodes {
-        current.retain(|&i| i != n_nodes);
-
         if current.is_empty() {
             break;
         }

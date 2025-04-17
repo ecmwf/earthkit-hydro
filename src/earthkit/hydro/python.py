@@ -30,6 +30,7 @@ def compute_topological_labels_rust(
 ):
     n_nodes = np.uintp(downstream_nodes.shape[0])
     inlets = downstream_nodes[sources]
+    inlets = inlets[inlets != n_nodes]
     labels = np.zeros(n_nodes, dtype=np.int32)
 
     labels = propagate_labels(labels, inlets, downstream_nodes, n_nodes)

@@ -23,10 +23,9 @@ jobs:
   install-rust:
     runs-on: ubuntu-latest
     steps:
-      # Install Rust using actions/setup-rust
-      - uses: actions/setup-rust@v1
+      - uses: actions-rs/toolchain@v1
         with:
-          rust-version: 'stable'  # Specify the version you want
+          toolchain: stable
 
   # Run CI including downstream packages on self-hosted runners
   downstream-ci:

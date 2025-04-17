@@ -1,7 +1,5 @@
 import numpy as np
 
-from earthkit.hydro._rust import propagate_labels
-
 
 def compute_topological_labels_python(
     sources: np.ndarray, sinks: np.ndarray, downstream_nodes: np.ndarray
@@ -17,8 +15,8 @@ def compute_topological_labels_python(
         labels[inlets] = n  # update furthest distance from source
         inlets = downstream_nodes[inlets]
 
-    if inlets.shape[0] > 0:
-        raise Exception("River Network contains a cycle.")
+    if inlets.shape[0] != 0:
+        raise ValueError("River Network contains a cycle.")
 
     labels[sinks] = n - 1  # put all sinks in last group in topological ordering
 
@@ -28,20 +26,11 @@ def compute_topological_labels_python(
 def compute_topological_labels_rust(
     sources: np.ndarray, sinks: np.ndarray, downstream_nodes: np.ndarray
 ):
+    from ._rust import propagate_labels
+
     n_nodes = np.uintp(downstream_nodes.shape[0])
-    inlets = downstream_nodes[sources]
-    inlets = inlets[inlets != n_nodes]
-    labels = np.zeros(n_nodes, dtype=np.int32)
+    labels = np.zeros(n_nodes, dtype=np.int64)
 
-    if (
-        not labels.flags["C_CONTIGUOUS"]
-        or not downstream_nodes.flags["C_CONTIGUOUS"]
-        or not inlets.flags["C_CONTIGUOUS"]
-    ):
-        raise ValueError("Arrays must be contiguous in memory.")
-
-    labels = propagate_labels(labels, inlets, downstream_nodes, n_nodes)
-
-    labels[sinks] = n_nodes - 1  # put all sinks in last group in topological ordering
+    labels = propagate_labels(labels, sources, sinks, downstream_nodes, n_nodes)
 
     return labels

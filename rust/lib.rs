@@ -1,42 +1,57 @@
-use numpy::{IntoPyArray, PyArray1};
 use pyo3::prelude::*;
+use numpy::{PyArray1, ToPyArray};
 
 #[pyfunction]
-fn compute_topological_labels_rust(py: Python, sources: &PyArray1<i64>, sinks: &PyArray1<i64>, downstream_nodes: &PyArray1<i64>) -> Py<PyArray1<i64>> {
-    let sources_slice = unsafe { sources.as_slice().unwrap() };
-    let sinks_slice = unsafe { sinks.as_slice().unwrap() };
-    let downstream_nodes = unsafe { downstream_nodes.as_slice().unwrap() };
+fn propagate_labels<'py>(
+    py: Python<'py>,
+    labels: &PyArray1<i32>,
+    inlets: &PyArray1<usize>,
+    downstream_nodes: &PyArray1<usize>,
+    n_nodes: usize,
+) -> &'py PyArray1<i32> {
 
-    let n_nodes = downstream_nodes.len();
+    let labels = unsafe { labels
+    .as_slice_mut()
+    .expect("Could not get mutable slice for labels")};
 
-    let mut labels = vec![0; n_nodes];
+    let downstream = unsafe { downstream_nodes
+        .as_slice()
+        .expect("Failed to get downstream_nodes slice")};
 
-    let mut current_inlets: Vec<i64> = sources_slice.iter().map(|x| downstream_nodes[*x as usize]).collect();
-    let mut loop_size = 0;
+    let mut current = unsafe { inlets
+        .as_slice()
+        .expect("Failed to get inlets slice")
+        .to_vec()};
+
+    let mut next = Vec::with_capacity(current.len());
 
     for n in 1..=n_nodes {
-        current_inlets = current_inlets.iter().map(|v| *v).filter(|x| *x != n_nodes as i64).collect();
-        let inlet_size = current_inlets.len();
-        if inlet_size == 0 {
-            loop_size = n;
+        current.retain(|&i| i != n_nodes);
+
+        if current.is_empty() {
             break;
         }
-        for &v in current_inlets.iter(){
-            labels[v as usize] = n;
-        }
-        current_inlets = current_inlets.iter().map(|x| downstream_nodes[*x as usize]).collect();
-    };
 
-    for &v in sinks_slice.iter(){
-        labels[v as usize] = loop_size-1;
+        for &i in &current {
+            labels[i] = n as i32;
+        }
+
+        next.clear();
+        for &i in &current {
+            let d = downstream[i];
+            if d != n_nodes {
+                next.push(d);
+            }
+        }
+
+        std::mem::swap(&mut current, &mut next);
     }
 
-    let labels_int: Vec<i64> = labels.iter().map(|&x| x as i64).collect();
-    labels_int.into_pyarray(py).to_owned()
+    labels.to_pyarray(py)
 }
 
 #[pymodule]
 fn _rust(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(propagate_labels, m)?)?;
     Ok(())
 }

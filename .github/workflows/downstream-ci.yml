@@ -23,6 +23,7 @@ jobs:
 
   # Run CI including downstream packages on self-hosted runners
   downstream-ci:
+  if: ${{ !github.event.pull_request.head.repo.fork && github.event.action != 'labeled' || github.event.label.name == 'approved-for-ci' }}
   steps:
   - name: Set up Rust
     uses: actions-rs/toolchain@v1
@@ -30,7 +31,6 @@ jobs:
       toolchain: stable
       override: true
   - name: downstream-ci
-  if: ${{ !github.event.pull_request.head.repo.fork && github.event.action != 'labeled' || github.event.label.name == 'approved-for-ci' }}
   uses: ecmwf/downstream-ci/.github/workflows/downstream-ci.yml@feat/add-earthkit-hydro
   with:
     earthkit-hydro: ecmwf/earthkit-hydro@${{ github.event.pull_request.head.sha || github.sha }}
@@ -40,6 +40,7 @@ jobs:
 
   # Build downstream packages on HPC
   downstream-ci-hpc:
+  if: ${{ !github.event.pull_request.head.repo.fork && github.event.action != 'labeled' || github.event.label.name == 'approved-for-ci' }}
   steps:
   - name: Set up Rust
     uses: actions-rs/toolchain@v1
@@ -47,7 +48,6 @@ jobs:
       toolchain: stable
       override: true
   - name: downstream-ci-hpc
-    if: ${{ !github.event.pull_request.head.repo.fork && github.event.action != 'labeled' || github.event.label.name == 'approved-for-ci' }}
     uses: ecmwf/downstream-ci/.github/workflows/downstream-ci-hpc.yml@feat/add-earthkit-hydro
     with:
       earthkit-hydro: ecmwf/earthkit-hydro@${{ github.event.pull_request.head.sha || github.sha }}

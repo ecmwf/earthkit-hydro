@@ -33,6 +33,13 @@ def compute_topological_labels_rust(
     inlets = inlets[inlets != n_nodes]
     labels = np.zeros(n_nodes, dtype=np.int32)
 
+    if (
+        not labels.flags["C_CONTIGUOUS"]
+        or not downstream_nodes.flags["C_CONTIGUOUS"]
+        or not inlets.flags["C_CONTIGUOUS"]
+    ):
+        raise ValueError("Arrays must be contiguous in memory.")
+
     labels = propagate_labels(labels, inlets, downstream_nodes, n_nodes)
 
     labels[sinks] = n_nodes - 1  # put all sinks in last group in topological ordering

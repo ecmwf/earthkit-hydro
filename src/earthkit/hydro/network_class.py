@@ -104,9 +104,11 @@ class RiverNetwork:
         downstream_no_sinks = self.downstream_nodes[
             self.downstream_nodes != self.n_nodes
         ]  # get all downstream nodes
-        tmp_nodes[downstream_no_sinks] = -1  # downstream nodes that aren't sinks = -1
+        tmp_nodes[downstream_no_sinks] = (
+            self.n_nodes + 1
+        )  # downstream nodes that aren't sinks = -1
         inlets = tmp_nodes[
-            tmp_nodes != -1
+            tmp_nodes != self.n_nodes + 1
         ]  # sources are nodes that are not downstream nodes
         return inlets
 
@@ -134,26 +136,21 @@ class RiverNetwork:
             Array of topological distance labels for each node.
 
         """
-        from tqdm import tqdm
-
-        inlets = self.downstream_nodes[self.sources]
-        labels = np.zeros(self.n_nodes, dtype=int)
-
-        for n in tqdm(range(1, self.n_nodes + 1)):
-            inlets = inlets[inlets != self.n_nodes]  # subset to valid nodes
-            if inlets.shape[0] == 0:
-                break
-            labels[inlets] = n  # update furthest distance from source
-            inlets = self.downstream_nodes[inlets]
-
-        if inlets.shape[0] > 0:
-            raise Exception("River Network contains a cycle.")
-
-        labels[self.sinks] = (
-            n - 1
-        )  # put all sinks in last group in topological ordering
-
-        return labels
+        try:
+            from .topological_labels import (
+                compute_topological_labels_rust as compute_topological_labels,
+            )
+        except ImportError:
+            print(
+                "Failed to load rust extension, falling back to python implementation."
+            )
+            from .topological_labels import (
+                compute_topological_labels_python as compute_topological_labels,
+            )
+        # TODO: check input types are okay for rust, otherwise should use Python
+        return compute_topological_labels(
+            self.sources, self.sinks, self.downstream_nodes
+        )
 
     def topological_groups_from_labels(self):
         """Groups nodes by their topological distance labels.

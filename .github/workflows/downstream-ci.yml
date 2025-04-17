@@ -20,10 +20,18 @@ on:
     types: [labeled]
 
 jobs:
+  install-rust:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+      - run: rustc --version
+      - run: cargo --version
 
   # Run CI including downstream packages on self-hosted runners
   downstream-ci:
-    name: downstream-ci
+    needs: install-rust
     if: ${{ !github.event.pull_request.head.repo.fork && github.event.action != 'labeled' || github.event.label.name == 'approved-for-ci' }}
     uses: ecmwf/downstream-ci/.github/workflows/downstream-ci.yml@feat/add-earthkit-hydro
     with:
@@ -34,7 +42,7 @@ jobs:
 
   # Build downstream packages on HPC
   downstream-ci-hpc:
-    name: downstream-ci-hpc
+    needs: install-rust
     if: ${{ !github.event.pull_request.head.repo.fork && github.event.action != 'labeled' || github.event.label.name == 'approved-for-ci' }}
     uses: ecmwf/downstream-ci/.github/workflows/downstream-ci-hpc.yml@feat/add-earthkit-hydro
     with:

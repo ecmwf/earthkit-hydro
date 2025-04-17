@@ -22,9 +22,11 @@ on:
 jobs:
   install-rust:
     runs-on: ubuntu-latest
-    uses: actions/setup-rust@v1  # Using the action directly
-    with:
-      rust-version: 'stable'  # Specify the version you want
+    steps:
+      # Install Rust using actions/setup-rust
+      - uses: actions/setup-rust@v1
+        with:
+          rust-version: 'stable'  # Specify the version you want
 
   # Run CI including downstream packages on self-hosted runners
   downstream-ci:

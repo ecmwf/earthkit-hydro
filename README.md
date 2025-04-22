@@ -288,7 +288,7 @@ The GloFAS river network is available under the conditions set out in the [Europ
     Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Disperati, Juliana; Grimaldi, Stefania; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
 
 <a id="attrib3"><sup>3</sup></a>
-The CaMa river networks are available under [CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/) and are available at [http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/](http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/).
+The CaMa river networks are available under [CC-BY 4.0 Licence](https://creativecommons.org/licenses/by/4.0/) and are available at [http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/](http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/).
 
     Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M. (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets. Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873
 

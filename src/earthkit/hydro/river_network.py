@@ -64,7 +64,6 @@ def create(path, river_network_format, source):
             from .pcr import from_file
 
             data = from_file(path, mask=False)
-            print(data.shape)
         else:
             ekd = import_earthkit_or_prompt_install(river_network_format, source)
             data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)

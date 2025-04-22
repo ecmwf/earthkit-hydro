@@ -91,6 +91,8 @@ def from_file(path, mask=False):
     size = dtype.itemsize * nrRows * nrCols
     data = np.frombuffer(bytes[256 : 256 + size], dtype)
     if mask:
-        data = celltype["fillmv"](data, np.nan)
+        data = celltype["fillmv"](data.astype(np.float64), np.nan)
+
+    data = data.reshape((nrRows, nrCols))
 
     return data

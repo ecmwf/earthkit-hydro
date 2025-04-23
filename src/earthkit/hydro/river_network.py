@@ -60,10 +60,16 @@ def create(path, river_network_format, source):
         or river_network_format == "esri_d8"
         or river_network_format == "merit_d8"
     ):
-        ekd = import_earthkit_or_prompt_install(river_network_format, source)
-        data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
-        var_name = find_main_var(data)
-        return from_d8(data[var_name].values, river_network_format=river_network_format)
+        if path.endswith(".map"):
+            from .pcr import from_file
+
+            data = from_file(path, mask=False)
+        else:
+            ekd = import_earthkit_or_prompt_install(river_network_format, source)
+            data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
+            var_name = find_main_var(data)
+            data = data[var_name].values
+        return from_d8(data, river_network_format=river_network_format)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
 

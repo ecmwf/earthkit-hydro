@@ -6,10 +6,9 @@ on:
       - '**'
 
 jobs:
-
   pypi:
     uses: ecmwf/reusable-workflows/.github/workflows/cd-pypi.yml@feat/build_multiple_wheels
     secrets: inherit
     with:
-      platforms: "ubuntu-latest,windows-latest,macos-latest"
-      python_versions: "3.8,3.9,3.10,3.11,3.12"
+      platforms: "[ubuntu-latest,windows-latest,macos-latest]"
+      python_versions: "[3.8,3.9,3.10,3.11,3.12]"

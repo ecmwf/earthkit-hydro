@@ -53,9 +53,12 @@ For a default installation, run
 pip install earthkit-hydro
 ```
 
-For a developer installation (includes linting and test libraries), run
+For a developer setup (includes linting and test libraries), run
 
 ```
+conda create -n hydro python=3.12
+conda activate hydro
+conda install -c conda-forge rust
 git clone https://github.com/ecmwf/earthkit-hydro.git
 cd earthkit-hydro
 pip install -e .[dev]

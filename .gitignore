@@ -2,3 +2,8 @@ __pycache__/
 .ipynb_checkpoints/
 *.egg-info
 _version.py
+target/
+dist/
+build/
+Cargo.lock
+.DS_Store

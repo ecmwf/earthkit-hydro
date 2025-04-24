@@ -328,13 +328,13 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
 
     """
     n_nodes = int(np.sum(missing_mask))
-    nodes = np.arange(n_nodes, dtype=int)
-    nodes_matrix = np.ones(missing_mask.size, dtype=int) * n_nodes
+    nodes = np.arange(n_nodes, dtype=np.uintp)
+    nodes_matrix = np.ones(missing_mask.size, dtype=np.uintp) * n_nodes
     nodes_matrix[missing_mask] = nodes
     upstream_nodes = nodes_matrix[upstream_indices]
     downstream_nodes = nodes_matrix[downstream_indices]
     del upstream_indices, downstream_indices, nodes_matrix
-    downstream = np.ones(n_nodes, dtype=int) * n_nodes
+    downstream = np.ones(n_nodes, dtype=np.uintp) * n_nodes
     downstream[upstream_nodes] = downstream_nodes
     del downstream_nodes, upstream_nodes, n_nodes
     return RiverNetwork(nodes, downstream, missing_mask.reshape(shape))

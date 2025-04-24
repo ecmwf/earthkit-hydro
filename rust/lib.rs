@@ -50,16 +50,13 @@ fn propagate_labels<'py>(
             break;
         }
 
-        for &i in &current {
-            labels[i] = n as i64;
-        }
-
         next.clear();
         for &i in &current {
             let d = downstream[i];
             if d != n_nodes {
                 next.push(d);
             }
+            labels[i] = n as i64;
         }
 
         std::mem::swap(&mut current, &mut next);

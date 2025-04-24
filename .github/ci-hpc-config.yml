@@ -1,6 +1,7 @@
 build:
   modules:
   - ninja
+  - rust
   dependencies:
   - ecmwf/ecbuild@develop
   - MathisRosenhauer/libaec@master

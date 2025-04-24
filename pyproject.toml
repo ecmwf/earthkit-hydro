@@ -41,7 +41,6 @@ dependencies = ["numpy", "joblib"]
 [project.optional-dependencies]
     readers = [
         "earthkit-data[geotiff]>=0.13.8",
-        "tqdm"
         ]
     tests = [
         "pytest",
@@ -52,7 +51,6 @@ dependencies = ["numpy", "joblib"]
         ]
     all = [
         "earthkit-data[geotiff]>=0.13.8",
-        "tqdm",
         "pytest",
         "pre-commit"
         ]
@@ -107,7 +105,6 @@ fallback_version='0.1.0'
 local_scheme = "no-local-version"
 
 [[tool.setuptools-rust.ext-modules]]
-target = "earthkit.hydro._rust"  # The last part of the name (e.g. "_lib") has to match lib.name in Cargo.toml,
-                             # but you can add a prefix to nest it inside of a Python package.
-path = "Cargo.toml"      # Default value, can be omitted
-binding = "PyO3"         # Default value, can be omitted
+target = "earthkit.hydro._rust"  # The last part of the name (e.g. "_rust") has to match lib.name in Cargo.toml
+path = "Cargo.toml"
+binding = "PyO3"

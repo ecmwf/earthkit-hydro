@@ -108,3 +108,11 @@ local_scheme = "no-local-version"
 target = "earthkit.hydro._rust"  # The last part of the name (e.g. "_rust") has to match lib.name in Cargo.toml
 path = "Cargo.toml"
 binding = "PyO3"
+
+[tool.cibuildwheel]
+skip = "*-musllinux_i686" # No musllinux-i686 rust compiler available.
+linux.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
+linux.environment = { PATH="$HOME/.cargo/bin:$PATH" }
+macos.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
+windows.before-all = "rustup target add aarch64-pc-windows-msvc i586-pc-windows-msvc i686-pc-windows-msvc x86_64-pc-windows-msvc"
+windows.archs = "all"

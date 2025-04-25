@@ -10,5 +10,5 @@ jobs:
     uses: ecmwf/reusable-workflows/.github/workflows/cd-pypi.yml@feat/build_multiple_wheels
     secrets: inherit
     with:
-      platforms: "['ubuntu-latest','windows-latest','macos-latest']"
+      platforms: "['ubuntu-latest','macos-latest']"
       pyversions: "['38','39','310','311','312']"

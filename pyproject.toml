@@ -110,7 +110,7 @@ path = "Cargo.toml"
 binding = "PyO3"
 
 [tool.cibuildwheel]
-CIBW_SKIP = "i686-unknown-linux-musl" # No musllinux-i686 rust compiler available.
+skip = "*musl*" # No musllinux-i686 rust compiler available.
 linux.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
 linux.environment = { PATH="$HOME/.cargo/bin:$PATH" }
 macos.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"

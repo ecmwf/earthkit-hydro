@@ -12,3 +12,4 @@ jobs:
       # platforms: "['ubuntu-latest','macos-latest','windows-latest']"
       # pyversions: "['38','39','310','311','312']"
       testpypi: true
+      build_args: '--sdist'

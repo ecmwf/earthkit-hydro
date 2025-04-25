@@ -568,7 +568,7 @@ def test_calculate_subcatchment(river_network, metric):
         assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
         np.testing.assert_raises(
             AssertionError,
-            np.testing.assert_array_equal,
+            np.testing.assert_allclose,
             subcatchment_metric[i],
             catchment_metric[i],
         )

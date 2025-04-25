@@ -110,7 +110,8 @@ path = "Cargo.toml"
 binding = "PyO3"
 
 [tool.cibuildwheel]
-skip = ["*musl*", "*-win_arm64"] # No musllinux-i686 rust compiler available.
+# takes inspiration from https://github.com/pypa/cibuildwheel/discussions/1814
+skip = ["*musl*", "*-win_arm64"] # ignore some problematic platforms
 linux.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
 linux.environment = { PATH="$HOME/.cargo/bin:$PATH" }
 macos.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"

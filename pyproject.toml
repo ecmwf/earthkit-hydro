@@ -109,8 +109,8 @@ target = "earthkit.hydro._rust"  # The last part of the name (e.g. "_rust") has 
 path = "Cargo.toml"
 binding = "PyO3"
 
-[tool.cibuildwheel]
 # takes inspiration from https://github.com/pypa/cibuildwheel/discussions/1814
+[tool.cibuildwheel]
 skip = ["*musl*", "*-win_arm64"] # ignore some problematic platforms
 linux.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
 linux.environment = { PATH="$HOME/.cargo/bin:$PATH" }

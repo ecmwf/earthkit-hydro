@@ -11,5 +11,5 @@ jobs:
     with:
       testpypi: true
       build_args: '--sdist'
-      platforms: ''
-      pyversions: ''
+      # platforms: ''
+      # pyversions: ''

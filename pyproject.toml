@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=65", "setuptools-rust", "setuptools_scm[toml]>=6.2", "wheel"]
+requires = ["setuptools>=65", "setuptools-rust", "setuptools_scm[toml]>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -104,10 +104,11 @@ parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarba
 fallback_version='0.1.0'
 local_scheme = "no-local-version"
 
-[[tool.setuptools-rust.ext-modules]]
-target = "earthkit.hydro._rust"  # The last part of the name (e.g. "_rust") has to match lib.name in Cargo.toml
-path = "Cargo.toml"
-binding = "PyO3"
+# Logic is done in setup.py for more flexibility
+# [[tool.setuptools-rust.ext-modules]]
+# target = "earthkit.hydro._rust"  # The last part of the name (e.g. "_rust") has to match lib.name in Cargo.toml
+# path = "Cargo.toml"
+# binding = "PyO3"
 
 # takes inspiration from https://github.com/pypa/cibuildwheel/discussions/1814
 [tool.cibuildwheel]

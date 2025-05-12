@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=65", "setuptools-rust", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=65", "setuptools-rust", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -96,8 +96,8 @@ include = [ "earthkit.hydro" ]
 where = [ "src/" ]
 
 [tool.setuptools_scm]
-write_to = "src/earthkit/hydro/_version.py"
-write_to_template = '''# Do not change! Do not track in version control!
+version_file = "src/earthkit/hydro/_version.py"
+version_file_template = '''# Do not change! Do not track in version control!
 __version__ = "{version}"
 '''
 parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs

@@ -6,10 +6,9 @@ on:
 
 jobs:
   deploy:
-    uses: ecmwf/reusable-workflows/.github/workflows/cd-pypi.yml@feat/build_multiple_wheels
+    uses: ecmwf/reusable-workflows/.github/workflows/cd-pypi-binwheel.yml@feat/build_multiple_wheels
     secrets: inherit
     with:
-      purepython_buildargs: '--sdist'
-      binwheel_platforms: "['ubuntu-latest','macos-latest','windows-latest']"
-      binwheel_pyversions: "['38','39','310','311','312','313']"
+      platforms: "['ubuntu-latest','macos-latest','windows-latest']"
+      pyversions: "['38']"
       testpypi: true

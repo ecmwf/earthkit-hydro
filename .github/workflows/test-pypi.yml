@@ -14,7 +14,8 @@ jobs:
       testpypi: true
       env_vars: |
         {
-          "USE_RUST": "1"
+          "USE_RUST": "1",
+          "SETUPTOOLS_RUST_CARGO_PROFILE": "release"
         }
 
   pypi_purepython:
@@ -25,5 +26,6 @@ jobs:
       testpypi: true
       env_vars: |
         {
-          "USE_RUST": "0"
+          "USE_RUST": "0",
+          "SETUPTOOLS_RUST_CARGO_PROFILE": "release"
         }

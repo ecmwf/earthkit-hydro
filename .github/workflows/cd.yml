@@ -14,7 +14,8 @@ jobs:
       pyversions: "['38','39','310','311','312','313']"
       env_vars: |
         {
-          "USE_RUST": "1"
+          "USE_RUST": "1",
+          "SETUPTOOLS_RUST_CARGO_PROFILE": "release"
         }
 
   pypi_purepython:
@@ -24,5 +25,6 @@ jobs:
     with:
       env_vars: |
         {
-          "USE_RUST": "0"
+          "USE_RUST": "0",
+          "SETUPTOOLS_RUST_CARGO_PROFILE": "release"
         }

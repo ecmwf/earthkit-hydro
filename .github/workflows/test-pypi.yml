@@ -14,6 +14,10 @@ jobs:
       platforms: "['ubuntu-latest','macos-latest','windows-latest']"
       pyversions: "['38','39','310','311','312','313']"
       testpypi: true
+      env_vars: |
+        {
+          "USE_RUST": "1"
+        }
 
   pypi_purepython:
     needs: pypi_binwheels
@@ -23,3 +27,7 @@ jobs:
       USE_RUST: 0
     with:
       testpypi: true
+      env_vars: |
+        {
+          "USE_RUST": "0"
+        }

@@ -137,17 +137,12 @@ class RiverNetwork:
 
         """
         try:
-            from .topological_labels import (
-                compute_topological_labels_rust as compute_topological_labels,
-            )
-        except (ImportError, ModuleNotFoundError):
+            from .topological_labels_rust import compute_topological_labels
+        except (ModuleNotFoundError, ImportError):
             print(
                 "Failed to load rust extension, falling back to python implementation."
             )
-            from .topological_labels import (
-                compute_topological_labels_python as compute_topological_labels,
-            )
-        # TODO: check input types are okay for rust, otherwise should use Python
+            from .topological_labels_python import compute_topological_labels
         return compute_topological_labels(
             self.sources, self.sinks, self.downstream_nodes
         )

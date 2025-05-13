@@ -140,7 +140,7 @@ class RiverNetwork:
             from .topological_labels import (
                 compute_topological_labels_rust as compute_topological_labels,
             )
-        except ImportError:
+        except (ImportError, ModuleNotFoundError):
             print(
                 "Failed to load rust extension, falling back to python implementation."
             )

@@ -6,10 +6,13 @@ from setuptools_rust import RustExtension
 use_rust = int(os.environ.get("USE_RUST", "-1"))
 
 if use_rust == 0:  # pure python
+    print("Building pure Python version.")
     rust_extensions = []
 elif use_rust == 1:  # rust extension
+    print("Building with rust bindings.")
     rust_extensions = [RustExtension("earthkit.hydro._rust", "Cargo.toml")]
 else:  # (default) try rust extension, if fail fallback to python
+    print("Building with rust bindings, and if failing reverting to pure Python.")
     rust_extensions = [
         RustExtension("earthkit.hydro._rust", "Cargo.toml", optional=True)
     ]

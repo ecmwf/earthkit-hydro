@@ -41,6 +41,7 @@
 - Support for PCRaster, CaMa-Flood and HydroSHEDS river networks
 - Computing statistics over catchments and subcatchments
 - Finding catchments and subcatchments
+- Calculating distances along river networks
 - Calculation of upstream or downstream fields
 - Handle arbitrary missing values
 - Handle N-dimensional fields
@@ -52,9 +53,12 @@ For a default installation, run
 pip install earthkit-hydro
 ```
 
-For a developer installation (includes linting and test libraries), run
+For a developer setup (includes linting and test libraries), run
 
 ```
+conda create -n hydro python=3.12
+conda activate hydro
+conda install -c conda-forge rust
 git clone https://github.com/ecmwf/earthkit-hydro.git
 cd earthkit-hydro
 pip install -e .[dev]
@@ -70,7 +74,7 @@ import earthkit.hydro as ekh
 ```
 
 The package contains different ways of constructing or loading a `RiverNetwork` object. A `RiverNetwork` object is a representation of a river network on a grid.
-It can be used to compute basic hydrological functions, such as propagating a scalar field along the river network or extract a catchment from the river network.
+It can be used to compute basic hydrological functions, such as propagating a scalar field along the river network or extracting a catchment from the river network.
 
 ### Mathematical Details
 Given a discretisation of a domain i.e. a set of points $\mathcal{D}=\{ (x_i, y_i)\}_{i=1}^N$, a river network is a directed acyclic graph $\mathcal{R}=(V,E)$ where the vertices $V \subseteq \mathcal{D}$. The out-degree of each vertex is at most 1 i.e. each point in the river network points to at most one downstream location.
@@ -101,7 +105,7 @@ Loads a precomputed `RiverNetwork`. Current options can be listed with `ekh.rive
 ekh.river_network.create(path, river_network_format, source="file")
 ```
 Creates a `RiverNetwork`. Current options are
-- river_network_format: "esri_d8", "pcr_d8", "cama" or "precomputed"
+- river_network_format: "esri_d8", "pcr_d8", , "merit_d8", "cama" or "precomputed"
 - source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html).
 
 ### Computing Metrics Over River Networks
@@ -118,6 +122,18 @@ ekh.upstream.std(river_network, field, weights=None)
 ekh.upstream.var(river_network, field, weights=None)
 ```
 Given an input field, returns as output a new field with the upstream metric calculated for each cell.
+
+#### Metrics Over Downstream Nodes
+```
+ekh.downstream.sum(river_network, field, weights=None)
+ekh.downstream.max(river_network, field, weights=None)
+ekh.downstream.min(river_network, field, weights=None)
+ekh.downstream.mean(river_network, field, weights=None)
+ekh.downstream.prod(river_network, field, weights=None)
+ekh.downstream.std(river_network, field, weights=None)
+ekh.downstream.var(river_network, field, weights=None)
+```
+Given an input field, returns as output a new field with the downstream metric calculated for each cell.
 
 #### Metrics Over Catchments
 ```
@@ -253,7 +269,10 @@ earthkit-hydro provides many functions with PCRaster equivalents, summarised bel
 | upstream | move_downstream | |
 | catchment | catchments.find | |
 | subcatchment | subcatchments.find | |
+| path | upstream.max | |
 | ldddist | distance.min | friction input is slightly different to weights, and by default ekh takes distance between two nodes to be one regardless if on diagonal or not |
+| downstreamdist | distance.to_sink | Same caveats as for ldddist |
+| slopelength | distance.to_source | path="longest", same caveats as for ldddist |
 | abs, sin, cos, tan, ...  | np.abs, np.sin, np.cos, np.tan, ... | any numpy operations can be directly used |
 
 _Points of difference_
@@ -272,7 +291,7 @@ The GloFAS river network is available under the conditions set out in the [Europ
     Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Disperati, Juliana; Grimaldi, Stefania; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
 
 <a id="attrib3"><sup>3</sup></a>
-The CaMa river networks are available under [CC-BY 4.0 licence](https://creativecommons.org/licenses/by/4.0/) and are available at [http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/](http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/).
+The CaMa river networks are available under [CC-BY 4.0 Licence](https://creativecommons.org/licenses/by/4.0/) and are available at [http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/](http://hydro.iis.u-tokyo.ac.jp/~yamadai/cama-flood/).
 
     Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M. (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets. Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873
 

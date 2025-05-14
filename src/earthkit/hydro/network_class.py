@@ -1,3 +1,11 @@
+# (C) Copyright 2025- ECMWF.
+#
+# This software is licensed under the terms of the Apache Licence Version 2.0
+# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+# In applying this licence, ECMWF does not waive the privileges and immunities
+# granted to it by virtue of its status as an intergovernmental organisation
+# nor does it submit to any jurisdiction.
+
 import joblib
 import numpy as np
 
@@ -60,17 +68,22 @@ class RiverNetwork:
 
         """
         self.nodes = nodes
-        self.n_nodes = len(nodes)
+        del nodes
+        self.n_nodes = len(self.nodes)
         self.downstream_nodes = downstream
+        del downstream
         self.mask = mask
+        del mask
         self.sinks = (
             sinks
             if sinks is not None
             else self.nodes[self.downstream_nodes == self.n_nodes]
         )  # nodes with no downstreams
+        del sinks
         self.sources = (
             sources if sources is not None else self.get_sources()
         )  # nodes with no upstreams
+        del sources
         if check_for_cycles:
             self.check_for_cycles()
         self.topological_labels = (
@@ -78,6 +91,7 @@ class RiverNetwork:
             if topological_labels is not None
             else self.compute_topological_labels()
         )
+        del topological_labels
         self.topological_groups = self.topological_groups_from_labels()
 
     @property
@@ -98,9 +112,11 @@ class RiverNetwork:
         downstream_no_sinks = self.downstream_nodes[
             self.downstream_nodes != self.n_nodes
         ]  # get all downstream nodes
-        tmp_nodes[downstream_no_sinks] = -1  # downstream nodes that aren't sinks = -1
+        tmp_nodes[downstream_no_sinks] = (
+            self.n_nodes + 1
+        )  # downstream nodes that aren't sinks = -1
         inlets = tmp_nodes[
-            tmp_nodes != -1
+            tmp_nodes != self.n_nodes + 1
         ]  # sources are nodes that are not downstream nodes
         return inlets
 
@@ -116,6 +132,7 @@ class RiverNetwork:
                 break
             not_sinks = nodes != self.n_nodes
             nodes[not_sinks] = self.downstream_nodes[nodes[not_sinks]].copy()
+        print("No cycles found in the river network.")
 
     def compute_topological_labels(self):
         """Finds the topological distance labels for each node in the river
@@ -127,22 +144,16 @@ class RiverNetwork:
             Array of topological distance labels for each node.
 
         """
-        inlets = self.sources
-        labels = np.zeros(self.n_nodes, dtype=int)
-        old_sum = -1
-        current_sum = 0  # sum of labels
-        n = 1  # distance from source
-        while current_sum > old_sum:
-            if n > self.n_nodes:
-                raise Exception("River Network contains a cycle.")
-            old_sum = current_sum
-            inlets = inlets[inlets != self.n_nodes]  # subset to valid nodes
-            labels[inlets] = n  # update furthest distance from source
-            inlets = self.downstream_nodes[inlets]
-            n += 1
-            current_sum = np.sum(labels)
-        labels[self.sinks] = n  # put all sinks in last group in topological ordering
-        return labels
+        try:
+            from .topological_labels_rust import compute_topological_labels
+        except (ModuleNotFoundError, ImportError):
+            print(
+                "Failed to load rust extension, falling back to python implementation."
+            )
+            from .topological_labels_python import compute_topological_labels
+        return compute_topological_labels(
+            self.sources, self.sinks, self.downstream_nodes
+        )
 
     def topological_groups_from_labels(self):
         """Groups nodes by their topological distance labels.
@@ -216,9 +227,9 @@ class RiverNetwork:
         subnetwork_nodes[river_network_mask] = np.arange(n_nodes)
         # get downstream nodes in the subnetwork
         non_sinks = np.where(downstream_indices != self.n_nodes)
-        downstream = np.full(n_nodes, n_nodes)
+        downstream = np.full(n_nodes, n_nodes, dtype=np.uintp)
         downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
-        nodes = np.arange(n_nodes)
+        nodes = np.arange(n_nodes, dtype=np.uintp)
 
         if not recompute:
             sinks = nodes[downstream == n_nodes]

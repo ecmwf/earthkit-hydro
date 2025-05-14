@@ -1,3 +1,11 @@
+# (C) Copyright 2025- ECMWF.
+#
+# This software is licensed under the terms of the Apache Licence Version 2.0
+# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+# In applying this licence, ECMWF does not waive the privileges and immunities
+# granted to it by virtue of its status as an intergovernmental organisation
+# nor does it submit to any jurisdiction.
+
 import numpy as np
 
 from .accumulation import flow_downstream, flow_upstream
@@ -45,9 +53,11 @@ def min(
     field = np.empty(river_network.n_nodes)
     field.fill(np.inf)
 
-    points = points_to_numpy(points)
-
-    points_1d = points_to_1d_indices(river_network, points)
+    if isinstance(points, np.ndarray):
+        points_1d = points
+    else:
+        points = points_to_numpy(points)
+        points_1d = points_to_1d_indices(river_network, points)
 
     field[points_1d] = weights[points_1d]
 
@@ -134,6 +144,7 @@ def max(
     else:
         points = points_to_numpy(points)
         points_1d = points_to_1d_indices(river_network, points)
+
     field[points_1d] = weights[points_1d]
 
     if downstream:

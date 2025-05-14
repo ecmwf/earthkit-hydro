@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=65", "setuptools_scm[toml]>=6.2"]
+requires = ["setuptools>=65", "setuptools-rust", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -17,8 +17,8 @@ license = { text = "Apache License Version 2.0" }
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Science/Research",
-    "License :: OSI Approved :: Apache Software License",
     "Natural Language :: English",
+    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.8",
@@ -40,7 +40,7 @@ dependencies = ["numpy", "joblib"]
 
 [project.optional-dependencies]
     readers = [
-        "earthkit-data[geotiff]>=0.13.0"
+        "earthkit-data[geotiff]>=0.13.8",
         ]
     tests = [
         "pytest",
@@ -50,7 +50,7 @@ dependencies = ["numpy", "joblib"]
         "pre-commit"
         ]
     all = [
-        "earthkit-data[geotiff]>=0.13.0",
+        "earthkit-data[geotiff]>=0.13.8",
         "pytest",
         "pre-commit"
         ]
@@ -96,10 +96,25 @@ include = [ "earthkit.hydro" ]
 where = [ "src/" ]
 
 [tool.setuptools_scm]
-write_to = "src/earthkit/hydro/_version.py"
-write_to_template = '''# Do not change! Do not track in version control!
+version_file = "src/earthkit/hydro/_version.py"
+version_file_template = '''# Do not change! Do not track in version control!
 __version__ = "{version}"
 '''
 parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs
 fallback_version='0.1.0'
 local_scheme = "no-local-version"
+
+# Logic is done in setup.py for more flexibility
+# [[tool.setuptools-rust.ext-modules]]
+# target = "earthkit.hydro._rust"  # The last part of the name (e.g. "_rust") has to match lib.name in Cargo.toml
+# path = "Cargo.toml"
+# binding = "PyO3"
+
+# takes inspiration from https://github.com/pypa/cibuildwheel/discussions/1814
+[tool.cibuildwheel]
+skip = ["*musl*", "*-win_arm64"] # ignore some problematic platforms
+linux.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
+linux.environment = { PATH="$HOME/.cargo/bin:$PATH" }
+macos.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
+windows.before-all = "rustup target add aarch64-pc-windows-msvc i586-pc-windows-msvc i686-pc-windows-msvc x86_64-pc-windows-msvc"
+windows.archs = "all"

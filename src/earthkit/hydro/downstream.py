@@ -16,7 +16,7 @@ from .utils import mask_and_unmask
 
 
 @mask_and_unmask
-def calculate_upstream_metric(
+def calculate_downstream_metric(
     river_network,
     field,
     metric,
@@ -25,7 +25,7 @@ def calculate_upstream_metric(
     accept_missing=False,
 ):
     """
-    Calculates a metric for the field over all upstream values.
+    Calculates a metric for the field over all downstream values.
 
     Parameters
     ----------
@@ -50,12 +50,12 @@ def calculate_upstream_metric(
     """
 
     return calculate_online_metric(
-        river_network, field, metric, weights, mv, accept_missing, flow_direction="down"
+        river_network, field, metric, weights, mv, accept_missing, flow_direction="up"
     )
 
 
 for metric in metrics_dict.keys():
 
-    func = partial(calculate_upstream_metric, metric=metric)
+    func = partial(calculate_downstream_metric, metric=metric)
 
     globals()[metric] = func

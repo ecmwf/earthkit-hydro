@@ -1,3 +1,11 @@
+# (C) Copyright 2025- ECMWF.
+#
+# This software is licensed under the terms of the Apache Licence Version 2.0
+# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+# In applying this licence, ECMWF does not waive the privileges and immunities
+# granted to it by virtue of its status as an intergovernmental organisation
+# nor does it submit to any jurisdiction.
+
 import numpy as np
 
 
@@ -321,6 +329,8 @@ def points_to_1d_indices(river_network, stations):
     """
     node_numbers = np.cumsum(river_network.mask) - 1
     valid_stations = river_network.mask[stations]
+    if np.any(~valid_stations):
+        raise ValueError("Not all points are present on the river network.")
     stations = tuple(station_index[valid_stations] for station_index in stations)
     stations_1d = node_numbers.reshape(river_network.mask.shape)[stations]
     return stations_1d

@@ -1,7 +1,16 @@
+# (C) Copyright 2025- ECMWF.
+#
+# This software is licensed under the terms of the Apache Licence Version 2.0
+# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
+# In applying this licence, ECMWF does not waive the privileges and immunities
+# granted to it by virtue of its status as an intergovernmental organisation
+# nor does it submit to any jurisdiction.
+
 from io import BytesIO
 from urllib.request import urlopen
 
 import joblib
+import numpy as np
 
 from ._version import __version__ as ekh_version
 from .readers import (
@@ -27,7 +36,8 @@ def create(path, river_network_format, source):
         The path to the river network data.
     river_network_format : str
         The format of the river network data.
-        Supported formats are "precomputed", "cama", "pcr_d8", and "esri_d8".
+        Supported formats are "precomputed", "cama", "pcr_d8", "esri_d8"
+        and "merit_d8".
     source : str
         The source of the river network data.
         For possible sources see:
@@ -35,15 +45,9 @@ def create(path, river_network_format, source):
 
     Returns
     -------
-    object
+    earthkit.hydro.RiverNetwork
         The river network object created from the given data.
 
-    Raises
-    ------
-    ValueError
-        If the river network format or source is unsupported.
-    NotImplementedError
-        If the river network format is "esri_d8".
     """
     if river_network_format == "precomputed":
         if source == "file":
@@ -60,11 +64,21 @@ def create(path, river_network_format, source):
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
         x, y = data.nextx.values, data.nexty.values
         return from_cama_nextxy(x, y)
-    elif river_network_format == "pcr_d8" or river_network_format == "esri_d8":
-        ekd = import_earthkit_or_prompt_install(river_network_format, source)
-        data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
-        var_name = find_main_var(data)
-        return from_d8(data[var_name].values, river_network_format=river_network_format)
+    elif (
+        river_network_format == "pcr_d8"
+        or river_network_format == "esri_d8"
+        or river_network_format == "merit_d8"
+    ):
+        if path.endswith(".map"):
+            from .pcr import from_file
+
+            data = from_file(path, mask=False)
+        else:
+            ekd = import_earthkit_or_prompt_install(river_network_format, source)
+            data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
+            var_name = find_main_var(data)
+            data = data[var_name].values
+        return from_d8(data, river_network_format=river_network_format)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
 
@@ -107,7 +121,14 @@ def load(
         domain=domain,
         river_network_version=river_network_version,
     )
-    return create(uri, "precomputed", "url", *args, **kwargs)
+    network = create(uri, "precomputed", "url", *args, **kwargs)
+    if network.sources.dtype != np.uintp:
+        network.sources = network.sources.astype(np.uintp)
+    if network.downstream_nodes.dtype != np.uintp:
+        network.downstream_nodes = network.downstream_nodes.astype(np.uintp)
+    if network.sinks.dtype != np.uintp:
+        network.sinks = network.sinks.astype(np.uintp)
+    return network
 
 
 def available():

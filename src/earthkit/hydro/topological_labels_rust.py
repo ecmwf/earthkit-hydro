@@ -14,6 +14,23 @@ from ._rust import propagate_labels
 def compute_topological_labels(
     sources: np.ndarray, sinks: np.ndarray, downstream_nodes: np.ndarray
 ):
+    """Finds the topological distance labels for each node in
+    downstream_nodes.
+
+    Parameters
+    ----------
+    sources : numpy.ndarray
+        The river network sources.
+    sinks : numpy.ndarray
+        The river network sinks.
+    downstream_nodes : cnumpy.ndarray
+        The river network downstream nodes.
+
+    Returns
+    -------
+    numpy.ndarray
+        Array of topological distance labels for each node.
+    """
 
     n_nodes = np.uintp(downstream_nodes.shape[0])
     labels = np.zeros(n_nodes, dtype=np.int64)

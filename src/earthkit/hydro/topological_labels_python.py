@@ -12,6 +12,23 @@ import numpy as np
 def compute_topological_labels(
     sources: np.ndarray, sinks: np.ndarray, downstream_nodes: np.ndarray
 ):
+    """Finds the topological distance labels for each node in
+    downstream_nodes.
+
+    Parameters
+    ----------
+    sources : numpy.ndarray
+        The river network sources.
+    sinks : numpy.ndarray
+        The river network sinks.
+    downstream_nodes : cnumpy.ndarray
+        The river network downstream nodes.
+
+    Returns
+    -------
+    numpy.ndarray
+        Array of topological distance labels for each node.
+    """
     n_nodes = downstream_nodes.shape[0]
     inlets = downstream_nodes[sources]
     labels = np.zeros(n_nodes, dtype=int)

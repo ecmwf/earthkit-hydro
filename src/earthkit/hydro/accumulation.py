@@ -325,12 +325,6 @@ def _ufunc_to_upstream(
 def calculate_online_metric(
     river_network, field, metric, weights, mv, accept_missing, flow_direction
 ):
-
-    if flow_direction == "up":
-        flow_func = flow_upstream
-    elif flow_direction == "down":
-        flow_func = flow_downstream
-
     """
     Calculates a metric for the field over all upstream or downstream values.
 
@@ -357,6 +351,11 @@ def calculate_online_metric(
         Output field.
 
     """
+
+    if flow_direction == "up":
+        flow_func = flow_upstream
+    elif flow_direction == "down":
+        flow_func = flow_downstream
 
     field, field_dtype = missing_to_nan(field.copy(), mv, accept_missing)
 

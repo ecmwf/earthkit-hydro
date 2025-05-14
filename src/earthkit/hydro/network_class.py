@@ -219,9 +219,9 @@ class RiverNetwork:
         subnetwork_nodes[river_network_mask] = np.arange(n_nodes)
         # get downstream nodes in the subnetwork
         non_sinks = np.where(downstream_indices != self.n_nodes)
-        downstream = np.full(n_nodes, n_nodes)
+        downstream = np.full(n_nodes, n_nodes, dtype=np.uintp)
         downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
-        nodes = np.arange(n_nodes)
+        nodes = np.arange(n_nodes, dtype=np.uintp)
 
         if not recompute:
             sinks = nodes[downstream == n_nodes]

@@ -2,6 +2,7 @@ from io import BytesIO
 from urllib.request import urlopen
 
 import joblib
+import numpy as np
 
 from ._version import __version__ as ekh_version
 from .readers import (
@@ -112,7 +113,14 @@ def load(
         domain=domain,
         river_network_version=river_network_version,
     )
-    return create(uri, "precomputed", "url", *args, **kwargs)
+    network = create(uri, "precomputed", "url", *args, **kwargs)
+    if network.sources.dtype != np.uintp:
+        network.sources = network.sources.astype(np.uintp)
+    if network.downstream_nodes.dtype != np.uintp:
+        network.downstream_nodes = network.downstream_nodes.astype(np.uintp)
+    if network.sinks.dtype != np.uintp:
+        network.sinks = network.sinks.astype(np.uintp)
+    return network
 
 
 def available():

@@ -76,7 +76,7 @@ CELLREPR = {
 
 def from_file(path, mask=False):
     """
-    Load a .map file from numpy array.
+    Load a .map file into a numpy array.
     """
 
     with open(path, "rb") as f:

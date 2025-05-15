@@ -53,6 +53,8 @@ For a default installation, run
 pip install earthkit-hydro
 ```
 
+*Developer instructions:*
+
 For a developer setup (includes linting and test libraries), run
 
 ```
@@ -64,6 +66,13 @@ cd earthkit-hydro
 pip install -e .[dev]
 pre-commit install
 ```
+Note: this project is a mixed Rust-Python project with a pure Python fallback. To handle this, the behaviour of the install is based on an environmental variable `USE_RUST`, with the following behaviour
+- `Not set or any other value (default behaviour)`:
+Attempts to build with Rust and if failure, skips and falls back to pure Python implementation.
+- `USE_RUST=0`:
+Builds pure Python implementation.
+- `USE_RUST=1`:
+Builds with Rust and fails if something goes wrong.
 
 ## Documentation
 **An [example notebook](docs/notebooks/example.ipynb) showing how to use the earthkit-hydro is provided in addition to the documentation below.**

@@ -94,7 +94,7 @@ Convenience helpers ``distance.to_source`` and ``distance.to_sink`` (and their
 sinks.
 
 Moving Fields Upstream and Downstream
-------------------------------------
+-------------------------------------
 
 Fields can be propagated along a river network using ``move_downstream`` or
 ``move_upstream``. This updates each node with the value from the connected

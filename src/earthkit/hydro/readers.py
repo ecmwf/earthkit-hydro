@@ -17,7 +17,7 @@ from ._version import __version__ as ekh_version
 from .network_class import RiverNetwork
 
 # read in only up to second decimal point
-# i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1
+# i.e. 0.1.dev90 -> 0.1
 ekh_version = ".".join(ekh_version.split(".")[:2])
 
 
@@ -185,10 +185,8 @@ def from_cama_nextxy(x, y):
     missing_mask = x != -9999
     mask_upstream = ((x != -9) & (x != -9999)) & (x != -10)
     upstream_indices = np.arange(x.size)[mask_upstream]
-    x = x[mask_upstream]
-    y = y.flatten()[mask_upstream]
-    x -= 1
-    y -= 1
+    x = x[mask_upstream] - 1
+    y = y.flatten()[mask_upstream] - 1
     downstream_indices = x + y * shape[1]
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
@@ -337,12 +335,12 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     """
     n_nodes = int(np.sum(missing_mask))
     nodes = np.arange(n_nodes, dtype=np.uintp)
-    nodes_matrix = np.ones(missing_mask.size, dtype=np.uintp) * n_nodes
+    nodes_matrix = np.full(missing_mask.size, n_nodes, dtype=np.uintp)
     nodes_matrix[missing_mask] = nodes
     upstream_nodes = nodes_matrix[upstream_indices]
     downstream_nodes = nodes_matrix[downstream_indices]
     del upstream_indices, downstream_indices, nodes_matrix
-    downstream = np.ones(n_nodes, dtype=np.uintp) * n_nodes
+    downstream = np.full(n_nodes, n_nodes, dtype=np.uintp)
     downstream[upstream_nodes] = downstream_nodes
     del downstream_nodes, upstream_nodes, n_nodes
     return RiverNetwork(nodes, downstream, missing_mask.reshape(shape))

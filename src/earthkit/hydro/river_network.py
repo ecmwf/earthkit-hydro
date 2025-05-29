@@ -138,6 +138,13 @@ def available(
 ):
     """
     Prints the available precomputed networks.
+
+    Parameters
+    ----------
+    data_source : str, optional
+        Base github URI to query from.
+    token : str, optional
+        Github access token.
     """
 
     base_headers = {

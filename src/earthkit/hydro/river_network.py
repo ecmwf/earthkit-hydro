@@ -6,8 +6,9 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
+import json
 from io import BytesIO
-from urllib.request import urlopen
+from urllib.request import Request, urlopen
 
 import joblib
 import numpy as np
@@ -131,21 +132,52 @@ def load(
     return network
 
 
-def available():
+def available(
+    data_source="https://api.github.com/repos/ecmwf/earthkit-hydro-store/git",
+    token=None,
+):
     """
     Prints the available precomputed networks.
     """
 
+    base_headers = {
+        "Accept": "application/vnd.github+json",
+        "User-Agent": "python-urllib-client",
+    }
+    if token:
+        base_headers["Authorization"] = f"Bearer {token}"
+
+    def github_api_request(url):
+        req = Request(url, headers=base_headers)
+        with urlopen(req) as response:
+            if response.status != 200:
+                raise Exception(f"GitHub API error {response.status}")
+            return json.loads(response.read().decode())
+
+    # get commit sha for main branch
+    commit_sha = github_api_request(f"{data_source}/refs/heads/main")["object"]["sha"]
+
+    # get entire tree
+    tree_sha = github_api_request(f"{data_source}/commits/{commit_sha}")["tree"]["sha"]
+
+    # get recursive tree
+    tree_data = github_api_request(f"{data_source}/trees/{tree_sha}?recursive=1")[
+        "tree"
+    ]
+
+    def is_valid_path(obj):
+        return (
+            ".joblib" in obj["path"].split("/")[-1]
+            and ekh_version in obj["path"].split("/")[0]
+        )
+
     print(
         "Available precomputed networks are:\n",
-        '`ekh.river_network.load("efas", "5")`\n',
-        '`ekh.river_network.load("efas", "4")`\n',
-        '`ekh.river_network.load("glofas", "4")`\n',
-        '`ekh.river_network.load("glofas", "3")`\n',
-        '`ekh.river_network.load("cama_15min", "4")`\n',
-        '`ekh.river_network.load("cama_06min", "4")`\n',
-        '`ekh.river_network.load("cama_05min", "4")`\n',
-        '`ekh.river_network.load("cama_03min", "4")`\n',
-        '`ekh.river_network.load("hydrosheds_06min", "1")`\n',
-        '`ekh.river_network.load("hydrosheds_05min", "1")`',
+        *[
+            '`ekh.river_network.load("{0}", "{1}")`\n'.format(
+                *obj["path"].split("/")[1:3]
+            )
+            for obj in tree_data
+            if is_valid_path(obj)
+        ],
     )

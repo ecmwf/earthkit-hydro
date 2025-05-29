@@ -217,7 +217,7 @@ class RiverNetwork:
             topological_labels = distance_to_source(network, path="longest")[
                 network.mask
             ].astype(int)
-            topological_labels[network.sinks] = np.max(topological_labels)
+            topological_labels[network.sinks] = network.n_nodes
             network.topological_labels = topological_labels
             del topological_labels
             network.topological_groups = network.topological_groups_from_labels()

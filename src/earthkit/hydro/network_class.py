@@ -9,6 +9,7 @@
 import joblib
 import numpy as np
 
+from .distance import to_source as distance_to_source
 from .utils import mask_2d
 
 
@@ -175,7 +176,7 @@ class RiverNetwork:
         joblib.dump(self, fpath, compress=compression)
 
     @mask_2d
-    def create_subnetwork(self, mask, recompute=False):
+    def create_subnetwork(self, mask, recompute=True):
         """Creates a subnetwork from the river network based on a mask.
 
         Parameters
@@ -198,14 +199,11 @@ class RiverNetwork:
         nodes, downstream, n_nodes, sinks, sources = _find_subnetwork_inputs(
             river_network_mask, self.downstream_nodes, self.n_nodes
         )
-
-        if not recompute:
-            topological_labels = self.topological_labels[river_network_mask]
-            topological_labels[sinks] = self.n_nodes
-        else:
-            topological_labels = None
-
-        return RiverNetwork(
+        topological_labels = self.topological_labels[river_network_mask]
+        del river_network_mask
+        topological_labels[sources] = 0
+        topological_labels[sinks] = self.n_nodes
+        network = RiverNetwork(
             nodes,
             downstream,
             domain_mask,
@@ -214,6 +212,16 @@ class RiverNetwork:
             n_nodes=n_nodes,
             topological_labels=topological_labels,
         )
+        del nodes, downstream, domain_mask, sinks, sources, n_nodes, topological_labels
+        if recompute:
+            topological_labels = distance_to_source(network, path="longest")[
+                network.mask
+            ].astype(int)
+            topological_labels[network.sinks] = np.max(topological_labels)
+            network.topological_labels = topological_labels
+            del topological_labels
+            network.topological_groups = network.topological_groups_from_labels()
+        return network
 
 
 def _get_sources(nodes, downstream_nodes, n_nodes):

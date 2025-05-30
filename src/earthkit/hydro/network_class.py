@@ -9,6 +9,7 @@
 import joblib
 import numpy as np
 
+from .distance import to_source as distance_to_source
 from .utils import mask_2d
 
 
@@ -43,6 +44,7 @@ class RiverNetwork:
         mask,
         sinks=None,
         sources=None,
+        n_nodes=None,
         topological_labels=None,
         check_for_cycles=False,
     ) -> None:
@@ -69,7 +71,7 @@ class RiverNetwork:
         """
         self.nodes = nodes
         del nodes
-        self.n_nodes = len(self.nodes)
+        self.n_nodes = len(self.nodes) if n_nodes is None else n_nodes
         self.downstream_nodes = downstream
         del downstream
         self.mask = mask
@@ -81,7 +83,9 @@ class RiverNetwork:
         )  # nodes with no downstreams
         del sinks
         self.sources = (
-            sources if sources is not None else self.get_sources()
+            sources
+            if sources is not None
+            else _get_sources(self.nodes, self.downstream_nodes, self.n_nodes)
         )  # nodes with no upstreams
         del sources
         if check_for_cycles:
@@ -97,28 +101,6 @@ class RiverNetwork:
     @property
     def shape(self):
         return self.mask.shape
-
-    def get_sources(self):
-        """Identifies the source nodes in the river network (nodes with no
-        upstream nodes).
-
-        Returns
-        -------
-        numpy.ndarray
-            Array of source nodes.
-
-        """
-        tmp_nodes = self.nodes.copy()
-        downstream_no_sinks = self.downstream_nodes[
-            self.downstream_nodes != self.n_nodes
-        ]  # get all downstream nodes
-        tmp_nodes[downstream_no_sinks] = (
-            self.n_nodes + 1
-        )  # downstream nodes that aren't sinks = -1
-        inlets = tmp_nodes[
-            tmp_nodes != self.n_nodes + 1
-        ]  # sources are nodes that are not downstream nodes
-        return inlets
 
     def check_for_cycles(self):
         """Checks if the river network contains any cycles and raises an
@@ -194,7 +176,7 @@ class RiverNetwork:
         joblib.dump(self, fpath, compress=compression)
 
     @mask_2d
-    def create_subnetwork(self, field, recompute=False):
+    def create_subnetwork(self, mask, recompute=True):
         """Creates a subnetwork from the river network based on a mask.
 
         Parameters
@@ -211,37 +193,92 @@ class RiverNetwork:
             A subnetwork of the river network.
 
         """
-        river_network_mask = field
-        valid_indices = np.where(self.mask)
+
+        domain_mask, river_network_mask = _find_new_masks(self.mask, mask)
+
+        nodes, downstream, n_nodes, sinks, sources = _find_subnetwork_inputs(
+            river_network_mask, self.downstream_nodes, self.n_nodes
+        )
+        topological_labels = self.topological_labels[river_network_mask]
+        del river_network_mask
+        topological_labels[sources] = 0
+        topological_labels[sinks] = self.n_nodes
+        network = RiverNetwork(
+            nodes,
+            downstream,
+            domain_mask,
+            sinks=sinks,
+            sources=sources,
+            n_nodes=n_nodes,
+            topological_labels=topological_labels,
+        )
+        del nodes, downstream, domain_mask, sinks, sources, n_nodes, topological_labels
+        if recompute:
+            topological_labels = distance_to_source(network, path="longest")[
+                network.mask
+            ].astype(int)
+            topological_labels[network.sinks] = network.n_nodes
+            network.topological_labels = topological_labels
+            del topological_labels
+            network.topological_groups = network.topological_groups_from_labels()
+        return network
+
+
+def _get_sources(nodes, downstream_nodes, n_nodes):
+    """Identifies the source nodes in the river network (nodes with no
+    upstream nodes).
+
+    Returns
+    -------
+    numpy.ndarray
+        Array of source nodes.
+
+    """
+    tmp_nodes = nodes.copy()
+    downstream_no_sinks = downstream_nodes[
+        downstream_nodes != n_nodes
+    ]  # get all downstream nodes
+    tmp_nodes[downstream_no_sinks] = (
+        n_nodes + 1
+    )  # downstream nodes that aren't sinks = -1
+    inlets = tmp_nodes[
+        tmp_nodes != n_nodes + 1
+    ]  # sources are nodes that are not downstream nodes
+    return inlets
+
+
+def _find_new_masks(original_mask, mask):
+    if mask.ndim == 1:
+        river_network_mask = mask
+        valid_indices = np.where(original_mask)
         new_valid_indices = (
             valid_indices[0][river_network_mask],
             valid_indices[1][river_network_mask],
         )
-        domain_mask = np.full(self.mask.shape, False)
+        domain_mask = np.full(original_mask.shape, False)
         domain_mask[new_valid_indices] = True
+    else:
+        domain_mask = mask & original_mask
+        river_network_mask = domain_mask[original_mask]
 
-        downstream_indices = self.downstream_nodes[river_network_mask]
-        n_nodes = len(downstream_indices)  # number of nodes in the subnetwork
-        # create new array of network nodes, setting all nodes not in mask to n_nodes
-        subnetwork_nodes = np.full(self.n_nodes, n_nodes)
-        subnetwork_nodes[river_network_mask] = np.arange(n_nodes)
-        # get downstream nodes in the subnetwork
-        non_sinks = np.where(downstream_indices != self.n_nodes)
-        downstream = np.full(n_nodes, n_nodes, dtype=np.uintp)
-        downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
-        nodes = np.arange(n_nodes, dtype=np.uintp)
+    return domain_mask, river_network_mask
 
-        if not recompute:
-            sinks = nodes[downstream == n_nodes]
-            topological_labels = self.topological_labels[river_network_mask]
-            topological_labels[sinks] = self.n_nodes
 
-            return RiverNetwork(
-                nodes,
-                downstream,
-                domain_mask,
-                sinks=sinks,
-                topological_labels=topological_labels,
-            )
-        else:
-            return RiverNetwork(nodes, downstream, domain_mask)
+def _find_subnetwork_inputs(
+    river_network_mask, original_downstream_nodes, original_n_nodes
+):
+    downstream_indices = original_downstream_nodes[river_network_mask]
+    n_nodes = len(downstream_indices)  # number of nodes in the subnetwork
+    # create new array of network nodes, setting all nodes not in mask to n_nodes
+    subnetwork_nodes = np.full(original_n_nodes, n_nodes)
+    subnetwork_nodes[river_network_mask] = np.arange(n_nodes)
+    # get downstream nodes in the subnetwork
+    non_sinks = downstream_indices != original_n_nodes
+    downstream = np.full(n_nodes, n_nodes, dtype=np.uintp)
+    downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
+    nodes = np.arange(n_nodes, dtype=np.uintp)
+
+    sinks = nodes[downstream == n_nodes]
+    sources = _get_sources(nodes, downstream, n_nodes)
+
+    return nodes, downstream, n_nodes, sinks, sources

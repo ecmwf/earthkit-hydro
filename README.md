@@ -38,7 +38,7 @@
 
 ## Main Features
 
-- Support for PCRaster, CaMa-Flood and HydroSHEDS river networks
+- Support for PCRaster, CaMa-Flood, HydroSHEDS and MERIT-Hydro river networks
 - Computing statistics over catchments and subcatchments
 - Finding catchments and subcatchments
 - Calculating distances along river networks
@@ -114,8 +114,10 @@ Loads a precomputed `RiverNetwork`. Current options can be listed with `ekh.rive
 ekh.river_network.create(path, river_network_format, source="file")
 ```
 Creates a `RiverNetwork`. Current options are
-- river_network_format: "esri_d8", "pcr_d8", , "merit_d8", "cama" or "precomputed"
+- river_network_format: "esri_d8", "pcr_d8", "merit_d8", "cama" or "precomputed"
 - source: An earthkit-data compatable source. See [list](https://earthkit-data.readthedocs.io/en/latest/guide/sources.html).
+
+Many filetypes are supported (NetCDF, GRIB, geoTIFF, .map, and more).
 
 ### Computing Metrics Over River Networks
 There are four high-level ways to compute metrics depending on the use-case.

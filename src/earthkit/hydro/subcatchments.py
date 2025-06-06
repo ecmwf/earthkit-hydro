@@ -32,7 +32,7 @@ def calculate_subcatchment_metric(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network.RiverNetwork
+    river_network : earthkit.hydro.network_class.RiverNetwork
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.
@@ -94,7 +94,7 @@ def find(river_network, field, mv=0, in_place=False):
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network.RiverNetwork
+    river_network : earthkit.hydro.network_class.RiverNetwork
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.

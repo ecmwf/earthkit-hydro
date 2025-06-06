@@ -29,7 +29,7 @@ def calculate_upstream_metric(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network.RiverNetwork
+    river_network : earthkit.hydro.network_class.RiverNetwork
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.

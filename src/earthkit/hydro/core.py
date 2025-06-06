@@ -12,7 +12,7 @@ def flow(river_network, field, invert_graph, operation, *args, **kwargs):
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network.RiverNetwork
+    river_network : earthkit.hydro.network_class.RiverNetwork
         An earthkit-hydro river network object.
     field : ndarray
         The field data to be modified in place.

@@ -14,7 +14,7 @@ import joblib
 import numpy as np
 
 from ._version import __version__ as ekh_version
-from .network_class import RiverNetwork
+from .network import RiverNetwork
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90 -> 0.1
@@ -71,7 +71,7 @@ def cache(func):
 
         Returns
         -------
-        earthkit.hydro.RiverNetwork
+        earthkit.hydro.network.RiverNetwork
             The loaded river network.
 
         """
@@ -176,7 +176,7 @@ def from_cama_nextxy(x, y):
 
     Returns
     -------
-    earthkit.hydro.RiverNetwork
+    earthkit.hydro.network.RiverNetwork
         The created river network.
 
     """
@@ -203,7 +203,7 @@ def from_cama_downxy(dx, dy):
 
     Returns
     -------
-    earthkit.hydro.RiverNetwork
+    earthkit.hydro.network.RiverNetwork
         The created river network.
 
     """
@@ -233,7 +233,7 @@ def from_d8(data, river_network_format="pcr_d8"):
 
     Returns
     -------
-    earthkit.hydro.RiverNetwork
+    earthkit.hydro.network.RiverNetwork
         The created river network.
 
     """
@@ -295,7 +295,7 @@ def find_upstream_downstream_indices_from_offsets(
 
     Returns
     -------
-    earthkit.hydro.RiverNetwork
+    earthkit.hydro.network.RiverNetwork
         The created river network.
 
     """
@@ -329,7 +329,7 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
 
     Returns
     -------
-    earthkit.hydro.RiverNetwork
+    earthkit.hydro.network.RiverNetwork
         The created river network.
 
     """

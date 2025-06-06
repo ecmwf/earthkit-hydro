@@ -23,7 +23,7 @@ def min(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     points : list of tuples
         List of tuple indices of the points.
@@ -97,7 +97,7 @@ def max(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     points : list of tuples
         List of tuple indices of the points.
@@ -181,7 +181,7 @@ def to_sink(river_network, weights=None, path="shortest", mv=np.nan):
 
     Parameters
     ----------
-    river_network : earthkit.hydro.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     weights : numpy.ndarray, optional
         Distance to the downstream point. Default is None, which
@@ -227,7 +227,7 @@ def to_source(river_network, weights=None, path="shortest", mv=np.nan):
 
     Parameters
     ----------
-    river_network : earthkit.hydro.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     weights : numpy.ndarray, optional
         Distance to the downstream point. Default is None, which

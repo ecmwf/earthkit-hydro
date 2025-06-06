@@ -7,3 +7,4 @@ dist/
 build/
 Cargo.lock
 .DS_Store
+*.so

@@ -46,7 +46,7 @@ def create(path, river_network_format, source):
 
     Returns
     -------
-    earthkit.hydro.network.RiverNetwork
+    earthkit.hydro.network_class.RiverNetwork
         The river network object created from the given data.
 
     """
@@ -113,7 +113,7 @@ def load(
 
     Returns
     -------
-    earthkit.hydro.network.RiverNetwork
+    earthkit.hydro.network_class.RiverNetwork
         The loaded river network.
 
     """

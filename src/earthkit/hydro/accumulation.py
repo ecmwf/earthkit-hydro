@@ -142,7 +142,8 @@ def _ufunc_to_downstream(
 
     """
     river_network._mask[grouping] = True
-    edge_inds = np.flatnonzero(river_network._mask[river_network._sources])
+    # edge_inds = np.flatnonzero(river_network._mask[river_network._sources])
+    edge_inds = get_edge_indices(river_network._sources, grouping)
     upstream_inds = river_network._sources[edge_inds]
     downstream_inds = river_network.edges[edge_inds]
     modifier_group = upstream_inds if modifier_use_upstream else downstream_inds
@@ -167,6 +168,24 @@ def _ufunc_to_downstream(
         modifier_field,
     )
     river_network._mask[grouping] = False
+
+
+def get_edge_indices(sources, grouping):
+    grouping_sorted = np.sort(grouping)
+    starts = np.searchsorted(sources, grouping_sorted, side="left")
+    ends = np.searchsorted(sources, grouping_sorted, side="right")
+
+    # Compute total number of edges
+    total_edges = np.sum(ends - starts)
+    edge_inds = np.empty(total_edges, dtype=int)
+
+    pos = 0
+    for start, end in zip(starts, ends):
+        length = end - start
+        edge_inds[pos : pos + length] = np.arange(start, end)
+        pos += length
+
+    return edge_inds
 
 
 @mask_and_unmask

@@ -6,6 +6,7 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
+import numba
 import numpy as np
 
 from .core import flow
@@ -142,8 +143,7 @@ def _ufunc_to_downstream(
 
     """
     river_network._mask[grouping] = True
-    # edge_inds = np.flatnonzero(river_network._mask[river_network._sources])
-    edge_inds = get_edge_indices(river_network._sources, grouping)
+    edge_inds = get_edge_indices_numba(river_network.offsets, grouping)
     upstream_inds = river_network._sources[edge_inds]
     downstream_inds = river_network.edges[edge_inds]
     modifier_group = upstream_inds if modifier_use_upstream else downstream_inds
@@ -170,22 +170,20 @@ def _ufunc_to_downstream(
     river_network._mask[grouping] = False
 
 
-def get_edge_indices(sources, grouping):
-    grouping_sorted = np.sort(grouping)
-    starts = np.searchsorted(sources, grouping_sorted, side="left")
-    ends = np.searchsorted(sources, grouping_sorted, side="right")
-
-    # Compute total number of edges
-    total_edges = np.sum(ends - starts)
-    edge_inds = np.empty(total_edges, dtype=int)
-
+@numba.njit
+def get_edge_indices_numba(offsets, grouping):
+    lengths = offsets[grouping + 1] - offsets[grouping]
+    total_len = np.sum(lengths)
+    result = np.empty(total_len, dtype=np.int64)
     pos = 0
-    for start, end in zip(starts, ends):
-        length = end - start
-        edge_inds[pos : pos + length] = np.arange(start, end)
+    for i in range(len(grouping)):
+        node = grouping[i]
+        length = lengths[i]
+        start = offsets[node]
+        for j in range(length):
+            result[pos + j] = start + j
         pos += length
-
-    return edge_inds
+    return result
 
 
 @mask_and_unmask

@@ -170,7 +170,7 @@ def _ufunc_to_downstream(
     river_network._mask[grouping] = False
 
 
-@numba.njit
+@numba.njit(numba.int64[:](numba.int64[:], numba.int64[:]))
 def get_edge_indices_numba(offsets, grouping):
     lengths = offsets[grouping + 1] - offsets[grouping]
     total_len = np.sum(lengths)

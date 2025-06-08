@@ -141,29 +141,32 @@ def _ufunc_to_downstream(
     None
 
     """
-    modifier_group = (
-        grouping if modifier_use_upstream else river_network.downstream_nodes[grouping]
-    )
-
+    river_network._mask[grouping] = True
+    edge_inds = np.flatnonzero(river_network._mask[river_network._sources])
+    upstream_inds = river_network._sources[edge_inds]
+    downstream_inds = river_network.edges[edge_inds]
+    modifier_group = upstream_inds if modifier_use_upstream else downstream_inds
     if additive_weight is None:
         if multiplicative_weight is None:
-            modifier_field = field[..., grouping]
-        else:
-            modifier_field = field[grouping] * multiplicative_weight[modifier_group]
-    else:
-        if multiplicative_weight is None:
-            modifier_field = field[grouping] + additive_weight[modifier_group]
+            modifier_field = field[..., upstream_inds]
         else:
             modifier_field = (
-                field[grouping] * multiplicative_weight[modifier_group]
+                field[upstream_inds] * multiplicative_weight[modifier_group]
+            )
+    else:
+        if multiplicative_weight is None:
+            modifier_field = field[upstream_inds] + additive_weight[modifier_group]
+        else:
+            modifier_field = (
+                field[upstream_inds] * multiplicative_weight[modifier_group]
                 + additive_weight[modifier_group]
             )
-
     ufunc.at(
         field,
-        (*[slice(None)] * (field.ndim - 1), river_network.downstream_nodes[grouping]),
+        (*[slice(None)] * (field.ndim - 1), downstream_inds),
         modifier_field,
     )
+    river_network._mask[grouping] = False
 
 
 @mask_and_unmask

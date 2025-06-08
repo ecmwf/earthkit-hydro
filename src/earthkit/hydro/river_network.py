@@ -129,6 +129,22 @@ def load(
         network.downstream_nodes = network.downstream_nodes.astype(np.uintp)
     if network.sinks.dtype != np.uintp:
         network.sinks = network.sinks.astype(np.uintp)
+
+    # ---
+    # TODO: remove before release
+    network.edges = network.downstream_nodes[
+        network.downstream_nodes != network.n_nodes
+    ]
+    counts = np.ones(network.n_nodes, dtype=int)
+    counts[network.downstream_nodes == network.n_nodes] = False
+    offsets = np.zeros(len(counts) + 1, dtype=int)
+    offsets[1:] = np.cumsum(counts)
+    sources = np.repeat(np.arange(len(offsets) - 1), offsets[1:] - offsets[:-1])
+    network.offsets = offsets
+    network._sources = sources
+    network._mask = np.zeros(network.n_nodes, dtype=bool)
+    # ---
+
     return network
 
 

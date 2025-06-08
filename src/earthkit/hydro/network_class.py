@@ -175,6 +175,17 @@ class RiverNetwork:
         """
         joblib.dump(self, fpath, compress=compression)
 
+    def __str__(self):
+        """Returns a string representation of the river network."""
+        return f""""
+            RiverNetwork with {self.n_nodes} nodes,
+            defined on a {self.mask.shape[0]}x{self.mask.shape[1]} grid.
+            """
+
+    def __repr__(self):
+        """Returns a string representation of the river network."""
+        return self.__str__()
+
     @mask_2d
     def create_subnetwork(self, mask, recompute=True):
         """Creates a subnetwork from the river network based on a mask.

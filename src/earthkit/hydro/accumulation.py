@@ -6,7 +6,6 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-import numba
 import numpy as np
 
 from .core import flow
@@ -143,7 +142,7 @@ def _ufunc_to_downstream(
 
     """
     river_network._mask[grouping] = True
-    edge_inds = get_edge_indices_numba(river_network.offsets, grouping)
+    edge_inds = get_edge_indices(river_network.offsets, grouping)
     upstream_inds = river_network._sources[edge_inds]
     downstream_inds = river_network.edges[edge_inds]
     modifier_group = upstream_inds if modifier_use_upstream else downstream_inds
@@ -170,20 +169,15 @@ def _ufunc_to_downstream(
     river_network._mask[grouping] = False
 
 
-@numba.njit(numba.int64[:](numba.int64[:], numba.int64[:]))
-def get_edge_indices_numba(offsets, grouping):
+def get_edge_indices(offsets, grouping):
     lengths = offsets[grouping + 1] - offsets[grouping]
-    total_len = np.sum(lengths)
-    result = np.empty(total_len, dtype=np.int64)
-    pos = 0
-    for i in range(len(grouping)):
-        node = grouping[i]
-        length = lengths[i]
-        start = offsets[node]
-        for j in range(length):
-            result[pos + j] = start + j
-        pos += length
-    return result
+    max_len = lengths.max()
+    starts = offsets[grouping][:, None]
+    ranges = np.arange(max_len)
+    edge_indices_2d = starts + ranges
+    mask = ranges < lengths[:, None]
+    flat_edge_indices = edge_indices_2d[mask]
+    return flat_edge_indices
 
 
 @mask_and_unmask

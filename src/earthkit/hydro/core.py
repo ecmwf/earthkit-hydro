@@ -31,12 +31,16 @@ def flow(river_network, field, invert_graph, operation, *args, **kwargs):
         The modified field after applying the operation along the river network.
 
     """
+    # TODO: possibly switch logic between whether edge group or node group
+    # dependening on if bifurcations or not
     if invert_graph:
-        groupings = river_network.topological_groups[:-1][
+        groupings = river_network.topological_groups_edges[:-1][
             ::-1
         ]  # go from sinks to sources
     else:
-        groupings = river_network.topological_groups[:-1]  # go from sources to sinks
+        groupings = river_network.topological_groups_edges[
+            :-1
+        ]  # go from sources to sinks
 
     for grouping in groupings:
         # modify field in_place with desired operation

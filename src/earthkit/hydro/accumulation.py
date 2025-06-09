@@ -141,10 +141,8 @@ def _ufunc_to_downstream(
     None
 
     """
-    river_network._mask[grouping] = True
-    edge_inds = get_edge_indices(river_network.offsets, grouping)
-    upstream_inds = river_network._sources[edge_inds]
-    downstream_inds = river_network.edges[edge_inds]
+    upstream_inds = river_network._sources[grouping]
+    downstream_inds = river_network.edges[grouping]
     modifier_group = upstream_inds if modifier_use_upstream else downstream_inds
     if additive_weight is None:
         if multiplicative_weight is None:
@@ -166,18 +164,6 @@ def _ufunc_to_downstream(
         (*[slice(None)] * (field.ndim - 1), downstream_inds),
         modifier_field,
     )
-    river_network._mask[grouping] = False
-
-
-def get_edge_indices(offsets, grouping):
-    lengths = offsets[grouping + 1] - offsets[grouping]
-    max_len = lengths.max()
-    starts = offsets[grouping][:, None]
-    ranges = np.arange(max_len)
-    edge_indices_2d = starts + ranges
-    mask = ranges < lengths[:, None]
-    flat_edge_indices = edge_indices_2d[mask]
-    return flat_edge_indices
 
 
 @mask_and_unmask

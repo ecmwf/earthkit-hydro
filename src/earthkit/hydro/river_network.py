@@ -132,6 +132,16 @@ def load(
 
     # ---
     # TODO: remove before release
+    def get_edge_indices(offsets, grouping):
+        lengths = offsets[grouping + 1] - offsets[grouping]
+        max_len = lengths.max()
+        starts = offsets[grouping][:, None]
+        ranges = np.arange(max_len)
+        edge_indices_2d = starts + ranges
+        mask = ranges < lengths[:, None]
+        flat_edge_indices = edge_indices_2d[mask]
+        return flat_edge_indices
+
     network.edges = network.downstream_nodes[
         network.downstream_nodes != network.n_nodes
     ]
@@ -142,7 +152,11 @@ def load(
     sources = np.repeat(np.arange(len(offsets) - 1), offsets[1:] - offsets[:-1])
     network.offsets = offsets
     network._sources = sources
-    network._mask = np.zeros(network.n_nodes, dtype=bool)
+    network.topological_groups_edges = []
+    for grouping in network.topological_groups:
+        network.topological_groups_edges.append(
+            get_edge_indices(network.offsets, grouping)
+        )
     # ---
 
     return network

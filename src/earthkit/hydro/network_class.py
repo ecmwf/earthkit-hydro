@@ -46,6 +46,7 @@ class RiverNetwork:
         sources=None,
         n_nodes=None,
         topological_labels=None,
+        shape=None,
         check_for_cycles=False,
     ) -> None:
         """Initialises the RiverNetwork with nodes, downstream nodes, and a
@@ -76,6 +77,7 @@ class RiverNetwork:
         del downstream
         self.mask = mask
         del mask
+        self.shape = shape if shape is not None else self.mask.shape
         self.sinks = (
             sinks
             if sinks is not None
@@ -97,10 +99,6 @@ class RiverNetwork:
         )
         del topological_labels
         self.topological_groups = self.topological_groups_from_labels()
-
-    @property
-    def shape(self):
-        return self.mask.shape
 
     def check_for_cycles(self):
         """Checks if the river network contains any cycles and raises an

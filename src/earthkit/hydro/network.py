@@ -211,12 +211,14 @@ class RiverNetwork:
         topological_labels[sinks] = self.n_nodes
         network = RiverNetwork(
             nodes,
+            np.where(domain_mask),
+            domain_mask.shape,
             downstream,
-            domain_mask,
             sinks=sinks,
             sources=sources,
             n_nodes=n_nodes,
             topological_labels=topological_labels,
+            mask=domain_mask,
         )
         del nodes, downstream, domain_mask, sinks, sources, n_nodes, topological_labels
         if recompute:
@@ -226,7 +228,12 @@ class RiverNetwork:
             topological_labels[network.sinks] = network.n_nodes
             network.topological_labels = topological_labels
             del topological_labels
-            network.topological_groups = network.topological_groups_from_labels()
+            topological_groups = network.topological_groups_from_labels()
+            network.topological_groups_edges = []
+            for grouping in topological_groups[:-1]:
+                network.topological_groups_edges.append(
+                    (grouping, network.downstream_nodes[grouping])
+                )
         return network
 
 

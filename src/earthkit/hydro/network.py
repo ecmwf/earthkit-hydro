@@ -83,9 +83,8 @@ class RiverNetwork:
             topological_groups = self.topological_groups_from_labels()
             self.topological_groups_edges = []
             for grouping in topological_groups[:-1]:
-                self.topological_groups_edges.append(
-                    (grouping, self.downstream_nodes[grouping])
-                )
+                self.topological_groups_edges.append(grouping)
+            self.get_up_down = self.get_up_down_no_bifurcations
         else:
             counts = np.bincount(up_ids, minlength=self.n_nodes)
             offsets = np.zeros(self.n_nodes + 1, dtype=int)
@@ -105,10 +104,19 @@ class RiverNetwork:
             )
             del topological_labels
             topological_groups = self.topological_groups_from_labels()
+            self.up_ids = up_ids
+            self.down_ids = down_ids
             self.topological_groups_edges = []
             for grouping in topological_groups[:-1]:
                 edges = get_edge_indices_numba(offsets, grouping)
-                self.topological_groups_edges.append((up_ids[edges], down_ids[edges]))
+                self.topological_groups_edges.append(edges)
+            self.get_up_down = self.get_up_down_bifurcations
+
+    def get_up_down_bifurcations(self, grouping):
+        return self.up_ids[grouping], self.down_ids[grouping]
+
+    def get_up_down_no_bifurcations(self, grouping):
+        return grouping, self.downstream_nodes[grouping]
 
     @property
     def mask(self):

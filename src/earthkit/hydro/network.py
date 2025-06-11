@@ -114,7 +114,7 @@ class RiverNetwork:
     def mask(self):
         if self._mask is None:
             raise ValueError(
-                "RiverNetwork is not raster-based and does not have a mask."
+                "This RiverNetwork is not raster-based and does not have a mask."
             )
         return self._mask
 

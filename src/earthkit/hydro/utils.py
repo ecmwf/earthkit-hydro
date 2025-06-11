@@ -316,7 +316,7 @@ def points_to_1d_indices(river_network, stations):
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network_class.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         The RiverNetwork instance calling the method.
     stations : tuple
         Tuple of numpy arrays defining the points.

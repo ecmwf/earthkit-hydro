@@ -30,7 +30,7 @@ def flow_downstream(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network_class.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.
@@ -119,7 +119,7 @@ def _ufunc_to_downstream(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network_class.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.
@@ -182,7 +182,7 @@ def flow_upstream(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network_class.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.
@@ -270,7 +270,7 @@ def _ufunc_to_upstream(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network_class.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.
@@ -330,7 +330,7 @@ def calculate_online_metric(
 
     Parameters
     ----------
-    river_network : earthkit.hydro.network_class.RiverNetwork
+    river_network : earthkit.hydro.network.RiverNetwork
         An earthkit-hydro river network object.
     field : numpy.ndarray
         The input field.

@@ -129,8 +129,8 @@ def find(river_network, field, mv=0, in_place=False):
     else:
         op = _find_catchments_ND
 
-    def operation(river_network, field, grouping, mv):
-        return op(river_network, field, grouping, mv, overwrite=True)
+    def operation(river_network, field, up_ids, down_ids, mv):
+        return op(river_network, field, up_ids, down_ids, mv, overwrite=True)
 
     return flow(river_network, field, True, operation, mv)
 
@@ -142,7 +142,7 @@ for metric in metrics_dict.keys():
     globals()[metric] = func
 
 
-def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
+def _find_catchments_2D(river_network, field, grouping, down_ids, mv, overwrite):
     """Updates field in-place with the value of its downstream nodes, dealing
     with missing values for 2D fields.
 
@@ -172,7 +172,7 @@ def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
     field[..., valid_group] = field[..., river_network.downstream_nodes[valid_group]]
 
 
-def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
+def _find_catchments_ND(river_network, field, grouping, down_ids, mv, overwrite):
     """Updates field in-place with the value of its downstream nodes, dealing
     with missing values for ND fields.
 

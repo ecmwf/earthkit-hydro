@@ -34,7 +34,7 @@ def flow(river_network, field, invert_graph, operation, *args, **kwargs):
     # TODO: possibly switch logic between whether edge group or node group
     # dependening on if bifurcations or not
     if invert_graph:
-        groupings = river_network.topological_groups_edges[:-1][
+        groupings = river_network.topological_groups_edges[
             ::-1
         ]  # go from sinks to sources
     else:
@@ -42,10 +42,10 @@ def flow(river_network, field, invert_graph, operation, *args, **kwargs):
             :-1
         ]  # go from sources to sinks
 
-    for grouping in groupings:
+    for up_ids, down_ids in groupings:
         # modify field in_place with desired operation
         # NB: this function needs to handle missing values
         # mv if they are allowed in input
-        operation(river_network, field, grouping, *args, **kwargs)
+        operation(river_network, field, up_ids, down_ids, *args, **kwargs)
 
     return field

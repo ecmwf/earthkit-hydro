@@ -70,7 +70,8 @@ def flow_downstream(
     def operation(
         river_network,
         field,
-        grouping,
+        up_ids,
+        down_ids,
         mv,
         additive_weight,
         multiplicative_weight,
@@ -79,7 +80,8 @@ def flow_downstream(
         return op(
             river_network,
             field,
-            grouping,
+            up_ids,
+            down_ids,
             mv,
             additive_weight,
             multiplicative_weight,
@@ -104,7 +106,8 @@ def flow_downstream(
 def _ufunc_to_downstream(
     river_network,
     field,
-    grouping,
+    up_ids,
+    down_ids,
     mv,
     additive_weight,
     multiplicative_weight,
@@ -141,27 +144,23 @@ def _ufunc_to_downstream(
     None
 
     """
-    upstream_inds = river_network._sources[grouping]
-    downstream_inds = river_network.edges[grouping]
-    modifier_group = upstream_inds if modifier_use_upstream else downstream_inds
+    modifier_group = up_ids if modifier_use_upstream else down_ids
     if additive_weight is None:
         if multiplicative_weight is None:
-            modifier_field = field[..., upstream_inds]
+            modifier_field = field[..., up_ids]
         else:
-            modifier_field = (
-                field[upstream_inds] * multiplicative_weight[modifier_group]
-            )
+            modifier_field = field[up_ids] * multiplicative_weight[modifier_group]
     else:
         if multiplicative_weight is None:
-            modifier_field = field[upstream_inds] + additive_weight[modifier_group]
+            modifier_field = field[up_ids] + additive_weight[modifier_group]
         else:
             modifier_field = (
-                field[upstream_inds] * multiplicative_weight[modifier_group]
+                field[up_ids] * multiplicative_weight[modifier_group]
                 + additive_weight[modifier_group]
             )
     ufunc.at(
         field,
-        (*[slice(None)] * (field.ndim - 1), downstream_inds),
+        (*[slice(None)] * (field.ndim - 1), down_ids),
         modifier_field,
     )
 
@@ -222,7 +221,8 @@ def flow_upstream(
     def operation(
         river_network,
         field,
-        grouping,
+        up_ids,
+        down_ids,
         mv,
         additive_weight,
         multiplicative_weight,
@@ -231,7 +231,8 @@ def flow_upstream(
         return op(
             river_network,
             field,
-            grouping,
+            up_ids,
+            down_ids,
             mv,
             additive_weight,
             multiplicative_weight,
@@ -256,7 +257,8 @@ def flow_upstream(
 def _ufunc_to_upstream(
     river_network,
     field,
-    grouping,
+    up_ids,
+    down_ids,
     mv,
     additive_weight,
     multiplicative_weight,
@@ -293,10 +295,8 @@ def _ufunc_to_upstream(
     None
 
     """
-    down_group = river_network.downstream_nodes[grouping]
-    modifier_group = (
-        grouping if modifier_use_upstream else river_network.downstream_nodes[grouping]
-    )
+    down_group = down_ids
+    modifier_group = up_ids if modifier_use_upstream else down_ids
     if additive_weight is None:
         if multiplicative_weight is None:
             modifier_field = field[..., down_group]
@@ -317,7 +317,7 @@ def _ufunc_to_upstream(
 
     ufunc.at(
         field,
-        (*[slice(None)] * (field.ndim - 1), grouping),
+        (*[slice(None)] * (field.ndim - 1), up_ids),
         modifier_field,
     )
 

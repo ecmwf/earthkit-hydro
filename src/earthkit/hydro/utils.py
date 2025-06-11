@@ -191,8 +191,7 @@ def mask_2d(func):
         args = tuple(
             (
                 arg[..., river_network.mask]
-                if isinstance(arg, np.ndarray)
-                and arg.shape[-2:] == river_network.mask.shape
+                if isinstance(arg, np.ndarray) and arg.shape[-2:] == river_network.shape
                 else arg if isinstance(arg, np.ndarray) else arg
             )
             for arg in args
@@ -202,7 +201,7 @@ def mask_2d(func):
             key: (
                 value[..., river_network.mask]
                 if isinstance(value, np.ndarray)
-                and value.shape[-2:] == river_network.mask.shape
+                and value.shape[-2:] == river_network.shape
                 else value if isinstance(value, np.ndarray) else value
             )
             for key, value in kwargs.items()
@@ -261,7 +260,7 @@ def mask_and_unmask(func):
         # otherwise takes default value of mv from func
         mv = kwargs.get("mv")
         mv = mv if mv is not None else func.__defaults__[0]
-        if field.shape[-2:] == river_network.mask.shape:
+        if field.shape[-2:] == river_network.shape:
             in_place = kwargs.get("in_place", False)
 
             values_on_river_network = mask_2d(func)(
@@ -332,5 +331,5 @@ def points_to_1d_indices(river_network, stations):
     if np.any(~valid_stations):
         raise ValueError("Not all points are present on the river network.")
     stations = tuple(station_index[valid_stations] for station_index in stations)
-    stations_1d = node_numbers.reshape(river_network.mask.shape)[stations]
+    stations_1d = node_numbers.reshape(river_network.shape)[stations]
     return stations_1d

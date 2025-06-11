@@ -14,7 +14,7 @@ import joblib
 import numpy as np
 
 from ._version import __version__ as ekh_version
-from .network_class import RiverNetwork
+from .network import RiverNetwork
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90 -> 0.1
@@ -343,4 +343,50 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     downstream = np.full(n_nodes, n_nodes, dtype=np.uintp)
     downstream[upstream_nodes] = downstream_nodes
     del downstream_nodes, upstream_nodes, n_nodes
-    return RiverNetwork(nodes, downstream, missing_mask.reshape(shape))
+    return RiverNetwork(
+        nodes,
+        np.where(missing_mask.reshape(shape)),
+        shape,
+        downstream,
+        mask=missing_mask.reshape(shape),
+    )
+
+
+def from_grit(path):
+    import geopandas as gpd
+    import numpy as np
+    import pandas as pd
+
+    gdf = gpd.read_file(path, layer="nodes")
+    gdf["x"] = gdf.geometry.x
+    gdf["y"] = gdf.geometry.y
+    x_spacing = pd.Series(np.diff(np.sort(gdf["x"].unique()))).mode().iloc[0]
+    y_spacing = pd.Series(np.diff(np.sort(gdf["y"].unique()))).mode().iloc[0]
+    print(f"Estimated grid spacing: dx={x_spacing}, dy={y_spacing}")
+    x_origin = gdf["x"].min()
+    y_origin = gdf["y"].min()
+    gdf["grid_col"] = ((gdf["x"] - x_origin) // x_spacing).astype(int)
+    gdf["grid_row"] = ((gdf["y"] - y_origin) // y_spacing).astype(int)
+    n_cols = gdf["grid_col"].max() + 1
+    gdf["flat_index"] = gdf["grid_row"] * n_cols + gdf["grid_col"]
+    gdf.sort_values(by=["flat_index"], inplace=True)
+    gdf.reset_index(inplace=True)
+    rows = gdf["grid_row"].to_numpy()
+    cols = gdf["grid_col"].to_numpy()
+    grid_ids = (rows[::-1], cols)
+
+    lines = gpd.read_file(path, layer="lines")
+    ref = gdf["global_id"]
+    value_to_index = pd.Series(ref.index, index=ref).to_dict()
+    lines["UPID"] = lines["upstream_node_id"].map(value_to_index)
+    lines["DOWNID"] = lines["downstream_node_id"].map(value_to_index)
+    lines.sort_values(by=["UPID"], inplace=True)
+    up_nodes = lines["UPID"].to_numpy()
+    down_nodes = lines["DOWNID"].to_numpy()
+    nodes = ref.index.values
+
+    shape = rows.max() + 1, cols.max() + 1
+
+    return RiverNetwork(
+        nodes, grid_ids, shape, down_nodes, up_nodes, has_bifurcations=True
+    )

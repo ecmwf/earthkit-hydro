@@ -18,103 +18,99 @@ class RiverNetwork:
 
     Attributes
     ----------
-    nodes : numpy.ndarray
-        Array containing the node ids of the river network.
-    n_nodes : int
-        The number of nodes in the river network.
-    downstream_nodes : numpy.ndarray
-        Array of downstream node ids corresponding to each node.
-    mask : numpy.ndarray
-        A boolean mask converting from the domain to the river network.
-    sinks : numpy.ndarray
-        Nodes with no downstream connections.
-    sources : numpy.ndarray
-        Nodes with no upstream connections.
-    topological_labels : numpy.ndarray
-        A topological group label for each node.
-    topological_groups : list of numpy.ndarray
-        Groups of nodes sorted in topological order.
+
 
     """
 
     def __init__(
         self,
         nodes,
-        downstream,
-        mask,
+        grid_ids,
+        shape,
+        down_ids,
+        up_ids=None,
+        has_bifurcations=False,
+        mask=None,
         sinks=None,
         sources=None,
         n_nodes=None,
         topological_labels=None,
-        shape=None,
-        check_for_cycles=False,
     ) -> None:
         """Initialises the RiverNetwork with nodes, downstream nodes, and a
         mask.
 
         Parameters
         ----------
-        nodes : numpy.ndarray
-            Array containing the node ids of the river network.
-        downstream : numpy.ndarray
-            Array of downstream node ids corresponding to each node.
-        mask : numpy.ndarray
-            A mask converting from the domain to the river network.
-        sinks : numpy.ndarray, optional
-            Array of sinks of the river network.
-        sources :  numpy.ndarray, optional
-            Array of sources of the river network.
-        topological_labels : numpy.ndarray, optional
-            Array of precomputed topological distance labels.
-        check_for_cycles : bool, optional
-            Whether to check for cycles when instantiating the river network.
 
         """
+        assert (up_ids is None) == (has_bifurcations is False)
+
         self.nodes = nodes
         del nodes
         self.n_nodes = len(self.nodes) if n_nodes is None else n_nodes
-        self.downstream_nodes = downstream
-        del downstream
         self.mask = mask
         del mask
         self.shape = shape if shape is not None else self.mask.shape
-        self.sinks = (
-            sinks
-            if sinks is not None
-            else self.nodes[self.downstream_nodes == self.n_nodes]
-        )  # nodes with no downstreams
-        del sinks
-        self.sources = (
-            sources
-            if sources is not None
-            else _get_sources(self.nodes, self.downstream_nodes, self.n_nodes)
-        )  # nodes with no upstreams
-        del sources
-        if check_for_cycles:
-            self.check_for_cycles()
-        self.topological_labels = (
-            topological_labels
-            if topological_labels is not None
-            else self.compute_topological_labels()
-        )
-        del topological_labels
-        self.topological_groups = self.topological_groups_from_labels()
+        del shape
+        self.grid_ids = grid_ids
+        del grid_ids
+        self.has_bifurcations = has_bifurcations
+        del has_bifurcations
 
-    def check_for_cycles(self):
-        """Checks if the river network contains any cycles and raises an
-        Exception if it does.
-        """
-        nodes = self.downstream_nodes.copy()
-        while True:
-            if np.any(nodes == self.nodes):
-                Exception("River Network contains a cycle.")
-            elif np.all(nodes == self.n_nodes):
-                break
-            not_sinks = nodes != self.n_nodes
-            nodes[not_sinks] = self.downstream_nodes[nodes[not_sinks]].copy()
-        print("No cycles found in the river network.")
+        if not self.has_bifurcations:
+            self.downstream_nodes = down_ids
+            del down_ids
 
-    def compute_topological_labels(self):
+            self.sinks = (
+                sinks
+                if sinks is not None
+                else self.nodes[self.downstream_nodes == self.n_nodes]
+            )  # nodes with no downstreams
+            del sinks
+            self.sources = (
+                sources
+                if sources is not None
+                else _get_sources(self.nodes, self.downstream_nodes, self.n_nodes)
+            )  # nodes with no upstreams
+            del sources
+
+            self.topological_labels = (
+                topological_labels
+                if topological_labels is not None
+                else self.compute_topological_labels_no_bifurcations()
+            )
+            del topological_labels
+            topological_groups = self.topological_groups_from_labels()
+            self.topological_groups_edges = []
+            for grouping in topological_groups[:-1]:
+                self.topological_groups_edges.append(
+                    (grouping, self.downstream_nodes[grouping])
+                )
+        else:
+            counts = np.bincount(up_ids, minlength=self.n_nodes)
+            offsets = np.zeros(self.n_nodes + 1, dtype=int)
+            offsets[1:] = np.cumsum(counts)
+            del counts
+            has_incoming = np.isin(self.nodes, down_ids)
+            self.sources = self.nodes[~has_incoming]
+            del has_incoming
+            self.sinks = np.where(offsets[1:] == offsets[:-1])[0]
+            from .network_utils import (
+                compute_topological_labels_bifurcations,
+                get_edge_indices_numba,
+            )
+
+            self.topological_labels = compute_topological_labels_bifurcations(
+                down_ids, offsets, self.sources, self.sinks
+            )
+            del topological_labels
+            topological_groups = self.topological_groups_from_labels()
+            self.topological_groups_edges = []
+            for grouping in topological_groups[:-1]:
+                edges = get_edge_indices_numba(offsets, grouping)
+                self.topological_groups_edges.append((up_ids[edges], down_ids[edges]))
+
+    def compute_topological_labels_no_bifurcations(self):
         """Finds the topological distance labels for each node in the river
         network.
 
@@ -203,6 +199,7 @@ class RiverNetwork:
 
         """
 
+        assert not self.has_bifurcations
         domain_mask, river_network_mask = _find_new_masks(self.mask, mask)
 
         nodes, downstream, n_nodes, sinks, sources = _find_subnetwork_inputs(

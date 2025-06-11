@@ -117,8 +117,8 @@ def find(river_network, field, mv=0, in_place=False):
     else:
         op = _find_catchments_ND
 
-    def operation(river_network, field, grouping, mv):
-        return op(river_network, field, grouping, mv, overwrite=False)
+    def operation(river_network, field, grouping, down_ids, mv):
+        return op(river_network, field, grouping, down_ids, mv, overwrite=False)
 
     return flow(river_network, field, True, operation, mv)
 

@@ -19,6 +19,7 @@ from .readers import (
     find_main_var,
     from_cama_nextxy,
     from_d8,
+    from_grit,
     import_earthkit_or_prompt_install,
 )
 
@@ -80,6 +81,9 @@ def create(path, river_network_format, source):
             var_name = find_main_var(data)
             data = data[var_name].values
         return from_d8(data, river_network_format=river_network_format)
+    elif river_network_format == "grit":
+        assert path.endswith(".gpkg")
+        return from_grit(path)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
 
@@ -129,35 +133,6 @@ def load(
         network.downstream_nodes = network.downstream_nodes.astype(np.uintp)
     if network.sinks.dtype != np.uintp:
         network.sinks = network.sinks.astype(np.uintp)
-
-    # ---
-    # TODO: remove before release
-    def get_edge_indices(offsets, grouping):
-        lengths = offsets[grouping + 1] - offsets[grouping]
-        max_len = lengths.max()
-        starts = offsets[grouping][:, None]
-        ranges = np.arange(max_len)
-        edge_indices_2d = starts + ranges
-        mask = ranges < lengths[:, None]
-        flat_edge_indices = edge_indices_2d[mask]
-        return flat_edge_indices
-
-    network.edges = network.downstream_nodes[
-        network.downstream_nodes != network.n_nodes
-    ]
-    counts = np.ones(network.n_nodes, dtype=int)
-    counts[network.downstream_nodes == network.n_nodes] = False
-    offsets = np.zeros(len(counts) + 1, dtype=int)
-    offsets[1:] = np.cumsum(counts)
-    sources = np.repeat(np.arange(len(offsets) - 1), offsets[1:] - offsets[:-1])
-    network.offsets = offsets
-    network._sources = sources
-    network.topological_groups_edges = []
-    for grouping in network.topological_groups:
-        network.topological_groups_edges.append(
-            get_edge_indices(network.offsets, grouping)
-        )
-    # ---
 
     return network
 

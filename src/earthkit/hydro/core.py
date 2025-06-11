@@ -38,9 +38,7 @@ def flow(river_network, field, invert_graph, operation, *args, **kwargs):
             ::-1
         ]  # go from sinks to sources
     else:
-        groupings = river_network.topological_groups_edges[
-            :-1
-        ]  # go from sources to sinks
+        groupings = river_network.topological_groups_edges
 
     for up_ids, down_ids in groupings:
         # modify field in_place with desired operation

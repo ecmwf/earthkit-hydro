@@ -48,7 +48,7 @@ class RiverNetwork:
         self.nodes = nodes
         del nodes
         self.n_nodes = len(self.nodes) if n_nodes is None else n_nodes
-        self.mask = mask
+        self._mask = mask
         del mask
         self.shape = shape if shape is not None else self.mask.shape
         del shape
@@ -109,6 +109,14 @@ class RiverNetwork:
             for grouping in topological_groups[:-1]:
                 edges = get_edge_indices_numba(offsets, grouping)
                 self.topological_groups_edges.append((up_ids[edges], down_ids[edges]))
+
+    @property
+    def mask(self):
+        if self._mask is None:
+            raise ValueError(
+                "RiverNetwork is not raster-based and does not have a mask."
+            )
+        return self._mask
 
     def compute_topological_labels_no_bifurcations(self):
         """Finds the topological distance labels for each node in the river

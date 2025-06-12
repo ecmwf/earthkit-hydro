@@ -10,6 +10,17 @@ import joblib
 import numpy as np
 
 from .distance import to_source as distance_to_source
+from .network_utils import (
+    _find_new_masks,
+    _find_subnetwork_inputs,
+    compute_topological_labels_bifurcations,
+    get_edge_indices_numba,
+    get_offsets,
+    get_sinks_bifurcations,
+    get_sinks_no_bifurcations,
+    get_sources_bifurcations,
+    get_sources_no_bifurcations,
+)
 from .utils import mask_2d
 
 
@@ -47,10 +58,10 @@ class RiverNetwork:
 
         self.nodes = nodes
         del nodes
-        self.n_nodes = len(self.nodes) if n_nodes is None else n_nodes
+        self.n_nodes = self.get_n_nodes(n_nodes)
         self._mask = mask
         del mask
-        self.shape = shape if shape is not None else self.mask.shape
+        self.shape = self.get_shape(shape)
         del shape
         self.grid_ids = grid_ids
         del grid_ids
@@ -60,57 +71,53 @@ class RiverNetwork:
         if not self.has_bifurcations:
             self.downstream_nodes = down_ids
             del down_ids
-
-            self.sinks = (
-                sinks
-                if sinks is not None
-                else self.nodes[self.downstream_nodes == self.n_nodes]
-            )  # nodes with no downstreams
-            del sinks
-            self.sources = (
-                sources
-                if sources is not None
-                else _get_sources(self.nodes, self.downstream_nodes, self.n_nodes)
-            )  # nodes with no upstreams
+            self.sources = get_sources_no_bifurcations(
+                sources, self.nodes, self.downstream_nodes, self.n_nodes
+            )
             del sources
-
+            self.sinks = get_sinks_no_bifurcations(
+                sinks, self.nodes, self.downstream_nodes, self.n_nodes
+            )
+            del sinks
             self.topological_labels = (
                 topological_labels
                 if topological_labels is not None
                 else self.compute_topological_labels_no_bifurcations()
             )
             del topological_labels
-            topological_groups = self.topological_groups_from_labels()
-            self.topological_groups_edges = []
-            for grouping in topological_groups[:-1]:
-                self.topological_groups_edges.append(grouping)
             self.get_up_down = self.get_up_down_no_bifurcations
-        else:
-            counts = np.bincount(up_ids, minlength=self.n_nodes)
-            offsets = np.zeros(self.n_nodes + 1, dtype=int)
-            offsets[1:] = np.cumsum(counts)
-            del counts
-            has_incoming = np.isin(self.nodes, down_ids)
-            self.sources = self.nodes[~has_incoming]
-            del has_incoming
-            self.sinks = np.where(offsets[1:] == offsets[:-1])[0]
-            from .network_utils import (
-                compute_topological_labels_bifurcations,
-                get_edge_indices_numba,
-            )
 
-            self.topological_labels = compute_topological_labels_bifurcations(
-                down_ids, offsets, self.sources, self.sinks
+            def get_group(grouping):
+                return grouping
+
+        else:
+            self.up_ids = up_ids
+            del up_ids
+            self.down_ids = down_ids
+            del down_ids
+            offsets = get_offsets(self.up_ids, self.n_nodes)
+            self.sources = get_sources_bifurcations(sources, self.nodes, self.down_ids)
+            del sources
+            self.sinks = get_sinks_bifurcations(sinks, offsets)
+            del sinks
+            self.topological_labels = (
+                topological_labels
+                if topological_labels is not None
+                else compute_topological_labels_bifurcations(
+                    down_ids, offsets, self.sources, self.sinks
+                )
             )
             del topological_labels
-            topological_groups = self.topological_groups_from_labels()
-            self.up_ids = up_ids
-            self.down_ids = down_ids
-            self.topological_groups_edges = []
-            for grouping in topological_groups[:-1]:
-                edges = get_edge_indices_numba(offsets, grouping)
-                self.topological_groups_edges.append(edges)
             self.get_up_down = self.get_up_down_bifurcations
+
+            def get_group(grouping):
+                return get_edge_indices_numba(offsets, grouping)
+
+        topological_groups = self.topological_groups_from_labels()
+        self.topological_groups_edges = []
+        for grouping in topological_groups[:-1]:
+            edges = get_group(grouping)
+            self.topological_groups_edges.append(edges)
 
     def get_up_down_bifurcations(self, grouping):
         return self.up_ids[grouping], self.down_ids[grouping]
@@ -125,6 +132,23 @@ class RiverNetwork:
                 "This RiverNetwork is not raster-based and does not have a mask."
             )
         return self._mask
+
+    def get_shape(self, shape):
+        return shape if shape is not None else self.mask.shape
+
+    def get_n_nodes(self, n_nodes):
+        return n_nodes if n_nodes is not None else len(self.nodes)
+
+    def __str__(self):
+        """Returns a string representation of the river network."""
+        return f""""
+            RiverNetwork with {self.n_nodes} nodes,
+            defined on a {self.shape[0]}x{self.shape[1]} grid.
+            """
+
+    def __repr__(self):
+        """Returns a string representation of the river network."""
+        return self.__str__()
 
     def compute_topological_labels_no_bifurcations(self):
         """Finds the topological distance labels for each node in the river
@@ -185,17 +209,6 @@ class RiverNetwork:
         """
         joblib.dump(self, fpath, compress=compression)
 
-    def __str__(self):
-        """Returns a string representation of the river network."""
-        return f""""
-            RiverNetwork with {self.n_nodes} nodes,
-            defined on a {self.mask.shape[0]}x{self.mask.shape[1]} grid.
-            """
-
-    def __repr__(self):
-        """Returns a string representation of the river network."""
-        return self.__str__()
-
     @mask_2d
     def create_subnetwork(self, mask, recompute=True):
         """Creates a subnetwork from the river network based on a mask.
@@ -247,67 +260,5 @@ class RiverNetwork:
             topological_groups = network.topological_groups_from_labels()
             network.topological_groups_edges = []
             for grouping in topological_groups[:-1]:
-                network.topological_groups_edges.append(
-                    (grouping, network.downstream_nodes[grouping])
-                )
+                network.topological_groups_edges.append(grouping)
         return network
-
-
-def _get_sources(nodes, downstream_nodes, n_nodes):
-    """Identifies the source nodes in the river network (nodes with no
-    upstream nodes).
-
-    Returns
-    -------
-    numpy.ndarray
-        Array of source nodes.
-
-    """
-    tmp_nodes = nodes.copy()
-    downstream_no_sinks = downstream_nodes[
-        downstream_nodes != n_nodes
-    ]  # get all downstream nodes
-    tmp_nodes[downstream_no_sinks] = (
-        n_nodes + 1
-    )  # downstream nodes that aren't sinks = -1
-    inlets = tmp_nodes[
-        tmp_nodes != n_nodes + 1
-    ]  # sources are nodes that are not downstream nodes
-    return inlets
-
-
-def _find_new_masks(original_mask, mask):
-    if mask.ndim == 1:
-        river_network_mask = mask
-        valid_indices = np.where(original_mask)
-        new_valid_indices = (
-            valid_indices[0][river_network_mask],
-            valid_indices[1][river_network_mask],
-        )
-        domain_mask = np.full(original_mask.shape, False)
-        domain_mask[new_valid_indices] = True
-    else:
-        domain_mask = mask & original_mask
-        river_network_mask = domain_mask[original_mask]
-
-    return domain_mask, river_network_mask
-
-
-def _find_subnetwork_inputs(
-    river_network_mask, original_downstream_nodes, original_n_nodes
-):
-    downstream_indices = original_downstream_nodes[river_network_mask]
-    n_nodes = len(downstream_indices)  # number of nodes in the subnetwork
-    # create new array of network nodes, setting all nodes not in mask to n_nodes
-    subnetwork_nodes = np.full(original_n_nodes, n_nodes)
-    subnetwork_nodes[river_network_mask] = np.arange(n_nodes)
-    # get downstream nodes in the subnetwork
-    non_sinks = downstream_indices != original_n_nodes
-    downstream = np.full(n_nodes, n_nodes, dtype=np.uintp)
-    downstream[non_sinks] = subnetwork_nodes[downstream_indices[non_sinks]]
-    nodes = np.arange(n_nodes, dtype=np.uintp)
-
-    sinks = nodes[downstream == n_nodes]
-    sources = _get_sources(nodes, downstream, n_nodes)
-
-    return nodes, downstream, n_nodes, sinks, sources

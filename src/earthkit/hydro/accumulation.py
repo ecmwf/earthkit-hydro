@@ -149,13 +149,13 @@ def _ufunc_to_downstream(
         if multiplicative_weight is None:
             modifier_field = field[..., up_ids]
         else:
-            modifier_field = field[up_ids] * multiplicative_weight[modifier_group]
+            modifier_field = field[..., up_ids] * multiplicative_weight[modifier_group]
     else:
         if multiplicative_weight is None:
-            modifier_field = field[up_ids] + additive_weight[modifier_group]
+            modifier_field = field[..., up_ids] + additive_weight[modifier_group]
         else:
             modifier_field = (
-                field[up_ids] * multiplicative_weight[modifier_group]
+                field[..., up_ids] * multiplicative_weight[modifier_group]
                 + additive_weight[modifier_group]
             )
     ufunc.at(

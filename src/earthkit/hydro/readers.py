@@ -374,17 +374,16 @@ def from_grit(path):
     rows = gdf["grid_row"].to_numpy()
     cols = gdf["grid_col"].to_numpy()
     grid_ids = (rows[::-1], cols)
-
-    lines = gpd.read_file(path, layer="lines")
     ref = gdf["global_id"]
     value_to_index = pd.Series(ref.index, index=ref).to_dict()
+
+    lines = gpd.read_file(path, layer="lines")
     lines["UPID"] = lines["upstream_node_id"].map(value_to_index)
     lines["DOWNID"] = lines["downstream_node_id"].map(value_to_index)
     lines.sort_values(by=["UPID"], inplace=True)
     up_nodes = lines["UPID"].to_numpy()
     down_nodes = lines["DOWNID"].to_numpy()
     nodes = ref.index.values
-
     shape = rows.max() + 1, cols.max() + 1
 
     return RiverNetwork(

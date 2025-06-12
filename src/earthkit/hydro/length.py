@@ -67,8 +67,8 @@ def min(
             field,
             mv,
             ufunc=np.minimum,
-            additive_weight=weights,
-            modifier_use_upstream=False,
+            node_additive_weight=weights,
+            node_modifier_use_upstream=False,
         )
     if upstream:
         field = flow_upstream(
@@ -76,8 +76,8 @@ def min(
             field,
             mv,
             ufunc=np.minimum,
-            additive_weight=weights,
-            modifier_use_upstream=True,
+            node_additive_weight=weights,
+            node_modifier_use_upstream=True,
         )
 
     out_field = np.empty(river_network.shape, dtype=field.dtype)
@@ -153,8 +153,8 @@ def max(
             field,
             mv,
             ufunc=np.maximum,
-            additive_weight=weights,
-            modifier_use_upstream=False,
+            node_additive_weight=weights,
+            node_modifier_use_upstream=False,
         )
     if upstream:
         field = flow_upstream(
@@ -162,8 +162,8 @@ def max(
             field,
             mv,
             ufunc=np.maximum,
-            additive_weight=weights,
-            modifier_use_upstream=True,
+            node_additive_weight=weights,
+            node_modifier_use_upstream=True,
         )
 
     field = np.nan_to_num(field, neginf=np.inf)

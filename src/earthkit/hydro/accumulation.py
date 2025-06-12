@@ -22,9 +22,11 @@ def flow_downstream(
     ufunc=np.add,
     accept_missing=False,
     skip_missing_check=False,
-    additive_weight=None,
-    multiplicative_weight=None,
-    modifier_use_upstream=True,
+    node_additive_weight=None,
+    node_multiplicative_weight=None,
+    node_modifier_use_upstream=True,
+    edge_additive_weight=None,
+    edge_multiplicative_weight=None,
 ):
     """Accumulates field values downstream.
 
@@ -70,22 +72,24 @@ def flow_downstream(
     def operation(
         river_network,
         field,
-        up_ids,
-        down_ids,
+        grouping,
         mv,
-        additive_weight,
-        multiplicative_weight,
-        modifier_use_upstream,
+        node_additive_weight,
+        node_multiplicative_weight,
+        node_modifier_use_upstream,
+        edge_additive_weight,
+        edge_multiplicative_weight,
     ):
         return op(
             river_network,
             field,
-            up_ids,
-            down_ids,
+            grouping,
             mv,
-            additive_weight,
-            multiplicative_weight,
-            modifier_use_upstream,
+            node_additive_weight,
+            node_multiplicative_weight,
+            node_modifier_use_upstream,
+            edge_additive_weight,
+            edge_multiplicative_weight,
             ufunc=ufunc,
         )
 
@@ -95,9 +99,11 @@ def flow_downstream(
         False,
         operation,
         mv,
-        additive_weight,
-        multiplicative_weight,
-        modifier_use_upstream,
+        node_additive_weight,
+        node_multiplicative_weight,
+        node_modifier_use_upstream,
+        edge_additive_weight,
+        edge_multiplicative_weight,
     )
 
     return nan_to_missing(field, field_dtype, mv)
@@ -106,12 +112,13 @@ def flow_downstream(
 def _ufunc_to_downstream(
     river_network,
     field,
-    up_ids,
-    down_ids,
+    grouping,
     mv,
-    additive_weight,
-    multiplicative_weight,
-    modifier_use_upstream,
+    node_additive_weight,
+    node_multiplicative_weight,
+    node_modifier_use_upstream,
+    edge_additive_weight,
+    edge_multiplicative_weight,
     ufunc,
 ):
     """Updates field in-place by applying a ufunc at the downstream nodes of
@@ -144,20 +151,19 @@ def _ufunc_to_downstream(
     None
 
     """
-    modifier_group = up_ids if modifier_use_upstream else down_ids
-    if additive_weight is None:
-        if multiplicative_weight is None:
-            modifier_field = field[..., up_ids]
-        else:
-            modifier_field = field[..., up_ids] * multiplicative_weight[modifier_group]
-    else:
-        if multiplicative_weight is None:
-            modifier_field = field[..., up_ids] + additive_weight[modifier_group]
-        else:
-            modifier_field = (
-                field[..., up_ids] * multiplicative_weight[modifier_group]
-                + additive_weight[modifier_group]
-            )
+    up_ids, down_ids = river_network.get_up_down(grouping)
+    modifier_group = up_ids if node_modifier_use_upstream else down_ids
+
+    modifier_field = field[..., up_ids]
+    if node_multiplicative_weight is not None:
+        modifier_field *= node_multiplicative_weight[modifier_group]
+    if edge_multiplicative_weight is not None:
+        modifier_field *= edge_multiplicative_weight[grouping]
+    if node_additive_weight is not None:
+        modifier_field += node_additive_weight[modifier_group]
+    if edge_additive_weight is not None:
+        modifier_field += edge_additive_weight[grouping]
+
     ufunc.at(
         field,
         (*[slice(None)] * (field.ndim - 1), down_ids),
@@ -174,9 +180,11 @@ def flow_upstream(
     ufunc=np.add,
     accept_missing=False,
     skip_missing_check=False,
-    additive_weight=None,
-    multiplicative_weight=None,
-    modifier_use_upstream=True,
+    node_additive_weight=None,
+    node_multiplicative_weight=None,
+    node_modifier_use_upstream=True,
+    edge_additive_weight=None,
+    edge_multiplicative_weight=None,
 ):
     """Accumulates field values upstream.
 
@@ -221,22 +229,24 @@ def flow_upstream(
     def operation(
         river_network,
         field,
-        up_ids,
-        down_ids,
+        grouping,
         mv,
-        additive_weight,
-        multiplicative_weight,
-        modifier_use_upstream,
+        node_additive_weight,
+        node_multiplicative_weight,
+        node_modifier_use_upstream,
+        edge_additive_weight,
+        edge_multiplicative_weight,
     ):
         return op(
             river_network,
             field,
-            up_ids,
-            down_ids,
+            grouping,
             mv,
-            additive_weight,
-            multiplicative_weight,
-            modifier_use_upstream,
+            node_additive_weight,
+            node_multiplicative_weight,
+            node_modifier_use_upstream,
+            edge_additive_weight,
+            edge_multiplicative_weight,
             ufunc=ufunc,
         )
 
@@ -246,9 +256,11 @@ def flow_upstream(
         True,
         operation,
         mv,
-        additive_weight,
-        multiplicative_weight,
-        modifier_use_upstream,
+        node_additive_weight,
+        node_multiplicative_weight,
+        node_modifier_use_upstream,
+        edge_additive_weight,
+        edge_multiplicative_weight,
     )
 
     return nan_to_missing(field, field_dtype, mv)
@@ -257,12 +269,13 @@ def flow_upstream(
 def _ufunc_to_upstream(
     river_network,
     field,
-    up_ids,
-    down_ids,
+    grouping,
     mv,
-    additive_weight,
-    multiplicative_weight,
-    modifier_use_upstream,
+    node_additive_weight,
+    node_multiplicative_weight,
+    node_modifier_use_upstream,
+    edge_additive_weight,
+    edge_multiplicative_weight,
     ufunc,
 ):
     """Updates field in-place by applying a ufunc at the nodes of
@@ -295,25 +308,18 @@ def _ufunc_to_upstream(
     None
 
     """
-    down_group = down_ids
-    modifier_group = up_ids if modifier_use_upstream else down_ids
-    if additive_weight is None:
-        if multiplicative_weight is None:
-            modifier_field = field[..., down_group]
-        else:
-            modifier_field = (
-                field[..., down_group] * multiplicative_weight[..., modifier_group]
-            )
-    else:
-        if multiplicative_weight is None:
-            modifier_field = (
-                field[..., down_group] + additive_weight[..., modifier_group]
-            )
-        else:
-            modifier_field = (
-                field[..., down_group] * multiplicative_weight[..., modifier_group]
-                + additive_weight[..., modifier_group]
-            )
+    up_ids, down_ids = river_network.get_up_down(grouping)
+    modifier_group = up_ids if node_modifier_use_upstream else down_ids
+
+    modifier_field = field[..., down_ids]
+    if node_multiplicative_weight is not None:
+        modifier_field *= node_multiplicative_weight[modifier_group]
+    if edge_multiplicative_weight is not None:
+        modifier_field *= edge_multiplicative_weight[grouping]
+    if node_additive_weight is not None:
+        modifier_field += node_additive_weight[modifier_group]
+    if edge_additive_weight is not None:
+        modifier_field += edge_additive_weight[grouping]
 
     ufunc.at(
         field,

@@ -41,10 +41,9 @@ def flow(river_network, field, invert_graph, operation, *args, **kwargs):
         groupings = river_network.topological_groups_edges
 
     for grouping in groupings:
-        up_ids, down_ids = river_network.get_up_down(grouping)
         # modify field in_place with desired operation
         # NB: this function needs to handle missing values
         # mv if they are allowed in input
-        operation(river_network, field, up_ids, down_ids, *args, **kwargs)
+        operation(river_network, field, grouping, *args, **kwargs)
 
     return field

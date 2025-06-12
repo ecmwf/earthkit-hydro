@@ -164,12 +164,22 @@ def _find_catchments_2D(river_network, field, grouping, mv, overwrite):
     None
 
     """
-    valid_group = grouping[
-        ~is_missing(field[..., river_network.downstream_nodes[grouping]], mv)
+    up_ids, down_ids = river_network.get_up_down(grouping)
+    down_not_missing = ~is_missing(field[..., down_ids], mv)
+    up_ids = up_ids[
+        down_not_missing
     ]  # only update nodes where the downstream belongs to a catchment
     if not overwrite:
-        valid_group = valid_group[is_missing(field[..., valid_group], mv)]
-    field[..., valid_group] = field[..., river_network.downstream_nodes[valid_group]]
+        up_is_missing = is_missing(field[..., up_ids], mv)
+        up_ids = up_ids[up_is_missing]
+    else:
+        up_is_missing = None
+    down_ids = (
+        down_ids[down_not_missing][up_is_missing]
+        if up_is_missing is not None
+        else down_ids[down_not_missing]
+    )
+    field[..., up_ids] = field[..., down_ids]
 
 
 def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
@@ -194,6 +204,7 @@ def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
     None
 
     """
+    assert not river_network.has_bifurcations
     field = field.T
     valid_mask = ~is_missing(field[river_network.downstream_nodes[grouping]], mv)
     valid_indices = np.array(np.where(valid_mask))

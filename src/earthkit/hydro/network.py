@@ -90,6 +90,8 @@ class RiverNetwork:
             def get_group(grouping):
                 return grouping
 
+            self.n_edges = self.n_nodes - len(self.sinks)
+
         else:
             self.up_ids = up_ids
             del up_ids
@@ -112,6 +114,8 @@ class RiverNetwork:
 
             def get_group(grouping):
                 return get_edge_indices_numba(offsets, grouping)
+
+            self.n_edges = self.down_ids.shape
 
         topological_groups = self.topological_groups_from_labels()
         self.topological_groups_edges = []

@@ -104,7 +104,7 @@ class RiverNetwork:
                 topological_labels
                 if topological_labels is not None
                 else compute_topological_labels_bifurcations(
-                    down_ids, offsets, self.sources, self.sinks
+                    self.down_ids, offsets, self.sources, self.sinks
                 )
             )
             del topological_labels

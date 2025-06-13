@@ -354,7 +354,6 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
 
 def from_grit(path):
     import geopandas as gpd
-    import numpy as np
     import pandas as pd
 
     gdf = gpd.read_file(path, layer="nodes")

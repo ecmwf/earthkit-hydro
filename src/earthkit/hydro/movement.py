@@ -40,7 +40,7 @@ def move_downstream(
         The updated field with upstream contributions.
 
     """
-
+    assert not river_network.has_bifurcations
     field, field_dtype = missing_to_nan(field, mv, accept_missing)
 
     ups = np.zeros(field.shape, dtype=field_dtype)
@@ -77,7 +77,7 @@ def move_upstream(river_network, field, mv=np.nan, accept_missing=False):
         The updated field with downstream values.
 
     """
-
+    assert not river_network.has_bifurcations
     field, field_dtype = missing_to_nan(field, mv, accept_missing)
 
     down = np.zeros(field.shape, dtype=field_dtype)

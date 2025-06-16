@@ -33,8 +33,7 @@ def compute_topological_labels(
     """
 
     n_nodes = np.uintp(downstream_nodes.shape[0])
-    labels = np.zeros(n_nodes, dtype=np.int64)
 
-    labels = propagate_labels(labels, sources, sinks, downstream_nodes, n_nodes)
+    labels = propagate_labels(sources, sinks, downstream_nodes, n_nodes)
 
     return labels

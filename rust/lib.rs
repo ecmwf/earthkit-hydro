@@ -11,6 +11,7 @@ use rayon::prelude::*;
 use numpy::{PyArray1};
 use pyo3::exceptions::PyValueError;
 use std::sync::atomic::{AtomicI64, Ordering};
+use fixedbitset::FixedBitSet;
 
 #[pyfunction]
 fn propagate_labels<'py>(
@@ -40,8 +41,8 @@ fn propagate_labels<'py>(
             .to_vec() };
 
     let mut next = Vec::with_capacity(current.len());
+    let mut visited = FixedBitSet::with_capacity(n_nodes);
 
-    next.clear();
     for &i in &current {
         let d = downstream[i];
         if d != n_nodes {
@@ -49,7 +50,6 @@ fn propagate_labels<'py>(
         }
     }
     std::mem::swap(&mut current, &mut next);
-
 
     for n in 1..=n_nodes {
         if current.is_empty() {
@@ -64,9 +64,11 @@ fn propagate_labels<'py>(
         });
 
         next.clear();
+        visited.clear();
         for &i in &current {
             let d = downstream[i];
-            if d != n_nodes {
+            if d != n_nodes && !visited.contains(d) {
+                visited.insert(d);
                 next.push(d);
             }
         }

@@ -7,22 +7,24 @@
 // nor does it submit to any jurisdiction.
 
 use pyo3::prelude::*;
-use numpy::{PyArray1, ToPyArray};
+use rayon::prelude::*;
+use numpy::{PyArray1};
 use pyo3::exceptions::PyValueError;
+use std::sync::atomic::{AtomicI64, Ordering};
+use fixedbitset::FixedBitSet;
 
 #[pyfunction]
 fn propagate_labels<'py>(
     py: Python<'py>,
-    labels: &PyArray1<i64>,
     sources: &PyArray1<usize>,
     sinks: &PyArray1<usize>,
     downstream_nodes: &PyArray1<usize>,
     n_nodes: usize,
 ) -> PyResult<&'py PyArray1<i64>> {
 
-    let labels = unsafe { labels
-    .as_slice_mut()
-    .expect("Failed to get labels slice")};
+    let mut labels: Vec<AtomicI64> = (0..n_nodes)
+        .map(|_| AtomicI64::new(0))
+        .collect();
 
     let downstream = unsafe { downstream_nodes
         .as_slice()
@@ -39,8 +41,8 @@ fn propagate_labels<'py>(
             .to_vec() };
 
     let mut next = Vec::with_capacity(current.len());
+    let mut visited = FixedBitSet::with_capacity(n_nodes);
 
-    next.clear();
     for &i in &current {
         let d = downstream[i];
         if d != n_nodes {
@@ -49,23 +51,24 @@ fn propagate_labels<'py>(
     }
     std::mem::swap(&mut current, &mut next);
 
-
     for n in 1..=n_nodes {
         if current.is_empty() {
-            for &i in &sinks {
-                labels[i] = (n as i64) - 1;
-            }
+            sinks.par_iter().for_each(|&i| {
+                labels[i].store((n as i64) - 1, Ordering::Relaxed);
+            });
             break;
         }
 
-        for &i in &current {
-            labels[i] = n as i64;
-        }
+        current.par_iter().for_each(|&i| {
+            labels[i].store(n as i64, Ordering::Relaxed);
+        });
 
         next.clear();
+        visited.clear();
         for &i in &current {
             let d = downstream[i];
-            if d != n_nodes {
+            if d != n_nodes && !visited.contains(d) {
+                visited.insert(d);
                 next.push(d);
             }
         }
@@ -77,7 +80,10 @@ fn propagate_labels<'py>(
         return Err(PyErr::new::<PyValueError, _>("River Network contains a cycle."));
     }
 
-    Ok(labels.to_pyarray(py))
+    let result: Vec<i64> = labels.iter()
+        .map(|a| a.load(Ordering::Relaxed))
+        .collect();
+    Ok(PyArray1::from_vec(py, result))
 }
 
 #[pymodule]

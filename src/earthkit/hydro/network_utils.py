@@ -1,4 +1,3 @@
-import numba
 import numpy as np
 
 
@@ -29,24 +28,9 @@ def get_sources_bifurcations(sources, nodes, down_ids):
     return nodes[~np.isin(nodes, down_ids)] if sources is None else sources
 
 
-@numba.njit(numba.int64[:](numba.int64[:], numba.int64[:]))
-def get_edge_indices_numba(offsets, grouping):
-    lengths = offsets[grouping + 1] - offsets[grouping]
-    total_len = np.sum(lengths)
-    result = np.empty(total_len, dtype=np.int64)
-    pos = 0
-
-    for i in range(len(grouping)):
-        node = grouping[i]
-        length = lengths[i]
-        start = offsets[node]
-        for j in range(length):
-            result[pos + j] = start + j
-        pos += length
-    return result
-
-
 def compute_topological_labels_bifurcations(down_ids, offsets, sources, sinks):
+    from ._numba import get_edge_indices_numba
+
     n_nodes = offsets.size - 1
     labels = np.zeros(n_nodes, dtype=int)
     inlets = sources

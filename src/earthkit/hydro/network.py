@@ -14,7 +14,6 @@ from .network_utils import (
     _find_new_masks,
     _find_subnetwork_inputs,
     compute_topological_labels_bifurcations,
-    get_edge_indices_numba,
     get_offsets,
     get_sinks_bifurcations,
     get_sinks_no_bifurcations,
@@ -111,6 +110,7 @@ class RiverNetwork:
             )
             del topological_labels
             self.get_up_down = self.get_up_down_bifurcations
+            from ._numba import get_edge_indices_numba
 
             def get_group(grouping):
                 return get_edge_indices_numba(offsets, grouping)

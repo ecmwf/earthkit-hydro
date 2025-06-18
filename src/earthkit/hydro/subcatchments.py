@@ -54,6 +54,7 @@ def calculate_subcatchment_metric(
     dict
         Dictionary with (station, catchment_metric) pairs.
     """
+    assert edge_weights is None
     if isinstance(points, np.ndarray):
         initial_field = np.zeros(river_network.n_nodes, dtype=int)
         initial_field[points] = np.arange(points.shape[0]) + 1

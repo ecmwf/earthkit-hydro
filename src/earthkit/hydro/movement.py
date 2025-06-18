@@ -15,8 +15,8 @@ from .utils import mask_and_unmask, missing_to_nan, nan_to_missing
 def move_downstream(
     river_network,
     field,
-    node_weights,
-    edge_weights,
+    node_weights=None,
+    edge_weights=None,
     mv=np.nan,
     ufunc=np.add,
     accept_missing=False,
@@ -92,8 +92,8 @@ def move_downstream(
 def move_upstream(
     river_network,
     field,
-    node_weights,
-    edge_weights,
+    node_weights=None,
+    edge_weights=None,
     mv=np.nan,
     ufunc=np.add,
     accept_missing=False,

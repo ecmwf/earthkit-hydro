@@ -28,7 +28,8 @@ def calculate_catchment_metric(
     field,
     points,
     metric,
-    weights=None,
+    node_weights=None,
+    edge_weights=None,
     mv=np.nan,
     accept_missing=False,
 ):
@@ -71,14 +72,14 @@ def calculate_catchment_metric(
             river_network,
             field,
             metric,
-            weights,
+            node_weights,
+            edge_weights,
             mv,
             accept_missing,
             skip=True,
         )
         upstream_field_at_stations = upstream_metric_field[..., points]
         upstream_field_at_stations = np.moveaxis(upstream_field_at_stations, -1, 0)
-
         return dict(zip(points, upstream_field_at_stations))
 
     points = points_to_numpy(points)
@@ -89,7 +90,8 @@ def calculate_catchment_metric(
         river_network,
         field,
         metric,
-        weights,
+        node_weights,
+        edge_weights,
         mv,
         accept_missing,
         skip=True,

@@ -23,7 +23,8 @@ def calculate_subcatchment_metric(
     field,
     points,
     metric,
-    weights=None,
+    node_weights=None,
+    edge_weights=None,
     mv=np.nan,
     accept_missing=False,
 ):
@@ -61,7 +62,7 @@ def calculate_subcatchment_metric(
             field,
             labels,
             metric,
-            weights if weights is not None else None,
+            node_weights,
             mv,
             0,  # missing labels value
             accept_missing,
@@ -80,7 +81,7 @@ def calculate_subcatchment_metric(
         field,
         labels,
         metric,
-        weights if weights is not None else None,
+        node_weights,
         mv,
         0,  # missing labels value
         accept_missing,

@@ -20,7 +20,8 @@ def calculate_upstream_metric(
     river_network,
     field,
     metric,
-    weights=None,
+    node_weights=None,
+    edge_weights=None,
     mv=np.nan,
     accept_missing=False,
 ):
@@ -35,8 +36,8 @@ def calculate_upstream_metric(
         The input field.
     metric : str
         Metric to compute. Options are "mean", "max", "min", "sum", "product"
-    weights : ndarray, optional
-        Used to weight the field when computing the metric. Default is None.
+    # weights : ndarray, optional
+    #     Used to weight the field when computing the metric. Default is None.
     mv : scalar, optional
         Missing value for the input field. Default is np.nan.
     accept_missing : bool, optional
@@ -50,7 +51,14 @@ def calculate_upstream_metric(
     """
 
     return calculate_online_metric(
-        river_network, field, metric, weights, mv, accept_missing, flow_direction="down"
+        river_network,
+        field,
+        metric,
+        node_weights,
+        edge_weights,
+        mv,
+        accept_missing,
+        flow_direction="down",
     )
 
 

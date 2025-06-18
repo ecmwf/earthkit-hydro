@@ -79,7 +79,7 @@ def get_numpy_function(function_name):
 )
 def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
     output_field = ekh.calculate_upstream_metric(
-        river_network, input_field, "sum", weights=None, mv=mv, accept_missing=True
+        river_network, input_field, "sum", node_weights=None, mv=mv, accept_missing=True
     )
     print(output_field)
     print(flow_downstream)
@@ -100,7 +100,7 @@ def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
     input_field = convert_to_2d(river_network, input_field, 0)
     flow_downstream = convert_to_2d(river_network, flow_downstream, 0)
     output_field = ekh.calculate_upstream_metric(
-        river_network, input_field, "sum", weights=None, mv=mv, accept_missing=True
+        river_network, input_field, "sum", node_weights=None, mv=mv, accept_missing=True
     )
     print(output_field)
     print(flow_downstream)
@@ -181,7 +181,7 @@ def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
 )
 def test_calculate_upstream_metric_max(river_network, input_field, flow_downstream, mv):
     output_field = ekh.calculate_upstream_metric(
-        river_network, input_field, "max", weights=None, mv=mv, accept_missing=True
+        river_network, input_field, "max", node_weights=None, mv=mv, accept_missing=True
     )
     print(output_field)
     print(flow_downstream)
@@ -262,7 +262,7 @@ def test_calculate_upstream_metric_max(river_network, input_field, flow_downstre
 )
 def test_calculate_upstream_metric_min(river_network, input_field, flow_downstream, mv):
     output_field = ekh.calculate_upstream_metric(
-        river_network, input_field, "min", weights=None, mv=mv, accept_missing=True
+        river_network, input_field, "min", node_weights=None, mv=mv, accept_missing=True
     )
     print(output_field)
     print(flow_downstream)
@@ -345,7 +345,12 @@ def test_calculate_upstream_metric_prod(
     river_network, input_field, flow_downstream, mv
 ):
     output_field = ekh.calculate_upstream_metric(
-        river_network, input_field, "prod", weights=None, mv=mv, accept_missing=True
+        river_network,
+        input_field,
+        "prod",
+        node_weights=None,
+        mv=mv,
+        accept_missing=True,
     )
     print(output_field)
     print(flow_downstream)
@@ -428,7 +433,12 @@ def test_calculate_upstream_metric_mean(
     river_network, input_field, flow_downstream, mv
 ):
     output_field = ekh.calculate_upstream_metric(
-        river_network, input_field, "mean", weights=None, mv=mv, accept_missing=True
+        river_network,
+        input_field,
+        "mean",
+        node_weights=None,
+        mv=mv,
+        accept_missing=True,
     )
     assert output_field.dtype == flow_downstream.dtype
     np.testing.assert_allclose(output_field, flow_downstream)
@@ -436,7 +446,12 @@ def test_calculate_upstream_metric_mean(
     input_field = convert_to_2d(river_network, input_field, 0)
     flow_downstream = convert_to_2d(river_network, flow_downstream, 0)
     output_field = ekh.calculate_upstream_metric(
-        river_network, input_field, "mean", weights=None, mv=mv, accept_missing=True
+        river_network,
+        input_field,
+        "mean",
+        node_weights=None,
+        mv=mv,
+        accept_missing=True,
     )
     print(output_field)
     print(flow_downstream)
@@ -504,12 +519,12 @@ def test_accumulate_downstream_2d(river_network, N):
 @pytest.mark.parametrize("metric", ["sum", "max", "min", "mean", "std", "var"])
 def test_calculate_catchment(river_network, metric):
     field = np.random.rand(3, 4, river_network.n_nodes)
-    weights = np.random.rand(3, 4, river_network.n_nodes)
+    node_weights = np.random.rand(3, 4, river_network.n_nodes)
     catchment_metric = ekh.calculate_catchment_metric(
-        river_network, field, river_network.nodes, metric, weights
+        river_network, field, river_network.nodes, metric, node_weights
     )
     upstream_field = ekh.calculate_upstream_metric(
-        river_network, field, metric, weights
+        river_network, field, metric, node_weights
     )
     print(catchment_metric[0].shape, upstream_field.shape)
     for i in catchment_metric.keys():
@@ -532,13 +547,13 @@ def test_calculate_catchment(river_network, metric):
 @pytest.mark.parametrize("metric", ["sum", "max", "min", "mean", "prod", "std", "var"])
 def test_calculate_subcatchment(river_network, metric):
     shape = (3, 4)
-    field = np.random.rand(*shape, river_network.n_nodes)
-    weights = np.random.rand(*shape, river_network.n_nodes)
+    field = np.random.rand(*shape, river_network.n_nodes) + 1
+    node_weights = np.random.rand(*shape, river_network.n_nodes) + 1
     subcatchment_metric = ekh.calculate_subcatchment_metric(
-        river_network, field, river_network.sinks, metric, weights
+        river_network, field, river_network.sinks, metric, node_weights
     )
     catchment_metric = ekh.calculate_catchment_metric(
-        river_network, field, river_network.sinks, metric, weights
+        river_network, field, river_network.sinks, metric, node_weights
     )
     for i in catchment_metric.keys():
         assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
@@ -549,7 +564,7 @@ def test_calculate_subcatchment(river_network, metric):
         )
 
     subcatchment_metric = ekh.calculate_subcatchment_metric(
-        river_network, field, river_network.nodes, metric, weights
+        river_network, field, river_network.nodes, metric, node_weights
     )
     catchment_metric = ekh.calculate_catchment_metric(
         river_network,
@@ -562,7 +577,7 @@ def test_calculate_subcatchment(river_network, metric):
             ]
         ),
         metric,
-        weights,
+        node_weights,
     )
     for i in catchment_metric.keys():
         assert catchment_metric[i].dtype == subcatchment_metric[i].dtype
@@ -590,10 +605,10 @@ def test_calculate_subcatchment(river_network, metric):
 def test_calculate_catchment_numpy(river_network, metric):
     shape = (3, 4)
     field = np.random.rand(*shape, river_network.n_nodes)
-    weights = None
+    node_weights = None
     nodes = np.random.choice(river_network.n_nodes, 5)
     catchment_metric = ekh.calculate_catchment_metric(
-        river_network, field, nodes, metric, weights
+        river_network, field, nodes, metric, node_weights
     )
     numpy_func = get_numpy_function(metric)
     for i in catchment_metric.keys():
@@ -621,10 +636,10 @@ def test_calculate_catchment_numpy(river_network, metric):
 def test_calculate_subcatchment_numpy(river_network, metric):
     shape = (3, 4)
     field = np.random.rand(*shape, river_network.n_nodes)
-    weights = None
+    node_weights = None
     nodes = np.random.choice(river_network.n_nodes, 5)
     subcatchment_metric = ekh.calculate_subcatchment_metric(
-        river_network, field, nodes, metric, weights
+        river_network, field, nodes, metric, node_weights
     )
     numpy_func = get_numpy_function(metric)
     labels = np.zeros(river_network.n_nodes, dtype=int)

@@ -156,13 +156,13 @@ def _ufunc_to_downstream(
 
     modifier_field = field[..., up_ids]
     if node_multiplicative_weight is not None:
-        modifier_field *= node_multiplicative_weight[modifier_group]
+        modifier_field *= node_multiplicative_weight[..., modifier_group]
     if edge_multiplicative_weight is not None:
-        modifier_field *= edge_multiplicative_weight[grouping]
+        modifier_field *= edge_multiplicative_weight[..., grouping]
     if node_additive_weight is not None:
-        modifier_field += node_additive_weight[modifier_group]
+        modifier_field += node_additive_weight[..., modifier_group]
     if edge_additive_weight is not None:
-        modifier_field += edge_additive_weight[grouping]
+        modifier_field += edge_additive_weight[..., grouping]
 
     ufunc.at(
         field,
@@ -313,13 +313,13 @@ def _ufunc_to_upstream(
 
     modifier_field = field[..., down_ids]
     if node_multiplicative_weight is not None:
-        modifier_field *= node_multiplicative_weight[modifier_group]
+        modifier_field *= node_multiplicative_weight[..., modifier_group]
     if edge_multiplicative_weight is not None:
-        modifier_field *= edge_multiplicative_weight[grouping]
+        modifier_field *= edge_multiplicative_weight[..., grouping]
     if node_additive_weight is not None:
-        modifier_field += node_additive_weight[modifier_group]
+        modifier_field += node_additive_weight[..., modifier_group]
     if edge_additive_weight is not None:
-        modifier_field += edge_additive_weight[grouping]
+        modifier_field += edge_additive_weight[..., grouping]
 
     ufunc.at(
         field,
@@ -329,7 +329,14 @@ def _ufunc_to_upstream(
 
 
 def calculate_online_metric(
-    river_network, field, metric, weights, mv, accept_missing, flow_direction
+    river_network,
+    field,
+    metric,
+    node_weights,
+    edge_weights,
+    mv,
+    accept_missing,
+    flow_direction,
 ):
     """
     Calculates a metric for the field over all upstream or downstream values.
@@ -357,7 +364,6 @@ def calculate_online_metric(
         Output field.
 
     """
-
     if flow_direction == "up":
         flow_func = flow_upstream
     elif flow_direction == "down":
@@ -365,24 +371,38 @@ def calculate_online_metric(
 
     field, field_dtype = missing_to_nan(field.copy(), mv, accept_missing)
 
-    if weights is None:
+    if node_weights is None:
         if metric == "mean" or metric == "std" or metric == "var":
-            weightings = np.ones(river_network.n_nodes, dtype=np.float64)
-        weighted_field = field.copy()
+            node_weights = np.ones(river_network.n_nodes, dtype=np.float64)
     else:
-        assert field_dtype == weights.dtype
-        weightings, _ = missing_to_nan(weights.copy(), mv, accept_missing)
-        weighted_field = field * weightings  # this isn't in_place !
+        if field_dtype != node_weights.dtype:
+            raise ValueError(
+                f"""
+                node_weights.dtype={node_weights.dtype} but field.dtype={field_dtype}.
+                """
+            )
+        node_weights, _ = missing_to_nan(node_weights.copy(), mv, accept_missing)
+
+    if edge_weights is not None:
+        print("we have edge weights")
+        if field_dtype != edge_weights.dtype:
+            raise ValueError(
+                f"""
+                edge_weights.dtype={edge_weights.dtype} but field.dtype={field_dtype}.
+                """
+            )
+        edge_weights, _ = missing_to_nan(edge_weights.copy(), mv, accept_missing)
 
     ufunc = metrics_dict[metric].func
 
     weighted_field = flow_func(
         river_network,
-        weighted_field,
+        field if node_weights is None else field * node_weights,
         np.nan,  # mv replaced by nan
-        True,  # do in-place on field copy
+        False,  # do in-place on field copy
         ufunc,
         accept_missing,
+        edge_multiplicative_weight=edge_weights,
         skip_missing_check=True,
         skip=True,
     )
@@ -390,11 +410,12 @@ def calculate_online_metric(
     if metric == "mean" or metric == "std" or metric == "var":
         counts = flow_func(
             river_network,
-            weightings,
+            node_weights,
             np.nan,  # mv replaced by nan
             False,
             ufunc,
             accept_missing,
+            edge_multiplicative_weight=edge_weights,
             skip_missing_check=True,
             skip=True,
         )
@@ -407,11 +428,12 @@ def calculate_online_metric(
         elif metric == "var" or metric == "std":
             weighted_sum_of_squares = flow_func(
                 river_network,
-                field**2 * weightings if weights is not None else field**2,
+                field**2 if node_weights is None else field**2 * node_weights,
                 np.nan,  # mv replaced by nan
                 True,  # do in-place on field copy
                 ufunc,
                 accept_missing,
+                edge_multiplicative_weight=edge_weights,
                 skip_missing_check=True,
                 skip=True,
             )

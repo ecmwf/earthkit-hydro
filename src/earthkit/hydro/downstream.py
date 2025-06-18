@@ -20,7 +20,8 @@ def calculate_downstream_metric(
     river_network,
     field,
     metric,
-    weights=None,
+    node_weights=None,
+    edge_weights=None,
     mv=np.nan,
     accept_missing=False,
 ):
@@ -50,7 +51,14 @@ def calculate_downstream_metric(
     """
 
     return calculate_online_metric(
-        river_network, field, metric, weights, mv, accept_missing, flow_direction="up"
+        river_network,
+        field,
+        metric,
+        node_weights,
+        edge_weights,
+        mv,
+        accept_missing,
+        flow_direction="up",
     )
 
 

@@ -214,7 +214,7 @@ class RiverNetwork:
         joblib.dump(self, fpath, compress=compression)
 
     @mask_2d
-    def create_subnetwork(self, mask, recompute=True):
+    def create_subnetwork(self, node_mask=None, edge_mask=None, recompute=True):
         """Creates a subnetwork from the river network based on a mask.
 
         Parameters
@@ -231,9 +231,12 @@ class RiverNetwork:
             A subnetwork of the river network.
 
         """
-
-        assert not self.has_bifurcations
-        domain_mask, river_network_mask = _find_new_masks(self.mask, mask)
+        assert not (node_mask is None and edge_mask is None)
+        if self.has_bifurcations:
+            raise NotImplementedError("Bifurcations not yet supported.")
+        if edge_mask is not None:
+            raise NotImplementedError("edge_mask not yet supported.")
+        domain_mask, river_network_mask = _find_new_masks(self.mask, node_mask)
 
         nodes, downstream, n_nodes, sinks, sources = _find_subnetwork_inputs(
             river_network_mask, self.downstream_nodes, self.n_nodes

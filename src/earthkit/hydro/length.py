@@ -44,7 +44,8 @@ def min(
     numpy.ndarray
         The length to the points in the river network.
     """
-    assert not river_network.has_bifurcations
+    if river_network.has_bifurcations:
+        raise NotImplementedError("Bifurcations not yet supported.")
     if weights is None:
         weights = np.ones(river_network.n_nodes)
     else:
@@ -119,7 +120,8 @@ def max(
     numpy.ndarray
         The length to the points in the river network.
     """
-    assert not river_network.has_bifurcations
+    if river_network.has_bifurcations:
+        raise NotImplementedError("Bifurcations not yet supported.")
     if upstream and downstream:
         # TODO: define how this should work
         # can one overwrite a starting station's length?

@@ -206,7 +206,8 @@ def _find_catchments_ND(river_network, field, grouping, mv, overwrite):
     None
 
     """
-    assert not river_network.has_bifurcations
+    if river_network.has_bifurcations:
+        raise NotImplementedError("Bifurcations not yet supported.")
     field = field.T
     valid_mask = ~is_missing(field[river_network.downstream_nodes[grouping]], mv)
     valid_indices = np.array(np.where(valid_mask))

@@ -11,15 +11,14 @@ from io import BytesIO
 from urllib.request import Request, urlopen
 
 import joblib
-import numpy as np
 
-from ._version import __version__ as ekh_version
-from .readers import (
-    cache,
+from earthkit.hydro._version import __version__ as ekh_version
+
+from .network import RiverNetwork
+from .readers import (  # cache,; from_grit,
     find_main_var,
     from_cama_nextxy,
     from_d8,
-    from_grit,
     import_earthkit_or_prompt_install,
 )
 
@@ -28,7 +27,7 @@ from .readers import (
 ekh_version = ".".join(ekh_version.split(".")[:2])
 
 
-@cache
+# @cache
 def create(path, river_network_format, source):
     """Creates a river network from the given path, format, and source.
 
@@ -53,9 +52,9 @@ def create(path, river_network_format, source):
     """
     if river_network_format == "precomputed":
         if source == "file":
-            return joblib.load(path)
+            river_network_storage = joblib.load(path)
         elif source == "url":
-            return joblib.load(BytesIO(urlopen(path).read()))
+            river_network_storage = joblib.load(BytesIO(urlopen(path).read()))
         else:
             raise ValueError(
                 "Unsupported source for river network format"
@@ -65,7 +64,7 @@ def create(path, river_network_format, source):
         ekd = import_earthkit_or_prompt_install(river_network_format, source)
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
         x, y = data.nextx.values, data.nexty.values
-        return from_cama_nextxy(x, y)
+        river_network_storage = from_cama_nextxy(x, y)
     elif (
         river_network_format == "pcr_d8"
         or river_network_format == "esri_d8"
@@ -80,12 +79,14 @@ def create(path, river_network_format, source):
             data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
             var_name = find_main_var(data)
             data = data[var_name].values
-        return from_d8(data, river_network_format=river_network_format)
-    elif river_network_format == "grit":
-        assert path.endswith(".gpkg")
-        return from_grit(path)
+        river_network_storage = from_d8(data, river_network_format=river_network_format)
+    # elif river_network_format == "grit":
+    #     assert path.endswith(".gpkg")
+    #     river_network_storage = from_grit(path)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
+
+    return RiverNetwork(river_network_storage)
 
 
 def load(
@@ -127,12 +128,6 @@ def load(
         river_network_version=river_network_version,
     )
     network = create(uri, "precomputed", "url", *args, **kwargs)
-    if network.sources.dtype != np.uintp:
-        network.sources = network.sources.astype(np.uintp)
-    if network.downstream_nodes.dtype != np.uintp:
-        network.downstream_nodes = network.downstream_nodes.astype(np.uintp)
-    if network.sinks.dtype != np.uintp:
-        network.sinks = network.sinks.astype(np.uintp)
 
     return network
 

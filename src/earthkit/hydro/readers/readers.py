@@ -6,99 +6,104 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
-import os
-import tempfile
-from hashlib import sha256
 
-import joblib
 import numpy as np
 
-from ._version import __version__ as ekh_version
-from .network import RiverNetwork
+from earthkit.hydro._version import __version__ as ekh_version
+from earthkit.hydro.network import RiverNetworkStorage
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90 -> 0.1
 ekh_version = ".".join(ekh_version.split(".")[:2])
 
+try:
+    from .topological_labels_rust import compute_topological_labels
+except (ModuleNotFoundError, ImportError):
+    print("Failed to load rust extension, falling back to python implementation.")
+    from .topological_labels_python import compute_topological_labels
 
-def cache(func):
-    """Decorator to allow automatic use of cache.
 
-    Parameters
-    ----------
-    func : callable
-        The function to be wrapped and executed with masking applied.
+# def cache(func):
+#     """Decorator to allow automatic use of cache.
 
-    Returns
-    -------
-    callable
-        The wrapped function.
+#     Parameters
+#     ----------
+#     func : callable
+#         The function to be wrapped and executed with masking applied.
 
-    """
+#     Returns
+#     -------
+#     callable
+#         The wrapped function.
 
-    def wrapper(
-        path,
-        river_network_format,
-        source="file",
-        use_cache=True,
-        cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
-        cache_fname="{ekh_version}_{hash}.joblib",
-        cache_compression=1,
-    ):
-        """Wrapper to load river network from cache if available, otherwise
-        create and cache it.
+#     """
 
-        Parameters
-        ----------
-        path : str
-            The path to the river network.
-        river_network_format : str
-            The format of the river network file.
-            Supported formats are "precomputed", "cama", "pcr_d8", and "esri_d8".
-        source : str, optional
-            The source of the river network.
-            For possible sources see:
-            https://earthkit-data.readthedocs.io/en/latest/guide/sources.html
-        use_cache : bool, optional
-            Whether to use caching. Default is True.
-        cache_dir : str, optional
-            The directory to store the cache files. Default is a temporary directory.
-        cache_fname : str, optional
-            The filename template for the cache files.
-            Default is "{ekh_version}_{hash}.joblib".
-        cache_compression : int, optional
-            The compression level for the cache files. Default is 1.
+#     def wrapper(
+#         path,
+#         river_network_format,
+#         source="file",
+#         use_cache=True,
+#         cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
+#         cache_fname="{ekh_version}_{hash}.joblib",
+#         cache_compression=1,
+#     ):
+#         """Wrapper to load river network from cache if available, otherwise
+#         create and cache it.
 
-        Returns
-        -------
-        earthkit.hydro.network.RiverNetwork
-            The loaded river network.
+#         Parameters
+#         ----------
+#         path : str
+#             The path to the river network.
+#         river_network_format : str
+#             The format of the river network file.
+#             Supported formats are "precomputed", "cama", "pcr_d8", and "esri_d8".
+#         source : str, optional
+#             The source of the river network.
+#             For possible sources see:
+#             https://earthkit-data.readthedocs.io/en/latest/guide/sources.html
+#         use_cache : bool, optional
+#             Whether to use caching. Default is True.
+#         cache_dir : str, optional
+#             The directory to store the cache files. Default is a temporary directory.
+#         cache_fname : str, optional
+#             The filename template for the cache files.
+#             Default is "{ekh_version}_{hash}.joblib".
+#         cache_compression : int, optional
+#             The compression level for the cache files. Default is 1.
 
-        """
-        if use_cache:
-            hashed_name = sha256(path.encode("utf-8")).hexdigest()
-            cache_dir = cache_dir.format(ekh_version=ekh_version, hash=hashed_name)
-            cache_fname = cache_fname.format(ekh_version=ekh_version, hash=hashed_name)
-            cache_filepath = os.path.join(cache_dir, cache_fname)
+#         Returns
+#         -------
+#         earthkit.hydro.network.RiverNetwork
+#             The loaded river network.
 
-            if os.path.isfile(cache_filepath):
-                print(f"Loading river network from cache ({cache_filepath}).")
-                return joblib.load(cache_filepath)
-            else:
-                print(f"River network not found in cache ({cache_filepath}).")
-                os.makedirs(cache_dir, exist_ok=True)
-        else:
-            print("Cache disabled.")
+#         """
+#         if use_cache:
+#             hashed_name = sha256(path.encode("utf-8")).hexdigest()
+#             cache_dir = cache_dir.format(ekh_version=ekh_version, hash=hashed_name)
+#             cache_fname = cache_fname.format(
+#                   ekh_version=ekh_version,
+#                   hash=hashed_name
+#                   )
+#             cache_filepath = os.path.join(cache_dir, cache_fname)
 
-        network = func(path, river_network_format, source)
+#             if os.path.isfile(cache_filepath):
+#                 print(f"Loading river network from cache ({cache_filepath}).")
+#                 return joblib.load(cache_filepath)
+#             else:
+#                 print(f"River network not found in cache ({cache_filepath}).")
+#                 os.makedirs(cache_dir, exist_ok=True)
+#         else:
+#             print("Cache disabled.")
 
-        if use_cache:
-            joblib.dump(network, cache_filepath, compress=cache_compression)
-            print(f"River network loaded, saving to cache ({cache_filepath}).")
+#         network = func(path, river_network_format, source)
 
-        return network
+#         if use_cache:
+#             joblib.dump(network, cache_filepath, compress=cache_compression)
+#             print(f"River network loaded, saving to cache ({cache_filepath}).")
 
-    return wrapper
+#         return network
+
+#     return wrapper
 
 
 def import_earthkit_or_prompt_install(river_network_format, source):
@@ -313,26 +318,14 @@ def find_upstream_downstream_indices_from_offsets(
     return upstream_indices, downstream_indices
 
 
+def get_sources(n_nodes, down_ids):
+    tmp_nodes = np.arange(n_nodes)
+    tmp_nodes[down_ids] = n_nodes + 1
+    inlets = tmp_nodes[tmp_nodes != n_nodes + 1]
+    return inlets
+
+
 def create_network(upstream_indices, downstream_indices, missing_mask, shape):
-    """Creates a river network from upstream and downstream indices.
-
-    Parameters
-    ----------
-    upstream_indices : numpy.ndarray
-        Indices of upstream nodes.
-    downstream_indices : numpy.ndarray
-        Indices of downstream nodes.
-    missing_mask : numpy.ndarray
-        Boolean mask indicating the presence of nodes.
-    shape : tuple
-        Shape of the original domain.
-
-    Returns
-    -------
-    earthkit.hydro.network.RiverNetwork
-        The created river network.
-
-    """
     n_nodes = int(np.sum(missing_mask))
     nodes = np.arange(n_nodes, dtype=np.uintp)
     nodes_matrix = np.full(missing_mask.size, n_nodes, dtype=np.uintp)
@@ -342,49 +335,73 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     del upstream_indices, downstream_indices, nodes_matrix
     downstream = np.full(n_nodes, n_nodes, dtype=np.uintp)
     downstream[upstream_nodes] = downstream_nodes
-    del downstream_nodes, upstream_nodes, n_nodes
-    return RiverNetwork(
-        nodes,
-        np.where(missing_mask.reshape(shape)),
-        shape,
-        downstream,
-        mask=missing_mask.reshape(shape),
+    del downstream_nodes, upstream_nodes
+
+    has_downstream = downstream != n_nodes
+    edge_indices = np.zeros(n_nodes) - 1
+    edge_indices[has_downstream] = np.arange(has_downstream.sum())
+    down_ids = downstream[has_downstream]
+    up_ids = nodes[has_downstream]
+    n_edges = down_ids.shape[0]
+    coords = None
+    mask = missing_mask.reshape(shape)
+    bifurcates = False
+    sources = get_sources(n_nodes, down_ids)
+    sinks = nodes[downstream == n_nodes]
+    downstream_group_labels = compute_topological_labels(
+        sources.astype(np.uintp), sinks.astype(np.uintp), downstream.astype(np.uintp)
+    )
+    downstream_group_labels = downstream_group_labels[has_downstream]
+    upstream_group_labels = np.max(downstream_group_labels) - downstream_group_labels
+
+    store = RiverNetworkStorage(
+        n_nodes,
+        n_edges,
+        up_ids,
+        down_ids,
+        coords,
+        mask,
+        bifurcates,
+        downstream_group_labels,
+        upstream_group_labels,
     )
 
+    return store
 
-def from_grit(path):
-    import geopandas as gpd
-    import pandas as pd
 
-    gdf = gpd.read_file(path, layer="nodes")
-    gdf["x"] = gdf.geometry.x
-    gdf["y"] = gdf.geometry.y
-    x_spacing = pd.Series(np.diff(np.sort(gdf["x"].unique()))).mode().iloc[0]
-    y_spacing = pd.Series(np.diff(np.sort(gdf["y"].unique()))).mode().iloc[0]
-    print(f"Estimated grid spacing: dx={x_spacing}, dy={y_spacing}")
-    x_origin = gdf["x"].min()
-    y_origin = gdf["y"].min()
-    gdf["grid_col"] = ((gdf["x"] - x_origin) // x_spacing).astype(int)
-    gdf["grid_row"] = ((gdf["y"] - y_origin) // y_spacing).astype(int)
-    n_cols = gdf["grid_col"].max() + 1
-    gdf["flat_index"] = gdf["grid_row"] * n_cols + gdf["grid_col"]
-    gdf.sort_values(by=["flat_index"], inplace=True)
-    gdf.reset_index(inplace=True)
-    rows = gdf["grid_row"].to_numpy()
-    cols = gdf["grid_col"].to_numpy()
-    grid_ids = (rows[::-1], cols)
-    ref = gdf["global_id"]
-    value_to_index = pd.Series(ref.index, index=ref).to_dict()
+# def from_grit(path):
+#     import geopandas as gpd
+#     import pandas as pd
 
-    lines = gpd.read_file(path, layer="lines")
-    lines["UPID"] = lines["upstream_node_id"].map(value_to_index)
-    lines["DOWNID"] = lines["downstream_node_id"].map(value_to_index)
-    lines.sort_values(by=["UPID"], inplace=True)
-    up_nodes = lines["UPID"].to_numpy()
-    down_nodes = lines["DOWNID"].to_numpy()
-    nodes = ref.index.values
-    shape = rows.max() + 1, cols.max() + 1
+#     gdf = gpd.read_file(path, layer="nodes")
+#     gdf["x"] = gdf.geometry.x
+#     gdf["y"] = gdf.geometry.y
+#     x_spacing = pd.Series(np.diff(np.sort(gdf["x"].unique()))).mode().iloc[0]
+#     y_spacing = pd.Series(np.diff(np.sort(gdf["y"].unique()))).mode().iloc[0]
+#     print(f"Estimated grid spacing: dx={x_spacing}, dy={y_spacing}")
+#     x_origin = gdf["x"].min()
+#     y_origin = gdf["y"].min()
+#     gdf["grid_col"] = ((gdf["x"] - x_origin) // x_spacing).astype(int)
+#     gdf["grid_row"] = ((gdf["y"] - y_origin) // y_spacing).astype(int)
+#     n_cols = gdf["grid_col"].max() + 1
+#     gdf["flat_index"] = gdf["grid_row"] * n_cols + gdf["grid_col"]
+#     gdf.sort_values(by=["flat_index"], inplace=True)
+#     gdf.reset_index(inplace=True)
+#     rows = gdf["grid_row"].to_numpy()
+#     cols = gdf["grid_col"].to_numpy()
+#     grid_ids = (rows[::-1], cols)
+#     ref = gdf["global_id"]
+#     value_to_index = pd.Series(ref.index, index=ref).to_dict()
 
-    return RiverNetwork(
-        nodes, grid_ids, shape, down_nodes, up_nodes, has_bifurcations=True
-    )
+#     lines = gpd.read_file(path, layer="lines")
+#     lines["UPID"] = lines["upstream_node_id"].map(value_to_index)
+#     lines["DOWNID"] = lines["downstream_node_id"].map(value_to_index)
+#     lines.sort_values(by=["UPID"], inplace=True)
+#     up_nodes = lines["UPID"].to_numpy()
+#     down_nodes = lines["DOWNID"].to_numpy()
+#     nodes = ref.index.values
+#     shape = rows.max() + 1, cols.max() + 1
+
+#     return RiverNetwork(
+#         nodes, grid_ids, shape, down_nodes, up_nodes, has_bifurcations=True
+#     )

@@ -151,7 +151,7 @@ def _ufunc_to_downstream(
     None
 
     """
-    up_ids, down_ids = river_network.get_up_down(grouping)
+    up_ids, down_ids, grouping = grouping
     modifier_group = up_ids if node_modifier_use_upstream else down_ids
 
     modifier_field = field[..., up_ids]
@@ -308,7 +308,7 @@ def _ufunc_to_upstream(
     None
 
     """
-    up_ids, down_ids = river_network.get_up_down(grouping)
+    up_ids, down_ids, grouping = grouping
     modifier_group = up_ids if node_modifier_use_upstream else down_ids
 
     modifier_field = field[..., down_ids]

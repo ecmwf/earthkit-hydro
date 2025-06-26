@@ -80,15 +80,13 @@ except (ModuleNotFoundError, ImportError):
 #         if use_cache:
 #             hashed_name = sha256(path.encode("utf-8")).hexdigest()
 #             cache_dir = cache_dir.format(ekh_version=ekh_version, hash=hashed_name)
-#             cache_fname = cache_fname.format(
-#                   ekh_version=ekh_version,
-#                   hash=hashed_name
-#                   )
+#             cache_fname = cache_fname.format(ekh_version=ekh_version,
+#                                               hash=hashed_name)
 #             cache_filepath = os.path.join(cache_dir, cache_fname)
 
 #             if os.path.isfile(cache_filepath):
 #                 print(f"Loading river network from cache ({cache_filepath}).")
-#                 return joblib.load(cache_filepath)
+#                 return RiverNetwork(joblib.load(cache_filepath))
 #             else:
 #                 print(f"River network not found in cache ({cache_filepath}).")
 #                 os.makedirs(cache_dir, exist_ok=True)
@@ -98,7 +96,7 @@ except (ModuleNotFoundError, ImportError):
 #         network = func(path, river_network_format, source)
 
 #         if use_cache:
-#             joblib.dump(network, cache_filepath, compress=cache_compression)
+#             network.export(cache_filepath, compression=cache_compression)
 #             print(f"River network loaded, saving to cache ({cache_filepath}).")
 
 #         return network
@@ -359,6 +357,8 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
         n_edges,
         up_ids,
         down_ids,
+        sources,
+        sinks,
         coords,
         mask,
         bifurcates,

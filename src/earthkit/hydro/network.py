@@ -18,6 +18,8 @@ class RiverNetworkStorage:
         n_edges,
         up_ids,
         down_ids,
+        sources,
+        sinks,
         coords,
         mask,
         bifurcates,
@@ -28,6 +30,10 @@ class RiverNetworkStorage:
         self.n_edges = n_edges
         self.bifurcates = bifurcates
         del n_edges, n_nodes, bifurcates
+        self.sources = sources
+        del sources
+        self.sinks = sinks
+        del sinks
         self.up_ids = up_ids
         del up_ids
         self.down_ids = down_ids
@@ -42,25 +48,20 @@ class RiverNetworkStorage:
         del upstream_group_labels
 
 
+def unique_sorted(array):
+    # array must be 1D and sorted!
+    mask = np.empty_like(array, dtype=bool)
+    mask[0] = True
+    mask[1:] = array[1:] != array[:-1]
+    return np.flatnonzero(mask)
+
+
 def split_by_labels(labels, sorted_indices, array):
     sorted_array = array[sorted_indices]
     sorted_labels = labels[sorted_indices]
-    _, indices = np.unique(sorted_labels, return_index=True)
+    indices = unique_sorted(sorted_labels)
     subarrays = np.split(sorted_array, indices[1:])
     return subarrays
-
-
-def get_sources(down_inds, up_inds):
-    return np.setdiff1d(up_inds, down_inds, assume_unique=False)
-
-
-def get_sinks(down_inds, up_inds):
-    return np.setdiff1d(down_inds, up_inds, assume_unique=False)
-
-
-def get_singletons(down_inds, up_inds, nodes):
-    connected = np.union1d(up_inds, down_inds)
-    return np.setdiff1d(nodes, connected)
 
 
 class RiverNetwork:
@@ -73,11 +74,8 @@ class RiverNetwork:
         self._edges = np.arange(self.n_edges)
         self._nodes = np.arange(self.n_nodes)
 
-        self.singletons = get_singletons(
-            self._storage.down_ids, self._storage.up_ids, self._nodes
-        )
-        self.sources = get_sources(self._storage.down_ids, self._storage.up_ids)
-        self.sinks = get_sinks(self._storage.down_ids, self._storage.up_ids)
+        self.sources = self._storage.sources
+        self.sinks = self._storage.sinks
 
         _sorted_indices_downstream = np.argsort(self._storage.downstream_group_labels)
         self.downstream_groups = zip(

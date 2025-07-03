@@ -9,99 +9,7 @@
 
 import numpy as np
 
-from earthkit.hydro._version import __version__ as ekh_version
 from earthkit.hydro.network import RiverNetworkStorage
-
-# read in only up to second decimal point
-# i.e. 0.1.dev90 -> 0.1
-ekh_version = ".".join(ekh_version.split(".")[:2])
-
-try:
-    from .topological_labels_rust import compute_topological_labels
-except (ModuleNotFoundError, ImportError):
-    print("Failed to load rust extension, falling back to python implementation.")
-    from .topological_labels_python import compute_topological_labels
-
-
-# def cache(func):
-#     """Decorator to allow automatic use of cache.
-
-#     Parameters
-#     ----------
-#     func : callable
-#         The function to be wrapped and executed with masking applied.
-
-#     Returns
-#     -------
-#     callable
-#         The wrapped function.
-
-#     """
-
-#     def wrapper(
-#         path,
-#         river_network_format,
-#         source="file",
-#         use_cache=True,
-#         cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
-#         cache_fname="{ekh_version}_{hash}.joblib",
-#         cache_compression=1,
-#     ):
-#         """Wrapper to load river network from cache if available, otherwise
-#         create and cache it.
-
-#         Parameters
-#         ----------
-#         path : str
-#             The path to the river network.
-#         river_network_format : str
-#             The format of the river network file.
-#             Supported formats are "precomputed", "cama", "pcr_d8", and "esri_d8".
-#         source : str, optional
-#             The source of the river network.
-#             For possible sources see:
-#             https://earthkit-data.readthedocs.io/en/latest/guide/sources.html
-#         use_cache : bool, optional
-#             Whether to use caching. Default is True.
-#         cache_dir : str, optional
-#             The directory to store the cache files. Default is a temporary directory.
-#         cache_fname : str, optional
-#             The filename template for the cache files.
-#             Default is "{ekh_version}_{hash}.joblib".
-#         cache_compression : int, optional
-#             The compression level for the cache files. Default is 1.
-
-#         Returns
-#         -------
-#         earthkit.hydro.network.RiverNetwork
-#             The loaded river network.
-
-#         """
-#         if use_cache:
-#             hashed_name = sha256(path.encode("utf-8")).hexdigest()
-#             cache_dir = cache_dir.format(ekh_version=ekh_version, hash=hashed_name)
-#             cache_fname = cache_fname.format(ekh_version=ekh_version,
-#                                               hash=hashed_name)
-#             cache_filepath = os.path.join(cache_dir, cache_fname)
-
-#             if os.path.isfile(cache_filepath):
-#                 print(f"Loading river network from cache ({cache_filepath}).")
-#                 return RiverNetwork(joblib.load(cache_filepath))
-#             else:
-#                 print(f"River network not found in cache ({cache_filepath}).")
-#                 os.makedirs(cache_dir, exist_ok=True)
-#         else:
-#             print("Cache disabled.")
-
-#         network = func(path, river_network_format, source)
-
-#         if use_cache:
-#             network.export(cache_filepath, compression=cache_compression)
-#             print(f"River network loaded, saving to cache ({cache_filepath}).")
-
-#         return network
-
-#     return wrapper
 
 
 def import_earthkit_or_prompt_install(river_network_format, source):
@@ -336,72 +244,96 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     del downstream_nodes, upstream_nodes
 
     has_downstream = downstream != n_nodes
-    edge_indices = np.zeros(n_nodes) - 1
-    edge_indices[has_downstream] = np.arange(has_downstream.sum())
-    down_ids = downstream[has_downstream]
+    n_edges = int(has_downstream.sum())
+
+    edge_indices = np.arange(has_downstream.sum())
+
     up_ids = nodes[has_downstream]
-    n_edges = down_ids.shape[0]
+    down_ids = downstream[has_downstream]
+
     coords = None
     mask = missing_mask.reshape(shape)
     bifurcates = False
     sources = get_sources(n_nodes, down_ids)
     sinks = nodes[downstream == n_nodes]
-    downstream_group_labels = compute_topological_labels(
+
+    assert np.all(np.isin(np.setdiff1d(sinks, sources), down_ids))
+
+    # TODO: fix convoluted logic: clean up
+    naive_topological_group_labels = compute_topological_labels(
         sources.astype(np.uintp), sinks.astype(np.uintp), downstream.astype(np.uintp)
     )
-    downstream_group_labels = downstream_group_labels[has_downstream]
-    upstream_group_labels = np.max(downstream_group_labels) - downstream_group_labels
+    print(naive_topological_group_labels)
+    sorted_indices = np.argsort(naive_topological_group_labels)  # sort by labels
+    sorted_array = nodes[sorted_indices]
+    sorted_labels = naive_topological_group_labels[sorted_indices]
+    _, indices = np.unique(sorted_labels, return_index=True)
+    naive_topological_groups = np.split(sorted_array, indices[1:])
+    distances = np.zeros(n_nodes)
+    for group in naive_topological_groups[:-1][::-1]:
+        np.maximum.at(distances, group, distances[downstream[group]] + 1)
+    distances = -distances[has_downstream]
+    # distances = naive_topological_group_labels[has_downstream] # remove sinks
+
+    sort_indices_downstream = np.argsort(distances)
+    sort_indices_upstream = np.argsort(-distances)
+    sorted_distances_downstream = distances[
+        sort_indices_downstream
+    ]  # from source to sink
+    sorted_distances_upstream = -distances[sort_indices_upstream]  # from sink to source
+    assert np.all(sorted_distances_upstream[::-1] == -sorted_distances_downstream)
+
+    up_ids_downsort = up_ids[sort_indices_downstream]
+    down_ids_downsort = down_ids[sort_indices_downstream]
+    edge_ids_downsort = edge_indices[sort_indices_downstream]
+
+    up_ids_upsort = up_ids[sort_indices_upstream]
+    down_ids_upsort = down_ids[sort_indices_upstream]
+    edge_ids_upsort = edge_indices[sort_indices_upstream]
+
+    _, up_splits = np.unique(sorted_distances_upstream, return_index=True)
+    up_splits = up_splits[1:]
+    _, down_splits = np.unique(sorted_distances_downstream, return_index=True)
+    down_splits = down_splits[1:]
 
     store = RiverNetworkStorage(
         n_nodes,
         n_edges,
-        up_ids,
-        down_ids,
+        up_ids_upsort,
+        down_ids_upsort,
+        edge_ids_upsort,
+        up_ids_downsort,
+        down_ids_downsort,
+        edge_ids_downsort,
         sources,
         sinks,
         coords,
         mask,
         bifurcates,
-        downstream_group_labels,
-        upstream_group_labels,
+        up_splits,
+        down_splits,
     )
 
     return store
 
 
-# def from_grit(path):
-#     import geopandas as gpd
-#     import pandas as pd
+# TODO: replace, using this initially only
+def compute_topological_labels(
+    sources: np.ndarray, sinks: np.ndarray, downstream_nodes: np.ndarray
+):
+    n_nodes = downstream_nodes.shape[0]
+    inlets = downstream_nodes[sources]
+    labels = np.zeros(n_nodes, dtype=int)
 
-#     gdf = gpd.read_file(path, layer="nodes")
-#     gdf["x"] = gdf.geometry.x
-#     gdf["y"] = gdf.geometry.y
-#     x_spacing = pd.Series(np.diff(np.sort(gdf["x"].unique()))).mode().iloc[0]
-#     y_spacing = pd.Series(np.diff(np.sort(gdf["y"].unique()))).mode().iloc[0]
-#     print(f"Estimated grid spacing: dx={x_spacing}, dy={y_spacing}")
-#     x_origin = gdf["x"].min()
-#     y_origin = gdf["y"].min()
-#     gdf["grid_col"] = ((gdf["x"] - x_origin) // x_spacing).astype(int)
-#     gdf["grid_row"] = ((gdf["y"] - y_origin) // y_spacing).astype(int)
-#     n_cols = gdf["grid_col"].max() + 1
-#     gdf["flat_index"] = gdf["grid_row"] * n_cols + gdf["grid_col"]
-#     gdf.sort_values(by=["flat_index"], inplace=True)
-#     gdf.reset_index(inplace=True)
-#     rows = gdf["grid_row"].to_numpy()
-#     cols = gdf["grid_col"].to_numpy()
-#     grid_ids = (rows[::-1], cols)
-#     ref = gdf["global_id"]
-#     value_to_index = pd.Series(ref.index, index=ref).to_dict()
+    for n in range(1, n_nodes + 1):
+        inlets = np.unique(inlets[inlets != n_nodes])  # subset to valid nodes
+        if inlets.shape[0] == 0:
+            break
+        labels[inlets] = n  # update furthest distance from source
+        inlets = downstream_nodes[inlets]
 
-#     lines = gpd.read_file(path, layer="lines")
-#     lines["UPID"] = lines["upstream_node_id"].map(value_to_index)
-#     lines["DOWNID"] = lines["downstream_node_id"].map(value_to_index)
-#     lines.sort_values(by=["UPID"], inplace=True)
-#     up_nodes = lines["UPID"].to_numpy()
-#     down_nodes = lines["DOWNID"].to_numpy()
-#     nodes = ref.index.values
-#     shape = rows.max() + 1, cols.max() + 1
+    if inlets.shape[0] != 0:
+        raise ValueError("River Network contains a cycle.")
+    labels[sinks] = n - 1  # put all sinks in last group in topological ordering
 
-#     return RiverNetwork(
-#         nodes, grid_ids, shape, down_nodes, up_nodes, has_bifurcations=True
-#     )
+    return labels

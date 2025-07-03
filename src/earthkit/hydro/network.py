@@ -11,57 +11,39 @@ import numpy as np
 
 
 class RiverNetworkStorage:
-
     def __init__(
         self,
         n_nodes,
         n_edges,
-        up_ids,
-        down_ids,
+        up_ids_upsort,  # sorted by top groups up
+        down_ids_upsort,  # sorted by top groups up
+        edge_ids_upsort,  # sorted by top groups up
+        up_ids_downsort,  # sorted by top groups down
+        down_ids_downsort,  # sorted by top groups down
+        edge_ids_downsort,  # sorted by top groups down
         sources,
         sinks,
         coords,
         mask,
         bifurcates,
-        downstream_group_labels,
-        upstream_group_labels,
+        up_splits,  # just indices of where to split
+        down_splits,  # just indices of where to split
     ):
         self.n_nodes = n_nodes
         self.n_edges = n_edges
         self.bifurcates = bifurcates
-        del n_edges, n_nodes, bifurcates
         self.sources = sources
-        del sources
         self.sinks = sinks
-        del sinks
-        self.up_ids = up_ids
-        del up_ids
-        self.down_ids = down_ids
-        del down_ids
         self.coords = coords
-        del coords
         self.mask = mask
-        del mask
-        self.downstream_group_labels = downstream_group_labels
-        del downstream_group_labels
-        self.upstream_group_labels = upstream_group_labels
-        del upstream_group_labels
-
-
-def unique_sorted(array):
-    # array must be 1D and sorted!
-    mask = np.empty_like(array, dtype=bool)
-    mask[0] = True
-    mask[1:] = array[1:] != array[:-1]
-    return np.flatnonzero(mask)
-
-
-def split_by_labels(labels, sorted_indices, array):
-    sorted_array = array[sorted_indices]
-    sorted_labels = labels[sorted_indices]
-    indices = unique_sorted(sorted_labels)
-    subarrays = np.split(sorted_array, indices[1:])
-    return subarrays
+        self.up_ids_upsort = up_ids_upsort
+        self.down_ids_upsort = down_ids_upsort
+        self.edge_ids_upsort = edge_ids_upsort
+        self.up_ids_downsort = up_ids_downsort
+        self.down_ids_downsort = down_ids_downsort
+        self.edge_ids_downsort = edge_ids_downsort
+        self.up_splits = up_splits
+        self.down_splits = down_splits
 
 
 class RiverNetwork:
@@ -70,51 +52,24 @@ class RiverNetwork:
         self._storage = river_network_storage
         self.n_nodes = self._storage.n_nodes
         self.n_edges = self._storage.n_edges
-
-        self._edges = np.arange(self.n_edges)
-        self._nodes = np.arange(self.n_nodes)
-
+        self._nodes = np.arange(self.n_nodes)  # TODO: check if needed
         self.sources = self._storage.sources
         self.sinks = self._storage.sinks
 
-        _sorted_indices_downstream = np.argsort(self._storage.downstream_group_labels)
-        self.downstream_groups = zip(
-            split_by_labels(
-                self._storage.downstream_group_labels,
-                _sorted_indices_downstream,
-                self._storage.up_ids,
-            ),
-            split_by_labels(
-                self._storage.downstream_group_labels,
-                _sorted_indices_downstream,
-                self._storage.down_ids,
-            ),
-            split_by_labels(
-                self._storage.downstream_group_labels,
-                _sorted_indices_downstream,
-                self._edges,
-            ),
+        self.downstream_groups = list(
+            zip(
+                np.split(self._storage.down_ids_downsort, self._storage.down_splits),
+                np.split(self._storage.up_ids_downsort, self._storage.down_splits),
+                np.split(self._storage.edge_ids_downsort, self._storage.down_splits),
+            )
         )
-        del _sorted_indices_downstream
-        _sorted_indices_upstream = np.argsort(self._storage.upstream_group_labels)
-        self.upstream_groups = zip(
-            split_by_labels(
-                self._storage.upstream_group_labels,
-                _sorted_indices_upstream,
-                self._storage.down_ids,
-            ),
-            split_by_labels(
-                self._storage.upstream_group_labels,
-                _sorted_indices_upstream,
-                self._storage.up_ids,
-            ),
-            split_by_labels(
-                self._storage.upstream_group_labels,
-                _sorted_indices_upstream,
-                self._edges,
-            ),
+        self.upstream_groups = list(
+            zip(
+                np.split(self._storage.up_ids_upsort, self._storage.up_splits),
+                np.split(self._storage.down_ids_upsort, self._storage.up_splits),
+                np.split(self._storage.edge_ids_upsort, self._storage.up_splits),
+            )
         )
-        del _sorted_indices_upstream
 
     @property
     def mask(self):

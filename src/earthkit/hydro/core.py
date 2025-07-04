@@ -38,10 +38,10 @@ def flow(river_network, field, invert_graph, operation, *args, **kwargs):
     else:
         groupings = river_network.downstream_groups
 
-    for grouping in groupings:
+    for did, uid, eid in groupings:
         # modify field in_place with desired operation
         # NB: this function needs to handle missing values
         # mv if they are allowed in input
-        operation(river_network, field, grouping, *args, **kwargs)
+        operation(river_network, field, did, uid, eid, *args, **kwargs)
 
     return field

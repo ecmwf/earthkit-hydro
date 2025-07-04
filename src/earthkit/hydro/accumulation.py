@@ -72,7 +72,9 @@ def flow_downstream(
     def operation(
         river_network,
         field,
-        grouping,
+        did,
+        uid,
+        eid,
         mv,
         node_additive_weight,
         node_multiplicative_weight,
@@ -83,7 +85,9 @@ def flow_downstream(
         return op(
             river_network,
             field,
-            grouping,
+            did,
+            uid,
+            eid,
             mv,
             node_additive_weight,
             node_multiplicative_weight,
@@ -112,7 +116,9 @@ def flow_downstream(
 def _ufunc_to_downstream(
     river_network,
     field,
-    grouping,
+    did,
+    uid,
+    eid,
     mv,
     node_additive_weight,
     node_multiplicative_weight,
@@ -151,22 +157,21 @@ def _ufunc_to_downstream(
     None
 
     """
-    up_ids, down_ids, grouping = grouping
-    modifier_group = up_ids if node_modifier_use_upstream else down_ids
+    modifier_group = uid if node_modifier_use_upstream else did
 
-    modifier_field = field[..., up_ids]
+    modifier_field = field[..., uid]
     if node_multiplicative_weight is not None:
         modifier_field *= node_multiplicative_weight[..., modifier_group]
     if edge_multiplicative_weight is not None:
-        modifier_field *= edge_multiplicative_weight[..., grouping]
+        modifier_field *= edge_multiplicative_weight[..., eid]
     if node_additive_weight is not None:
         modifier_field += node_additive_weight[..., modifier_group]
     if edge_additive_weight is not None:
-        modifier_field += edge_additive_weight[..., grouping]
+        modifier_field += edge_additive_weight[..., eid]
 
     ufunc.at(
         field,
-        (*[slice(None)] * (field.ndim - 1), down_ids),
+        (*[slice(None)] * (field.ndim - 1), did),
         modifier_field,
     )
 
@@ -224,12 +229,14 @@ def flow_upstream(
 
     field, field_dtype = missing_to_nan(field, mv, accept_missing, skip_missing_check)
 
-    op = _ufunc_to_upstream
+    op = _ufunc_to_downstream
 
     def operation(
         river_network,
         field,
-        grouping,
+        did,
+        uid,
+        eid,
         mv,
         node_additive_weight,
         node_multiplicative_weight,
@@ -240,7 +247,9 @@ def flow_upstream(
         return op(
             river_network,
             field,
-            grouping,
+            did,
+            uid,
+            eid,
             mv,
             node_additive_weight,
             node_multiplicative_weight,
@@ -264,68 +273,6 @@ def flow_upstream(
     )
 
     return nan_to_missing(field, field_dtype, mv)
-
-
-def _ufunc_to_upstream(
-    river_network,
-    field,
-    grouping,
-    mv,
-    node_additive_weight,
-    node_multiplicative_weight,
-    node_modifier_use_upstream,
-    edge_additive_weight,
-    edge_multiplicative_weight,
-    ufunc,
-):
-    """Updates field in-place by applying a ufunc at the nodes of
-    the grouping.
-
-    Parameters
-    ----------
-    river_network : earthkit.hydro.network.RiverNetwork
-        An earthkit-hydro river network object.
-    field : numpy.ndarray
-        The input field.
-    grouping : numpy.ndarray
-        An array of indices.
-    mv : scalar
-        A missing value indicator (not used in the function but kept for consistency).
-    additive_weight : numpy.ndarray, optional
-        A weight to be added to the field values. Default is None.
-    multiplicative_weight : numpy.ndarray, optional
-        A weight to be multiplied with the field values. Default is None.
-    modifier_use_upstream : bool, optional
-        If True, the modifiers are used on the upstream nodes instead of downstream.
-        Default is True.
-    ufunc : numpy.ufunc
-        A universal function from the numpy library to be applied to the field data.
-        Available ufuncs: https://numpy.org/doc/2.2/reference/ufuncs.html.
-        Note: must allow two operands.
-
-    Returns
-    -------
-    None
-
-    """
-    up_ids, down_ids, grouping = grouping
-    modifier_group = up_ids if node_modifier_use_upstream else down_ids
-
-    modifier_field = field[..., down_ids]
-    if node_multiplicative_weight is not None:
-        modifier_field *= node_multiplicative_weight[..., modifier_group]
-    if edge_multiplicative_weight is not None:
-        modifier_field *= edge_multiplicative_weight[..., grouping]
-    if node_additive_weight is not None:
-        modifier_field += node_additive_weight[..., modifier_group]
-    if edge_additive_weight is not None:
-        modifier_field += edge_additive_weight[..., grouping]
-
-    ufunc.at(
-        field,
-        (*[slice(None)] * (field.ndim - 1), up_ids),
-        modifier_field,
-    )
 
 
 def calculate_online_metric(

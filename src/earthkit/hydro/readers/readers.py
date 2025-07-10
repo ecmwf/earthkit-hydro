@@ -9,7 +9,7 @@
 
 import numpy as np
 
-from earthkit.hydro.network import RiverNetworkStorage
+from earthkit.hydro.data_structures._network import RiverNetworkStorage
 
 
 def import_earthkit_or_prompt_install(river_network_format, source):
@@ -246,10 +246,10 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     has_downstream = downstream != n_nodes
     n_edges = int(has_downstream.sum())
 
-    edge_indices = np.arange(has_downstream.sum())
+    edge_indices = np.arange(has_downstream.sum()).astype(np.uintp)
 
-    up_ids = nodes[has_downstream]
-    down_ids = downstream[has_downstream]
+    up_ids = nodes[has_downstream].astype(np.uintp)
+    down_ids = downstream[has_downstream].astype(np.uintp)
 
     coords = None
     mask = missing_mask.reshape(shape)
@@ -263,55 +263,46 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     naive_topological_group_labels = compute_topological_labels(
         sources.astype(np.uintp), sinks.astype(np.uintp), downstream.astype(np.uintp)
     )
-    print(naive_topological_group_labels)
-    sorted_indices = np.argsort(naive_topological_group_labels)  # sort by labels
-    sorted_array = nodes[sorted_indices]
-    sorted_labels = naive_topological_group_labels[sorted_indices]
-    _, indices = np.unique(sorted_labels, return_index=True)
-    naive_topological_groups = np.split(sorted_array, indices[1:])
-    distances = np.zeros(n_nodes)
-    for group in naive_topological_groups[:-1][::-1]:
-        np.maximum.at(distances, group, distances[downstream[group]] + 1)
-    distances = -distances[has_downstream]
-    # distances = naive_topological_group_labels[has_downstream] # remove sinks
 
-    sort_indices_downstream = np.argsort(distances)
-    sort_indices_upstream = np.argsort(-distances)
-    sorted_distances_downstream = distances[
-        sort_indices_downstream
-    ]  # from source to sink
-    sorted_distances_upstream = -distances[sort_indices_upstream]  # from sink to source
-    assert np.all(sorted_distances_upstream[::-1] == -sorted_distances_downstream)
+    # sorted_indices = np.argsort(naive_topological_group_labels)  # sort by labels
+    # sorted_array = nodes[sorted_indices]
+    # sorted_labels = naive_topological_group_labels[sorted_indices]
+    # _, indices = np.unique(sorted_labels, return_index=True)
+    # naive_topological_groups = np.split(sorted_array, indices[1:])
+    # distances = np.zeros(n_nodes)
+    # for group in naive_topological_groups[:-1][::-1]:
+    #     np.maximum.at(distances, group, distances[downstream[group]] + 1)
+    # distances = -distances[has_downstream]
 
-    up_ids_downsort = up_ids[sort_indices_downstream]
-    down_ids_downsort = down_ids[sort_indices_downstream]
-    edge_ids_downsort = edge_indices[sort_indices_downstream]
+    distances = naive_topological_group_labels[has_downstream]  # remove sinks
 
-    up_ids_upsort = up_ids[sort_indices_upstream]
-    down_ids_upsort = down_ids[sort_indices_upstream]
-    edge_ids_upsort = edge_indices[sort_indices_upstream]
+    sort_indices = np.lexsort(
+        (nodes[has_downstream], distances)
+    )  # np.argsort(distances)
+    sorted_distances = distances[sort_indices]  # from source to sink
 
-    _, up_splits = np.unique(sorted_distances_upstream, return_index=True)
-    up_splits = up_splits[1:]
-    _, down_splits = np.unique(sorted_distances_downstream, return_index=True)
-    down_splits = down_splits[1:]
+    up_ids_sort = up_ids[sort_indices]
+    down_ids_sort = down_ids[sort_indices]
+    edge_ids_sort = edge_indices[sort_indices]
+
+    _, splits = np.unique(sorted_distances, return_index=True)
+    splits = splits[1:]
+
+    pixarea = None
+    edge_weights = None
 
     store = RiverNetworkStorage(
         n_nodes,
         n_edges,
-        up_ids_upsort,
-        down_ids_upsort,
-        edge_ids_upsort,
-        up_ids_downsort,
-        down_ids_downsort,
-        edge_ids_downsort,
+        np.vstack([down_ids_sort, up_ids_sort, edge_ids_sort]),
         sources,
         sinks,
         coords,
+        splits,
+        pixarea,
         mask,
         bifurcates,
-        up_splits,
-        down_splits,
+        edge_weights,
     )
 
     return store

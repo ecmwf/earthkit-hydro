@@ -1,11 +1,3 @@
-# (C) Copyright 2025- ECMWF.
-#
-# This software is licensed under the terms of the Apache Licence Version 2.0
-# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
-# In applying this licence, ECMWF does not waive the privileges and immunities
-# granted to it by virtue of its status as an intergovernmental organisation
-# nor does it submit to any jurisdiction.
-
 import json
 from io import BytesIO
 from urllib.request import Request, urlopen
@@ -13,21 +5,23 @@ from urllib.request import Request, urlopen
 import joblib
 
 from earthkit.hydro._version import __version__ as ekh_version
-
-from .network import RiverNetwork
-from .readers import (  # cache, from_grit,
+from earthkit.hydro.data_structures.network import RiverNetwork
+from earthkit.hydro.readers import (  # cache, from_grit,
     find_main_var,
     from_cama_nextxy,
     from_d8,
     import_earthkit_or_prompt_install,
 )
+from earthkit.hydro.utils.readers import from_file
+
+from .cache import cache
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1
 ekh_version = ".".join(ekh_version.split(".")[:2])
 
 
-# @cache
+@cache
 def create(path, river_network_format, source):
     """Creates a river network from the given path, format, and source.
 
@@ -71,8 +65,6 @@ def create(path, river_network_format, source):
         or river_network_format == "merit_d8"
     ):
         if path.endswith(".map"):
-            from .pcr import from_file
-
             data = from_file(path, mask=False)
         else:
             ekd = import_earthkit_or_prompt_install(river_network_format, source)

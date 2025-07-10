@@ -14,4 +14,4 @@ def river_network(request):
         river_network = ekh.readers.from_cama_nextxy(*flow_directions)
     # TODO: add ESRI
 
-    return river_network
+    return ekh.data_structures.RiverNetwork(river_network)

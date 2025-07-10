@@ -1,15 +1,8 @@
-# (C) Copyright 2025- ECMWF.
-#
-# This software is licensed under the terms of the Apache Licence Version 2.0
-# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
-# In applying this licence, ECMWF does not waive the privileges and immunities
-# granted to it by virtue of its status as an intergovernmental organisation
-# nor does it submit to any jurisdiction.
-
 import numpy as np
 
-from .accumulation import flow_downstream, flow_upstream
-from .utils import mask_2d, points_to_1d_indices, points_to_numpy
+from earthkit.hydro.core.accumulate import flow_downstream, flow_upstream
+from earthkit.hydro.utils.convert import points_to_1d_indices, points_to_numpy
+from earthkit.hydro.utils.decorators import mask_2d
 
 
 @mask_2d
@@ -44,7 +37,7 @@ def min(
     numpy.ndarray
         The length to the points in the river network.
     """
-    if river_network.has_bifurcations and (upstream and downstream):
+    if river_network.bifurcates and (upstream and downstream):
         raise NotImplementedError(
             "Undirected lengths not yet supported for bifurcations."
         )
@@ -68,7 +61,6 @@ def min(
         field = flow_downstream(
             river_network,
             field,
-            mv,
             ufunc=np.minimum,
             node_additive_weight=weights,
             node_modifier_use_upstream=False,
@@ -77,10 +69,9 @@ def min(
         field = flow_upstream(
             river_network,
             field,
-            mv,
             ufunc=np.minimum,
             node_additive_weight=weights,
-            node_modifier_use_upstream=True,
+            node_modifier_use_upstream=False,
         )
 
     out_field = np.empty(river_network.shape, dtype=field.dtype)
@@ -153,7 +144,6 @@ def max(
         field = flow_downstream(
             river_network,
             field,
-            mv,
             ufunc=np.maximum,
             node_additive_weight=weights,
             node_modifier_use_upstream=False,
@@ -162,10 +152,9 @@ def max(
         field = flow_upstream(
             river_network,
             field,
-            mv,
             ufunc=np.maximum,
             node_additive_weight=weights,
-            node_modifier_use_upstream=True,
+            node_modifier_use_upstream=False,
         )
 
     field = np.nan_to_num(field, neginf=np.inf)

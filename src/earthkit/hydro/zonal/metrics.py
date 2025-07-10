@@ -1,17 +1,7 @@
-# (C) Copyright 2025- ECMWF.
-#
-# This software is licensed under the terms of the Apache Licence Version 2.0
-# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
-# In applying this licence, ECMWF does not waive the privileges and immunities
-# granted to it by virtue of its status as an intergovernmental organisation
-# nor does it submit to any jurisdiction.
-
-from functools import partial
-
 import numpy as np
 
-from .metrics import metrics_dict
-from .utils import is_missing, missing_to_nan, nan_to_missing
+from earthkit.hydro.core.metrics import metrics_dict
+from earthkit.hydro.utils.missing import is_missing, missing_to_nan, nan_to_missing
 
 
 def calculate_zonal_metric(
@@ -153,8 +143,162 @@ def calculate_zonal_metric(
         return dict(zip(unique_labels, initial_field))
 
 
-for metric in metrics_dict.keys():
+def sum(
+    field,
+    labels,
+    weights=None,
+    field_mv=np.nan,
+    labels_mv=0,
+    return_field=False,
+    field_accept_missing=False,
+    skip_missing_check=False,
+):
+    return calculate_zonal_metric(
+        field,
+        labels,
+        "sum",
+        weights,
+        field_mv,
+        labels_mv,
+        return_field,
+        field_accept_missing,
+        skip_missing_check,
+    )
 
-    func = partial(calculate_zonal_metric, metric=metric)
 
-    globals()[metric] = func
+def max(
+    field,
+    labels,
+    weights=None,
+    field_mv=np.nan,
+    labels_mv=0,
+    return_field=False,
+    field_accept_missing=False,
+    skip_missing_check=False,
+):
+    return calculate_zonal_metric(
+        field,
+        labels,
+        "max",
+        weights,
+        field_mv,
+        labels_mv,
+        return_field,
+        field_accept_missing,
+        skip_missing_check,
+    )
+
+
+def min(
+    field,
+    labels,
+    weights=None,
+    field_mv=np.nan,
+    labels_mv=0,
+    return_field=False,
+    field_accept_missing=False,
+    skip_missing_check=False,
+):
+    return calculate_zonal_metric(
+        field,
+        labels,
+        "min",
+        weights,
+        field_mv,
+        labels_mv,
+        return_field,
+        field_accept_missing,
+        skip_missing_check,
+    )
+
+
+def mean(
+    field,
+    labels,
+    weights=None,
+    field_mv=np.nan,
+    labels_mv=0,
+    return_field=False,
+    field_accept_missing=False,
+    skip_missing_check=False,
+):
+    return calculate_zonal_metric(
+        field,
+        labels,
+        "mean",
+        weights,
+        field_mv,
+        labels_mv,
+        return_field,
+        field_accept_missing,
+        skip_missing_check,
+    )
+
+
+def std(
+    field,
+    labels,
+    weights=None,
+    field_mv=np.nan,
+    labels_mv=0,
+    return_field=False,
+    field_accept_missing=False,
+    skip_missing_check=False,
+):
+    return calculate_zonal_metric(
+        field,
+        labels,
+        "std",
+        weights,
+        field_mv,
+        labels_mv,
+        return_field,
+        field_accept_missing,
+        skip_missing_check,
+    )
+
+
+def var(
+    field,
+    labels,
+    weights=None,
+    field_mv=np.nan,
+    labels_mv=0,
+    return_field=False,
+    field_accept_missing=False,
+    skip_missing_check=False,
+):
+    return calculate_zonal_metric(
+        field,
+        labels,
+        "var",
+        weights,
+        field_mv,
+        labels_mv,
+        return_field,
+        field_accept_missing,
+        skip_missing_check,
+    )
+
+
+def prod(
+    field,
+    labels,
+    weights=None,
+    field_mv=np.nan,
+    labels_mv=0,
+    return_field=False,
+    field_accept_missing=False,
+    skip_missing_check=False,
+):
+    return calculate_zonal_metric(
+        field,
+        labels,
+        "prod",
+        weights,
+        field_mv,
+        labels_mv,
+        return_field,
+        field_accept_missing,
+        skip_missing_check,
+    )

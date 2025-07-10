@@ -11,6 +11,8 @@ import numpy as np
 
 from earthkit.hydro.data_structures._network import RiverNetworkStorage
 
+from .group_labels import compute_topological_labels
+
 
 def import_earthkit_or_prompt_install(river_network_format, source):
     """Ensure that the `earthkit.data` package is installed and import it. If
@@ -259,22 +261,12 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
 
     assert np.all(np.isin(np.setdiff1d(sinks, sources), down_ids))
 
-    # TODO: fix convoluted logic: clean up
-    naive_topological_group_labels = compute_topological_labels(
-        sources.astype(np.uintp), sinks.astype(np.uintp), downstream.astype(np.uintp)
-    )
-
-    # sorted_indices = np.argsort(naive_topological_group_labels)  # sort by labels
-    # sorted_array = nodes[sorted_indices]
-    # sorted_labels = naive_topological_group_labels[sorted_indices]
-    # _, indices = np.unique(sorted_labels, return_index=True)
-    # naive_topological_groups = np.split(sorted_array, indices[1:])
-    # distances = np.zeros(n_nodes)
-    # for group in naive_topological_groups[:-1][::-1]:
-    #     np.maximum.at(distances, group, distances[downstream[group]] + 1)
-    # distances = -distances[has_downstream]
-
-    distances = naive_topological_group_labels[has_downstream]  # remove sinks
+    distances = compute_topological_labels(
+        sources.astype(np.uintp),
+        sinks.astype(np.uintp),
+        downstream.astype(np.uintp),
+        n_nodes,
+    )[has_downstream]
 
     sort_indices = np.lexsort(
         (nodes[has_downstream], distances)
@@ -306,25 +298,3 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     )
 
     return store
-
-
-# TODO: replace, using this initially only
-def compute_topological_labels(
-    sources: np.ndarray, sinks: np.ndarray, downstream_nodes: np.ndarray
-):
-    n_nodes = downstream_nodes.shape[0]
-    inlets = downstream_nodes[sources]
-    labels = np.zeros(n_nodes, dtype=int)
-
-    for n in range(1, n_nodes + 1):
-        inlets = np.unique(inlets[inlets != n_nodes])  # subset to valid nodes
-        if inlets.shape[0] == 0:
-            break
-        labels[inlets] = n  # update furthest distance from source
-        inlets = downstream_nodes[inlets]
-
-    if inlets.shape[0] != 0:
-        raise ValueError("River Network contains a cycle.")
-    labels[sinks] = n - 1  # put all sinks in last group in topological ordering
-
-    return labels

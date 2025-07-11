@@ -8,139 +8,114 @@
 
 use pyo3::prelude::*;
 use rayon::prelude::*;
-use numpy::{PyArray1};
+use pyo3::types::PyList;
+use numpy::{PyArrayDyn, PyArray2, PyArray1};
+use ndarray::{Axis, Zip};
 use pyo3::exceptions::PyValueError;
 use std::sync::atomic::{AtomicI64, Ordering};
 use fixedbitset::FixedBitSet;
 
-use std::collections::HashMap;
-
 #[pyfunction]
-fn flow_downstream_par(
-    _py: Python,
-    topo_groups: &PyAny,           // List of (up, down) np arrays
-    field: &PyArray1<f64>,         // Mutable target array
+fn _flow_rust<'py>(
+    py: Python<'py>,
+    field: &'py PyArrayDyn<f64>,  // shape (..., F)
+    groups: &PyList, // shape (3, N)
+    invert_graph: bool,
+    node_modifier_use_upstream: bool,
+    node_multiplicative_weight: Option<&'py PyArrayDyn<f64>>, // shape (..., G)
+    edge_multiplicative_weight: Option<&'py PyArrayDyn<f64>>, // shape (..., E)
+    node_additive_weight: Option<&'py PyArrayDyn<f64>>,       // shape (..., G)
+    edge_additive_weight: Option<&'py PyArrayDyn<f64>>,       // shape (..., E)
 ) -> PyResult<()> {
-    let field_slice = unsafe { field.as_slice_mut()? };
+    let mut field = unsafe { field.as_array_mut() };
+    let ndim = field.ndim();
+    let last_axis = ndim - 1;
 
-    for group in topo_groups.iter()? {
-        let (up, down, eid): (&PyArray1<usize>, &PyArray1<usize>, &PyArray1<usize>) = group?.extract()?;
-        let up_inds = unsafe { up.as_slice()? };
-        let down_inds = unsafe { down.as_slice()? };
-
-        // Parallel accumulation: final output is a single merged HashMap
-        let contribs: HashMap<usize, f64> = up_inds
-            .par_iter()
-            .zip(down_inds.par_iter())
-            .fold(
-                || HashMap::new(),
-                |mut local_map, (&u, &d)| {
-                    *local_map.entry(d).or_insert(0.0) += field_slice[u];
-                    local_map
-                },
-            )
-            .reduce(
-                || HashMap::new(),
-                |mut acc, map| {
-                    for (k, v) in map {
-                        *acc.entry(k).or_insert(0.0) += v;
-                    }
-                    acc
-                },
-            );
-
-        // Serial application of results to field
-        for (d, val) in contribs {
-            field_slice[d] += val;
+    for group_any in groups.iter() {
+        let group = group_any.downcast::<PyArray2<usize>>()?;
+        let group = unsafe { group.as_array() }; // shape (3, K)
+        if group.shape()[0] != 3 {
+            return Err(pyo3::exceptions::PyValueError::new_err("Group must have shape (3, K)"));
         }
-    }
 
-    Ok(())
-}
+        let k = group.shape()[1];
 
-// Wrapper to mark raw pointer as Send + Sync safely
-#[derive(Copy, Clone)]
-struct FieldPtr(*mut f64);
+        // Extract slices from group
+        let dids = group.row(0);
+        let uids = group.row(1);
+        let eids = group.row(2);
 
-unsafe impl Send for FieldPtr {}
-unsafe impl Sync for FieldPtr {}
+        // Determine srcs and dsts according to invert_graph
+        let (srcs, dsts) = if invert_graph { (dids, uids) } else { (uids, dids) };
+        // Determine modifier_group based on flag
+        let modifier_group = if node_modifier_use_upstream { srcs } else { dsts };
 
-#[pyfunction]
-fn move_upstream_par(
-    _py: Python,
-    topo_groups: Vec<(&PyArray1<usize>, &PyArray1<usize>, &PyArray1<usize>)>,
-    field: &PyArray1<f64>,
-) -> PyResult<()> {
-    // Get mutable slice safely
-    let field_slice = unsafe { field.as_slice_mut()? };
-    let field_ptr = FieldPtr(field_slice.as_mut_ptr());
+        // Gather modifier fields: field[..., srcs]
+        // We'll create an Array with shape: field.shape[0..-1] + (k,)
+        let mut modifier_shape = field.shape().to_vec();
+        modifier_shape[last_axis] = k;
+        let mut modifier = ndarray::ArrayD::<f64>::zeros(modifier_shape);
 
-    for (down, up, _edge) in topo_groups {
-        let up_inds = unsafe { up.as_slice()? };
-        let down_inds = unsafe { down.as_slice()? };
+        // Gather slices for each src index
+        for (i, &src) in srcs.iter().enumerate() {
+            let src_slice = field.index_axis(Axis(last_axis), src);
+            let mut mod_slice = modifier.index_axis_mut(Axis(last_axis), i);
+            mod_slice.assign(&src_slice);
+        }
 
-        // Move the raw pointer inside the closure to satisfy the compiler
-        up_inds.par_iter()
-            .zip(down_inds.par_iter())
-            .for_each(|(&u, &d)| {
-                // Copy the pointer here inside the closure, so no lifetime issues
-                let ptr_for_closure = field_ptr;
-                unsafe {
-                    let val = *ptr_for_closure.0.add(u);
-                    *ptr_for_closure.0.add(d) += val;
-                }
-            });
-    }
+        // Apply node multiplicative weights
+        if let Some(node_mul) = node_multiplicative_weight {
+            let node_mul = unsafe { node_mul.as_array() };
+            for (i, &mod_gid) in modifier_group.iter().enumerate() {
+                let weight = node_mul.index_axis(Axis(node_mul.ndim() - 1), mod_gid);
+                let weight_b = weight.broadcast(modifier.index_axis(Axis(last_axis), i).shape())
+                    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Node multiplicative weight not broadcastable"))?;
+                let mut slice = modifier.index_axis_mut(Axis(last_axis), i);
+                slice *= &weight_b;
+            }
+        }
 
-    Ok(())
-}
+        // Apply edge multiplicative weights
+        if let Some(edge_mul) = edge_multiplicative_weight {
+            let edge_mul = unsafe { edge_mul.as_array() };
+            for (i, &eid) in eids.iter().enumerate() {
+                let weight = edge_mul.index_axis(Axis(edge_mul.ndim() - 1), eid);
+                let weight_b = weight.broadcast(modifier.index_axis(Axis(last_axis), i).shape())
+                    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Edge multiplicative weight not broadcastable"))?;
+                let mut slice = modifier.index_axis_mut(Axis(last_axis), i);
+                slice *= &weight_b;
+            }
+        }
 
-#[pyfunction]
-fn move_upstream_par_2(
-    _py: Python,
-    topo_groups: &PyAny,
-    field: &PyArray1<f64>,
-) -> PyResult<()> {
-    // Get mutable slice safely
-    let field_slice = unsafe { field.as_slice_mut()? };
-    let field_ptr = FieldPtr(field_slice.as_mut_ptr());
+        // Apply node additive weights
+        if let Some(node_add) = node_additive_weight {
+            let node_add = unsafe { node_add.as_array() };
+            for (i, &mod_gid) in modifier_group.iter().enumerate() {
+                let add = node_add.index_axis(Axis(node_add.ndim() - 1), mod_gid);
+                let add_b = add.broadcast(modifier.index_axis(Axis(last_axis), i).shape())
+                    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Node additive weight not broadcastable"))?;
+                let mut slice = modifier.index_axis_mut(Axis(last_axis), i);
+                slice += &add_b;
+            }
+        }
 
-    for group in topo_groups.iter()? {
-        let (down, up): (&PyArray1<usize>, &PyArray1<usize>) = group?.extract()?;
-        let up_inds = unsafe { up.as_slice()? };
-        let down_inds = unsafe { down.as_slice()? };
+        // Apply edge additive weights
+        if let Some(edge_add) = edge_additive_weight {
+            let edge_add = unsafe { edge_add.as_array() };
+            for (i, &eid) in eids.iter().enumerate() {
+                let add = edge_add.index_axis(Axis(edge_add.ndim() - 1), eid);
+                let add_b = add.broadcast(modifier.index_axis(Axis(last_axis), i).shape())
+                    .ok_or_else(|| pyo3::exceptions::PyValueError::new_err("Edge additive weight not broadcastable"))?;
+                let mut slice = modifier.index_axis_mut(Axis(last_axis), i);
+                slice += &add_b;
+            }
+        }
 
-        // Move the raw pointer inside the closure to satisfy the compiler
-        up_inds.par_iter()
-            .zip(down_inds.par_iter())
-            .for_each(|(&u, &d)| {
-                // Copy the pointer here inside the closure, so no lifetime issues
-                let ptr_for_closure = field_ptr;
-                unsafe {
-                    let val = *ptr_for_closure.0.add(u);
-                    *ptr_for_closure.0.add(d) += val;
-                }
-            });
-    }
-
-    Ok(())
-}
-
-#[pyfunction]
-fn move_upstream_seq(
-    _py: Python,
-    topo_groups: Vec<(&PyArray1<usize>, &PyArray1<usize>, &PyArray1<usize>)>,
-    field: &PyArray1<f64>,
-) -> PyResult<()> {
-    // Get mutable slice safely
-    let field_slice = unsafe { field.as_slice_mut()? };
-
-    for (down, up, _edge) in topo_groups {
-        let up_inds = unsafe { up.as_slice()? };
-        let down_inds = unsafe { down.as_slice()? };
-
-        for (&u, &d) in up_inds.iter().zip(down_inds.iter()) {
-            field_slice[d] += field_slice[u];
+        // Scatter-add modifier[..., i] into field[..., dsts[i]]
+        for (i, &dst) in dsts.iter().enumerate() {
+            let mut dest = field.index_axis_mut(Axis(last_axis), dst);
+            let mod_slice = modifier.index_axis(Axis(last_axis), i);
+            Zip::from(&mut dest).and(&mod_slice).for_each(|a, &b| *a += b);
         }
     }
 
@@ -156,9 +131,6 @@ fn compute_topological_labels_rust<'py>(
     n_nodes: usize,
 ) -> PyResult<&'py PyArray1<i64>> {
 
-    // let labels = unsafe { labels
-    // .as_slice_mut()
-    // .expect("Failed to get labels slice")};
     let labels: Vec<AtomicI64> = (0..n_nodes)
         .map(|_| AtomicI64::new(0))
         .collect();
@@ -221,36 +193,12 @@ fn compute_topological_labels_rust<'py>(
         .map(|a| a.load(Ordering::Relaxed))
         .collect();
 
-    // Return as PyArray1
     Ok(PyArray1::from_vec(py, result))
-
-    // Ok(labels.to_pyarray(py))
-}
-
-#[pyfunction]
-fn get_rayon_num_threads() -> usize {
-    rayon::current_num_threads()
 }
 
 #[pymodule]
 fn _rust(_py: Python, m: &PyModule) -> PyResult<()> {
-
-    rayon::ThreadPoolBuilder::new().build_global().ok();
-
-    // Optional: pre-run a dummy parallel op to ensure threads are spun up
-    rayon::scope(|s| {
-        for _ in 0..rayon::current_num_threads() {
-            s.spawn(|_| {
-                std::hint::black_box(42); // prevent optimization
-            });
-        }
-    });
-
-    m.add_function(wrap_pyfunction!(move_upstream_par, m)?)?;
-    m.add_function(wrap_pyfunction!(move_upstream_par_2, m)?)?;
-    m.add_function(wrap_pyfunction!(move_upstream_seq, m)?)?;
+    m.add_function(wrap_pyfunction!(_flow_rust, m)?)?;
     m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
-    m.add_function(wrap_pyfunction!(flow_downstream_par, m)?)?;
-    m.add_function(wrap_pyfunction!(get_rayon_num_threads, m)?)?;
     Ok(())
 }

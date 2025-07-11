@@ -42,11 +42,11 @@ def min(
             "Undirected lengths not yet supported for bifurcations."
         )
     if weights is None:
-        weights = np.ones(river_network.n_nodes)
+        weights = np.ones(river_network.n_nodes, dtype=np.float64)
     else:
         # maybe check sinks are all zero or nan length
         pass
-    field = np.empty(river_network.n_nodes)
+    field = np.empty(river_network.n_nodes, dtype=np.float64)
     field.fill(np.inf)
 
     if isinstance(points, np.ndarray):
@@ -127,9 +127,11 @@ def max(
             "Max length both upstream and downstream is not yet implemented."
         )
 
-    weights = np.ones(river_network.n_nodes) if weights is None else weights
+    weights = (
+        np.ones(river_network.n_nodes, dtype=np.float64) if weights is None else weights
+    )
 
-    field = np.empty(river_network.n_nodes)
+    field = np.empty(river_network.n_nodes, dtype=np.float64)
     field.fill(-np.inf)
 
     if isinstance(points, np.ndarray):

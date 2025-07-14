@@ -8,10 +8,12 @@
 
 import earthkit.hydro.catchments
 import earthkit.hydro.distance
+import earthkit.hydro.downstream
 import earthkit.hydro.length
 import earthkit.hydro.move
 import earthkit.hydro.readers  # for tests
 import earthkit.hydro.river_network
 import earthkit.hydro.subcatchments
+import earthkit.hydro.upstream
 
 from ._version import __version__

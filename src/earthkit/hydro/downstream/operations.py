@@ -1,17 +1,18 @@
 import numpy as np
 
 from earthkit.hydro.core.online import calculate_online_metric
-from earthkit.hydro.utils import mask_and_unmask
+from earthkit.hydro.utils import xarray_mask_and_unmask
 
 
+@xarray_mask_and_unmask
 def calculate_downstream_metric(
-    river_network,
     field,
+    node_weights,
+    edge_weights,
+    river_network,
     metric,
-    node_weights=None,
-    edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
+    mv,
+    accept_missing,
 ):
     return calculate_online_metric(
         river_network,
@@ -25,7 +26,6 @@ def calculate_downstream_metric(
     )
 
 
-@mask_and_unmask
 def var(
     river_network,
     field,
@@ -35,17 +35,16 @@ def var(
     accept_missing=False,
 ):
     return calculate_downstream_metric(
-        river_network,
-        field,
-        "var",
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        river_network=river_network,
+        metric="var",
+        mv=mv,
+        accept_missing=accept_missing,
     )
 
 
-@mask_and_unmask
 def std(
     river_network,
     field,
@@ -65,7 +64,6 @@ def std(
     )
 
 
-@mask_and_unmask
 def mean(
     river_network,
     field,
@@ -85,7 +83,6 @@ def mean(
     )
 
 
-@mask_and_unmask
 def min(
     river_network,
     field,
@@ -105,7 +102,6 @@ def min(
     )
 
 
-@mask_and_unmask
 def max(
     river_network,
     field,
@@ -125,7 +121,6 @@ def max(
     )
 
 
-@mask_and_unmask
 def sum(
     river_network,
     field,
@@ -145,7 +140,6 @@ def sum(
     )
 
 
-@mask_and_unmask
 def prod(
     river_network,
     field,

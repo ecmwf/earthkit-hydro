@@ -20,7 +20,7 @@ def mask_2d(func):
 
     """
 
-    def wrapper(*args, **kwargs):
+    def wrapper(river_network, *args, **kwargs):
         """Wrapper masking 2d data fields to allow for processing along the
         river network, then undoing the masking.
 
@@ -39,7 +39,6 @@ def mask_2d(func):
             The processed field.
 
         """
-        river_network = kwargs["river_network"]
 
         args = tuple(
             (
@@ -60,7 +59,7 @@ def mask_2d(func):
             for key, value in kwargs.items()
         }
 
-        return func(*args, **kwargs)
+        return func(river_network, *args, **kwargs)
 
     return wrapper
 
@@ -80,7 +79,8 @@ def mask_and_unmask(func):
 
     """
 
-    def wrapper(field, *args, **kwargs):
+    @wraps(func)
+    def wrapper(river_network, field, *args, **kwargs):
         """Wrapper masking 2d data fields to allow for processing along the
         river network, then undoing the masking.
 
@@ -105,11 +105,11 @@ def mask_and_unmask(func):
         mv = kwargs.get("mv")
         mv = mv if mv is not None else func.__defaults__[0]
 
-        river_network = kwargs["river_network"]
-
         if field.shape[-2:] == river_network.shape:
 
-            values_on_river_network = mask_2d(func)(field, *args, **kwargs)
+            values_on_river_network = mask_2d(func)(
+                river_network, field, *args, **kwargs
+            )
 
             out_field = np.empty(field.shape, dtype=values_on_river_network.dtype)
 
@@ -124,53 +124,66 @@ def mask_and_unmask(func):
             out_field[..., ~river_network.mask] = mv
             return out_field
         else:
-            return mask_2d(func)(field, *args, **kwargs)
+            return mask_2d(func)(river_network, field, *args, **kwargs)
 
     return wrapper
 
 
 def xarray_mask_and_unmask(func):
+    func = mask_and_unmask(func)
+
     @wraps(func)
     def wrapper(*args, **kwargs):
-        if any(isinstance(a, (xr.DataArray, xr.Dataset)) for a in args) or any(
-            isinstance(a, (xr.DataArray, xr.Dataset)) for a in kwargs.values()
+        # Fast path: no xarray inputs, use original logic
+        if not (
+            any(isinstance(a, (xr.DataArray, xr.Dataset)) for a in args)
+            or any(isinstance(a, (xr.DataArray, xr.Dataset)) for a in kwargs.values())
         ):
-            sig = signature(func)
-            bound_args = sig.bind(*args, **kwargs)
-            bound_args.apply_defaults()
-            all_args = bound_args.arguments
+            return func(*args, **kwargs)
 
-            xr_args = []
-            non_xr_values = {}
-            for name, value in all_args.items():
-                if isinstance(value, (xr.DataArray, xr.Dataset)):
-                    xr_args.append(value)
+        # Introspect the function signature and bind all arguments
+        sig = signature(func)
+        bound_args = sig.bind(*args, **kwargs)
+        bound_args.apply_defaults()
+        all_args = bound_args.arguments
+
+        # Separate xarray and non-xarray arguments
+        xr_args = []
+        non_xr_kwargs = {}
+        arg_order = []
+
+        for name, value in all_args.items():
+            if isinstance(value, (xr.DataArray, xr.Dataset)):
+                xr_args.append(value)
+                arg_order.append(("xr", name))
+            else:
+                non_xr_kwargs[name] = value
+                arg_order.append(("nonxr", name))
+
+        # Create a function that reshuffles the args correctly
+        def reshuffled_func(*only_xr_args, **kwargs):
+            full_args = {}
+            xr_i = 0
+            for kind, name in arg_order:
+                if kind == "xr":
+                    full_args[name] = only_xr_args[xr_i]
+                    xr_i += 1
                 else:
-                    non_xr_values[name] = value
+                    full_args[name] = kwargs[name]
+            return func(**full_args)
 
-            def wrapped_func(*only_xr_args, **kwargs):
-                full_args = []
-                i = 0
-                for name in all_args:
-                    if name in non_xr_values:
-                        full_args.append(kwargs[name])
-                    else:
-                        full_args.append(only_xr_args[i])
-                        i += 1
-                return func(*full_args)
+        # TODO: Avoid hardcoding lat/lon
+        input_core_dims = [["lat", "lon"]] * len(xr_args)
 
-            # TODO: Avoid hard coding lat and lon as coord names...
-            return xr.apply_ufunc(
-                mask_and_unmask(wrapped_func),
-                *xr_args,
-                input_core_dims=[["lat", "lon"] * len(xr_args)],
-                output_core_dims=[["lat", "lon"]],
-                output_dtypes=[float],
-                vectorize=True,
-                dask="parallelized",
-                kwargs=non_xr_values,
-            )
-        else:
-            return mask_and_unmask(func)(*args, **kwargs)
+        return xr.apply_ufunc(
+            reshuffled_func,
+            *xr_args,
+            input_core_dims=input_core_dims,
+            output_core_dims=[["lat", "lon"]],
+            output_dtypes=[float],
+            vectorize=True,
+            dask="parallelized",
+            kwargs=non_xr_kwargs,
+        )
 
     return wrapper

@@ -1,11 +1,11 @@
 import numpy as np
 
 from earthkit.hydro.data_structures import RiverNetwork
-from earthkit.hydro.utils.decorators import mask_and_unmask
+from earthkit.hydro.utils.decorators import xarray_mask_and_unmask
 from earthkit.hydro.utils.missing import missing_to_nan, nan_to_missing
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def downstream(
     river_network: RiverNetwork,
     field,
@@ -71,7 +71,7 @@ def downstream(
     return ups
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def upstream(
     river_network: RiverNetwork,
     field,

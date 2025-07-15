@@ -4,13 +4,12 @@ from earthkit.hydro.core.online import calculate_online_metric
 from earthkit.hydro.utils import xarray_mask_and_unmask
 
 
-@xarray_mask_and_unmask
 def calculate_downstream_metric(
+    river_network,
     field,
+    metric,
     node_weights,
     edge_weights,
-    river_network,
-    metric,
     mv,
     accept_missing,
 ):
@@ -26,6 +25,7 @@ def calculate_downstream_metric(
     )
 
 
+@xarray_mask_and_unmask
 def var(
     river_network,
     field,
@@ -35,16 +35,17 @@ def var(
     accept_missing=False,
 ):
     return calculate_downstream_metric(
-        field=field,
-        node_weights=node_weights,
-        edge_weights=edge_weights,
-        river_network=river_network,
-        metric="var",
-        mv=mv,
-        accept_missing=accept_missing,
+        river_network,
+        field,
+        "var",
+        node_weights,
+        edge_weights,
+        mv,
+        accept_missing,
     )
 
 
+@xarray_mask_and_unmask
 def std(
     river_network,
     field,
@@ -64,6 +65,7 @@ def std(
     )
 
 
+@xarray_mask_and_unmask
 def mean(
     river_network,
     field,
@@ -83,6 +85,7 @@ def mean(
     )
 
 
+@xarray_mask_and_unmask
 def min(
     river_network,
     field,
@@ -102,6 +105,7 @@ def min(
     )
 
 
+@xarray_mask_and_unmask
 def max(
     river_network,
     field,
@@ -121,6 +125,7 @@ def max(
     )
 
 
+@xarray_mask_and_unmask
 def sum(
     river_network,
     field,
@@ -140,6 +145,7 @@ def sum(
     )
 
 
+@xarray_mask_and_unmask
 def prod(
     river_network,
     field,

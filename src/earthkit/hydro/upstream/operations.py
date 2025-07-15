@@ -1,7 +1,7 @@
 import numpy as np
 
 from earthkit.hydro.core.online import calculate_online_metric
-from earthkit.hydro.utils import mask_and_unmask
+from earthkit.hydro.utils import xarray_mask_and_unmask
 
 
 def calculate_upstream_metric(
@@ -25,7 +25,7 @@ def calculate_upstream_metric(
     )
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def var(
     river_network,
     field,
@@ -45,7 +45,7 @@ def var(
     )
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def std(
     river_network,
     field,
@@ -65,7 +65,7 @@ def std(
     )
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def mean(
     river_network,
     field,
@@ -85,7 +85,7 @@ def mean(
     )
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def min(
     river_network,
     field,
@@ -105,7 +105,7 @@ def min(
     )
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def max(
     river_network,
     field,
@@ -125,7 +125,7 @@ def max(
     )
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def sum(
     river_network,
     field,
@@ -145,7 +145,7 @@ def sum(
     )
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def prod(
     river_network,
     field,

@@ -134,8 +134,7 @@ def xarray_mask_and_unmask(func):
 
     @wraps(func)
     def wrapper(*args, **kwargs):
-        # Fast path: no xarray inputs, use original logic
-        if not (
+        if kwargs.pop("no_xr", False) or not (
             any(isinstance(a, (xr.DataArray, xr.Dataset)) for a in args)
             or any(isinstance(a, (xr.DataArray, xr.Dataset)) for a in kwargs.values())
         ):
@@ -161,7 +160,7 @@ def xarray_mask_and_unmask(func):
                 arg_order.append(("nonxr", name))
 
         # Create a function that reshuffles the args correctly
-        def reshuffled_func(*only_xr_args, **kwargs):
+        def reshuffled_func(*only_xr_args, **non_xr_kwargs):
             full_args = {}
             xr_i = 0
             for kind, name in arg_order:
@@ -169,17 +168,25 @@ def xarray_mask_and_unmask(func):
                     full_args[name] = only_xr_args[xr_i]
                     xr_i += 1
                 else:
-                    full_args[name] = kwargs[name]
+                    full_args[name] = non_xr_kwargs[name]
             return func(**full_args)
 
-        # TODO: Avoid hardcoding lat/lon
-        input_core_dims = [["lat", "lon"]] * len(xr_args)
+        input_core_dims = kwargs.pop("input_core_dims", None)
+        input_core_dims = (
+            [["lat", "lon"]] * len(xr_args)
+            if input_core_dims is None
+            else input_core_dims
+        )
+        output_core_dims = kwargs.pop("output_core_dims", None)
+        output_core_dims = (
+            [["lat", "lon"]] if output_core_dims is None else output_core_dims
+        )
 
         return xr.apply_ufunc(
             reshuffled_func,
             *xr_args,
             input_core_dims=input_core_dims,
-            output_core_dims=[["lat", "lon"]],
+            output_core_dims=output_core_dims,
             output_dtypes=[float],
             vectorize=True,
             dask="parallelized",

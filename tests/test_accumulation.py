@@ -592,7 +592,7 @@ def test_calculate_subcatchment_numpy(river_network, metric):
     shape = (3, 4)
     field = np.random.rand(*shape, river_network.n_nodes)
     node_weights = None
-    nodes = np.random.choice(river_network.n_nodes, 5)
+    nodes = np.random.choice(river_network.n_nodes, 5, replace=False)
     subcatchment_metric = calculate_subcatchment_metric(
         river_network, field, nodes, metric, node_weights
     )

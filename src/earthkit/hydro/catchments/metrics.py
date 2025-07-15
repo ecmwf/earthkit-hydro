@@ -62,24 +62,30 @@ def calculate_catchment_metric(
         upstream_field_at_stations = upstream_metric_field[..., points]
         upstream_field_at_stations = np.moveaxis(upstream_field_at_stations, -1, 0)
         return dict(zip(points, upstream_field_at_stations))
+    elif isinstance(points, list):
+        points = points_to_numpy(points)
 
-    points = points_to_numpy(points)
+        stations_1d = points_to_1d_indices(river_network, points)
 
-    stations_1d = points_to_1d_indices(river_network, points)
+        upstream_metric_field = calculate_upstream_metric(
+            river_network,
+            field,
+            metric,
+            node_weights,
+            edge_weights,
+            mv,
+            accept_missing,
+        )
 
-    upstream_metric_field = calculate_upstream_metric(
-        river_network,
-        field,
-        metric,
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-    )
+        metric_at_stations = upstream_metric_field[..., stations_1d]
 
-    metric_at_stations = upstream_metric_field[..., stations_1d]
-
-    return {(x, y): metric_at_stations[..., i] for i, (x, y) in enumerate(zip(*points))}
+        return {
+            (x, y): metric_at_stations[..., i] for i, (x, y) in enumerate(zip(*points))
+        }
+    elif isinstance(points, dict):
+        raise NotImplementedError(f"points of type {type(points)} not yet implemented.")
+    else:
+        raise ValueError(f"points of type {type(points)} is not supported.")
 
 
 @mask_2d

@@ -1,13 +1,35 @@
 import numpy as np
 
 from earthkit.hydro.utils.convert import points_to_1d_indices, points_to_numpy
-from earthkit.hydro.utils.decorators import mask_2d
+from earthkit.hydro.utils.decorators import xarray_mask_and_unmask
 from earthkit.hydro.zonal.metrics import calculate_zonal_metric
 
 from .find import find
 
 
-@mask_2d
+@xarray_mask_and_unmask
+def _calculate_subcatchment_metric(
+    river_network,
+    field,
+    initial_field,
+    metric,
+    node_weights=None,
+    mv=np.nan,
+    accept_missing=False,
+):
+    labels = find(river_network, initial_field)  # TODO: can skip redoing calcs here
+    metric_at_stations = calculate_zonal_metric(
+        field,
+        labels,
+        metric,
+        node_weights,
+        mv,
+        0,  # missing labels value
+        accept_missing,
+    )
+    return metric_at_stations
+
+
 def calculate_subcatchment_metric(
     river_network,
     field,
@@ -47,37 +69,42 @@ def calculate_subcatchment_metric(
     assert edge_weights is None
     if isinstance(points, np.ndarray):
         initial_field = np.zeros(river_network.n_nodes, dtype=int)
-        initial_field[points] = np.arange(points.shape[0]) + 1
-        labels = find(river_network, initial_field)
-        metric_at_stations = calculate_zonal_metric(
+        temp_labs = np.arange(points.shape[0]) + 1
+        initial_field[points] = temp_labs
+        metric_at_stations = _calculate_subcatchment_metric(
+            river_network,
             field,
-            labels,
+            initial_field,
             metric,
             node_weights,
             mv,
-            0,  # missing labels value
             accept_missing,
+            no_xr=True,
         )
-        return {x: metric_at_stations[y] for (x, y) in zip(points, labels[points])}
-
-    points = points_to_numpy(points)
-
-    stations_1d = points_to_1d_indices(river_network, points)
-
-    initial_field = np.zeros(river_network.n_nodes, dtype=int)
-    unique_labels = np.arange(stations_1d.shape[0]) + 1
-    initial_field[stations_1d] = unique_labels
-    labels = find(river_network, initial_field)
-    metric_at_stations = calculate_zonal_metric(
-        field,
-        labels,
-        metric,
-        node_weights,
-        mv,
-        0,  # missing labels value
-        accept_missing,
-    )
-    return {(x, y): metric_at_stations[z] for (x, y, z) in zip(*points, unique_labels)}
+        return {x: metric_at_stations[y] for (x, y) in zip(points, temp_labs)}
+    elif isinstance(points, list):
+        points = points_to_numpy(points)
+        stations_1d = points_to_1d_indices(river_network, points)
+        initial_field = np.zeros(river_network.n_nodes, dtype=int)
+        unique_labels = np.arange(stations_1d.shape[0]) + 1
+        initial_field[stations_1d] = unique_labels
+        metric_at_stations = _calculate_subcatchment_metric(
+            river_network,
+            field,
+            initial_field,
+            metric,
+            node_weights,
+            mv,
+            accept_missing,
+            no_xr=True,
+        )
+        return {
+            (x, y): metric_at_stations[z] for (x, y, z) in zip(*points, unique_labels)
+        }
+    elif isinstance(points, dict):
+        raise NotImplementedError(f"points of type {type(points)} not yet implemented.")
+    else:
+        raise ValueError(f"points of type {type(points)} is not supported.")
 
 
 def sum(

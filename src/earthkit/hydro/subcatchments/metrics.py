@@ -48,7 +48,7 @@ def calculate_subcatchment_metric(
     if isinstance(points, np.ndarray):
         initial_field = np.zeros(river_network.n_nodes, dtype=int)
         initial_field[points] = np.arange(points.shape[0]) + 1
-        labels = find(river_network, initial_field, skip=True)
+        labels = find(river_network, initial_field)
         metric_at_stations = calculate_zonal_metric(
             field,
             labels,
@@ -67,7 +67,7 @@ def calculate_subcatchment_metric(
     initial_field = np.zeros(river_network.n_nodes, dtype=int)
     unique_labels = np.arange(stations_1d.shape[0]) + 1
     initial_field[stations_1d] = unique_labels
-    labels = find(river_network, initial_field, skip=True)
+    labels = find(river_network, initial_field)
     metric_at_stations = calculate_zonal_metric(
         field,
         labels,

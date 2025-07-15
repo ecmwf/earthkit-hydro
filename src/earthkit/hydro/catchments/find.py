@@ -1,9 +1,9 @@
 from earthkit.hydro.core import propagate
 from earthkit.hydro.core._find import _find_catchments_2D
-from earthkit.hydro.utils.decorators import mask_and_unmask
+from earthkit.hydro.utils.decorators import xarray_mask_and_unmask
 
 
-@mask_and_unmask
+@xarray_mask_and_unmask
 def find(river_network, field, mv=0, in_place=False):
     """Labels the catchments given a field of labelled sinks.
 

@@ -265,17 +265,20 @@ def xarray_mask(func):
             kwargs=non_xr_kwargs,
         )
         station_names = kwargs.get("station_names", None)
-        if station_names is not None:
+        if isinstance(station_names, list):
             result = result.assign_coords(
                 station_name=("station", station_names),
             )
-        elif isinstance(points, np.ndarray):
-            result = result.assign_coords(idx=("station", points))
-        elif isinstance(points, list):
-            points = np.array(points)
+        elif station_names.ndim == 1:
+            result = result.assign_coords(idx=("station", station_names))
+        elif station_names.ndim == 2:
+            station_names = np.array(station_names)
             result = result.assign_coords(
-                xidx=("station", points[:, 0]), yidx=("station", points[:, 1])
+                xidx=("station", station_names[:, 0]),
+                yidx=("station", station_names[:, 1]),
             )
+        else:
+            raise ValueError("Invalid points specified.")
 
         return result
 

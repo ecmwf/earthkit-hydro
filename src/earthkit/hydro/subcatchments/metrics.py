@@ -117,7 +117,9 @@ def calculate_subcatchment_metric(
         edge_weights,
         mv,
         accept_missing,
-        station_names=list(points.keys()) if isinstance(points, dict) else None,
+        station_names=(
+            list(points.keys()) if isinstance(points, dict) else np.array(points)
+        ),
     )
 
 

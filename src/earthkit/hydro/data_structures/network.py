@@ -1,5 +1,5 @@
-import joblib
 import numpy as np
+from earthkit.utils.array import to_device
 
 from ._network import RiverNetworkStorage
 
@@ -13,18 +13,21 @@ class RiverNetwork:
         self.nodes = np.arange(self.n_nodes)
         self.sources = self._storage.sources
         self.sinks = self._storage.sinks
-        self.area = self._storage.area
+        # self.area = self._storage.area
         self.bifurcates = self._storage.bifurcates
+        self._mask = self._storage.mask
 
         self.groups = np.split(self._storage.sorted_data, self._storage.splits, axis=1)
 
+        del self._storage
+
     @property
     def mask(self):
-        if self._storage.mask is None:
+        if self._mask is None:
             raise ValueError(
                 "This RiverNetwork is not raster-based and does not have a mask."
             )
-        return self._storage.mask
+        return self._mask
 
     @property
     def shape(self):
@@ -36,13 +39,16 @@ class RiverNetwork:
     def __repr__(self):
         return self.__str__()
 
-    def to(self, backend="numpy", dev=None):
-        raise NotImplementedError(
-            f"Switching array backend to {backend} on device {dev} not yet supported."
-        )
+    def to_device(self, device, array_backend=None):
+        self.groups = [to_device(group, device, array_backend) for group in self.groups]
+        self._mask = to_device(self._mask, device, array_backend)
+        # TODO: remove
+        self.nodes = to_device(self.nodes, device, array_backend)
+        self.sources = to_device(self.sources, device, array_backend)
+        self.sinks = to_device(self.sinks, device, array_backend)
 
-    def export(self, fpath="river_network.joblib", compression=1):
-        joblib.dump(self._storage, fpath, compress=compression)
+    # def export(self, fpath="river_network.joblib", compression=1):
+    #     joblib.dump(self._storage, fpath, compress=compression)
 
     def create_subnetwork(self, *args, **kwargs):
         raise NotImplementedError("Subnetwork creation not yet supported.")

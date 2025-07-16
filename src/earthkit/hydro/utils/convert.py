@@ -1,7 +1,4 @@
-import numpy as np
-
-
-def points_to_numpy(points):
+def points_to_numpy(xp, points):
     """
     Converts a list of tuples (indices) into a tuple of lists
     for use in numpy indexing.
@@ -18,11 +15,12 @@ def points_to_numpy(points):
     """
     # transform here list of tuples (indices) into a tuple of lists
     # (easier to manipulate)
-    points = np.array(points)
+    print(xp)
+    points = xp.array(points)
     return (points[:, 0], points[:, 1])
 
 
-def points_to_1d_indices(river_network, stations):
+def points_to_1d_indices(river_network, xp, stations):
     """ "
     Converts a numpy index into a 1D index suitable
     for use with the flattened river representation.
@@ -39,9 +37,9 @@ def points_to_1d_indices(river_network, stations):
     numpy.ndarray
         1D array of indices.
     """
-    node_numbers = np.cumsum(river_network.mask) - 1
+    node_numbers = xp.cumsum(river_network.mask) - 1
     valid_stations = river_network.mask[stations]
-    if np.any(~valid_stations):
+    if xp.any(~valid_stations):
         raise ValueError("Not all points are present on the river network.")
     stations = tuple(station_index[valid_stations] for station_index in stations)
     stations_1d = node_numbers.reshape(river_network.shape)[stations]

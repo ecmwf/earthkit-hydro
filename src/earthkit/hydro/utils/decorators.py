@@ -1,8 +1,8 @@
 from functools import wraps
 from inspect import signature
 
-import numpy as np
 import xarray as xr
+from earthkit.utils.array import array_namespace
 
 
 def mask_2d(func):
@@ -41,11 +41,13 @@ def mask_2d(func):
 
         """
 
+        xp = array_namespace(river_network.mask)  # TODO: use field if possible
+
         args = tuple(
             (
                 arg[..., river_network.mask]
-                if isinstance(arg, np.ndarray) and arg.shape[-2:] == river_network.shape
-                else arg if isinstance(arg, np.ndarray) else arg
+                if isinstance(arg, xp.ndarray) and arg.shape[-2:] == river_network.shape
+                else arg if isinstance(arg, xp.ndarray) else arg
             )
             for arg in args
         )
@@ -53,9 +55,9 @@ def mask_2d(func):
         kwargs = {
             key: (
                 value[..., river_network.mask]
-                if isinstance(value, np.ndarray)
+                if isinstance(value, xp.ndarray)
                 and value.shape[-2:] == river_network.shape
-                else value if isinstance(value, np.ndarray) else value
+                else value if isinstance(value, xp.ndarray) else value
             )
             for key, value in kwargs.items()
         }
@@ -106,17 +108,19 @@ def mask_and_unmask(func):
         mv = kwargs.get("mv")
         mv = mv if mv is not None else func.__defaults__[0]
 
+        xp = array_namespace(field)
+
         if field.shape[-2:] == river_network.shape:
 
             values_on_river_network = mask_2d(func)(
                 river_network, field, *args, **kwargs
             )
 
-            out_field = np.empty(field.shape, dtype=values_on_river_network.dtype)
+            out_field = xp.empty(field.shape, dtype=values_on_river_network.dtype)
 
             out_field[..., river_network.mask] = values_on_river_network
 
-            if np.result_type(mv, field) != field.dtype:
+            if xp.result_type(mv, field) != field.dtype:  # TODO: check this
                 raise ValueError(
                     f"Missing value of type {type(mv)} is not compatible"
                     f" with field of dtype {field.dtype}"
@@ -204,6 +208,7 @@ def xarray_mask(func):
     def wrapper(*args, **kwargs):
         input_core_dims = kwargs.pop("input_core_dims", None)
         output_core_dims = kwargs.pop("output_core_dims", None)
+        station_names = kwargs.pop("station_names", None)
 
         if kwargs.pop("no_xr", False) or not (
             any(isinstance(a, (xr.DataArray, xr.Dataset)) for a in args)
@@ -260,11 +265,9 @@ def xarray_mask(func):
             input_core_dims=input_core_dims,
             output_core_dims=output_core_dims,
             output_dtypes=[float],
-            vectorize=True,
             dask="parallelized",
             kwargs=non_xr_kwargs,
         )
-        station_names = kwargs.get("station_names", None)
         if isinstance(station_names, list):
             result = result.assign_coords(
                 station_name=("station", station_names),
@@ -272,7 +275,8 @@ def xarray_mask(func):
         elif station_names.ndim == 1:
             result = result.assign_coords(idx=("station", station_names))
         elif station_names.ndim == 2:
-            station_names = np.array(station_names)
+            xp = array_namespace(station_names)
+            station_names = xp.array(station_names)
             result = result.assign_coords(
                 xidx=("station", station_names[:, 0]),
                 yidx=("station", station_names[:, 1]),

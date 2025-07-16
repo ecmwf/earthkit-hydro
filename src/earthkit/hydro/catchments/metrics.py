@@ -1,5 +1,6 @@
 import numpy as np
 import xarray as xr
+from earthkit.utils.array import array_namespace
 
 from earthkit.hydro.upstream.operations import calculate_upstream_metric
 from earthkit.hydro.utils.convert import points_to_1d_indices, points_to_numpy
@@ -97,15 +98,20 @@ def calculate_catchment_metric(
     # (should be quicker, particularly for
     # small numbers of points)
 
-    if isinstance(points, np.ndarray):
+    if isinstance(field, (xr.Dataset, xr.DataArray)):
+        xp = array_namespace(field.data)
+    else:
+        xp = array_namespace(field)
+
+    if isinstance(points, xp.ndarray):
         stations_1d = points
     elif isinstance(points, list):
-        stations_1d = points_to_numpy(points)
-        stations_1d = points_to_1d_indices(river_network, stations_1d)
+        stations_1d = points_to_numpy(xp, points)
+        stations_1d = points_to_1d_indices(river_network, xp, stations_1d)
     elif isinstance(points, dict):
         assert isinstance(field, (xr.DataArray, xr.Dataset))
-        lats = field.lat.values
-        lons = field.lon.values
+        lats = field.lat.data
+        lons = field.lon.data
 
         indices = []
         for lat_val, lon_val in points.values():
@@ -113,8 +119,8 @@ def calculate_catchment_metric(
             ilon = np.abs(lons - lon_val).argmin()
             indices.append((int(ilat), int(ilon)))
 
-        stations_1d = points_to_numpy(indices)
-        stations_1d = points_to_1d_indices(river_network, stations_1d)
+        stations_1d = points_to_numpy(xp, indices)
+        stations_1d = points_to_1d_indices(river_network, xp, stations_1d)
     else:
         raise ValueError(f"points of type {type(points)} is not supported.")
 

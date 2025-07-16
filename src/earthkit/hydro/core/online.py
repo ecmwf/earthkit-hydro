@@ -1,9 +1,9 @@
-import numpy as np
+from earthkit.utils.array import array_namespace
 
 from earthkit.hydro.utils import missing_to_nan, nan_to_missing
 
 from .accumulate import flow
-from .metrics import metrics_dict
+from .metrics import metrics_func_finder
 
 
 def calculate_online_metric(
@@ -25,11 +25,13 @@ def calculate_online_metric(
             f"flow_direction must be 'up' or 'down', got {flow_direction}."
         )
 
+    xp = array_namespace(field)
+
     field, field_dtype = missing_to_nan(field.copy(), mv, accept_missing)
 
     if node_weights is None:
         if metric == "mean" or metric == "std" or metric == "var":
-            node_weights = np.ones(river_network.n_nodes, dtype=np.float64)
+            node_weights = xp.ones(river_network.n_nodes, dtype=xp.float64)
     else:
         if field_dtype != node_weights.dtype:
             raise ValueError(
@@ -48,7 +50,7 @@ def calculate_online_metric(
             )
         edge_weights, _ = missing_to_nan(edge_weights.copy(), mv, accept_missing)
 
-    ufunc = metrics_dict[metric].func
+    ufunc = metrics_func_finder(metric, xp).func
 
     weighted_field = flow(
         river_network,
@@ -70,7 +72,7 @@ def calculate_online_metric(
         if metric == "mean":
             weighted_field /= counts  # weighted mean
             return nan_to_missing(
-                weighted_field, np.float64, mv
+                weighted_field, xp.float64, mv
             )  # if we compute means, we change dtype for int fields etc.
         elif metric == "var" or metric == "std":
             weighted_sum_of_squares = flow(
@@ -86,9 +88,9 @@ def calculate_online_metric(
                 0  # can occur for numerical issues
             )
             if metric == "var":
-                return nan_to_missing(weighted_sum_of_squares, np.float64, mv)
+                return nan_to_missing(weighted_sum_of_squares, xp.float64, mv)
             elif metric == "std":
-                return nan_to_missing(np.sqrt(weighted_sum_of_squares), np.float64, mv)
+                return nan_to_missing(xp.sqrt(weighted_sum_of_squares), xp.float64, mv)
 
     else:
         return nan_to_missing(weighted_field, field_dtype, mv)

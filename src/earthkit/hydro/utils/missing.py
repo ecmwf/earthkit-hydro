@@ -1,4 +1,4 @@
-import numpy as np
+from earthkit.utils.array import array_namespace
 
 
 def is_missing(field, mv):
@@ -17,10 +17,12 @@ def is_missing(field, mv):
         A boolean mask of missing values.
 
     """
-    if np.isnan(mv):
-        return np.isnan(field)
-    elif np.isinf(mv):
-        return np.isinf(field)
+    xp = array_namespace(field)
+
+    if xp.isnan(mv):
+        return xp.isnan(field)
+    elif xp.isinf(mv):
+        return xp.isinf(field)
     else:
         return field == mv
 
@@ -41,7 +43,8 @@ def are_missing_values_present(field, mv):
         True if missing values are present, False otherwise.
 
     """
-    return np.any(is_missing(field, mv))
+    xp = array_namespace(field)
+    return xp.any(is_missing(field, mv))
 
 
 def check_missing(field, mv, accept_missing):
@@ -97,12 +100,15 @@ def missing_to_nan(field, mv, accept_missing, skip=False):
 
 
     """
+
+    xp = array_namespace(field)
+
     if skip:
         return field, field.dtype
 
     missing_mask = is_missing(field, mv)
 
-    if np.any(missing_mask):
+    if xp.any(missing_mask):
         if not accept_missing:
             raise ValueError(
                 "Missing values present in input field and accept_missing is False."
@@ -111,11 +117,11 @@ def missing_to_nan(field, mv, accept_missing, skip=False):
             print("Warning: missing values present in input field.")
 
     field_dtype = field.dtype
-    if not field_dtype == np.float64:
-        field = field.astype(np.float64, copy=False)  # convert to float64
-    if np.isnan(mv):
+    if not field_dtype == xp.float64:
+        field = field.astype(xp.float64, copy=False)  # convert to float64
+    if xp.isnan(mv):
         return field, field_dtype
-    field[missing_mask] = np.nan
+    field[missing_mask] = xp.nan
     return field, field_dtype
 
 
@@ -139,8 +145,9 @@ def nan_to_missing(out_field, field_dtype, mv):
         Output field.
 
     """
-    if not np.isnan(mv):
-        np.nan_to_num(out_field, copy=False, nan=mv)
-    if field_dtype != np.float64:
+    xp = array_namespace(out_field)
+    if not xp.isnan(mv):
+        xp.nan_to_num(out_field, copy=False, nan=mv)
+    if field_dtype != xp.float64:
         out_field = out_field.astype(field_dtype, copy=False)
     return out_field

@@ -1,22 +1,25 @@
 import numpy as np
+import xarray as xr
 
 from earthkit.hydro.utils.convert import points_to_1d_indices, points_to_numpy
-from earthkit.hydro.utils.decorators import xarray_mask_and_unmask
+from earthkit.hydro.utils.decorators import xarray_mask
 from earthkit.hydro.zonal.metrics import calculate_zonal_metric
 
 from .find import find
 
 
-@xarray_mask_and_unmask
-def _calculate_subcatchment_metric(
+def __calculate_subcatchment_metric(
     river_network,
     field,
-    initial_field,
+    stations_1d,
     metric,
     node_weights=None,
     mv=np.nan,
     accept_missing=False,
 ):
+    initial_field = np.zeros(river_network.n_nodes, dtype=int)
+    unique_labels = np.arange(stations_1d.shape[0]) + 1
+    initial_field[stations_1d] = unique_labels
     labels = find(river_network, initial_field)  # TODO: can skip redoing calcs here
     metric_at_stations = calculate_zonal_metric(
         field,
@@ -27,7 +30,24 @@ def _calculate_subcatchment_metric(
         0,  # missing labels value
         accept_missing,
     )
-    return metric_at_stations
+    return metric_at_stations[..., stations_1d]
+
+
+@xarray_mask
+def _calculate_subcatchment_metric(
+    river_network,
+    field,
+    points,
+    metric,
+    node_weights=None,
+    edge_weights=None,
+    mv=np.nan,
+    accept_missing=False,
+    station_names=None,
+):
+    return __calculate_subcatchment_metric(
+        river_network, field, points, metric, node_weights, mv, accept_missing
+    )
 
 
 def calculate_subcatchment_metric(
@@ -64,47 +84,41 @@ def calculate_subcatchment_metric(
     Returns
     -------
     dict
-        Dictionary with (station, catchment_metric) pairs.
+        Numpy array of values for each station.
     """
     assert edge_weights is None
     if isinstance(points, np.ndarray):
-        initial_field = np.zeros(river_network.n_nodes, dtype=int)
-        temp_labs = np.arange(points.shape[0]) + 1
-        initial_field[points] = temp_labs
-        metric_at_stations = _calculate_subcatchment_metric(
-            river_network,
-            field,
-            initial_field,
-            metric,
-            node_weights,
-            mv,
-            accept_missing,
-            no_xr=True,
-        )
-        return {x: metric_at_stations[y] for (x, y) in zip(points, temp_labs)}
+        stations_1d = points
     elif isinstance(points, list):
-        points = points_to_numpy(points)
-        stations_1d = points_to_1d_indices(river_network, points)
-        initial_field = np.zeros(river_network.n_nodes, dtype=int)
-        unique_labels = np.arange(stations_1d.shape[0]) + 1
-        initial_field[stations_1d] = unique_labels
-        metric_at_stations = _calculate_subcatchment_metric(
-            river_network,
-            field,
-            initial_field,
-            metric,
-            node_weights,
-            mv,
-            accept_missing,
-            no_xr=True,
-        )
-        return {
-            (x, y): metric_at_stations[z] for (x, y, z) in zip(*points, unique_labels)
-        }
+        stations_1d = points_to_numpy(points)
+        stations_1d = points_to_1d_indices(river_network, stations_1d)
     elif isinstance(points, dict):
-        raise NotImplementedError(f"points of type {type(points)} not yet implemented.")
+        assert isinstance(field, (xr.DataArray, xr.Dataset))
+        lats = field.lat.values
+        lons = field.lon.values
+
+        indices = []
+        for lat_val, lon_val in points.values():
+            ilat = np.abs(lats - lat_val).argmin()
+            ilon = np.abs(lons - lon_val).argmin()
+            indices.append((int(ilat), int(ilon)))
+
+        stations_1d = points_to_numpy(indices)
+        stations_1d = points_to_1d_indices(river_network, stations_1d)
     else:
         raise ValueError(f"points of type {type(points)} is not supported.")
+
+    return _calculate_subcatchment_metric(
+        river_network,
+        field,
+        stations_1d,
+        metric,
+        node_weights,
+        edge_weights,
+        mv,
+        accept_missing,
+        station_names=list(points.keys()) if isinstance(points, dict) else None,
+    )
 
 
 def sum(

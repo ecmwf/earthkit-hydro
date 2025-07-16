@@ -1,8 +1,56 @@
 import numpy as np
+import xarray as xr
 
 from earthkit.hydro.upstream.operations import calculate_upstream_metric
 from earthkit.hydro.utils.convert import points_to_1d_indices, points_to_numpy
-from earthkit.hydro.utils.decorators import mask_2d
+from earthkit.hydro.utils.decorators import xarray_mask
+
+
+def __calculate_catchment_metric(
+    river_network,
+    field,
+    stations_1d,
+    metric,
+    node_weights=None,
+    edge_weights=None,
+    mv=np.nan,
+    accept_missing=False,
+):
+    upstream_metric_field = calculate_upstream_metric(
+        river_network,
+        field,
+        metric,
+        node_weights,
+        edge_weights,
+        mv,
+        accept_missing,
+    )
+    upstream_field_at_stations = upstream_metric_field[..., stations_1d]
+    return upstream_field_at_stations
+
+
+@xarray_mask
+def _calculate_catchment_metric(
+    river_network,
+    field,
+    points,
+    metric,
+    node_weights=None,
+    edge_weights=None,
+    mv=np.nan,
+    accept_missing=False,
+    station_names=None,
+):
+    return __calculate_catchment_metric(
+        river_network,
+        field,
+        points,
+        metric,
+        node_weights,
+        edge_weights,
+        mv,
+        accept_missing,
+    )
 
 
 def calculate_catchment_metric(
@@ -50,45 +98,39 @@ def calculate_catchment_metric(
     # small numbers of points)
 
     if isinstance(points, np.ndarray):
-        upstream_metric_field = calculate_upstream_metric(
-            river_network,
-            field,
-            metric,
-            node_weights,
-            edge_weights,
-            mv,
-            accept_missing,
-        )
-        upstream_field_at_stations = upstream_metric_field[..., points]
-        upstream_field_at_stations = np.moveaxis(upstream_field_at_stations, -1, 0)
-        return dict(zip(points, upstream_field_at_stations))
+        stations_1d = points
     elif isinstance(points, list):
-        points = points_to_numpy(points)
-
-        stations_1d = points_to_1d_indices(river_network, points)
-
-        upstream_metric_field = calculate_upstream_metric(
-            river_network,
-            field,
-            metric,
-            node_weights,
-            edge_weights,
-            mv,
-            accept_missing,
-        )
-
-        metric_at_stations = upstream_metric_field[..., stations_1d]
-
-        return {
-            (x, y): metric_at_stations[..., i] for i, (x, y) in enumerate(zip(*points))
-        }
+        stations_1d = points_to_numpy(points)
+        stations_1d = points_to_1d_indices(river_network, stations_1d)
     elif isinstance(points, dict):
-        raise NotImplementedError(f"points of type {type(points)} not yet implemented.")
+        assert isinstance(field, (xr.DataArray, xr.Dataset))
+        lats = field.lat.values
+        lons = field.lon.values
+
+        indices = []
+        for lat_val, lon_val in points.values():
+            ilat = np.abs(lats - lat_val).argmin()
+            ilon = np.abs(lons - lon_val).argmin()
+            indices.append((int(ilat), int(ilon)))
+
+        stations_1d = points_to_numpy(indices)
+        stations_1d = points_to_1d_indices(river_network, stations_1d)
     else:
         raise ValueError(f"points of type {type(points)} is not supported.")
 
+    return _calculate_catchment_metric(
+        river_network,
+        field,
+        stations_1d,
+        metric,
+        node_weights,
+        edge_weights,
+        mv,
+        accept_missing,
+        station_names=list(points.keys()) if isinstance(points, dict) else None,
+    )
 
-@mask_2d
+
 def sum(
     river_network,
     field,
@@ -110,7 +152,6 @@ def sum(
     )
 
 
-@mask_2d
 def max(
     river_network,
     field,
@@ -132,7 +173,6 @@ def max(
     )
 
 
-@mask_2d
 def min(
     river_network,
     field,
@@ -154,7 +194,6 @@ def min(
     )
 
 
-@mask_2d
 def prod(
     river_network,
     field,
@@ -176,7 +215,6 @@ def prod(
     )
 
 
-@mask_2d
 def std(
     river_network,
     field,
@@ -198,7 +236,6 @@ def std(
     )
 
 
-@mask_2d
 def var(
     river_network,
     field,
@@ -220,7 +257,6 @@ def var(
     )
 
 
-@mask_2d
 def mean(
     river_network,
     field,

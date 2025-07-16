@@ -11,7 +11,6 @@ def calculate_zonal_metric(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
-    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -42,7 +41,7 @@ def calculate_zonal_metric(
     Returns
     -------
     np.array or dict
-        Field if return_field, else dictionary with (label, metric) pairs.
+        Field.
     """
     ufunc = metrics_dict[metric].func
 
@@ -131,16 +130,10 @@ def calculate_zonal_metric(
             f" with field of dtype {initial_field.dtype}"
         )
 
-    if return_field:
-        out_field = np.empty(field.shape, dtype=np.float64)
-        out_field[..., ~mask] = np.nan  # works correctly
-        out_field[..., mask] = initial_field[unique_label_positions].T
-        return out_field
-    else:
-        initial_field = np.transpose(
-            initial_field, axes=[0] + list(range(initial_field.ndim - 1, 0, -1))
-        )
-        return dict(zip(unique_labels, initial_field))
+    out_field = np.empty(field.shape, dtype=np.float64)
+    out_field[..., ~mask] = np.nan  # works correctly
+    out_field[..., mask] = initial_field[unique_label_positions].T
+    return out_field
 
 
 def sum(
@@ -149,7 +142,6 @@ def sum(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
-    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -160,7 +152,6 @@ def sum(
         weights,
         field_mv,
         labels_mv,
-        return_field,
         field_accept_missing,
         skip_missing_check,
     )
@@ -172,7 +163,6 @@ def max(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
-    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -183,7 +173,6 @@ def max(
         weights,
         field_mv,
         labels_mv,
-        return_field,
         field_accept_missing,
         skip_missing_check,
     )
@@ -195,7 +184,6 @@ def min(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
-    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -206,7 +194,6 @@ def min(
         weights,
         field_mv,
         labels_mv,
-        return_field,
         field_accept_missing,
         skip_missing_check,
     )
@@ -218,7 +205,6 @@ def mean(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
-    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -229,7 +215,6 @@ def mean(
         weights,
         field_mv,
         labels_mv,
-        return_field,
         field_accept_missing,
         skip_missing_check,
     )
@@ -241,7 +226,6 @@ def std(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
-    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -252,7 +236,6 @@ def std(
         weights,
         field_mv,
         labels_mv,
-        return_field,
         field_accept_missing,
         skip_missing_check,
     )
@@ -264,7 +247,6 @@ def var(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
-    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -275,7 +257,6 @@ def var(
         weights,
         field_mv,
         labels_mv,
-        return_field,
         field_accept_missing,
         skip_missing_check,
     )
@@ -287,7 +268,6 @@ def prod(
     weights=None,
     field_mv=np.nan,
     labels_mv=0,
-    return_field=False,
     field_accept_missing=False,
     skip_missing_check=False,
 ):
@@ -298,7 +278,6 @@ def prod(
         weights,
         field_mv,
         labels_mv,
-        return_field,
         field_accept_missing,
         skip_missing_check,
     )

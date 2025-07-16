@@ -20,6 +20,7 @@ def mask_2d(func):
 
     """
 
+    @wraps(func)
     def wrapper(river_network, *args, **kwargs):
         """Wrapper masking 2d data fields to allow for processing along the
         river network, then undoing the masking.
@@ -192,5 +193,90 @@ def xarray_mask_and_unmask(func):
             dask="parallelized",
             kwargs=non_xr_kwargs,
         )
+
+    return wrapper
+
+
+def xarray_mask(func):
+    func = mask_2d(func)
+
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        input_core_dims = kwargs.pop("input_core_dims", None)
+        output_core_dims = kwargs.pop("output_core_dims", None)
+
+        if kwargs.pop("no_xr", False) or not (
+            any(isinstance(a, (xr.DataArray, xr.Dataset)) for a in args)
+            or any(isinstance(a, (xr.DataArray, xr.Dataset)) for a in kwargs.values())
+        ):
+            return func(*args, **kwargs)
+
+        points = kwargs.get("points", None)
+        points = points if points is not None else args[2]
+
+        # Introspect the function signature and bind all arguments
+        sig = signature(func)
+        bound_args = sig.bind(*args, **kwargs)
+        bound_args.apply_defaults()
+        all_args = bound_args.arguments
+
+        # Separate xarray and non-xarray arguments
+        xr_args = []
+        non_xr_kwargs = {}
+        arg_order = []
+
+        for name, value in all_args.items():
+            if isinstance(value, (xr.DataArray, xr.Dataset)):
+                xr_args.append(value)
+                arg_order.append(("xr", name))
+            else:
+                non_xr_kwargs[name] = value
+                arg_order.append(("nonxr", name))
+
+        # Create a function that reshuffles the args correctly
+        def reshuffled_func(*only_xr_args, **non_xr_kwargs):
+            full_args = {}
+            xr_i = 0
+            for kind, name in arg_order:
+                if kind == "xr":
+                    full_args[name] = only_xr_args[xr_i]
+                    xr_i += 1
+                else:
+                    full_args[name] = non_xr_kwargs[name]
+            return func(**full_args)
+
+        output_core_dims = (
+            [["station"]] if output_core_dims is None else output_core_dims
+        )
+        input_core_dims = (
+            [["lat", "lon"]] * len(xr_args)
+            if input_core_dims is None
+            else input_core_dims
+        )
+
+        result = xr.apply_ufunc(
+            reshuffled_func,
+            *xr_args,
+            input_core_dims=input_core_dims,
+            output_core_dims=output_core_dims,
+            output_dtypes=[float],
+            vectorize=True,
+            dask="parallelized",
+            kwargs=non_xr_kwargs,
+        )
+        station_names = kwargs.get("station_names", None)
+        if station_names is not None:
+            result = result.assign_coords(
+                station_name=("station", station_names),
+            )
+        elif isinstance(points, np.ndarray):
+            result = result.assign_coords(idx=("station", points))
+        elif isinstance(points, list):
+            points = np.array(points)
+            result = result.assign_coords(
+                xidx=("station", points[:, 0]), yidx=("station", points[:, 1])
+            )
+
+        return result
 
     return wrapper

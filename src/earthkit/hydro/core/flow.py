@@ -13,9 +13,9 @@ def propagate(
 ):
     if invert_graph:
         for uid, did, eid in river_network.groups[::-1]:
-            operation(field, did, uid, eid, *args, **kwargs)
+            field = operation(field, did, uid, eid, *args, **kwargs)
     else:
         for did, uid, eid in river_network.groups:
-            operation(field, did, uid, eid, *args, **kwargs)
+            field = operation(field, did, uid, eid, *args, **kwargs)
 
     return field

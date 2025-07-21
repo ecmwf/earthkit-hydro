@@ -1,3 +1,5 @@
+import math
+
 from earthkit.utils.array import array_namespace
 
 
@@ -19,9 +21,9 @@ def is_missing(field, mv):
     """
     xp = array_namespace(field)
 
-    if xp.isnan(mv):
+    if math.isnan(mv):
         return xp.isnan(field)
-    elif xp.isinf(mv):
+    elif math.isinf(mv):
         return xp.isinf(field)
     else:
         return field == mv

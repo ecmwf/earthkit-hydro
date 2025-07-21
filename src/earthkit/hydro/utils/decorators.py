@@ -1,6 +1,7 @@
 from functools import wraps
 from inspect import signature
 
+import numpy as np
 import xarray as xr
 from earthkit.utils.array import array_namespace
 
@@ -106,7 +107,7 @@ def mask_and_unmask(func):
         # gets the missing value from the keyword arguments if it is present,
         # otherwise takes default value of mv from func
         mv = kwargs.get("mv")
-        mv = mv if mv is not None else func.__defaults__[0]
+        mv = mv if mv is not None else np.nan  # func.__defaults__[0]
 
         xp = array_namespace(field)
 

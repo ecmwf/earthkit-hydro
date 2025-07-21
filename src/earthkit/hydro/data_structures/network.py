@@ -43,9 +43,10 @@ class RiverNetwork:
         self.groups = [to_device(group, device, array_backend) for group in self.groups]
         self._mask = to_device(self._mask, device, array_backend)
         # TODO: remove
-        self.nodes = to_device(self.nodes, device, array_backend)
-        self.sources = to_device(self.sources, device, array_backend)
-        self.sinks = to_device(self.sinks, device, array_backend)
+        # self.nodes = to_device(self.nodes, device, array_backend)
+        # self.sources = to_device(self.sources, device, array_backend)
+        # self.sinks = to_device(self.sinks, device, array_backend)
+        return self
 
     # def export(self, fpath="river_network.joblib", compression=1):
     #     joblib.dump(self._storage, fpath, compress=compression)

@@ -8,7 +8,8 @@ def _ufunc_to_downstream(
     node_modifier_use_upstream,
     edge_additive_weight,
     edge_multiplicative_weight,
-    ufunc,
+    func,
+    xp,
 ):
     """Updates field in-place by applying a ufunc at the downstream nodes of
     the grouping.
@@ -42,7 +43,7 @@ def _ufunc_to_downstream(
     """
     modifier_group = uid if node_modifier_use_upstream else did
 
-    modifier_field = field[..., uid]
+    modifier_field = xp.take_along_axis(field, uid, axis=-1)
     if node_multiplicative_weight is not None:
         modifier_field *= node_multiplicative_weight[..., modifier_group]
     if edge_multiplicative_weight is not None:
@@ -52,8 +53,8 @@ def _ufunc_to_downstream(
     if edge_additive_weight is not None:
         modifier_field += edge_additive_weight[..., eid]
 
-    ufunc.at(
+    return func(
         field,
-        (*[slice(None)] * (field.ndim - 1), did),
+        did,
         modifier_field,
     )

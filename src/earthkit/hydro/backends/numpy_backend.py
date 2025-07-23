@@ -11,6 +11,5 @@ class NumPyBackend(ArrayBackend):
         return x.copy()
 
     def scatter_add(self, target, indices, updates):
-
         np.add.at(target, (*[slice(None)] * (target.ndim - 1), indices), updates)
         return target

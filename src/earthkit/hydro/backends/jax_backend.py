@@ -8,7 +8,7 @@ class JAXBackend(ArrayBackend):
         super().__init__(jnp)
 
     def copy(self, x):
-        return x.copy()
+        return x
 
     def scatter_add(self, target, indices, updates):
         return target.at[(*[slice(None)] * (target.ndim - 1), indices)].add(updates)

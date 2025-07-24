@@ -10,6 +10,7 @@ class RiverNetworkStorage:
         splits,  # just indices of where to split
         area,
         mask,
+        shape,
         bifurcates=False,
         edge_weights=None,
     ):
@@ -23,5 +24,6 @@ class RiverNetworkStorage:
         self.sorted_data = sorted_data
         self.splits = splits
         self.mask = mask
+        self.shape = shape
         self.edge_weights = edge_weights
         assert not (bifurcates and edge_weights is None)

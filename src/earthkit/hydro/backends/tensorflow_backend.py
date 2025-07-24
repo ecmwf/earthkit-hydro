@@ -67,6 +67,9 @@ class TFBackend(ArrayBackend):
     def full_like(self, arr, value):
         return tf.fill(tf.shape(arr), value)
 
+    def full(self, shape, value):
+        return tf.fill(shape, value)
+
     @property
     def nan(self):
         return float("nan")

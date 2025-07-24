@@ -2,16 +2,46 @@ def mask_and_unmask(func):
 
     def wrapper(xp, river_network, field, *args, **kwargs):
 
-        # if field.shape[-2:] == river_network.shape:
-        shape = field.shape
-        B = shape[:-2]
-        M, N = shape[-2], shape[-1]
-        new_shape = B + (M * N,)
-        field_flat = xp.reshape(field, new_shape)
-        field_1d = xp.take_along_axis(field_flat, river_network.mask, axis=-1)
-        out_1d = func(xp, river_network, field_1d, *args, **kwargs)
-        out_flat = xp.full_like(field_flat, xp.nan)
-        out_flat = xp.scatter_assign(out_flat, river_network.mask, out_1d)
-        return xp.reshape(out_flat, shape)
+        if field.shape[-2:] == river_network.shape:
+            args, kwargs = process_args_kwargs(xp, river_network, args, kwargs)
+            field_1d = mask_last2_dims(xp, field, river_network.mask, field.shape)
+
+            out_1d = func(xp, river_network, field_1d, *args, **kwargs)
+
+            return scatter_and_reshape(xp, river_network.mask, out_1d, field.shape)
+        else:
+            return func(xp, river_network, field, *args, **kwargs)
 
     return wrapper
+
+
+def mask_last2_dims(xp, tensor, mask, target_shape):
+    B = target_shape[:-2]
+    M, N = target_shape[-2], target_shape[-1]
+    flat_shape = B + (M * N,)
+    tensor_flat = xp.reshape(tensor, flat_shape)
+    return xp.take_along_axis(tensor_flat, mask, axis=-1)
+
+
+def scatter_and_reshape(xp, mask, out_1d, target_shape):
+    B = target_shape[:-2]
+    M, N = target_shape[-2], target_shape[-1]
+    flat_shape = B + (M * N,)
+    out_flat = xp.full(flat_shape, xp.nan)
+    out_flat = xp.scatter_assign(out_flat, mask, out_1d)
+    return xp.reshape(out_flat, target_shape)
+
+
+def process_args_kwargs(xp, river_network, args, kwargs):
+    def process_arg(arg):
+        if (
+            hasattr(arg, "shape")  # TODO: decide if robust enough
+            and len(arg.shape) >= 2
+            and arg.shape[-2:] == river_network.shape
+        ):
+            return mask_last2_dims(xp, arg, river_network.mask, arg.shape)
+        return arg
+
+    new_args = tuple(process_arg(arg) for arg in args)
+    new_kwargs = {k: process_arg(v) for k, v in kwargs.items()}
+    return new_args, new_kwargs

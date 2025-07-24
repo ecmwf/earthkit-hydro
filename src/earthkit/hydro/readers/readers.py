@@ -286,13 +286,14 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     store = RiverNetworkStorage(
         n_nodes,
         n_edges,
-        np.vstack([down_ids_sort, up_ids_sort, edge_ids_sort]),
+        np.vstack([down_ids_sort, up_ids_sort, edge_ids_sort]).astype(np.int64),
         sources,
         sinks,
         coords,
         splits,
         pixarea,
-        mask,
+        np.where(mask.flatten())[0],
+        mask.shape,
         bifurcates,
         edge_weights,
     )

@@ -1,165 +1,42 @@
-import numpy as np
-
-from earthkit.hydro.core.online import calculate_online_metric
-from earthkit.hydro.utils import xarray_mask_and_unmask
+from earthkit.hydro.upstream import array
+from earthkit.hydro.utils.decs.xarray import xarray
 
 
-def calculate_upstream_metric(
-    river_network,
-    field,
-    metric,
-    node_weights=None,
-    edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
-    return calculate_online_metric(
-        river_network,
-        field,
-        metric,
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-        flow_direction="down",
-    )
-
-
-@xarray_mask_and_unmask
+@xarray
 def var(
     river_network,
     field,
     node_weights=None,
     edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
 ):
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "var",
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-    )
+    return array.var(river_network, field, node_weights, edge_weights)
 
 
-@xarray_mask_and_unmask
+@xarray
 def std(
     river_network,
     field,
     node_weights=None,
     edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
 ):
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "std",
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-    )
+    return array.std(river_network, field, node_weights, edge_weights)
 
 
-@xarray_mask_and_unmask
+@xarray
 def mean(
     river_network,
     field,
     node_weights=None,
     edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
 ):
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "mean",
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-    )
+    return array.mean(river_network, field, node_weights, edge_weights)
 
 
-@xarray_mask_and_unmask
-def min(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "min",
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-    )
-
-
-@xarray_mask_and_unmask
-def max(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "max",
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-    )
-
-
-@xarray_mask_and_unmask
+@xarray
 def sum(
     river_network,
     field,
     node_weights=None,
     edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
 ):
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "sum",
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-    )
-
-
-@xarray_mask_and_unmask
-def prod(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-    mv=np.nan,
-    accept_missing=False,
-):
-    return calculate_upstream_metric(
-        river_network,
-        field,
-        "prod",
-        node_weights,
-        edge_weights,
-        mv,
-        accept_missing,
-    )
+    return array.sum(river_network, field, node_weights, edge_weights)

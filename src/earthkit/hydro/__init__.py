@@ -17,3 +17,6 @@ import earthkit.hydro.subcatchments
 import earthkit.hydro.upstream
 
 from ._version import __version__
+
+# NB: will be removed
+# import earthkit.hydro.zonal

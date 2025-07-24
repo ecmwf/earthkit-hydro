@@ -2,7 +2,7 @@ import numpy as np
 import xarray as xr
 from earthkit.utils.array import array_namespace
 
-from earthkit.hydro.upstream.operations import calculate_upstream_metric
+from earthkit.hydro.upstream.array.operations import calculate_upstream_metric
 from earthkit.hydro.utils.convert import points_to_1d_indices, points_to_numpy
 from earthkit.hydro.utils.decorators import xarray_mask
 

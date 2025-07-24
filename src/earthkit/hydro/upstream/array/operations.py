@@ -1,7 +1,7 @@
 import numpy as np
 
 from earthkit.hydro.core.online import calculate_online_metric
-from earthkit.hydro.utils.decs import mask_and_unmask, multi_backend
+from earthkit.hydro.utils.decs import mask, multi_backend
 
 
 def calculate_upstream_metric(
@@ -28,7 +28,7 @@ def calculate_upstream_metric(
 
 
 @multi_backend
-@mask_and_unmask
+@mask()
 def var(
     xp,
     river_network,
@@ -49,7 +49,7 @@ def var(
 
 
 @multi_backend
-@mask_and_unmask
+@mask()
 def std(
     xp,
     river_network,
@@ -70,7 +70,7 @@ def std(
 
 
 @multi_backend
-@mask_and_unmask
+@mask()
 def mean(
     xp,
     river_network,
@@ -91,7 +91,7 @@ def mean(
 
 
 @multi_backend
-@mask_and_unmask
+@mask()
 def sum(
     xp,
     river_network,

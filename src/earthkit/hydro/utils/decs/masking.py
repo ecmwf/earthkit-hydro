@@ -1,18 +1,27 @@
-def mask_and_unmask(func):
+def mask(unmask=True):
 
-    def wrapper(xp, river_network, field, *args, **kwargs):
+    def decorator(func):
 
-        if field.shape[-2:] == river_network.shape:
-            args, kwargs = process_args_kwargs(xp, river_network, args, kwargs)
-            field_1d = mask_last2_dims(xp, field, river_network.mask, field.shape)
+        def wrapper(xp, river_network, field, *args, **kwargs):
 
-            out_1d = func(xp, river_network, field_1d, *args, **kwargs)
+            if field.shape[-2:] == river_network.shape:
+                args, kwargs = process_args_kwargs(xp, river_network, args, kwargs)
+                field_1d = mask_last2_dims(xp, field, river_network.mask, field.shape)
 
-            return scatter_and_reshape(xp, river_network.mask, out_1d, field.shape)
-        else:
-            return func(xp, river_network, field, *args, **kwargs)
+                out_1d = func(xp, river_network, field_1d, *args, **kwargs)
 
-    return wrapper
+                if unmask:
+                    return scatter_and_reshape(
+                        xp, river_network.mask, out_1d, field.shape
+                    )
+                else:
+                    return out_1d
+            else:
+                return func(xp, river_network, field, *args, **kwargs)
+
+        return wrapper
+
+    return decorator
 
 
 def mask_last2_dims(xp, tensor, mask, target_shape):

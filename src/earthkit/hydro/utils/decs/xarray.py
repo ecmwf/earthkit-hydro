@@ -9,6 +9,9 @@ def xarray(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
 
+        input_core_dims = kwargs.pop("input_core_dims", None)
+        output_core_dims = kwargs.pop("output_core_dims", None)
+
         # Introspect the function signature and bind all arguments
         sig = signature(func)
         bound_args = sig.bind(*args, **kwargs)
@@ -40,13 +43,15 @@ def xarray(func):
                     full_args[name] = non_xr_kwargs[name]
             return func(**full_args)
 
-        input_core_dims = kwargs.pop("input_core_dims", None)
         input_core_dims = (
             [["lat", "lon"]] * len(xr_args)
             if input_core_dims is None
-            else input_core_dims
+            else (
+                input_core_dims * len(xr_args)
+                if len(input_core_dims) == 1
+                else input_core_dims
+            )
         )
-        output_core_dims = kwargs.pop("output_core_dims", None)
         output_core_dims = (
             [["lat", "lon"]] if output_core_dims is None else output_core_dims
         )

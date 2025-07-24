@@ -41,7 +41,7 @@ class RiverNetwork:
         if device is None:
             device = "cpu" if array_backend != "cupy" else "gpu"
 
-        if array_backend in ["torch", "cupy", "numpy"]:
+        if array_backend in [None, "torch", "cupy", "numpy"]:
             self.groups = [
                 to_device(group, device, array_backend=array_backend)
                 for group in self.groups

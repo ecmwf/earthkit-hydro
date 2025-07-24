@@ -28,6 +28,7 @@ def calculate_downstream_metric(
 
 
 @multi_backend
+@mask_and_unmask
 def var(
     xp,
     river_network,
@@ -48,6 +49,7 @@ def var(
 
 
 @multi_backend
+@mask_and_unmask
 def std(
     xp,
     river_network,
@@ -68,6 +70,7 @@ def std(
 
 
 @multi_backend
+@mask_and_unmask
 def mean(
     xp,
     river_network,

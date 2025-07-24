@@ -61,7 +61,7 @@ class TFBackend(ArrayBackend):
         result = tf.reshape(scattered, tf.concat([batch_shape, [depth]], axis=0))
         return target + result
 
-    def take_along_axis(self, arr, indices, axis=-1):
+    def gather(self, arr, indices, axis=-1):
         return tf.gather(arr, indices, axis=axis)
 
     def full_like(self, arr, value):

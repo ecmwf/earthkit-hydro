@@ -1,2 +1,1 @@
-from .find import find
-from .metrics import max, mean, min, prod, std, sum, var
+from .operations import find, mean, std, sum, var

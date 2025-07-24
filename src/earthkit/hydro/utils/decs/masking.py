@@ -29,7 +29,7 @@ def mask_last2_dims(xp, tensor, mask, target_shape):
     M, N = target_shape[-2], target_shape[-1]
     flat_shape = B + (M * N,)
     tensor_flat = xp.reshape(tensor, flat_shape)
-    return xp.take_along_axis(tensor_flat, mask, axis=-1)
+    return xp.gather(tensor_flat, mask, axis=-1)
 
 
 def scatter_and_reshape(xp, mask, out_1d, target_shape):

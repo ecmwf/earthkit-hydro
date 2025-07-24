@@ -10,6 +10,10 @@ class JAXBackend(ArrayBackend):
     def copy(self, x):
         return x
 
+    def gather(self, arr, indices, axis=-1):
+        assert axis == -1
+        return arr[..., indices]
+
     def scatter_assign(self, target, indices, updates):
         return target.at[..., indices].set(updates)
 

@@ -10,6 +10,9 @@ class TorchBackend(ArrayBackend):
     def copy(self, x):
         return x.clone()
 
+    def gather(self, arr, indices, axis=-1):
+        return torch.index_select(arr, dim=axis, index=indices)
+
     def scatter_assign(self, target, indices, updates):
         target[..., indices] = updates
         return target

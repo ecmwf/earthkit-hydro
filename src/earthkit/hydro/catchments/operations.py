@@ -1,0 +1,47 @@
+from earthkit.hydro.catchments import array
+from earthkit.hydro.utils.decs.xarray import xarray
+
+
+@xarray
+def var(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+):
+    return array.var(river_network, field, node_weights, edge_weights)
+
+
+@xarray
+def std(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+):
+    return array.std(river_network, field, node_weights, edge_weights)
+
+
+@xarray
+def mean(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+):
+    return array.mean(river_network, field, node_weights, edge_weights)
+
+
+@xarray
+def sum(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+):
+    return array.sum(river_network, field, node_weights, edge_weights)
+
+
+@xarray
+def find(*args, **kwargs):
+    return array.find(*args, **kwargs)

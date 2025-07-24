@@ -10,6 +10,10 @@ class NumPyBackend(ArrayBackend):
     def copy(self, x):
         return x.copy()
 
+    def gather(self, arr, indices, axis=-1):
+        assert axis == -1
+        return arr[..., indices]
+
     def scatter_assign(self, target, indices, updates):
         target[..., indices] = updates
         return target

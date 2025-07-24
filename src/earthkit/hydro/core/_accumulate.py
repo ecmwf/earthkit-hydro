@@ -43,7 +43,7 @@ def _ufunc_to_downstream(
     """
     modifier_group = uid if node_modifier_use_upstream else did
 
-    modifier_field = xp.take_along_axis(field, uid, axis=-1)
+    modifier_field = xp.gather(field, uid, axis=-1)
     if node_multiplicative_weight is not None:
         modifier_field *= node_multiplicative_weight[..., modifier_group]
     if edge_multiplicative_weight is not None:

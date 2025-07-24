@@ -31,7 +31,11 @@ classifiers = [
     ]
 dynamic = ["version", "readme"]
 
-dependencies = ["numpy", "joblib"]
+dependencies = [
+    "numpy",
+    "joblib",
+    "xarray"
+]
 
 [project.urls]
     repository = "https://github.com/ecmwf/earthkit-hydro"
@@ -41,11 +45,7 @@ dependencies = ["numpy", "joblib"]
 [project.optional-dependencies]
     readers = [
         "earthkit-data[geotiff]>=0.13.8",
-        "geopandas"
         ]
-    bifurcations = [
-        "numba",
-    ]
     tests = [
         "pytest",
         ]
@@ -55,8 +55,6 @@ dependencies = ["numpy", "joblib"]
         ]
     all = [
         "earthkit-data[geotiff]>=0.13.8",
-        "geopandas",
-        "numba",
         "pytest",
         "pre-commit"
         ]

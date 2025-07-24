@@ -10,6 +10,29 @@ class TFBackend(ArrayBackend):
     def copy(self, x):
         return x
 
+    def scatter_assign(self, target, indices, updates):
+        target_shape = tf.shape(target)
+        batch_dims = target_shape[:-1]
+        num_batch = tf.reduce_prod(batch_dims)
+        num_idx = tf.shape(indices)[0]
+
+        flat_target = tf.reshape(target, (num_batch, -1))
+        flat_values = tf.reshape(updates, (num_batch, num_idx))
+
+        batch_range = tf.range(num_batch)[:, None]
+        batch_ids = tf.tile(batch_range, [1, num_idx])
+        scatter_idx = tf.stack(
+            [batch_ids, tf.tile(tf.expand_dims(indices, 0), [num_batch, 1])], axis=-1
+        )
+        scatter_idx = tf.reshape(scatter_idx, (-1, 2))
+
+        scatter_vals = tf.reshape(flat_values, (-1,))
+        flat_result = tf.tensor_scatter_nd_update(
+            flat_target, scatter_idx, scatter_vals
+        )
+
+        return tf.reshape(flat_result, target_shape)
+
     def scatter_add(self, target, indices, updates):
         target_shape = tf.shape(target)
         batch_shape = target_shape[:-1]
@@ -39,5 +62,11 @@ class TFBackend(ArrayBackend):
         return target + result
 
     def take_along_axis(self, arr, indices, axis=-1):
-        update_with = tf.gather(arr, indices, axis=axis)
-        return update_with
+        return tf.gather(arr, indices, axis=axis)
+
+    def full_like(self, arr, value):
+        return tf.fill(tf.shape(arr), value)
+
+    @property
+    def nan(self):
+        return float("nan")

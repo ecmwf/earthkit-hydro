@@ -10,6 +10,10 @@ class CuPyBackend(ArrayBackend):
     def copy(self, x):
         return x.copy()
 
+    def scatter_assign(self, target, indices, updates):
+        target[..., indices] = updates
+        return target
+
     def scatter_add(self, target, indices, updates):
         cp.add.at(target, (*[slice(None)] * (target.ndim - 1), indices), updates)
         return target

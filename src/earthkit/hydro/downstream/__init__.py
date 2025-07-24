@@ -1,1 +1,3 @@
-from .operations import max, mean, min, prod, std, sum, var
+import earthkit.hydro.downstream.array as array
+
+from .operations import mean, std, sum, var

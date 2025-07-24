@@ -13,6 +13,9 @@ class ArrayBackend:
         raise NotImplementedError
 
     # extended functionality
+    def scatter_assign(self, target, indices, updates):
+        raise NotImplementedError
+
     def scatter_add(self, target, indices, updates):
         raise NotImplementedError
 

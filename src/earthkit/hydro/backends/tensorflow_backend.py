@@ -73,3 +73,14 @@ class TFBackend(ArrayBackend):
     @property
     def nan(self):
         return float("nan")
+
+    def asarray(self, arr, dtype=None, device=None, copy=None):
+        tensor = tf.convert_to_tensor(arr, dtype=dtype)
+
+        if copy and device is None:
+            tensor = tf.identity(tensor)
+
+        if device is not None:
+            with tf.device(device):
+                tensor = tf.identity(tensor)
+        return tensor

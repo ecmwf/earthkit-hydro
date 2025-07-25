@@ -17,6 +17,8 @@ class RiverNetwork:
         self.bifurcates = self._storage.bifurcates
         self.mask = self._storage.mask
         self.shape = self._storage.shape
+        self.array_backend = "numpy"
+        self.device = "cpu"
 
         self.groups = np.split(self._storage.sorted_data, self._storage.splits, axis=1)
 
@@ -40,8 +42,14 @@ class RiverNetwork:
 
         if device is None:
             device = "cpu" if array_backend != "cupy" else "gpu"
+        if (
+            array_backend is None
+            and self.array_backend == "numpy"
+            and device in ["gpu", "cuda"]
+        ):
+            array_backend = "cupy"
 
-        if array_backend in [None, "torch", "cupy", "numpy"]:
+        if array_backend in ["torch", "cupy", "numpy"]:
             self.groups = [
                 to_device(group, device, array_backend=array_backend)
                 for group in self.groups
@@ -61,6 +69,9 @@ class RiverNetwork:
             self.mask = tf.convert_to_tensor(self.mask, dtype=tf.int32)
         else:
             raise NotImplementedError
+
+        self.array_backend = array_backend
+        self.device = device
         return self
 
     def export(self, fpath="river_network.joblib", compression=1):

@@ -11,6 +11,7 @@ def xarray(func):
 
         input_core_dims = kwargs.pop("input_core_dims", None)
         output_core_dims = kwargs.pop("output_core_dims", None)
+        output_sizes = kwargs.pop("output_sizes", None)
 
         # Introspect the function signature and bind all arguments
         sig = signature(func)
@@ -61,8 +62,8 @@ def xarray(func):
             *xr_args,
             input_core_dims=input_core_dims,
             output_core_dims=output_core_dims,
+            output_sizes=output_sizes,
             output_dtypes=[float],
-            vectorize=True,  # TODO: check if works with cupy
             dask="parallelized",
             kwargs=non_xr_kwargs,
         )

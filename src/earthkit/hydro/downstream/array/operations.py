@@ -27,7 +27,7 @@ def calculate_downstream_metric(
     )
 
 
-@multi_backend
+@multi_backend()
 @mask()
 def var(
     xp,
@@ -48,7 +48,7 @@ def var(
     )
 
 
-@multi_backend
+@multi_backend()
 @mask()
 def std(
     xp,
@@ -69,7 +69,7 @@ def std(
     )
 
 
-@multi_backend
+@multi_backend()
 @mask()
 def mean(
     xp,
@@ -90,7 +90,7 @@ def mean(
     )
 
 
-@multi_backend
+@multi_backend()
 @mask()
 def sum(
     xp,

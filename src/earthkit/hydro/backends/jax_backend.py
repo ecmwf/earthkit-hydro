@@ -1,3 +1,4 @@
+import jax
 import jax.numpy as jnp
 
 from .array_backend import ArrayBackend
@@ -19,3 +20,10 @@ class JAXBackend(ArrayBackend):
 
     def scatter_add(self, target, indices, updates):
         return target.at[(*[slice(None)] * (target.ndim - 1), indices)].add(updates)
+
+    def asarray(self, arr, dtype=None, device=None, copy=None):
+        for d in jax.devices():
+            if d.platform == device:
+                device = d
+                break
+        return jnp.asarray(arr, dtype=dtype, order=None, copy=copy, device=device)

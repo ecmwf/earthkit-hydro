@@ -1,10 +1,8 @@
-from earthkit.hydro.data_structures.network import RiverNetwork
-
 from ._accumulate import _ufunc_to_downstream
 from .flow import propagate
 
 
-def flow_downstream(
+def move_downstream(
     xp,
     river_network,
     field,
@@ -16,7 +14,7 @@ def flow_downstream(
     edge_multiplicative_weight=None,
 ):
     invert_graph = False
-    return flow(
+    return move_python(
         xp,
         river_network,
         field,
@@ -30,7 +28,7 @@ def flow_downstream(
     )
 
 
-def flow_upstream(
+def move_upstream(
     xp,
     river_network,
     field,
@@ -42,7 +40,7 @@ def flow_upstream(
     edge_multiplicative_weight=None,
 ):
     invert_graph = True
-    return flow(
+    return move_python(
         xp,
         river_network,
         field,
@@ -56,34 +54,7 @@ def flow_upstream(
     )
 
 
-def flow(
-    xp,
-    river_network: RiverNetwork,
-    field,
-    func,
-    invert_graph=False,
-    node_additive_weight=None,
-    node_multiplicative_weight=None,
-    node_modifier_use_upstream=True,
-    edge_additive_weight=None,
-    edge_multiplicative_weight=None,
-):
-
-    return flow_python(
-        xp,
-        river_network,
-        field,
-        func,
-        invert_graph,
-        node_additive_weight,
-        node_multiplicative_weight,
-        node_modifier_use_upstream,
-        edge_additive_weight,
-        edge_multiplicative_weight,
-    )
-
-
-def flow_python(
+def move_python(
     xp,
     river_network,
     field,
@@ -124,7 +95,7 @@ def flow_python(
 
     field = propagate(
         river_network,
-        river_network.groups,
+        river_network.data,
         field,
         invert_graph,
         operation,

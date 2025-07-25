@@ -19,6 +19,7 @@ class RiverNetwork:
         self.shape = self._storage.shape
         self.array_backend = "numpy"
         self.device = "cpu"
+        self.data = [self._storage.sorted_data]
 
         self.groups = np.split(self._storage.sorted_data, self._storage.splits, axis=1)
 
@@ -55,18 +56,21 @@ class RiverNetwork:
                 for group in self.groups
             ]
             self.mask = to_device(self.mask, device, array_backend=array_backend)
+            self.data = [to_device(self.data[0], device, array_backend=array_backend)]
         elif array_backend == "jax":
             assert device == "cpu"
             import jax.numpy as jnp
 
             self.groups = [jnp.array(x) for x in self.groups]
             self.mask = jnp.array(self.mask)
+            self.data = [jnp.array(self.data[0])]
         elif array_backend == "tensorflow":
             assert device == "cpu"
             import tensorflow as tf
 
             self.groups = [tf.convert_to_tensor(x, dtype=tf.int32) for x in self.groups]
             self.mask = tf.convert_to_tensor(self.mask, dtype=tf.int32)
+            self.data = [tf.convert_to_tensor(self.data[0], dtype=tf.int32)]
         else:
             raise NotImplementedError
 

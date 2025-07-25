@@ -1,16 +1,8 @@
-def var(*args, **kwargs):
+def to_source(*args, **kwargs):
     raise NotImplementedError
 
 
-def std(*args, **kwargs):
-    raise NotImplementedError
-
-
-def mean(*args, **kwargs):
-    raise NotImplementedError
-
-
-def sum(*args, **kwargs):
+def to_sink(*args, **kwargs):
     raise NotImplementedError
 
 

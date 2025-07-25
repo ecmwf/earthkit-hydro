@@ -131,7 +131,7 @@ fn compute_topological_labels_rust<'py>(
     n_nodes: usize,
 ) -> PyResult<&'py PyArray1<i64>> {
 
-    let labels: Vec<AtomicI64> = (0..n_nodes)
+    let mut labels: Vec<AtomicI64> = (0..n_nodes)
         .map(|_| AtomicI64::new(0))
         .collect();
 
@@ -151,6 +151,7 @@ fn compute_topological_labels_rust<'py>(
 
     let mut next = Vec::with_capacity(current.len());
     let mut visited = FixedBitSet::with_capacity(n_nodes);
+    let mut visited = FixedBitSet::with_capacity(n_nodes);
 
     for &i in &current {
         let d = downstream[i];
@@ -165,17 +166,26 @@ fn compute_topological_labels_rust<'py>(
             sinks.par_iter().for_each(|&i| {
                 labels[i].store((n as i64) - 1, Ordering::Relaxed);
             });
+            sinks.par_iter().for_each(|&i| {
+                labels[i].store((n as i64) - 1, Ordering::Relaxed);
+            });
             break;
         }
 
         current.par_iter().for_each(|&i| {
             labels[i].store(n as i64, Ordering::Relaxed);
         });
+        current.par_iter().for_each(|&i| {
+            labels[i].store(n as i64, Ordering::Relaxed);
+        });
 
         next.clear();
         visited.clear();
+        visited.clear();
         for &i in &current {
             let d = downstream[i];
+            if d != n_nodes && !visited.contains(d) {
+                visited.insert(d);
             if d != n_nodes && !visited.contains(d) {
                 visited.insert(d);
                 next.push(d);
@@ -189,6 +199,10 @@ fn compute_topological_labels_rust<'py>(
         return Err(PyErr::new::<PyValueError, _>("River Network contains a cycle."));
     }
 
+    let result: Vec<i64> = labels.iter()
+        .map(|a| a.load(Ordering::Relaxed))
+        .collect();
+    Ok(PyArray1::from_vec(py, result))
     let result: Vec<i64> = labels.iter()
         .map(|a| a.load(Ordering::Relaxed))
         .collect();

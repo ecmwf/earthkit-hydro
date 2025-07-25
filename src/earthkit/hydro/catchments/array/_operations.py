@@ -1,5 +1,3 @@
-import numpy as np
-
 from earthkit.hydro.upstream.array.operations import calculate_upstream_metric
 from earthkit.hydro.utils.decs import mask, multi_backend
 
@@ -12,8 +10,6 @@ def calculate_catchment_metric(
     metric,
     node_weights,
     edge_weights,
-    mv,
-    accept_missing,
 ):
     upstream_metric_field = calculate_upstream_metric(
         xp,
@@ -22,8 +18,6 @@ def calculate_catchment_metric(
         metric,
         node_weights,
         edge_weights,
-        mv,
-        accept_missing,
     )
     return xp.gather(upstream_metric_field, stations_1d, axis=-1)
 
@@ -39,8 +33,6 @@ def var(xp, river_network, field, locations, node_weights=None, edge_weights=Non
         "var",
         node_weights,
         edge_weights,
-        mv=np.nan,
-        accept_missing=False,
     )
 
 
@@ -55,8 +47,6 @@ def std(xp, river_network, field, locations, node_weights=None, edge_weights=Non
         "std",
         node_weights,
         edge_weights,
-        mv=np.nan,
-        accept_missing=False,
     )
 
 
@@ -71,8 +61,6 @@ def mean(xp, river_network, field, locations, node_weights=None, edge_weights=No
         "mean",
         node_weights,
         edge_weights,
-        mv=np.nan,
-        accept_missing=False,
     )
 
 
@@ -87,8 +75,6 @@ def sum(xp, river_network, field, locations, node_weights=None, edge_weights=Non
         "sum",
         node_weights,
         edge_weights,
-        mv=np.nan,
-        accept_missing=False,
     )
 
 

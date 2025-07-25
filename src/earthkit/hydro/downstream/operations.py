@@ -40,3 +40,21 @@ def sum(
     edge_weights=None,
 ):
     return array.sum(river_network, field, node_weights, edge_weights)
+
+
+def min(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+):
+    raise NotImplementedError
+
+
+def max(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+):
+    raise NotImplementedError

@@ -107,3 +107,23 @@ def sum(
 
 def find(*args, **kwargs):
     raise NotImplementedError
+
+
+def min(
+    river_network,
+    field,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+):
+    raise NotImplementedError
+
+
+def max(
+    river_network,
+    field,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+):
+    raise NotImplementedError

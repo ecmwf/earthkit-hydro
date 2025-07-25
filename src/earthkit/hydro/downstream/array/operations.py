@@ -1,5 +1,3 @@
-import numpy as np
-
 from earthkit.hydro.core.online import calculate_online_metric
 from earthkit.hydro.utils.decs import mask, multi_backend
 
@@ -11,8 +9,6 @@ def calculate_downstream_metric(
     metric,
     node_weights,
     edge_weights,
-    mv,
-    accept_missing,
 ):
     return calculate_online_metric(
         xp,
@@ -21,8 +17,6 @@ def calculate_downstream_metric(
         metric,
         node_weights,
         edge_weights,
-        mv,
-        accept_missing,
         flow_direction="up",
     )
 
@@ -43,8 +37,6 @@ def var(
         "var",
         node_weights,
         edge_weights,
-        mv=np.nan,
-        accept_missing=False,
     )
 
 
@@ -64,8 +56,6 @@ def std(
         "std",
         node_weights,
         edge_weights,
-        mv=np.nan,
-        accept_missing=False,
     )
 
 
@@ -85,8 +75,6 @@ def mean(
         "mean",
         node_weights,
         edge_weights,
-        mv=np.nan,
-        accept_missing=False,
     )
 
 
@@ -106,6 +94,22 @@ def sum(
         "sum",
         node_weights,
         edge_weights,
-        mv=np.nan,
-        accept_missing=False,
     )
+
+
+def min(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+):
+    raise NotImplementedError
+
+
+def max(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+):
+    raise NotImplementedError

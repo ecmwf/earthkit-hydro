@@ -1,1 +1,1 @@
-from .operations import find, mean, std, sum, var
+from .operations import find, max, mean, min, std, sum, var

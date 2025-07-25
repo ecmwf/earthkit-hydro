@@ -4,6 +4,8 @@ from earthkit.hydro.utils.decs import multi_backend
 
 def preprocess_stations(xp, river_network, stations):
     if stations.ndim == 2 and stations.shape[1] == 2:
+        if xp.name not in ["numpy", "cupy"]:
+            raise NotImplementedError
         # TODO: make this code actually xp agnostic
         rows, cols = stations[:, 0], stations[:, 1]
         flat_indices = rows * river_network.shape[1] + cols
@@ -52,4 +54,24 @@ def sum(xp, river_network, field, locations, node_weights=None, edge_weights=Non
 
 
 def find(*args, **kwargs):
+    raise NotImplementedError
+
+
+def min(
+    river_network,
+    field,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+):
+    raise NotImplementedError
+
+
+def max(
+    river_network,
+    field,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+):
     raise NotImplementedError

@@ -1,5 +1,5 @@
 from earthkit.hydro.upstream.array.operations import calculate_upstream_metric
-from earthkit.hydro.utils.decs import mask, multi_backend
+from earthkit.hydro.utils.decorators import mask, multi_backend
 
 
 def calculate_catchment_metric(

@@ -1,5 +1,5 @@
 from earthkit.hydro.downstream import array
-from earthkit.hydro.utils.decs.xarray import xarray
+from earthkit.hydro.utils.decorators import xarray
 
 
 @xarray

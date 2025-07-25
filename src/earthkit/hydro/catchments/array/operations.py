@@ -1,5 +1,5 @@
 from earthkit.hydro.catchments.array import _operations
-from earthkit.hydro.utils.decs import multi_backend
+from earthkit.hydro.utils.decorators import multi_backend
 
 
 def preprocess_stations(xp, river_network, stations):

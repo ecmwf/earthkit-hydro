@@ -4,7 +4,7 @@ import xarray as xr
 import earthkit.hydro.catchments.array._operations as array
 from earthkit.hydro.backends.find import get_array_backend
 from earthkit.hydro.catchments.array.operations import preprocess_stations
-from earthkit.hydro.utils.decs.xarray import xarray
+from earthkit.hydro.utils.decorators.xarray import xarray
 
 
 def name_last_dim(func):

@@ -7,6 +7,10 @@ class TorchBackend(ArrayBackend):
     def __init__(self):
         super().__init__(torch)
 
+    @property
+    def name(self):
+        return "torch"
+
     def copy(self, x):
         return x.clone()
 

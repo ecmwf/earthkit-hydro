@@ -4,7 +4,7 @@ import xarray as xr
 import earthkit.hydro.catchments.array._operations as array
 from earthkit.hydro.backends.find import get_array_backend
 from earthkit.hydro.catchments.array.operations import preprocess_stations
-from earthkit.hydro.utils.decorators.xarray import xarray
+from earthkit.hydro.utils.decorators import xarray
 
 
 def name_last_dim(func):
@@ -38,10 +38,16 @@ def name_last_dim(func):
 
         if xr_present:
             if dict_locations:
-                # TODO: decide if should be xr and not list
-                names = list(orig_locations.keys())
+                names = xp.asarray(
+                    list(orig_locations.keys()), device=river_network.device
+                )
+                coords = xp.asarray(
+                    list(orig_locations.values()), device=river_network.device
+                )
                 result = result.assign_coords(
                     station_name=("station_index", names),
+                    lat=("station_index", coords[:, 0]),
+                    lon=("station_index", coords[:, 1]),
                 )
 
             if locations.ndim == 1:
@@ -105,10 +111,8 @@ def sum(
     return array.sum(river_network, field, locations, node_weights, edge_weights)
 
 
-def find(*args, **kwargs):
-    raise NotImplementedError
-
-
+@name_last_dim
+@xarray
 def min(
     river_network,
     field,
@@ -116,9 +120,11 @@ def min(
     node_weights=None,
     edge_weights=None,
 ):
-    raise NotImplementedError
+    return array.min(river_network, field, locations, node_weights, edge_weights)
 
 
+@name_last_dim
+@xarray
 def max(
     river_network,
     field,
@@ -126,4 +132,8 @@ def max(
     node_weights=None,
     edge_weights=None,
 ):
+    return array.max(river_network, field, locations, node_weights, edge_weights)
+
+
+def find(*args, **kwargs):
     raise NotImplementedError

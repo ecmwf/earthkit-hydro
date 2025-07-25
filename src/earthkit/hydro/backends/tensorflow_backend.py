@@ -7,6 +7,10 @@ class TFBackend(ArrayBackend):
     def __init__(self):
         super().__init__(tf)
 
+    @property
+    def name(self):
+        return "tensorflow"
+
     def copy(self, x):
         return x
 

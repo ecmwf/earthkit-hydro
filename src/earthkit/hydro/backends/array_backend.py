@@ -7,7 +7,7 @@ class ArrayBackend:
 
     @property
     def name(self):
-        return self._mod.__name__.split(".")[0]
+        raise NotImplementedError
 
     def copy(self, x):
         raise NotImplementedError

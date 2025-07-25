@@ -7,6 +7,10 @@ class CuPyBackend(ArrayBackend):
     def __init__(self):
         super().__init__(cp)
 
+    @property
+    def name(self):
+        return "cupy"
+
     def copy(self, x):
         return x.copy()
 

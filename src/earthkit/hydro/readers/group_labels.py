@@ -6,7 +6,6 @@ import numpy as np
 def compute_topological_labels(sources, sinks, downstream_nodes, n_nodes):
 
     use_rust = int(os.environ.get("USE_RUST", "-1"))
-    print(use_rust)
 
     if use_rust == 0:
         func = compute_topological_labels_python

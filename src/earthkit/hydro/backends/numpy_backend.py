@@ -7,6 +7,10 @@ class NumPyBackend(ArrayBackend):
     def __init__(self):
         super().__init__(np)
 
+    @property
+    def name(self):
+        return "numpy"
+
     def copy(self, x):
         return x.copy()
 

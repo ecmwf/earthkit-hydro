@@ -8,6 +8,10 @@ class JAXBackend(ArrayBackend):
     def __init__(self):
         super().__init__(jnp)
 
+    @property
+    def name(self):
+        return "jax"
+
     def copy(self, x):
         return x
 

@@ -6,15 +6,8 @@ edition = "2021"
 [dependencies]
 pyo3 = { version = "0.19", features = ["extension-module"] }
 numpy = "0.19"
-<<<<<<< HEAD
-ndarray = "0.15"
 rayon = "1.7"
 fixedbitset = "0.5"
-num-traits = "0.2"
-=======
-rayon = "1.7"
-fixedbitset = "0.5"
->>>>>>> develop
 
 [lib]
 # See https://github.com/PyO3/pyo3 for details

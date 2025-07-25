@@ -42,19 +42,21 @@ def sum(
     return array.sum(river_network, field, node_weights, edge_weights)
 
 
+@xarray
 def min(
     river_network,
     field,
     node_weights=None,
     edge_weights=None,
 ):
-    raise NotImplementedError
+    return array.min(river_network, field, node_weights, edge_weights)
 
 
+@xarray
 def max(
     river_network,
     field,
     node_weights=None,
     edge_weights=None,
 ):
-    raise NotImplementedError
+    return array.max(river_network, field, node_weights, edge_weights)

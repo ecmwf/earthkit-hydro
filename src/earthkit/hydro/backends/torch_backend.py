@@ -18,4 +18,5 @@ class TorchBackend(ArrayBackend):
         return target
 
     def scatter_add(self, target, indices, updates):
-        return target.index_add(-1, indices, updates)
+        target.index_add_(-1, indices, updates)
+        return target

@@ -21,3 +21,11 @@ class NumPyBackend(ArrayBackend):
     def scatter_add(self, target, indices, updates):
         np.add.at(target, (*[slice(None)] * (target.ndim - 1), indices), updates)
         return target
+
+    def scatter_max(self, target, indices, updates):
+        np.maximum.at(target, (*[slice(None)] * (target.ndim - 1), indices), updates)
+        return target
+
+    def scatter_min(self, target, indices, updates):
+        np.minimum.at(target, (*[slice(None)] * (target.ndim - 1), indices), updates)
+        return target

@@ -21,3 +21,11 @@ class CuPyBackend(ArrayBackend):
     def scatter_add(self, target, indices, updates):
         cp.add.at(target, (*[slice(None)] * (target.ndim - 1), indices), updates)
         return target
+
+    def scatter_max(self, target, indices, updates):
+        cp.maximum.at(target, (*[slice(None)] * (target.ndim - 1), indices), updates)
+        return target
+
+    def scatter_min(self, target, indices, updates):
+        cp.minimum.at(target, (*[slice(None)] * (target.ndim - 1), indices), updates)
+        return target

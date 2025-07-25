@@ -97,19 +97,39 @@ def sum(
     )
 
 
+@multi_backend()
+@mask()
 def min(
+    xp,
     river_network,
     field,
     node_weights=None,
     edge_weights=None,
 ):
-    raise NotImplementedError
+    return calculate_downstream_metric(
+        xp,
+        river_network,
+        field,
+        "min",
+        node_weights,
+        edge_weights,
+    )
 
 
+@multi_backend()
+@mask()
 def max(
+    xp,
     river_network,
     field,
     node_weights=None,
     edge_weights=None,
 ):
-    raise NotImplementedError
+    return calculate_downstream_metric(
+        xp,
+        river_network,
+        field,
+        "max",
+        node_weights,
+        edge_weights,
+    )

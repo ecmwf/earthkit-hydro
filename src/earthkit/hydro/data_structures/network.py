@@ -31,7 +31,7 @@ class RiverNetwork:
 
     def to_device(self, device=None, array_backend=None):
 
-        # shorthands
+        # TODO: use xp.asarray
         if array_backend == "np":
             array_backend = "numpy"
         elif array_backend == "cp":

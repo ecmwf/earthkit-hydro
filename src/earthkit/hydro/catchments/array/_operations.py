@@ -78,5 +78,33 @@ def sum(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
+@multi_backend()
+@mask(unmask=False)
+def min(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+    return calculate_catchment_metric(
+        xp,
+        river_network,
+        field,
+        locations,
+        "min",
+        node_weights,
+        edge_weights,
+    )
+
+
+@multi_backend()
+@mask(unmask=False)
+def max(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+    return calculate_catchment_metric(
+        xp,
+        river_network,
+        field,
+        locations,
+        "max",
+        node_weights,
+        edge_weights,
+    )
+
+
 def find(*args, **kwargs):
     raise NotImplementedError

@@ -3,7 +3,6 @@ from earthkit.hydro.utils.decs import multi_backend
 
 
 def preprocess_stations(xp, river_network, stations):
-    stations = xp.asarray(stations, device=river_network.device)
     if stations.ndim == 2 and stations.shape[1] == 2:
         # TODO: make this code actually xp agnostic
         rows, cols = stations[:, 0], stations[:, 1]
@@ -26,24 +25,28 @@ def preprocess_stations(xp, river_network, stations):
 
 @multi_backend(allow_jax_jit=False)
 def var(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+    locations = xp.asarray(locations, device=river_network.device)
     stations_1d = preprocess_stations(xp, river_network, locations)
     return _operations.var(river_network, field, stations_1d)
 
 
 @multi_backend(allow_jax_jit=False)
 def std(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+    locations = xp.asarray(locations, device=river_network.device)
     stations_1d = preprocess_stations(xp, river_network, locations)
     return _operations.std(river_network, field, stations_1d)
 
 
 @multi_backend(allow_jax_jit=False)
 def mean(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+    locations = xp.asarray(locations, device=river_network.device)
     stations_1d = preprocess_stations(xp, river_network, locations)
     return _operations.mean(river_network, field, stations_1d)
 
 
 @multi_backend(allow_jax_jit=False)
 def sum(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+    locations = xp.asarray(locations, device=river_network.device)
     stations_1d = preprocess_stations(xp, river_network, locations)
     return _operations.sum(river_network, field, stations_1d)
 

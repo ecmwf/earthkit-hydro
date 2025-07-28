@@ -1,7 +1,42 @@
-from earthkit.hydro.utils.missing import is_missing
+from earthkit.hydro.core.flow import propagate
 
 
-def _find_catchments_2D(field, did, uid, eid, mv, overwrite):
+def _flow_find(
+    xp,
+    river_network,
+    field,
+    overwrite=True,
+    invert_graph=True,
+):
+    op = _find_catchments
+
+    def operation(
+        field,
+        did,
+        uid,
+        eid,
+    ):
+        return op(
+            xp,
+            field,
+            did,
+            uid,
+            eid,
+            overwrite=overwrite,
+        )
+
+    field = propagate(
+        river_network,
+        river_network.groups,
+        field,
+        invert_graph,
+        operation,
+    )
+
+    return field
+
+
+def _find_catchments(xp, field, did, uid, eid, overwrite):
     """Updates field in-place with the value of its downstream nodes, dealing
     with missing values for 2D fields.
 
@@ -13,8 +48,6 @@ def _find_catchments_2D(field, did, uid, eid, mv, overwrite):
         The input field.
     grouping : numpy.ndarray
         The array of node indices.
-    mv : scalar
-        The missing value indicator.
     overwrite : bool
         If True, overwrite existing non-missing values in the field array.
 
@@ -23,12 +56,12 @@ def _find_catchments_2D(field, did, uid, eid, mv, overwrite):
     None
 
     """
-    down_not_missing = ~is_missing(field[..., uid], mv)
+    down_not_missing = ~xp.isnan(xp.gather(field, uid, axis=-1))
     did = did[
         down_not_missing
     ]  # only update nodes where the downstream belongs to a catchment
     if not overwrite:
-        up_is_missing = is_missing(field[..., did], mv)
+        up_is_missing = xp.isnan(xp.gather(field, did, axis=-1))
         did = did[up_is_missing]
     else:
         up_is_missing = None
@@ -37,4 +70,5 @@ def _find_catchments_2D(field, did, uid, eid, mv, overwrite):
         if up_is_missing is not None
         else uid[down_not_missing]
     )
-    field[..., did] = field[..., uid]
+    updates = xp.gather(field, uid, axis=-1)
+    return xp.scatter_assign(field, did, updates)

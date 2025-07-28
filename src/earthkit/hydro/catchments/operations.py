@@ -135,5 +135,6 @@ def max(
     return array.max(river_network, field, locations, node_weights, edge_weights)
 
 
-def find(*args, **kwargs):
-    raise NotImplementedError
+@xarray
+def find(river_network, field):
+    array.find(river_network, field)

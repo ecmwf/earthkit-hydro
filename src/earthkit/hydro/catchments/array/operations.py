@@ -79,5 +79,5 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-def find(*args, **kwargs):
-    raise NotImplementedError
+def find(river_network, field):
+    return _operations.find(river_network, field)

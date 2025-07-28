@@ -1,3 +1,4 @@
+from earthkit.hydro.core._find import _flow_find
 from earthkit.hydro.upstream.array.operations import calculate_upstream_metric
 from earthkit.hydro.utils.decorators import mask, multi_backend
 
@@ -106,5 +107,8 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-def find(*args, **kwargs):
-    raise NotImplementedError
+@multi_backend()
+@mask()
+def find(xp, river_network, field):
+    field = xp.copy(field)
+    return _flow_find(xp, river_network, field)

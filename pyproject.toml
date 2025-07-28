@@ -34,7 +34,8 @@ dynamic = ["version", "readme"]
 dependencies = [
     "numpy",
     "joblib",
-    "xarray"
+    "xarray",
+    "earthkit-utils>=0.1.0"
 ]
 
 [project.urls]

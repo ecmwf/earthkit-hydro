@@ -9,7 +9,7 @@
 
 import numpy as np
 
-from earthkit.hydro.data_structures._network import RiverNetworkStorage
+from earthkit.hydro.data_structures._network_storage import RiverNetworkStorage
 
 from .group_labels import compute_topological_labels
 

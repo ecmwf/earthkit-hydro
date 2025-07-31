@@ -1,4 +1,4 @@
-from earthkit.hydro.data_structures.network import RiverNetwork
+from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._accumulate import _ufunc_to_downstream
 from .flow import propagate

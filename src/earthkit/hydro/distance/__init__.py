@@ -1,3 +1,5 @@
 import earthkit.hydro.distance.array
 
-from .operations import max, min, to_sink, to_source
+from ._toplevel import max, min, to_sink, to_source
+
+__all__ = ["array", "max", "min", "to_sink", "to_source"]

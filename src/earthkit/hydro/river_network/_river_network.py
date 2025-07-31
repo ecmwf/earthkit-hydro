@@ -4,17 +4,17 @@ from urllib.request import Request, urlopen
 
 import joblib
 
-from earthkit.hydro._version import __version__ as ekh_version
-from earthkit.hydro.data_structures.network import RiverNetwork
-from earthkit.hydro.readers import (  # cache, from_grit,
+from earthkit.hydro._readers import (  # cache, from_grit,
     find_main_var,
     from_cama_nextxy,
     from_d8,
     import_earthkit_or_prompt_install,
 )
-from earthkit.hydro.utils.readers import from_file
+from earthkit.hydro._utils.readers import from_file
+from earthkit.hydro._version import __version__ as ekh_version
+from earthkit.hydro.data_structures._network import RiverNetwork
 
-from .cache import cache
+from ._cache import cache
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1
@@ -22,7 +22,7 @@ ekh_version = ".".join(ekh_version.split(".")[:2])
 
 
 @cache
-def create(path, river_network_format, source):
+def create(path, river_network_format, source="file"):
     """Creates a river network from the given path, format, and source.
 
     Parameters
@@ -40,7 +40,7 @@ def create(path, river_network_format, source):
 
     Returns
     -------
-    earthkit.hydro.network.RiverNetwork
+    RiverNetwork
         The river network object created from the given data.
 
     """
@@ -110,7 +110,7 @@ def load(
 
     Returns
     -------
-    earthkit.hydro.network.RiverNetwork
+    RiverNetwork
         The loaded river network.
 
     """

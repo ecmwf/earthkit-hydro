@@ -1,1 +1,3 @@
-from .network import RiverNetwork
+from ._network import RiverNetwork
+
+__all__ = ["RiverNetwork"]

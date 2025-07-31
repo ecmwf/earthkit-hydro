@@ -1,4 +1,4 @@
-from earthkit.hydro.core.flow import propagate
+from earthkit.hydro._core.flow import propagate
 
 
 def _flow_find(

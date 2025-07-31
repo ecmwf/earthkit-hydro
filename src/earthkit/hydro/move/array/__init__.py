@@ -1,1 +1,3 @@
-from .operations import downstream, upstream
+from ._toplevel import downstream, upstream
+
+__all__ = ["downstream", "upstream"]

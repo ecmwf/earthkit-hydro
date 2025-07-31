@@ -1,6 +1,6 @@
 from functools import wraps
 
-from earthkit.hydro.backends import get_array_backend
+from earthkit.hydro._backends.find import get_array_backend
 
 
 def multi_backend(allow_jax_jit=True):

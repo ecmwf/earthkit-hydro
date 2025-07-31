@@ -1,5 +1,5 @@
-from earthkit.hydro.core.move import calculate_move_metric
-from earthkit.hydro.utils.decorators import mask, multi_backend
+from earthkit.hydro._core.move import calculate_move_metric
+from earthkit.hydro._utils.decorators import mask, multi_backend
 
 
 @multi_backend()

@@ -1,7 +1,11 @@
+from functools import wraps
+
+
 def mask(unmask=True):
 
     def decorator(func):
 
+        @wraps(func)
         def wrapper(xp, river_network, field, *args, **kwargs):
 
             if field.shape[-2:] == river_network.shape:

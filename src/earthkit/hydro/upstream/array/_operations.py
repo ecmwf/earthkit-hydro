@@ -1,8 +1,8 @@
-from earthkit.hydro.core.online import calculate_online_metric
-from earthkit.hydro.utils.decorators import mask, multi_backend
+from earthkit.hydro._core.online import calculate_online_metric
+from earthkit.hydro._utils.decorators import mask, multi_backend
 
 
-def calculate_downstream_metric(
+def calculate_upstream_metric(
     xp,
     river_network,
     field,
@@ -17,7 +17,7 @@ def calculate_downstream_metric(
         metric,
         node_weights,
         edge_weights,
-        flow_direction="up",
+        flow_direction="down",
     )
 
 
@@ -30,7 +30,7 @@ def var(
     node_weights=None,
     edge_weights=None,
 ):
-    return calculate_downstream_metric(
+    return calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -49,7 +49,7 @@ def std(
     node_weights=None,
     edge_weights=None,
 ):
-    return calculate_downstream_metric(
+    return calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -68,7 +68,7 @@ def mean(
     node_weights=None,
     edge_weights=None,
 ):
-    return calculate_downstream_metric(
+    return calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -87,7 +87,7 @@ def sum(
     node_weights=None,
     edge_weights=None,
 ):
-    return calculate_downstream_metric(
+    return calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -106,7 +106,7 @@ def min(
     node_weights=None,
     edge_weights=None,
 ):
-    return calculate_downstream_metric(
+    return calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -125,7 +125,7 @@ def max(
     node_weights=None,
     edge_weights=None,
 ):
-    return calculate_downstream_metric(
+    return calculate_upstream_metric(
         xp,
         river_network,
         field,

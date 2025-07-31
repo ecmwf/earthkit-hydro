@@ -1,11 +1,12 @@
 import os
 import tempfile
+from functools import wraps
 from hashlib import sha256
 
 import joblib
 
 from earthkit.hydro._version import __version__ as ekh_version
-from earthkit.hydro.data_structures.network import RiverNetwork
+from earthkit.hydro.data_structures._network import RiverNetwork
 
 # read in only up to second decimal point
 # i.e. 0.1.dev90 -> 0.1
@@ -27,6 +28,7 @@ def cache(func):
 
     """
 
+    @wraps(func)
     def wrapper(
         path,
         river_network_format,

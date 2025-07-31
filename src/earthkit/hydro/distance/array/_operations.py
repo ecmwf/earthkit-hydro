@@ -1,71 +1,31 @@
-from earthkit.hydro.core.accumulate import flow_downstream, flow_upstream
-from earthkit.hydro.core.metrics import metrics_func_finder
-from earthkit.hydro.utils.decorators import mask
+from earthkit.hydro._utils.decorators import multi_backend
+from earthkit.hydro.catchments.array._operations import preprocess_stations
+from earthkit.hydro.distance.array import __operations as _operations
 
 
-@mask()
-def min(xp, river_network, field, locations, upstream, downstream):
-
-    func_obj = metrics_func_finder("min", xp)
-
-    out = xp.full(river_network.n_nodes, func_obj.base_val)
-
-    out[locations] = 0
-
-    func = func_obj.func
-
-    if downstream:
-        out = flow_downstream(
-            xp,
-            river_network,
-            out,
-            func,
-            node_additive_weight=field,
-            node_modifier_use_upstream=True,
-        )
-    if upstream:
-        out = flow_upstream(
-            xp,
-            river_network,
-            out,
-            func,
-            node_additive_weight=field,
-            node_modifier_use_upstream=True,
-        )
-
-    return out
+@multi_backend()
+def min(xp, river_network, field, locations, upstream=False, downstream=True):
+    locations = xp.asarray(locations, device=river_network.device)
+    locations = preprocess_stations(xp, river_network, locations)
+    # TODO: add back when we have default xarray with correct lat lon
+    # if weights is None:
+    #     weights = xp.ones(river_network.shape)
+    return _operations.min(xp, river_network, field, locations, upstream, downstream)
 
 
-@mask()
-def max(xp, river_network, field, locations, upstream, downstream):
+@multi_backend()
+def max(xp, river_network, field, locations, upstream=False, downstream=True):
+    locations = xp.asarray(locations, device=river_network.device)
+    locations = preprocess_stations(xp, river_network, locations)
+    # TODO: add back when we have default xarray with correct lat lon
+    # if weights is None:
+    #     weights = xp.ones(river_network.shape)
+    return _operations.max(xp, river_network, field, locations, upstream, downstream)
 
-    func_obj = metrics_func_finder("min", xp)
 
-    out = xp.full(river_network.n_nodes, func_obj.base_val)
+def to_source(*args, **kwargs):
+    raise NotImplementedError
 
-    out[locations] = 0
 
-    func = func_obj.func
-
-    if downstream:
-        out = flow_downstream(
-            xp,
-            river_network,
-            out,
-            func,
-            node_additive_weight=field,
-            node_modifier_use_upstream=True,
-        )
-    if upstream:
-        out = flow_upstream(
-            xp,
-            river_network,
-            out,
-            func,
-            node_additive_weight=field,
-            node_modifier_use_upstream=True,
-        )
-
-    # TODO: convert -xp.inf to xp.inf
-
-    return out
+def to_sink(*args, **kwargs):
+    raise NotImplementedError

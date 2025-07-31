@@ -11,11 +11,18 @@ import earthkit.hydro.distance
 import earthkit.hydro.downstream
 import earthkit.hydro.length
 import earthkit.hydro.move
-import earthkit.hydro.readers  # for tests
 import earthkit.hydro.river_network
 import earthkit.hydro.upstream
 
 from ._version import __version__
 
-# NB: will be removed
-# import earthkit.hydro.zonal
+__all__ = [
+    "catchments",
+    "distance",
+    "downstream",
+    "length",
+    "move",
+    "river_network",
+    "upstream",
+    "__version__",
+]

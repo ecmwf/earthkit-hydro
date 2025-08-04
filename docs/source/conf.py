@@ -1,0 +1,95 @@
+# Configuration file for the Sphinx documentation builder.
+#
+# For the full list of built-in configuration values, see the documentation:
+# https://www.sphinx-doc.org/en/master/usage/configuration.html
+
+# -- Project information -----------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
+
+import os
+import sys
+
+sys.path.insert(0, os.path.abspath("../../src"))
+
+project = "earthkit-hydro"
+copyright = "2025, European Centre for Medium-Range Weather Forecasts (ECMWF)"
+author = "European Centre for Medium-Range Weather Forecasts (ECMWF)"
+# release = '0.0.0'
+
+# -- General configuration ---------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
+
+extensions = [
+    # Automatically extracts documentation from your Python docstrings
+    "sphinx.ext.autodoc",
+    # Supports Google-style and NumPy-style docstrings
+    "sphinx.ext.napoleon",
+    # Renders LaTeX math in HTML using MathJax
+    "sphinx.ext.mathjax",
+    # Option to click viewcode
+    "sphinx.ext.viewcode",
+    # Links to the documentation of other projects via cross-references
+    # "sphinx.ext.intersphinx",
+    # Generates summary tables for modules/classes/functions
+    # "sphinx.ext.autosummary",
+    # Allows citing BibTeX bibliographic entries in reStructuredText
+    "sphinxcontrib.bibtex",
+    # Tests snippets in documentation by running embedded Python examples
+    # "sphinx.ext.doctest",
+    # Checks documentation coverage of the codebase
+    # "sphinx.ext.coverage",
+    # Adds .nojekyll file and helps configure docs for GitHub Pages hosting
+    # "sphinx.ext.githubpages",
+    # Adds "Edit on GitHub" links to documentation pages
+    # "edit_on_github",
+    # Adds "Edit on GitHub" links to documentation pages
+    # "sphinx_github_style",
+    # Option to link to code
+    # "sphinx.ext.linkcode",
+    # Automatically includes type hints from function signatures into the documentation
+    # "sphinx_autodoc_typehints",
+    # Integrates Jupyter Notebooks into Sphinx
+    "nbsphinx",
+]
+
+templates_path = ["_templates"]
+exclude_patterns = []
+
+# -- Options for HTML output -------------------------------------------------
+# https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
+
+
+html_theme = "furo"
+
+html_static_path = ["_static"]
+
+# html_context = {
+#     "display_github": True,
+#     "github_user": "ecmwf",         # GitHub username
+#     "github_repo": "docsample",             # GitHub repository name
+#     "github_version": "main",               # Branch (e.g., 'main', 'master')
+#     "conf_py_path": "/docs/",               # Path to your docs root in the repo
+# }
+
+bibtex_bibfiles = ["references.bib"]
+
+html_theme_options = {
+    "light_css_variables": {
+        "color-sidebar-background": "#001F3F",
+        "color-sidebar-link-text": "#ffffff",
+        "color-sidebar-brand-text": "#ffffff",
+        "color-sidebar-caption-text": "#ffffff",
+        "color-brand-primary": "#00D9FF",
+        "color-brand-content": "#5f8dd3",
+    },
+    "dark_css_variables": {
+        "color-sidebar-background": "#001F3F",
+        "color-sidebar-link-text": "#ffffff",
+        "color-sidebar-brand-text": "#ffffff",
+        "color-sidebar-caption-text": "#ffffff",
+        "color-brand-primary": "#00D9FF",
+        "color-brand-content": "#5f8dd3",
+    },
+    "light_logo": "earthkit-hydro-dark.svg",  # "codex_dark.png",
+    "dark_logo": "earthkit-hydro-dark.svg",  # "codex_dark.png",
+}

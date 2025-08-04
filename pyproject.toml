@@ -54,6 +54,14 @@ dependencies = [
         "pytest",
         "pre-commit"
         ]
+    docs = [
+        "sphinx",
+        "furo",
+        "sphinxcontrib-bibtex",
+        "nbsphinx",
+        "nbconvert",
+        "ipykernel"
+    ]
     all = [
         "earthkit-data[geotiff]>=0.13.8",
         "pytest",

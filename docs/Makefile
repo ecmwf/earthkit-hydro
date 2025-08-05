@@ -25,4 +25,6 @@ rst:
 	@rm -rf ./$(SOURCEDIR)/autodocs/*
 	@echo "Generating .rst files with sphinx-apidoc..."
 	sphinx-apidoc --implicit-namespaces --separate -o ./$(SOURCEDIR)/autodocs ../src/earthkit/
+	@rm ./$(SOURCEDIR)/autodocs/earthkit.rst
+	@rm ./$(SOURCEDIR)/autodocs/modules.rst
 	python clean_autodocs.py

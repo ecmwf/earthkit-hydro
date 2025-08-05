@@ -15,7 +15,7 @@ Development workflow
 5. Make your changes and commit them with a clear message
 6. Run tests to ensure everything is working correctly
 7. Push your changes to your fork on GitHub
-8. Open a pull request against the develop branch
+8. Open a pull request against the develop branch of the main repository
 
 Code style
 ----------

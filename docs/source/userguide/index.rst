@@ -17,9 +17,11 @@ In this user guide, we provide detailed instructions for such steps.
 
    loading_a_river_network
    xarray_array_backend
+   raster_vector_inputs
+   flow_accumulations
    catchment_delineation
    catchment_statistics
-   flow_accumulations
    distance_length_calculations
    subnetwork_creation
+   earthkit
    pcraster

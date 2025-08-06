@@ -12,39 +12,55 @@ def var(
     r"""
     Computes the weighted variance of a field over all upstream nodes.
 
-    TODO: add better description
+    For each node in the river network, this function identifies all upstream nodes in the river network
+    and accumulates their contributions downstream, weighted by both node and edge weights.
 
     The weighted variance is defined as:
 
     .. math::
+       :nowrap:
 
-        \mathrm{min}_{v} = TODO: fill
+       \begin{align*}
+       x'_i &= w'_i \cdot x_i \\
+       q'_i &= w'_i \cdot x_i^2 \\
+       n_j &= x'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot n_i \\
+       q_j &= q'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot q_i \\
+       d_j &= w'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot d_i \\
+       \bar{x}_j &= \frac{n_j}{d_j} \\
+       \mathrm{Var}(x)_j &= \frac{q_j}{d_j} - \bar{x}_j^2
+       \end{align*}
 
     where:
-        - :math:`x_i` is the value of the field at upstream node :math:`i`,
-        - :math:`w_i` is the weight associated with node :math:`i` (default is 1),
-        - :math:`\pi_{iv}` is the cumulative product of edge weights along all paths from node :math:`i` to node :math:`v` (default is 1),
-        - :math:`\mathcal{U}(v)` is the set of all nodes upstream of :math:`v`.
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`w_{ij}` is the edge weight from node :math:`i` to node :math:`j` (e.g., discharge partitioning ratio),
+    - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
+    - :math:`n_j` is the accumulated weighted value,
+    - :math:`q_j` is the accumulated weighted squared value,
+    - :math:`d_j` is the accumulated weight (denominator),
+    - :math:`\bar{x}_j` is the weighted average at node :math:`j`,
+    - :math:`\mathrm{Var}(x)_j` is the weighted variance at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population variance.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
+    field : array-like or xarray object
         An array containing field values defined on nodes of the river network.
-    node_weights : array, optional
+    locations : array-like or dict
+        A list of node indices at which to compute.
+    node_weights : array-like or xarray object, optional
         Array of weights for each node.
-    edge_weights : array, optional
+    edge_weights : array-like or xarray object, optional
         Array of weights for each edge.
 
     Returns
     -------
-    array
-        Array of variance values.
-
-    Notes
-    -----
-    - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
+    array-like or xarray object
+        Array of variance values for every node in the river network.
     """
     return array.var(river_network, field, node_weights, edge_weights)
 
@@ -59,39 +75,57 @@ def std(
     r"""
     Computes the weighted standard deviation of a field over all upstream nodes.
 
-    TODO: add better description
+    For each node in the river network, this function identifies all upstream nodes in the river network
+    and accumulates their contributions downstream, weighted by both node and edge weights.
 
     The weighted standard deviation is defined as:
 
     .. math::
+       :nowrap:
 
-        \mathrm{min}_{v} = TODO: fill
+       \begin{align*}
+       x'_i &= w'_i \cdot x_i \\
+       q'_i &= w'_i \cdot x_i^2 \\
+       n_j &= x'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot n_i \\
+       q_j &= q'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot q_i \\
+       d_j &= w'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot d_i \\
+       \bar{x}_j &= \frac{n_j}{d_j} \\
+       \mathrm{Var}(x)_j &= \frac{q_j}{d_j} - \bar{x}_j^2 \\
+       \mathrm{Std}(x)_j &= \sqrt{\mathrm{Var}(x)_j}
+       \end{align*}
 
     where:
-        - :math:`x_i` is the value of the field at upstream node :math:`i`,
-        - :math:`w_i` is the weight associated with node :math:`i` (default is 1),
-        - :math:`\pi_{iv}` is the cumulative product of edge weights along all paths from node :math:`i` to node :math:`v` (default is 1),
-        - :math:`\mathcal{U}(v)` is the set of all nodes upstream of :math:`v`.
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`w_{ij}` is the edge weight from node :math:`i` to node :math:`j` (e.g., discharge partitioning ratio),
+    - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
+    - :math:`n_j` is the accumulated weighted value,
+    - :math:`q_j` is the accumulated weighted squared value,
+    - :math:`d_j` is the accumulated weight (denominator),
+    - :math:`\bar{x}_j` is the weighted average at node :math:`j`,
+    - :math:`\mathrm{Var}(x)_j` is the weighted variance at node :math:`j`.
+    - :math:`\mathrm{Std}(x)_j` is the weighted standard deviation at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population standard deviation.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
+    field : array-like or xarray object
         An array containing field values defined on nodes of the river network.
-    node_weights : array, optional
+    locations : array-like or dict
+        A list of node indices at which to compute.
+    node_weights : array-like or xarray object, optional
         Array of weights for each node.
-    edge_weights : array, optional
+    edge_weights : array-like or xarray object, optional
         Array of weights for each edge.
 
     Returns
     -------
-    array
-        Array of standard deviation values.
-
-    Notes
-    -----
-    - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
+    array-like or xarray object
+        Array of standard deviation values for every node in the river network.
     """
     return array.std(river_network, field, node_weights, edge_weights)
 
@@ -106,39 +140,50 @@ def mean(
     r"""
     Computes the weighted mean of a field over all upstream nodes.
 
-    TODO: add better description
+    For each node in the river network, this function identifies all upstream nodes in the river network
+    and accumulates their contributions downstream, weighted by both node and edge weights.
 
     The weighted mean is defined as:
 
     .. math::
+       :nowrap:
 
-        \mathrm{min}_{v} = TODO: fill
+       \begin{align*}
+       x'_i &= w'_i \cdot x_i \\
+       n_j &= x'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot n_i \\
+       d_j &= w'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot d_i \\
+       \bar{x}_j &= \frac{n_j}{d_j}
+       \end{align*}
 
     where:
-        - :math:`x_i` is the value of the field at upstream node :math:`i`,
-        - :math:`w_i` is the weight associated with node :math:`i` (default is 1),
-        - :math:`\pi_{iv}` is the cumulative product of edge weights along all paths from node :math:`i` to node :math:`v` (default is 1),
-        - :math:`\mathcal{U}(v)` is the set of all nodes upstream of :math:`v`.
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`w_{ij}` is the edge weight from node :math:`i` to node :math:`j` (e.g. discharge partitioning ratio),
+    - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
+    - :math:`n_j` is the accumulated weighted value,
+    - :math:`d_j` is the accumulated weight (denominator),
+    - :math:`\bar{x}_j` is the weighted mean at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sources to the sinks.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
+    field : array-like or xarray object
         An array containing field values defined on nodes of the river network.
-    node_weights : array, optional
+    locations : array-like or dict
+        A list of node indices at which to compute.
+    node_weights : array-like or xarray object, optional
         Array of weights for each node.
-    edge_weights : array, optional
+    edge_weights : array-like or xarray object, optional
         Array of weights for each edge.
 
     Returns
     -------
-    array
-        Array of mean values.
-
-    Notes
-    -----
-    - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
+    array-like or xarray object
+        Array of mean values for every node in the river network.
     """
     return array.mean(river_network, field, node_weights, edge_weights)
 
@@ -153,39 +198,46 @@ def sum(
     r"""
     Computes the weighted sum of a field over all upstream nodes.
 
-    TODO: add better description
+    For each node in the river network, this function identifies all upstream nodes in the river network
+    and accumulates their contributions downstream, weighted by both node and edge weights.
 
     The weighted sum is defined as:
 
     .. math::
+        :nowrap:
 
-        \mathrm{min}_{v} = TODO: fill
+        \begin{align*}
+        x'_i &= w'_i \cdot x_i \\
+        n_j &= x'_j + \sum_{i \in \mathrm{Up}(j)} w_{ij} \cdot n_i
+        \end{align*}
 
     where:
-        - :math:`x_i` is the value of the field at upstream node :math:`i`,
-        - :math:`w_i` is the weight associated with node :math:`i` (default is 1),
-        - :math:`\pi_{iv}` is the cumulative product of edge weights along all paths from node :math:`i` to node :math:`v` (default is 1),
-        - :math:`\mathcal{U}(v)` is the set of all nodes upstream of :math:`v`.
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`w_{ij}` is the edge weight from node :math:`i` to node :math:`j` (e.g. discharge partitioning ratio),
+    - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
+    - :math:`n_j` is the weighted sum at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sources to the sinks.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
+    field : array-like or xarray object
         An array containing field values defined on nodes of the river network.
-    node_weights : array, optional
+    locations : array-like or dict
+        A list of node indices at which to compute.
+    node_weights : array-like or xarray object, optional
         Array of weights for each node.
-    edge_weights : array, optional
+    edge_weights : array-like or xarray object, optional
         Array of weights for each edge.
 
     Returns
     -------
-    array
-        Array of sum values.
-
-    Notes
-    -----
-    - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
+    array-like or xarray object
+        Array of sum values for every node in the river network.
     """
     return array.sum(river_network, field, node_weights, edge_weights)
 
@@ -200,39 +252,46 @@ def min(
     r"""
     Computes the weighted minimum of a field over all upstream nodes.
 
-    TODO: add better description
+    For each node in the river network, this function identifies all upstream nodes in the river network
+    and accumulates their contributions downstream, weighted by both node and edge weights.
 
     The weighted minimum is defined as:
 
     .. math::
+        :nowrap:
 
-        \mathrm{min}_{v} = TODO: fill
+        \begin{align*}
+        x'_i &= w'_i \cdot x_i \\
+        m_j &= \mathrm{min}(x'_j,~\mathrm{min}_{i \in \mathrm{Up}(j)} w_{ij} \cdot m_i)
+        \end{align*}
 
     where:
-        - :math:`x_i` is the value of the field at upstream node :math:`i`,
-        - :math:`w_i` is the weight associated with node :math:`i` (default is 1),
-        - :math:`\pi_{iv}` is the cumulative product of edge weights along all paths from node :math:`i` to node :math:`v` (default is 1),
-        - :math:`\mathcal{U}(v)` is the set of all nodes upstream of :math:`v`.
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`w_{ij}` is the edge weight from node :math:`i` to node :math:`j` (e.g. discharge partitioning ratio),
+    - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
+    - :math:`m_j` is the weighted minimum at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sources to the sinks.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
+    field : array-like or xarray object
         An array containing field values defined on nodes of the river network.
-    node_weights : array, optional
+    locations : array-like or dict
+        A list of node indices at which to compute.
+    node_weights : array-like or xarray object, optional
         Array of weights for each node.
-    edge_weights : array, optional
+    edge_weights : array-like or xarray object, optional
         Array of weights for each edge.
 
     Returns
     -------
-    array
-        Array of minimum values.
-
-    Notes
-    -----
-    - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
+    array-like or xarray object
+        Array of minimum values for every node in the river network.
     """
     return array.min(river_network, field, node_weights, edge_weights)
 
@@ -247,38 +306,45 @@ def max(
     r"""
     Computes the weighted maximum of a field over all upstream nodes.
 
-    TODO: add better description
+    For each node in the river network, this function identifies all upstream nodes in the river network
+    and accumulates their contributions downstream, weighted by both node and edge weights.
 
     The weighted maximum is defined as:
 
     .. math::
+        :nowrap:
 
-        \mathrm{min}_{v} = TODO: fill
+        \begin{align*}
+        x'_i &= w'_i \cdot x_i \\
+        m_j &= \mathrm{max} (x'_j,~\mathrm{max}_{i \in \mathrm{Up}(j)} w_{ij} \cdot m_i)
+        \end{align*}
 
     where:
-        - :math:`x_i` is the value of the field at upstream node :math:`i`,
-        - :math:`w_i` is the weight associated with node :math:`i` (default is 1),
-        - :math:`\pi_{iv}` is the cumulative product of edge weights along all paths from node :math:`i` to node :math:`v` (default is 1),
-        - :math:`\mathcal{U}(v)` is the set of all nodes upstream of :math:`v`.
 
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`w_{ij}` is the edge weight from node :math:`i` to node :math:`j` (e.g. discharge partitioning ratio),
+    - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
+    - :math:`m_j` is the weighted maximum at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sources to the sinks.
+    
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
+    field : array-like or xarray object
         An array containing field values defined on nodes of the river network.
-    node_weights : array, optional
+    locations : array-like or dict
+        A list of node indices at which to compute.
+    node_weights : array-like or xarray object, optional
         Array of weights for each node.
-    edge_weights : array, optional
+    edge_weights : array-like or xarray object, optional
         Array of weights for each edge.
 
     Returns
     -------
-    array
-        Array of maximum values.
-
-    Notes
-    -----
-    - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
+    array-like or xarray object
+        Array of maximum values for every node in the river network.
     """
     return array.max(river_network, field, node_weights, edge_weights)

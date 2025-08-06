@@ -328,7 +328,7 @@ def max(
     - :math:`m_j` is the weighted maximum at node :math:`j`.
 
     Accumulation proceeds in topological order from the sources to the sinks.
-    
+
     Parameters
     ----------
     river_network : RiverNetwork

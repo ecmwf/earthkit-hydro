@@ -94,11 +94,37 @@ def load(
     """Load a precomputed river network from a named domain and
     river_network_version.
 
+    Supported networks are as follows:
+
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | `domain`             | `version` | Details             | Note                       | Attribution    |
+    +======================+===========+=====================+============================+================+
+    | "efas"               | "5"       | 1arcmin European    |                            | [1]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "efas"               | "4"       | 5km European        | Smaller domain than v5     | [1]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "glofas"             | "4"       | 3arcmin global      | 60° South to 90° North     | [2]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "glofas"             | "3"       | 6arcmin global      | 60° South to 90° North     | [2]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "cama_03min"         | "4"       | 3arcmin global      |                            | [3]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "cama_05min"         | "4"       | 5arcmin global      |                            | [3]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "cama_06min"         | "4"       | 6arcmin global      |                            | [3]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "cama_15min"         | "4"       | 15arcmin global     |                            | [3]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "hydrosheds_05min"   | "1"       | 5arcmin global      | 56° South to 84° North     | [4]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+    | "hydrosheds_06min"   | "1"       | 6arcmin global      | 56° South to 84° North     | [4]_           |
+    +----------------------+-----------+---------------------+----------------------------+----------------+
+
+
     Parameters
     ----------
     domain : str
-        The domain of the river network. Supported domains are "efas", "glofas",
-        "cama_15min", "cama_06min", "cama_05min", "cama_03min".
+        The domain of the river network.
     river_network_version : str
         The version of the river network on the specified domain.
     data_source : str, optional
@@ -112,6 +138,13 @@ def load(
     -------
     RiverNetwork
         The loaded river network.
+
+    References
+    ----------
+    .. [1] Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Grimaldi, Stefania; Disperati, Juliana; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for Europe. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/f572c443-7466-4adf-87aa-c0847a169f23
+    .. [2] Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Disperati, Juliana; Grimaldi, Stefania; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
+    .. [3] Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M. (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets. Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873
+    .. [4] Lehner, Bernhard; Verdin, Kristine; Jarvis, Andy (2008): New global hydrography derived from spaceborne elevation data. Eos, Transactions, 89(10): 93-94. Data available at https://www.hydrosheds.org.
 
     """
     uri = data_source.format(

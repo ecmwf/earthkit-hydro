@@ -5,12 +5,32 @@ from ._network_storage import RiverNetworkStorage
 
 
 class RiverNetwork:
+    """
+    A class representing a river network for hydrological processing.
+
+    Attributes
+    ----------
+    n_nodes : int
+        The number of nodes in the river network.
+    n_edges : int
+        The number of nodes in the river network.
+    sinks : array-like
+        Nodes with no downstream connections.
+    sources : array-like
+        Nodes with no upstream connections.
+    bifurcates : bool
+        Whether the river network has bifurcations.
+    shape : tuple
+        The size of the river network grid. None if the network is vector-based.
+    mask : array-like
+        Flattened 1D indices on the raster grid corresponding to river network nodes.
+    """
 
     def __init__(self, river_network_storage: RiverNetworkStorage):
         self._storage = river_network_storage
         self.n_nodes = self._storage.n_nodes
         self.n_edges = self._storage.n_edges
-        self.nodes = np.arange(self.n_nodes)
+        # self.nodes = np.arange(self.n_nodes)
         self.sources = self._storage.sources
         self.sinks = self._storage.sinks
         # self.area = self._storage.area
@@ -30,6 +50,22 @@ class RiverNetwork:
         return self.__str__()
 
     def to_device(self, device=None, array_backend=None):
+        """
+        Change the RiverNetwork's array backend and/or move it to a different device.
+
+        Parameters
+        ----------
+        device : str, optional
+            The device to transfer to.
+        array_backend : str, optional
+            The array backend.
+            One of "numpy", "np", "cupy", "cp", "pytorch", "torch", "jax", "jnp", "tensorflow", "tf".
+
+        Returns
+        -------
+        RiverNetwork
+            The modified RiverNetwork.
+        """
 
         # TODO: use xp.asarray
         if array_backend == "np":
@@ -40,6 +76,8 @@ class RiverNetwork:
             array_backend = "jax"
         elif array_backend == "tf":
             array_backend = "tensorflow"
+        elif array_backend == "pytorch":
+            array_backend = "torch"
 
         if device is None:
             device = "cpu" if array_backend != "cupy" else "gpu"
@@ -79,9 +117,29 @@ class RiverNetwork:
         return self
 
     def export(self, fpath="river_network.joblib", compression=1):
+        """
+        Save the RiverNetwork to a local file.
+
+        Parameters
+        ----------
+        fpath : str, optional
+            The filepath specifying where to save the RiverNetwork.
+        compression : str, optional
+            The compression factor used for saving.
+
+        Returns
+        -------
+        None
+
+        """
         import joblib
 
         joblib.dump(self._storage, fpath, compress=compression)
 
     def create_subnetwork(self, *args, **kwargs):
+        """
+        NotImplemented
+
+        TODO: write when implemented
+        """
         raise NotImplementedError("Subnetwork creation not yet supported.")

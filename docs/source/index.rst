@@ -60,6 +60,8 @@ Documentation
    :maxdepth: 2
    :titlesonly:
 
+   userguide/index
+   tutorials/index
    autodocs/earthkit.hydro
-   notebook
+   contributing
    references

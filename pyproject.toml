@@ -31,7 +31,12 @@ classifiers = [
     ]
 dynamic = ["version", "readme"]
 
-dependencies = ["numpy", "joblib"]
+dependencies = [
+    "numpy",
+    "joblib",
+    "xarray",
+    "earthkit-utils>=0.1.0"
+]
 
 [project.urls]
     repository = "https://github.com/ecmwf/earthkit-hydro"

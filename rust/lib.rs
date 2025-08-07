@@ -14,7 +14,7 @@ use std::sync::atomic::{AtomicI64, Ordering};
 use fixedbitset::FixedBitSet;
 
 #[pyfunction]
-fn propagate_labels<'py>(
+fn compute_topological_labels_rust<'py>(
     py: Python<'py>,
     sources: &PyArray1<usize>,
     sinks: &PyArray1<usize>,
@@ -88,6 +88,6 @@ fn propagate_labels<'py>(
 
 #[pymodule]
 fn _rust(_py: Python, m: &PyModule) -> PyResult<()> {
-    m.add_function(wrap_pyfunction!(propagate_labels, m)?)?;
+    m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
     Ok(())
 }

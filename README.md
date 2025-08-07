@@ -38,9 +38,12 @@
 
 ## Main Features
 
-<div style="float: left; margin-right: 30px;">
-  <img src="./docs/images/glofas.png" width="300px" alt="Adapted from: doc_figure"/>
-</div>
+<table>
+  <tr>
+    <td><img src="./docs/images/glofas.png" height="300" alt="Adapted from: doc_figure" /></td>
+    <td><img src="./docs/images/array_backends_with_xr.png" height="300" alt="Array backends with xr" /></td>
+  </tr>
+</table>
 
 - Catchment delineation
 - Catchment-based statistics
@@ -49,19 +52,11 @@
 - Upstream/downstream field propagation
 - Bifurcation handling
 - Custom weighting and decay support
-
-<div style="clear: both;"></div>
-
-<div style="float: right; margin-left: 30px;">
-  <img src="./docs/images/array_backends_with_xr.png" width="300px" alt="Array backends with xr"/>
-</div>
-
 - Support for PCRaster, CaMa-Flood, HydroSHEDS and MERIT-Hydro river network formats
 - Compatible with major array-backends: xarray, numpy, cupy, torch, jax and tensorflow
 - GPU support
 - Differentiable operations suitable for machine learning
 
-<div style="clear: both;"></div>
 
 ## Installation
 For a default installation, run

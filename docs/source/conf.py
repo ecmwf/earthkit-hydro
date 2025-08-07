@@ -9,6 +9,15 @@
 import os
 import sys
 
+on_rtd = os.environ.get("READTHEDOCS") == "True"
+
+if on_rtd:
+    version = os.environ.get("READTHEDOCS_VERSION", "latest")
+    release = version
+else:
+    version = "dev"
+    release = "dev"
+
 sys.path.insert(0, os.path.abspath("../../src"))
 
 project = "earthkit-hydro"

@@ -7,7 +7,8 @@ from earthkit.hydro.distance._toplevel import _convert_locations
 @xarray
 def min(river_network, field, locations, upstream=False, downstream=True):
     r"""
-    Calculates the minimum length to all points from a set of start locations.
+    Calculates the minimum length to all points from a set of start
+    locations.
 
     For each node in the network, calculates the minimum length starting from any of the start locations.
 
@@ -54,7 +55,8 @@ def min(river_network, field, locations, upstream=False, downstream=True):
 @xarray
 def max(river_network, field, locations, upstream=False, downstream=True):
     r"""
-    Calculates the maximum length to all points from a set of start locations.
+    Calculates the maximum length to all points from a set of start
+    locations.
 
     For each node in the network, calculates the maximum length starting from any of the start locations.
 

@@ -51,7 +51,8 @@ class RiverNetwork:
 
     def to_device(self, device=None, array_backend=None):
         """
-        Change the RiverNetwork's array backend and/or move it to a different device.
+        Change the RiverNetwork's array backend and/or move it to a
+        different device.
 
         Parameters
         ----------
@@ -130,7 +131,6 @@ class RiverNetwork:
         Returns
         -------
         None
-
         """
         import joblib
 
@@ -138,7 +138,7 @@ class RiverNetwork:
 
     def create_subnetwork(self, *args, **kwargs):
         """
-        NotImplemented
+        NotImplemented.
 
         TODO: write when implemented
         """

@@ -73,7 +73,8 @@ def std(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted standard deviation of a field over all downstream nodes.
+    Computes the weighted standard deviation of a field over all
+    downstream nodes.
 
     For each node in the river network, this function identifies all downstream nodes in the river network
     and accumulates their contributions upstream, weighted by both node and edge weights.
@@ -328,7 +329,7 @@ def max(
     - :math:`m_j` is the weighted maximum at node :math:`j`.
 
     Accumulation proceeds in inverse topological order from the sinks to the sources.
-    
+
     Parameters
     ----------
     river_network : RiverNetwork

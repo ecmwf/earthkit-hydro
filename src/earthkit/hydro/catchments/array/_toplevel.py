@@ -3,7 +3,8 @@ from earthkit.hydro.catchments.array import _operations
 
 def var(river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
-    Computes the weighted variance of a field over the upstream catchment of each specified location.
+    Computes the weighted variance of a field over the upstream
+    catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -48,7 +49,8 @@ def var(river_network, field, locations, node_weights=None, edge_weights=None):
 
 def std(river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
-    Computes the weighted standard deviation of a field over the upstream catchment of each specified location.
+    Computes the weighted standard deviation of a field over the
+    upstream catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -93,7 +95,8 @@ def std(river_network, field, locations, node_weights=None, edge_weights=None):
 
 def mean(river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
-    Computes the weighted mean of a field over the upstream catchment of each specified location.
+    Computes the weighted mean of a field over the upstream catchment of
+    each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -137,7 +140,8 @@ def mean(river_network, field, locations, node_weights=None, edge_weights=None):
 
 def sum(river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
-    Computes the weighted sum of a field over the upstream catchment of each specified location.
+    Computes the weighted sum of a field over the upstream catchment of
+    each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -181,7 +185,8 @@ def sum(river_network, field, locations, node_weights=None, edge_weights=None):
 
 def min(river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
-    Computes the weighted minimum of a field over the upstream catchment of each specified location.
+    Computes the weighted minimum of a field over the upstream catchment
+    of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -225,7 +230,8 @@ def min(river_network, field, locations, node_weights=None, edge_weights=None):
 
 def max(xp, river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
-    Computes the weighted maximum of a field over the upstream catchment of each specified location.
+    Computes the weighted maximum of a field over the upstream catchment
+    of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.

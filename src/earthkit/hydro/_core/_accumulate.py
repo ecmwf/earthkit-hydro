@@ -11,8 +11,9 @@ def _ufunc_to_downstream(
     func,
     xp,
 ):
-    """Updates field in-place by applying a ufunc at the downstream nodes of
-    the grouping.
+    """
+    Updates field in-place by applying a ufunc at the downstream nodes
+    of the grouping.
 
     Parameters
     ----------
@@ -39,7 +40,6 @@ def _ufunc_to_downstream(
     Returns
     -------
     None
-
     """
     modifier_group = uid if node_modifier_use_upstream else did
 

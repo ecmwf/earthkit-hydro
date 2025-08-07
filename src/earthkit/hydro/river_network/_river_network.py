@@ -23,7 +23,8 @@ ekh_version = ".".join(ekh_version.split(".")[:2])
 
 @cache
 def create(path, river_network_format, source="file"):
-    """Creates a river network from the given path, format, and source.
+    """
+    Creates a river network from the given path, format, and source.
 
     Parameters
     ----------
@@ -42,7 +43,6 @@ def create(path, river_network_format, source="file"):
     -------
     RiverNetwork
         The river network object created from the given data.
-
     """
     if river_network_format == "precomputed":
         if source == "file":
@@ -91,7 +91,8 @@ def load(
     *args,
     **kwargs,
 ):
-    """Load a precomputed river network from a named domain and
+    """
+    Load a precomputed river network from a named domain and
     river_network_version.
 
     Supported networks are as follows:
@@ -145,7 +146,6 @@ def load(
     .. [2] Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Disperati, Juliana; Grimaldi, Stefania; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
     .. [3] Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M. (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets. Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873
     .. [4] Lehner, Bernhard; Verdin, Kristine; Jarvis, Andy (2008): New global hydrography derived from spaceborne elevation data. Eos, Transactions, 89(10): 93-94. Data available at https://www.hydrosheds.org.
-
     """
     uri = data_source.format(
         ekh_version=ekh_version,

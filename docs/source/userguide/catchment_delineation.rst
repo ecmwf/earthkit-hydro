@@ -20,7 +20,7 @@ This can be done in earthkit-hydro using the `catchments.find` method.
 .. code-block:: python
 
     network = ekh.river_network.load("efas", "5")
-    
+
     # create points somehow
 
     labelled_field = ekh.catchments.find(network, points)

@@ -73,7 +73,8 @@ def std(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted standard deviation of a field over all upstream nodes.
+    Computes the weighted standard deviation of a field over all
+    upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.

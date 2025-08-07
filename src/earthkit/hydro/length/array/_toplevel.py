@@ -3,7 +3,8 @@ from earthkit.hydro.length.array import _operations
 
 def min(river_network, field, locations, upstream=False, downstream=True):
     r"""
-    Calculates the minimum length to all points from a set of start locations.
+    Calculates the minimum length to all points from a set of start
+    locations.
 
     TODO: improve description, and use node weights
 
@@ -31,7 +32,8 @@ def min(river_network, field, locations, upstream=False, downstream=True):
 
 def max(river_network, field, locations, upstream=False, downstream=True):
     r"""
-    Calculates the maximum length to all points from a set of start locations.
+    Calculates the maximum length to all points from a set of start
+    locations.
 
     TODO: improve description, and use node weights
 

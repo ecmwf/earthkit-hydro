@@ -37,8 +37,9 @@ def _flow_find(
 
 
 def _find_catchments(xp, field, did, uid, eid, overwrite):
-    """Updates field in-place with the value of its downstream nodes, dealing
-    with missing values for 2D fields.
+    """
+    Updates field in-place with the value of its downstream nodes,
+    dealing with missing values for 2D fields.
 
     Parameters
     ----------
@@ -54,7 +55,6 @@ def _find_catchments(xp, field, did, uid, eid, overwrite):
     Returns
     -------
     None
-
     """
     down_not_missing = ~xp.isnan(xp.gather(field, uid, axis=-1))
     did = did[

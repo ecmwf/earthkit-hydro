@@ -41,7 +41,7 @@ In vector networks, each river segment is represented as a node, and the network
 .. code-block:: python
 
     # vector field (1D) defined on the nodes of the river network
-    field = np.ones(network.n_nodes) 
+    field = np.ones(network.n_nodes)
 
     # output field is also 1D, defined on the nodes of the river network
     output = ekh.upstream.sum(network, field)

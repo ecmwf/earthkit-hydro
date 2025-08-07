@@ -76,7 +76,8 @@ def var(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted variance of a field over the upstream catchment of each specified location.
+    Computes the weighted variance of a field over the upstream
+    catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -141,7 +142,8 @@ def std(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted standard deviation of a field over the upstream catchment of each specified location.
+    Computes the weighted standard deviation of a field over the
+    upstream catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -194,10 +196,6 @@ def std(
     -------
     array-like or xarray object
         Array of standard deviation values for each location in `locations`.
-
-    Notes
-    -----
-    - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
     """
     return array.std(river_network, field, locations, node_weights, edge_weights)
 
@@ -212,7 +210,8 @@ def mean(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted mean of a field over the upstream catchment of each specified location.
+    Computes the weighted mean of a field over the upstream catchment of
+    each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -272,7 +271,8 @@ def sum(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted sum of a field over the upstream catchment of each specified location.
+    Computes the weighted sum of a field over the upstream catchment of
+    each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -328,7 +328,8 @@ def min(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted minimum of a field over the upstream catchment of each specified location.
+    Computes the weighted minimum of a field over the upstream catchment
+    of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -382,7 +383,8 @@ def max(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted maximum of a field over the upstream catchment of each specified location.
+    Computes the weighted maximum of a field over the upstream catchment
+    of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.

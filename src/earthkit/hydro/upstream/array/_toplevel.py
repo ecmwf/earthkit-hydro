@@ -59,7 +59,8 @@ def std(
     edge_weights=None,
 ):
     r"""
-    Computes the weighted standard deviation of a field over all upstream nodes.
+    Computes the weighted standard deviation of a field over all
+    upstream nodes.
 
     TODO: add better description
 

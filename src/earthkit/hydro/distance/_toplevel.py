@@ -43,7 +43,8 @@ def _convert_locations(func):
 @xarray
 def min(river_network, field, locations, upstream=False, downstream=True):
     r"""
-    Calculates the minimum distance to all points from a set of start locations.
+    Calculates the minimum distance to all points from a set of start
+    locations.
 
     For each node in the network, calculates the minimum distance starting from any of the start locations.
 
@@ -90,7 +91,8 @@ def min(river_network, field, locations, upstream=False, downstream=True):
 @xarray
 def max(river_network, field, locations, upstream=False, downstream=True):
     r"""
-    Calculates the maximum distance to all points from a set of start locations.
+    Calculates the maximum distance to all points from a set of start
+    locations.
 
     For each node in the network, calculates the maximum distance starting from any of the start locations.
 

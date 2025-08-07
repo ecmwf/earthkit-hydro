@@ -39,4 +39,3 @@ Specifically, the code below:
     catchment_mean = ekh.catchments.mean(network, ds, weights)
 
     ekp.quickplot(catchment_mean)
-

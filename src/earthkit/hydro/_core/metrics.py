@@ -14,6 +14,9 @@ def metrics_func_finder(metric, xp):
 
     metrics_dict = {
         "sum": SumBased,
+        "mean": SumBased,
+        "std": SumBased,
+        "var": SumBased,
         "max": MaxBased,
         "min": MinBased,
     }

@@ -9,26 +9,43 @@ def min(river_network, field, locations, upstream=False, downstream=True):
     r"""
     Calculates the minimum length to all points from a set of start locations.
 
-    TODO: improve description, and use node weights
+    For each node in the network, calculates the minimum length starting from any of the start locations.
+
+    The length is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        l_j &= w_j ~\text{for start locations}\\
+        l_j &= \mathrm{min}(\infty,~\mathrm{min}_{i \in \mathrm{Neighbour}(j)} l_i) + w_j
+        \end{align*}
+
+    where:
+
+    - :math:`w_i` is the node length (e.g., pixel length),
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`l_j` is the total length at node :math:`j`.
+
+    Unreachable nodes are given a length of :math:`\infty`.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
-        An array of river network lengths defined on nodes of the river network.
+    field : array-like or xarray object
+        An array containing length values defined on nodes of the river network.
     locations : array-like or dict
         A list of node indices at which to compute.
     upstream : bool, optional
-        Whether to compute distances downstream.
+        Whether or not to consider upstream lengths.
     downstream : bool, optional
-        Whether to compute distances upstream.
-
+        Whether or not to consider downstream lengths.
 
     Returns
     -------
-    array
-        Array of lengths.
+    array-like or xarray object
+        Array of minimum lengths for every node in the river network.
     """
     return array.min(river_network, field, locations, upstream, downstream)
 
@@ -39,26 +56,43 @@ def max(river_network, field, locations, upstream=False, downstream=True):
     r"""
     Calculates the maximum length to all points from a set of start locations.
 
-    TODO: improve description, and use node weights
+    For each node in the network, calculates the maximum length starting from any of the start locations.
+
+    The length is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        l_j &= w_j ~\text{for start locations}\\
+        l_j &= \mathrm{max}(-\infty,~\mathrm{max}_{i \in \mathrm{Neighbour}(j)} l_i) + w_j
+        \end{align*}
+
+    where:
+
+    - :math:`w_i` is the node length (e.g., pixel length),
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`l_j` is the total length at node :math:`j`.
+
+    Unreachable nodes are given a length of :math:`-\infty`.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
-        An array of river network lengths defined on nodes of the river network.
+    field : array-like or xarray object
+        An array containing length values defined on nodes of the river network.
     locations : array-like or dict
         A list of node indices at which to compute.
     upstream : bool, optional
-        Whether to compute distances downstream.
+        Whether or not to consider upstream lengths.
     downstream : bool, optional
-        Whether to compute distances upstream.
-
+        Whether or not to consider downstream lengths.
 
     Returns
     -------
-    array
-        Array of lengths.
+    array-like or xarray object
+        Array of maximum lengths for every node in the river network.
     """
     return array.max(river_network, field, locations, upstream, downstream)
 

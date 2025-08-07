@@ -45,26 +45,43 @@ def min(river_network, field, locations, upstream=False, downstream=True):
     r"""
     Calculates the minimum distance to all points from a set of start locations.
 
-    TODO: improve description, and use edge weights
+    For each node in the network, calculates the minimum distance starting from any of the start locations.
+
+    The distance is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        d_j &= 0 ~\text{for start locations}\\
+        d_j &= \mathrm{min}(\infty,~\mathrm{min}_{i \in \mathrm{Neighbour}(j)} (d_i + w_{ij}) )
+        \end{align*}
+
+    where:
+
+    - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`d_j` is the total distance at node :math:`j`.
+
+    Unreachable nodes are given a distance of :math:`\infty`.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
-        An array of river network lengths defined on nodes of the river network.
+    field : array-like or xarray object
+        An array containing distance values defined on edges of the river network.
     locations : array-like or dict
         A list of node indices at which to compute.
     upstream : bool, optional
-        Whether to compute distances downstream.
+        Whether or not to consider upstream distances.
     downstream : bool, optional
-        Whether to compute distances upstream.
-
+        Whether or not to consider downstream distances.
 
     Returns
     -------
-    array
-        Array of distances.
+    array-like or xarray object
+        Array of minimum distances for every node in the river network.
     """
     return array.min(river_network, field, locations, upstream, downstream)
 
@@ -75,26 +92,43 @@ def max(river_network, field, locations, upstream=False, downstream=True):
     r"""
     Calculates the maximum distance to all points from a set of start locations.
 
-    TODO: improve description, and use edge weights
+    For each node in the network, calculates the maximum distance starting from any of the start locations.
+
+    The distance is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        d_j &= 0 ~\text{for start locations}\\
+        d_j &= \mathrm{max}(-\infty,~\mathrm{max}_{i \in \mathrm{Neighbour}(j)} (d_i + w_{ij}) )
+        \end{align*}
+
+    where:
+
+    - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`d_j` is the total distance at node :math:`j`.
+
+    Unreachable nodes are given a distance of :math:`-\infty`.
 
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array
-        An array of river network lengths defined on nodes of the river network.
+    field : array-like or xarray object
+        An array containing distance values defined on edges of the river network.
     locations : array-like or dict
         A list of node indices at which to compute.
     upstream : bool, optional
-        Whether to compute distances downstream.
+        Whether or not to consider upstream distances.
     downstream : bool, optional
-        Whether to compute distances upstream.
-
+        Whether or not to consider downstream distances.
 
     Returns
     -------
-    array
-        Array of distances.
+    array-like or xarray object
+        Array of maximum distances for every node in the river network.
     """
     return array.max(river_network, field, locations, upstream, downstream)
 

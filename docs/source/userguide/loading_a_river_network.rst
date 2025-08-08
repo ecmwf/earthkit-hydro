@@ -20,7 +20,7 @@ If a river network is not available via `ekh.river_network.load`, it is possible
 
 .. code-block:: python
 
-    network = ekh.river_network.load(path, river_network_format, source)
+    network = ekh.river_network.create(path, river_network_format, source)
 
 This operation involves topologically sorting the river network, which is computationally expensive for large networks. Therefore, it is recommended to export the river network for re-use.
 
@@ -32,4 +32,4 @@ In subsequent analyses, the precomputed river network can now be loaded via
 
 .. code-block:: python
 
-    network = ekh.river_network.load("my_river_network.joblib", "precomputed")
+    network = ekh.river_network.create("my_river_network.joblib", "precomputed")

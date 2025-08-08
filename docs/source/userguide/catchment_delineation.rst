@@ -21,8 +21,12 @@ This can be done in earthkit-hydro using the `catchments.find` method.
 
     network = ekh.river_network.load("efas", "5")
 
-    # create points somehow
+    # TODO: decide on API. Possibly should match locations
+
+    points = np.full(network.shape, np.nan)
+    # give gauge location at gridindex (900, 900) a label of 0
+    points[900, 900] = 0
+    # give gauge location at gridindex (700, 350) a label of 1
+    points[700, 350] = 1
 
     labelled_field = ekh.catchments.find(network, points)
-
-TODO: decide on API

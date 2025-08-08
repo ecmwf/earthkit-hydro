@@ -135,11 +135,3 @@ class RiverNetwork:
         import joblib
 
         joblib.dump(self._storage, fpath, compress=compression)
-
-    def create_subnetwork(self, *args, **kwargs):
-        """
-        NotImplemented.
-
-        TODO: write when implemented
-        """
-        raise NotImplementedError("Subnetwork creation not yet supported.")

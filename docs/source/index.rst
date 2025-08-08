@@ -49,6 +49,15 @@ Main Features
 
    <br style="clear: both">
 
+Installation
+------------
+
+Try it out - earthkit-hydro is readily available via PyPI!
+
+.. code-block:: bash
+
+   pip install earthkit-hydro
+
 Support
 -------
 Have a feature request or found a bug? Feel free to open an

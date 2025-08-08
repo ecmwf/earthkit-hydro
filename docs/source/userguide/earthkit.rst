@@ -1,8 +1,6 @@
 Integration with the earthkit system
 ====================================
 
-TODO: figure out a good example that actually works right now
-
 earthkit-hydro is the hydrological component of earthkit :cite:`earthkit`. It is designed to interplay with other earthkit components seamlessly, primarily via xarray integration.
 
 Here is a simple example of using different earthkit packages together.

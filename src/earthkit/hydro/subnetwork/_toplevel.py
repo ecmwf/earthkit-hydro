@@ -9,7 +9,7 @@ np = NumPyBackend()
 
 def create(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=True):
     """
-    Create a subnetwork from a RiverNetwork.
+    Create a subnetwork from a river network.
 
     Parameters
     ----------

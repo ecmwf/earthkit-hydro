@@ -29,4 +29,14 @@ Here is a simple example of using different earthkit packages together.
     upstream_sum = ekh.upstream.sum(network, da)
 
     # plot result
-    ekp.quickplot(upstream_sum, domain="Europe", style=style)
+    chart = ekp.Map()
+    chart.quickplot(upstream_sum, style=style)
+    chart.legend(label="{variable_name}")
+    chart.title("Upstream precipitation at {time:%H:%M on %-d %B %Y}")
+    chart.coastlines()
+    chart.gridlines()
+    chart.show()
+
+.. image:: ../../images/earthkit_example.png
+   :width: 100%
+   :align: center

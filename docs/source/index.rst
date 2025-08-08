@@ -52,7 +52,7 @@ Main Features
 Installation
 ------------
 
-Try it out - earthkit-hydro is readily available via PyPI!
+Try it out! earthkit-hydro is readily available on PyPI.
 
 .. code-block:: bash
 

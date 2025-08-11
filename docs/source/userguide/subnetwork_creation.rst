@@ -18,7 +18,7 @@ The mask can be specified over the grid:
     node_mask = np.ones(network.shape, dtype=bool)
     node_mask[10,10] = False
 
-    subnetwork = ekh.subnetwork.create(network, node_mask=node_mask)
+    subnetwork = ekh.subnetwork.from_mask(network, node_mask=node_mask)
 
 Or as usual it is also possible to specify directly a mask on the nodes:
 
@@ -27,7 +27,7 @@ Or as usual it is also possible to specify directly a mask on the nodes:
     node_mask = np.ones(network.n_nodes, dtype=bool)
     node_mask[10] = False
 
-    subnetwork = ekh.subnetwork.create(network, node_mask=node_mask)
+    subnetwork = ekh.subnetwork.from_mask(network, node_mask=node_mask)
 
 
 Masking edges
@@ -40,7 +40,7 @@ Masking edges is also possible. This is useful for controlling bifurcating river
     edge_mask = np.ones(network.n_edges, dtype=bool)
     edge_mask[10] = False
 
-    subnetwork = ekh.subnetwork.create(network, edge_mask=edge_mask)
+    subnetwork = ekh.subnetwork.from_mask(network, edge_mask=edge_mask)
 
 Combining masks
 ---------------
@@ -55,4 +55,4 @@ It also possible to mask both nodes and edges in a single call.
     edge_mask = np.ones(network.n_edges, dtype=bool)
     edge_mask[10] = False
 
-    subnetwork = ekh.subnetwork.create(network, node_mask=node_mask, edge_mask=edge_mask)
+    subnetwork = ekh.subnetwork.from_mask(network, node_mask=node_mask, edge_mask=edge_mask)

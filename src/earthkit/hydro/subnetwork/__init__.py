@@ -1,3 +1,3 @@
-from ._toplevel import create
+from ._toplevel import from_mask
 
-__all__ = ["create"]
+__all__ = ["from_mask"]

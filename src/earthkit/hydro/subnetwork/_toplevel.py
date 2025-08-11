@@ -7,7 +7,7 @@ from earthkit.hydro.data_structures import RiverNetwork
 np = NumPyBackend()
 
 
-def create(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=True):
+def from_mask(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=True):
     """
     Create a subnetwork from a river network.
 
@@ -39,9 +39,12 @@ def create(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=Tru
                 np, node_mask, river_network.mask, node_mask.shape
             )
 
+    node_relabel = np.empty(river_network.n_nodes, dtype=int)
+    node_relabel[node_mask] = np.arange(node_mask.sum())
+
     storage = cp.deepcopy(river_network._storage)
     if edge_mask is not None and node_mask is not None:
-        valid_edges = edge_mask & (
+        valid_edges = edge_mask[storage.sorted_data[2]] & (
             node_mask[storage.sorted_data[0]] & node_mask[storage.sorted_data[1]]
         )
     elif edge_mask is None:
@@ -49,8 +52,18 @@ def create(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=Tru
             node_mask[storage.sorted_data[0]] & node_mask[storage.sorted_data[1]]
         )
     else:
-        valid_edges = edge_mask
+        valid_edges = edge_mask[storage.sorted_data[2]]
+
+    original_order_edge_mask = np.empty(river_network.n_edges, dtype=bool)
+    original_order_edge_mask[storage.sorted_data[2]] = valid_edges
+    edge_relabel = np.empty(river_network.n_edges, dtype=int)
+    edge_relabel[original_order_edge_mask] = np.arange(original_order_edge_mask.sum())
+
     storage.sorted_data = storage.sorted_data[..., valid_edges]
+    storage.sorted_data[0] = node_relabel[storage.sorted_data[0]]
+    storage.sorted_data[1] = node_relabel[storage.sorted_data[1]]
+    storage.sorted_data[2] = edge_relabel[storage.sorted_data[2]]
+
     storage.splits = np.cumsum(valid_edges)[storage.splits - 1]
     storage.mask = storage.mask[node_mask]
     storage.n_nodes = storage.mask.shape[0]

@@ -23,7 +23,6 @@ def calculate_catchment_metric(
     return xp.gather(upstream_metric_field, stations_1d, axis=-1)
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
 def var(xp, river_network, field, locations, node_weights=None, edge_weights=None):
     return calculate_catchment_metric(
@@ -37,7 +36,6 @@ def var(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
 def std(xp, river_network, field, locations, node_weights=None, edge_weights=None):
     return calculate_catchment_metric(
@@ -51,7 +49,6 @@ def std(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
 def mean(xp, river_network, field, locations, node_weights=None, edge_weights=None):
     return calculate_catchment_metric(
@@ -65,7 +62,6 @@ def mean(xp, river_network, field, locations, node_weights=None, edge_weights=No
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
 def sum(xp, river_network, field, locations, node_weights=None, edge_weights=None):
     return calculate_catchment_metric(
@@ -79,7 +75,6 @@ def sum(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
 def min(xp, river_network, field, locations, node_weights=None, edge_weights=None):
     return calculate_catchment_metric(
@@ -93,7 +88,6 @@ def min(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
 def max(xp, river_network, field, locations, node_weights=None, edge_weights=None):
     return calculate_catchment_metric(

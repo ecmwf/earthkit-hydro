@@ -1,69 +1,7 @@
-from functools import wraps
-
-import numpy as np
-import xarray as xr
-
-import earthkit.hydro.catchments.array._operations as array
-from earthkit.hydro._backends.find import get_array_backend
+import earthkit.hydro.catchments._operations as array
 from earthkit.hydro._utils.decorators import xarray
-from earthkit.hydro.catchments.array._operations import preprocess_stations
 
-
-def _name_last_dim(func):
-    @wraps(func)
-    def wrapper(river_network, field, locations, *args, **kwargs):
-        orig_locations = locations
-        xr_present = isinstance(field, (xr.DataArray, xr.Dataset))
-        dict_locations = isinstance(locations, dict)
-        if dict_locations:
-            assert xr_present
-
-            lats = field.lat.data
-            lons = field.lon.data
-
-            # TODO: decide if acceptable to always use np here
-            locations = []
-            for lat_val, lon_val in orig_locations.values():
-                ilat = np.abs(lats - lat_val).argmin()
-                ilon = np.abs(lons - lon_val).argmin()
-                locations.append((int(ilat), int(ilon)))
-
-        xp = get_array_backend(river_network.groups[0])
-        locations = xp.asarray(locations, device=river_network.device)
-        stations_1d = preprocess_stations(xp, river_network, locations)
-
-        if kwargs.get("output_core_dims", None) is None:
-            kwargs["output_core_dims"] = [["station_index"]]
-        if kwargs.get("output_sizes", None) is None:
-            kwargs["output_sizes"] = {"station_index": locations.shape[0]}
-
-        result = func(river_network, field, stations_1d, *args, **kwargs)
-
-        if xr_present:
-            if dict_locations:
-                names = xp.asarray(
-                    list(orig_locations.keys()), device=river_network.device
-                )
-                coords = xp.asarray(
-                    list(orig_locations.values()), device=river_network.device
-                )
-                result = result.assign_coords(
-                    station_name=("station_index", names),
-                    lat=("station_index", coords[:, 0]),
-                    lon=("station_index", coords[:, 1]),
-                )
-
-            if locations.ndim == 1:
-                result = result.assign_coords(idx=("station_index", locations))
-            elif locations.ndim == 2:
-                # TODO: check if xp agnostic
-                result = result.assign_coords(
-                    xidx=("station_index", locations[:, 0]),
-                    yidx=("station_index", locations[:, 1]),
-                )
-        return result
-
-    return wrapper
+from ._operations import _name_last_dim
 
 
 @_name_last_dim

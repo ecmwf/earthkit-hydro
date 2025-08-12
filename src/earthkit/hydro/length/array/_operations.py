@@ -1,12 +1,11 @@
 from earthkit.hydro._utils.decorators import multi_backend
-from earthkit.hydro.catchments.array._operations import preprocess_stations
+from earthkit.hydro.catchments.array._utils import locations_to_1d
 from earthkit.hydro.length.array import __operations as _operations
 
 
 @multi_backend()
 def min(xp, river_network, field, locations, upstream=False, downstream=True):
-    locations = xp.asarray(locations, device=river_network.device)
-    locations = preprocess_stations(xp, river_network, locations)
+    locations, _, _ = locations_to_1d(xp, river_network, locations)
     # TODO: add back when we have default xarray with correct lat lon
     # if weights is None:
     #     weights = xp.ones(river_network.shape)
@@ -15,8 +14,7 @@ def min(xp, river_network, field, locations, upstream=False, downstream=True):
 
 @multi_backend()
 def max(xp, river_network, field, locations, upstream=False, downstream=True):
-    locations = xp.asarray(locations, device=river_network.device)
-    locations = preprocess_stations(xp, river_network, locations)
+    locations, _, _ = locations_to_1d(xp, river_network, locations)
     # TODO: add back when we have default xarray with correct lat lon
     # if weights is None:
     #     weights = xp.ones(river_network.shape)

@@ -3,6 +3,7 @@ from io import BytesIO
 from urllib.request import Request, urlopen
 
 import joblib
+import numpy as np
 
 from earthkit.hydro._readers import (  # cache, from_grit,
     find_main_var,
@@ -59,6 +60,20 @@ def create(path, river_network_format, source="file"):
         data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
         x, y = data.nextx.values, data.nexty.values
         river_network_storage = from_cama_nextxy(x, y)
+        coord1, coord2 = (
+            ("lon", "lat")
+            if ("lon" in data.coords and "lat" in data.coords)
+            else (
+                ("longitude", "latitude")
+                if ("longitude" in data.coords and "latitude" in data.coords)
+                else ("x", "y")
+            )
+        )
+        coord1_grid, coord2_grid = np.meshgrid(data[coord1], data[coord2])
+        river_network_storage.coords = {
+            coord1: coord1_grid.flat[river_network_storage.mask],
+            coord2: coord2_grid.flat[river_network_storage.mask],
+        }
     elif (
         river_network_format == "pcr_d8"
         or river_network_format == "esri_d8"
@@ -66,12 +81,32 @@ def create(path, river_network_format, source="file"):
     ):
         if path.endswith(".map"):
             data = from_file(path, mask=False)
+            river_network_storage = from_d8(
+                data, river_network_format=river_network_format
+            )
+            # coords not available
         else:
             ekd = import_earthkit_or_prompt_install(river_network_format, source)
             data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
+            coord1, coord2 = (
+                ("lon", "lat")
+                if ("lon" in data.coords and "lat" in data.coords)
+                else (
+                    ("longitude", "latitude")
+                    if ("longitude" in data.coords and "latitude" in data.coords)
+                    else ("x", "y")
+                )
+            )
+            coord1_grid, coord2_grid = np.meshgrid(data[coord1], data[coord2])
             var_name = find_main_var(data)
             data = data[var_name].values
-        river_network_storage = from_d8(data, river_network_format=river_network_format)
+            river_network_storage = from_d8(
+                data, river_network_format=river_network_format
+            )
+            river_network_storage.coords = {
+                coord1: coord1_grid.flat[river_network_storage.mask],
+                coord2: coord2_grid.flat[river_network_storage.mask],
+            }
     # elif river_network_format == "grit":
     #     assert path.endswith(".gpkg")
     #     river_network_storage = from_grit(path)

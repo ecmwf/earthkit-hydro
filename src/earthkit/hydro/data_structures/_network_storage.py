@@ -7,7 +7,7 @@ class RiverNetworkStorage:
         sources,
         sinks,
         coords,
-        splits,  # just indices of where to split
+        splits,  # indices of where to split sorted_data
         area,
         mask,
         shape,

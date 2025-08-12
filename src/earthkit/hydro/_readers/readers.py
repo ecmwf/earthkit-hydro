@@ -253,11 +253,12 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     up_ids = nodes[has_downstream].astype(np.uintp)
     down_ids = downstream[has_downstream].astype(np.uintp)
 
-    coords = None
     mask = missing_mask.reshape(shape)
     bifurcates = False
     sources = get_sources(n_nodes, down_ids)
     sinks = nodes[downstream == n_nodes]
+
+    coords = None
 
     assert np.all(np.isin(np.setdiff1d(sinks, sources), down_ids))
 

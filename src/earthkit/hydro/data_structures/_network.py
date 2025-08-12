@@ -30,17 +30,20 @@ class RiverNetwork:
         self._storage = river_network_storage
         self.n_nodes = self._storage.n_nodes
         self.n_edges = self._storage.n_edges
-        # self.nodes = np.arange(self.n_nodes)
         self.sources = self._storage.sources
         self.sinks = self._storage.sinks
-        # self.area = self._storage.area
+
         self.bifurcates = self._storage.bifurcates
+        self.edge_weights = self._storage.edge_weights
+
         self.mask = self._storage.mask
         self.shape = self._storage.shape
         self.array_backend = "numpy"
         self.device = "cpu"
-        self.data = [self._storage.sorted_data]
 
+        self.coords = self._storage.coords
+
+        self.data = [self._storage.sorted_data]
         self.groups = np.split(self._storage.sorted_data, self._storage.splits, axis=1)
 
     def __str__(self):

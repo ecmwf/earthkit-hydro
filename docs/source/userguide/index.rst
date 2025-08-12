@@ -19,6 +19,7 @@ In this user guide, we provide detailed instructions for such steps.
    xarray_array_backend
    raster_vector_inputs
    flow_accumulations
+   specifying_locations
    catchment_delineation
    catchment_statistics
    distance_length_calculations

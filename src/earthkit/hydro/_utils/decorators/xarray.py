@@ -4,7 +4,7 @@ from inspect import signature
 import numpy as np
 import xarray as xr
 
-from earthkit.hydro._utils.coords import get_core_dims
+from earthkit.hydro._utils.coords import get_core_dims, node_default_coord
 
 
 def get_full_signature(func, *args, **kwargs):
@@ -49,7 +49,7 @@ def get_reshuffled_func(func, arg_order):
     return reshuffled_func
 
 
-def get_input_output_core_dims_and_sizes(
+def get_input_output_core_dims(
     input_core_dims, output_core_dims, xr_args, river_network, return_grid
 ):
     if input_core_dims is None:
@@ -69,7 +69,7 @@ def get_input_output_core_dims_and_sizes(
             if len(input_core_dims[0]) == 1:  # 1d in and out
                 output_core_dims = [input_core_dims[0]]
             else:
-                output_core_dims = [["station_index"]]
+                output_core_dims = [[node_default_coord]]
 
     return input_core_dims, output_core_dims
 
@@ -109,15 +109,15 @@ def xarray(func):
                     coords[k] = v
                     dim_names.append(k)
             else:
-                coords["station_index"] = np.arange(river_network.n_nodes)
-                dim_names.append("station_index")
+                coords[node_default_coord] = np.arange(river_network.n_nodes)
+                dim_names.append(node_default_coord)
 
             result = xr.DataArray(output, dims=dim_names, coords=coords, name="out")
 
             if not return_grid:
                 coords_grid = np.meshgrid(*river_network.coords.values())
                 assign_dict = {
-                    k: ("station_index", v.flat[river_network.mask])
+                    k: (node_default_coord, v.flat[river_network.mask])
                     for k, v in zip(river_network.coords.keys(), coords_grid)
                 }
                 result = result.assign_coords(**assign_dict)
@@ -125,7 +125,7 @@ def xarray(func):
 
             reshuffled_func = get_reshuffled_func(func, arg_order)
 
-            input_core_dims, output_core_dims = get_input_output_core_dims_and_sizes(
+            input_core_dims, output_core_dims = get_input_output_core_dims(
                 input_core_dims, output_core_dims, xr_args, river_network, return_grid
             )
 

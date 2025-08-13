@@ -1,10 +1,8 @@
 import earthkit.hydro.catchments._operations as array
-from earthkit.hydro._utils.decorators import xarray
 
-from ._operations import _name_last_dim
+from ._xarray import xarray
 
 
-@_name_last_dim
 @xarray
 def var(
     river_network,
@@ -70,7 +68,6 @@ def var(
     return array.var(river_network, field, locations, node_weights, edge_weights)
 
 
-@_name_last_dim
 @xarray
 def std(
     river_network,
@@ -138,7 +135,6 @@ def std(
     return array.std(river_network, field, locations, node_weights, edge_weights)
 
 
-@_name_last_dim
 @xarray
 def mean(
     river_network,
@@ -199,7 +195,6 @@ def mean(
     return array.mean(river_network, field, locations, node_weights, edge_weights)
 
 
-@_name_last_dim
 @xarray
 def sum(
     river_network,
@@ -256,7 +251,6 @@ def sum(
     return array.sum(river_network, field, locations, node_weights, edge_weights)
 
 
-@_name_last_dim
 @xarray
 def min(
     river_network,
@@ -311,7 +305,6 @@ def min(
     return array.min(river_network, field, locations, node_weights, edge_weights)
 
 
-@_name_last_dim
 @xarray
 def max(
     river_network,

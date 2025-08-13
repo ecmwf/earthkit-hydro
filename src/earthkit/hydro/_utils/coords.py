@@ -11,6 +11,8 @@ def get_core_grid_dims(ds):
 def get_core_node_dims(ds):
     possible_names = [
         ["index"],
+        ["node_index"],
+        ["node_id"],
         ["station_index"],
         ["station_id"],
         ["gauge_id"],
@@ -44,3 +46,6 @@ def get_core_dims(ds):
     if dims is None:
         raise ValueError("Could not autodetect xarray core dims.")
     return dims
+
+
+node_default_coord = "node_index"

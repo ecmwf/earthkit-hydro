@@ -1,11 +1,16 @@
-import earthkit.hydro.length.array._operations as array
+import earthkit.hydro.length.array as array
 from earthkit.hydro._utils.decorators import xarray
-from earthkit.hydro.distance._toplevel import _convert_locations
 
 
-@_convert_locations
 @xarray
-def min(river_network, field, locations, upstream=False, downstream=True):
+def min(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+):
     r"""
     Calculates the minimum length to all points from a set of start
     locations.
@@ -48,12 +53,18 @@ def min(river_network, field, locations, upstream=False, downstream=True):
     array-like or xarray object
         Array of minimum lengths for every node in the river network.
     """
-    return array.min(river_network, field, locations, upstream, downstream)
+    return array.min(river_network, locations, field, upstream, downstream, return_grid)
 
 
-@_convert_locations
 @xarray
-def max(river_network, field, locations, upstream=False, downstream=True):
+def max(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+):
     r"""
     Calculates the maximum length to all points from a set of start
     locations.
@@ -96,7 +107,7 @@ def max(river_network, field, locations, upstream=False, downstream=True):
     array-like or xarray object
         Array of maximum lengths for every node in the river network.
     """
-    return array.max(river_network, field, locations, upstream, downstream)
+    return array.max(river_network, locations, field, upstream, downstream, return_grid)
 
 
 def to_source(*args, **kwargs):

@@ -98,7 +98,7 @@ def xarray(func):
 
             offset = 2 if return_grid else 1
             ndim = output.ndim
-            dim_names = [f"axis{i+1}" for i in range(ndim - offset)]
+            dim_names = [f"axis{i + 1}" for i in range(ndim - offset)]
             coords = {
                 dim: np.arange(size)
                 for dim, size in zip(dim_names, output.shape[:-offset])

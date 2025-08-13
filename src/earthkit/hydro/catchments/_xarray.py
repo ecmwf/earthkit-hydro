@@ -55,7 +55,7 @@ def xarray(func):
             output = func(**all_args)
 
             ndim = output.ndim
-            dim_names = [f"axis{i+1}" for i in range(ndim - 1)]
+            dim_names = [f"axis{i + 1}" for i in range(ndim - 1)]
             coords = {
                 dim: np.arange(size) for dim, size in zip(dim_names, output.shape[:-1])
             }

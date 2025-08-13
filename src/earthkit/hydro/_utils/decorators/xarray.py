@@ -62,7 +62,7 @@ def xarray(func):
             *xr_args,
             input_core_dims=input_core_dims,
             output_core_dims=output_core_dims,
-            output_sizes=output_sizes,
+            dask_gufunc_kwargs={"output_sizes": output_sizes},
             output_dtypes=[float],
             dask="parallelized",
             kwargs=non_xr_kwargs,

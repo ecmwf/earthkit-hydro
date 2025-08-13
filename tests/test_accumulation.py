@@ -78,7 +78,9 @@ def get_numpy_function(function_name):
     indirect=["river_network"],
 )
 def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
-    output_field = ekh.upstream.sum(river_network, input_field, node_weights=None)
+    output_field = ekh.upstream.array.sum(
+        river_network, input_field, node_weights=None, return_grid=False
+    )
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
@@ -89,7 +91,9 @@ def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
     flow_downstream = convert_to_2d(river_network, flow_downstream, 0)
     print(mv, input_field.dtype)
     print(input_field, flow_downstream)
-    output_field = ekh.upstream.sum(river_network, input_field, node_weights=None)
+    output_field = ekh.upstream.array.sum(
+        river_network, input_field, node_weights=None
+    ).flatten()
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
@@ -157,7 +161,9 @@ def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
     indirect=["river_network"],
 )
 def test_calculate_upstream_metric_max(river_network, input_field, flow_downstream, mv):
-    output_field = ekh.upstream.max(river_network, input_field, node_weights=None)
+    output_field = ekh.upstream.array.max(
+        river_network, input_field, node_weights=None, return_grid=False
+    )
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
@@ -225,7 +231,9 @@ def test_calculate_upstream_metric_max(river_network, input_field, flow_downstre
     indirect=["river_network"],
 )
 def test_calculate_upstream_metric_min(river_network, input_field, flow_downstream, mv):
-    output_field = ekh.upstream.min(river_network, input_field, node_weights=None)
+    output_field = ekh.upstream.array.min(
+        river_network, input_field, node_weights=None, return_grid=False
+    )
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
@@ -295,7 +303,7 @@ def test_calculate_upstream_metric_min(river_network, input_field, flow_downstre
 # # def test_calculate_upstream_metric_prod(
 # #     river_network, input_field, flow_downstream, mv
 # # ):
-# #     output_field = ekh.upstream.prod(
+# #     output_field = ekh.upstream.array.prod(
 # #         river_network,
 # #         input_field,
 # #         node_weights=None,
@@ -371,21 +379,19 @@ def test_calculate_upstream_metric_min(river_network, input_field, flow_downstre
 def test_calculate_upstream_metric_mean(
     river_network, input_field, flow_downstream, mv
 ):
-    output_field = ekh.upstream.mean(
-        river_network,
-        input_field,
-        node_weights=None,
+    output_field = ekh.upstream.array.mean(
+        river_network, input_field, node_weights=None, return_grid=False
     )
     assert output_field.dtype == flow_downstream.dtype
     np.testing.assert_allclose(output_field, flow_downstream)
 
     input_field = convert_to_2d(river_network, input_field, 0)
     flow_downstream = convert_to_2d(river_network, flow_downstream, 0)
-    output_field = ekh.upstream.mean(
+    output_field = ekh.upstream.array.mean(
         river_network,
         input_field,
         node_weights=None,
-    )
+    ).flatten()
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
@@ -405,7 +411,7 @@ def test_calculate_upstream_metric_mean(
 #     indirect=["river_network"],
 # )
 # def test_accumulate_downstream_missing(river_network, input_field, accum_field):
-#     accum = ekh.upstream.sum(river_network, input_field, mv=-1, accept_missing=True)
+#     accum = ekh.upstream.array.sum(river_network, input_field, mv=-1, accept_missing=True)
 #     print(accum)
 #     print(accum_field)
 #     np.testing.assert_array_equal(accum, accum_field)
@@ -427,12 +433,12 @@ def test_calculate_upstream_metric_mean(
 # def test_accumulate_downstream_2d(river_network, N):
 #     field = np.random.rand(*([np.random.randint(10)] * N), *river_network.mask.shape)
 #     field_1d = field[..., river_network.mask]
-#     accum = ekh.upstream.sum(river_network, field_1d)
+#     accum = ekh.upstream.array.sum(river_network, field_1d)
 #     np.testing.assert_array_equal(
-#         accum, ekh.upstream.sum(river_network, field)[..., river_network.mask]
+#         accum, ekh.upstream.array.sum(river_network, field)[..., river_network.mask]
 #     )
 #     np.testing.assert_array_equal(
-#         ekh.upstream.sum(river_network, field)[..., ~river_network.mask],
+#         ekh.upstream.array.sum(river_network, field)[..., ~river_network.mask],
 #         field[..., ~river_network.mask],
 #     )
 

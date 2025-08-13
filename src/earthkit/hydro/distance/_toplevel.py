@@ -3,7 +3,7 @@ from functools import wraps
 import earthkit.hydro.distance.array._operations as array
 from earthkit.hydro._backends.find import get_array_backend
 from earthkit.hydro._utils.decorators import xarray
-from earthkit.hydro.catchments.array._utils import locations_to_1d
+from earthkit.hydro._utils.locations import locations_to_1d
 
 
 def _convert_locations(func):

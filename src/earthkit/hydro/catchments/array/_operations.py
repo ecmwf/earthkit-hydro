@@ -1,7 +1,6 @@
 from earthkit.hydro._utils.decorators import multi_backend
+from earthkit.hydro._utils.locations import locations_to_1d
 from earthkit.hydro.catchments.array import __operations as _operations
-
-from ._utils import locations_to_1d
 
 
 @multi_backend(allow_jax_jit=False)
@@ -52,6 +51,9 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-def find(river_network, locations):
-
-    return _operations.find(river_network, locations)
+@multi_backend()
+def find(xp, river_network, locations, return_grid):
+    stations1d, _, _ = locations_to_1d(xp, river_network, locations)
+    field = xp.full(river_network.n_nodes, xp.nan, device=river_network.device)
+    field[stations1d] = xp.arange(stations1d.shape[0])
+    return _operations.find(xp, river_network, field, return_grid)

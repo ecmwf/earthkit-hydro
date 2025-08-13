@@ -1,5 +1,5 @@
 from earthkit.hydro._utils.decorators import multi_backend
-from earthkit.hydro.catchments.array._utils import locations_to_1d
+from earthkit.hydro._utils.locations import locations_to_1d
 from earthkit.hydro.distance.array import __operations as _operations
 
 

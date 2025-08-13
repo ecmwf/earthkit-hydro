@@ -1,4 +1,6 @@
 import earthkit.hydro.catchments._operations as array
+from earthkit.hydro._utils.decorators.xarray import xarray as find_xarray
+from earthkit.hydro.catchments.array._toplevel import find as find_func
 
 from ._xarray import xarray
 
@@ -359,8 +361,8 @@ def max(
     return array.max(river_network, field, locations, node_weights, edge_weights)
 
 
-@xarray
-def find(river_network, field):
+@find_xarray
+def find(river_network, locations, return_grid=True):
     r"""
     Delineates catchment areas.
 
@@ -379,4 +381,4 @@ def find(river_network, field):
     array-like or xarray object
         Array of labelled nodes.
     """
-    array.find(river_network, field)
+    return find_func(river_network, locations, return_grid)

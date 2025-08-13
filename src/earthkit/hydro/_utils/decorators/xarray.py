@@ -94,7 +94,8 @@ def xarray(func):
         river_network = all_args["river_network"]
 
         if len(xr_args) == 0:
-            output = func(*args, **kwargs)
+            output = func(**all_args)
+            print(output)
 
             offset = 2 if return_grid else 1
             ndim = output.ndim

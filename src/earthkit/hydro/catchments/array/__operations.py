@@ -1,5 +1,6 @@
 from earthkit.hydro._core._find import _flow_find
 from earthkit.hydro._utils.decorators import mask, multi_backend
+from earthkit.hydro.catchments.array._utils import locations_to_1d
 from earthkit.hydro.upstream.array._operations import calculate_upstream_metric
 
 
@@ -102,7 +103,8 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
 
 
 @multi_backend()
-@mask()
-def find(xp, river_network, field):
-    field = xp.copy(field)
+def find(xp, river_network, locations):
+    stations1d, _, _ = locations_to_1d(xp, river_network, locations)
+    field = xp.full(river_network.n_nodes, xp.nan, device=river_network.device)
+    field[stations1d] = xp.arange(stations1d.shape[0])
     return _flow_find(xp, river_network, field)

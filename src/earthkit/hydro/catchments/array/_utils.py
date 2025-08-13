@@ -7,7 +7,7 @@ def locations_to_1d(xp, river_network, locations):
         coord1_network_vals, coord2_network_vals = river_network.coords.values()
 
         locations = []
-        if coord1_network_vals.shape == coord2_network_vals.shape:  # vector network
+        if river_network.shape is None:  # vector network
             for coord1_val, coord2_val in orig_locations.values():
                 indx = (
                     (coord1_val - coord1_network_vals) ** 2

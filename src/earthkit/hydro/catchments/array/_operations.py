@@ -52,5 +52,6 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-def find(river_network, field):
-    return _operations.find(river_network, field)
+def find(river_network, locations):
+
+    return _operations.find(river_network, locations)

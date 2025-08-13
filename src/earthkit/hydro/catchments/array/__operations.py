@@ -24,7 +24,7 @@ def calculate_catchment_metric(
 
 
 @mask(unmask=False)
-def var(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def var(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -37,7 +37,7 @@ def var(xp, river_network, field, locations, node_weights=None, edge_weights=Non
 
 
 @mask(unmask=False)
-def std(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def std(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -50,7 +50,7 @@ def std(xp, river_network, field, locations, node_weights=None, edge_weights=Non
 
 
 @mask(unmask=False)
-def mean(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def mean(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -63,7 +63,7 @@ def mean(xp, river_network, field, locations, node_weights=None, edge_weights=No
 
 
 @mask(unmask=False)
-def sum(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def sum(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -76,7 +76,7 @@ def sum(xp, river_network, field, locations, node_weights=None, edge_weights=Non
 
 
 @mask(unmask=False)
-def min(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def min(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -89,7 +89,7 @@ def min(xp, river_network, field, locations, node_weights=None, edge_weights=Non
 
 
 @mask(unmask=False)
-def max(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def max(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,

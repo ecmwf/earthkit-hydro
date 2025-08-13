@@ -8,8 +8,8 @@ def var(
     river_network,
     field,
     locations,
-    node_weights=None,
-    edge_weights=None,
+    node_weights,
+    edge_weights,
 ):
     return array.var(xp, river_network, field, locations, node_weights, edge_weights)
 
@@ -20,8 +20,8 @@ def std(
     river_network,
     field,
     locations,
-    node_weights=None,
-    edge_weights=None,
+    node_weights,
+    edge_weights,
 ):
     return array.std(xp, river_network, field, locations, node_weights, edge_weights)
 
@@ -32,8 +32,8 @@ def mean(
     river_network,
     field,
     locations,
-    node_weights=None,
-    edge_weights=None,
+    node_weights,
+    edge_weights,
 ):
     return array.mean(xp, river_network, field, locations, node_weights, edge_weights)
 
@@ -44,8 +44,8 @@ def sum(
     river_network,
     field,
     locations,
-    node_weights=None,
-    edge_weights=None,
+    node_weights,
+    edge_weights,
 ):
     return array.sum(xp, river_network, field, locations, node_weights, edge_weights)
 
@@ -56,8 +56,8 @@ def min(
     river_network,
     field,
     locations,
-    node_weights=None,
-    edge_weights=None,
+    node_weights,
+    edge_weights,
 ):
     return array.min(xp, river_network, field, locations, node_weights, edge_weights)
 
@@ -68,8 +68,8 @@ def max(
     river_network,
     field,
     locations,
-    node_weights=None,
-    edge_weights=None,
+    node_weights,
+    edge_weights,
 ):
     return array.max(xp, river_network, field, locations, node_weights, edge_weights)
 

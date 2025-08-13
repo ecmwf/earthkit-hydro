@@ -15,13 +15,21 @@ def mask(unmask=True):
                 out_1d = func(xp, river_network, field_1d, *args, **kwargs)
 
                 if unmask:
+                    out_shape = field.shape
                     return scatter_and_reshape(
-                        xp, river_network.mask, out_1d, field.shape
+                        xp, river_network.mask, out_1d, out_shape
                     )
                 else:
                     return out_1d
             else:
-                return func(xp, river_network, field, *args, **kwargs)
+                out_1d = func(xp, river_network, field, *args, **kwargs)
+                if unmask:
+                    out_shape = field.shape[:-2] + river_network.shape
+                    return scatter_and_reshape(
+                        xp, river_network.mask, out_1d, out_shape
+                    )
+                else:
+                    return out_1d
 
         return wrapper
 

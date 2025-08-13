@@ -3,12 +3,7 @@ from earthkit.hydro.upstream import array
 
 
 @xarray
-def var(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def var(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted variance of a field over all upstream nodes.
 
@@ -62,16 +57,11 @@ def var(
     array-like or xarray object
         Array of variance values for every node in the river network.
     """
-    return array.var(river_network, field, node_weights, edge_weights)
+    return array.var(river_network, field, node_weights, edge_weights, return_grid)
 
 
 @xarray
-def std(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def std(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted standard deviation of a field over all
     upstream nodes.
@@ -128,16 +118,11 @@ def std(
     array-like or xarray object
         Array of standard deviation values for every node in the river network.
     """
-    return array.std(river_network, field, node_weights, edge_weights)
+    return array.std(river_network, field, node_weights, edge_weights, return_grid)
 
 
 @xarray
-def mean(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def mean(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted mean of a field over all upstream nodes.
 
@@ -186,16 +171,11 @@ def mean(
     array-like or xarray object
         Array of mean values for every node in the river network.
     """
-    return array.mean(river_network, field, node_weights, edge_weights)
+    return array.mean(river_network, field, node_weights, edge_weights, return_grid)
 
 
 @xarray
-def sum(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def sum(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted sum of a field over all upstream nodes.
 
@@ -240,16 +220,11 @@ def sum(
     array-like or xarray object
         Array of sum values for every node in the river network.
     """
-    return array.sum(river_network, field, node_weights, edge_weights)
+    return array.sum(river_network, field, node_weights, edge_weights, return_grid)
 
 
 @xarray
-def min(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def min(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted minimum of a field over all upstream nodes.
 
@@ -294,16 +269,11 @@ def min(
     array-like or xarray object
         Array of minimum values for every node in the river network.
     """
-    return array.min(river_network, field, node_weights, edge_weights)
+    return array.min(river_network, field, node_weights, edge_weights, return_grid)
 
 
 @xarray
-def max(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def max(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted maximum of a field over all upstream nodes.
 
@@ -348,4 +318,4 @@ def max(
     array-like or xarray object
         Array of maximum values for every node in the river network.
     """
-    return array.max(river_network, field, node_weights, edge_weights)
+    return array.max(river_network, field, node_weights, edge_weights, return_grid)

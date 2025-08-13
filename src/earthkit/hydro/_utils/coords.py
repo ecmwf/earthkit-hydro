@@ -33,3 +33,14 @@ def get_core_edge_dims(ds):
             present &= name in ds.coords
         if present:
             return names
+
+
+def get_core_dims(ds):
+    dims = get_core_grid_dims(ds)
+    if dims is None:
+        dims = get_core_node_dims(ds)
+    if dims is None:
+        dims = get_core_edge_dims(ds)
+    if dims is None:
+        raise ValueError("Could not autodetect xarray core dims.")
+    return dims

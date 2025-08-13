@@ -52,8 +52,8 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
 
 
 @multi_backend()
-def find(xp, river_network, locations, return_grid):
+def find(xp, river_network, locations, overwrite, return_grid):
     stations1d, _, _ = locations_to_1d(xp, river_network, locations)
     field = xp.full(river_network.n_nodes, xp.nan, device=river_network.device)
     field[stations1d] = xp.arange(stations1d.shape[0])
-    return _operations.find(xp, river_network, field, return_grid)
+    return _operations.find(xp, river_network, field, overwrite, return_grid)

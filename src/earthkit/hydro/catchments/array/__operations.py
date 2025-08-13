@@ -101,6 +101,6 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-def find(xp, river_network, field, return_grid):
+def find(xp, river_network, field, overwrite, return_grid):
     decorated_flow_find = mask(return_grid)(_flow_find)
-    return decorated_flow_find(xp, river_network, field)
+    return decorated_flow_find(xp, river_network, field, overwrite)

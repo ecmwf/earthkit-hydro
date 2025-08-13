@@ -362,7 +362,7 @@ def max(
 
 
 @find_xarray
-def find(river_network, locations, return_grid=True):
+def find(river_network, locations, overwrite=True, return_grid=True):
     r"""
     Delineates catchment areas.
 
@@ -381,4 +381,4 @@ def find(river_network, locations, return_grid=True):
     array-like or xarray object
         Array of labelled nodes.
     """
-    return find_func(river_network, locations, return_grid)
+    return find_func(river_network, locations, overwrite, return_grid)

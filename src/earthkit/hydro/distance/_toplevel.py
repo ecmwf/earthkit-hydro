@@ -1,27 +1,16 @@
-from functools import wraps
-
-import earthkit.hydro.distance.array._operations as array
-from earthkit.hydro._backends.find import get_array_backend
+import earthkit.hydro.distance.array as array
 from earthkit.hydro._utils.decorators import xarray
-from earthkit.hydro._utils.locations import locations_to_1d
 
 
-def _convert_locations(func):
-    @wraps(func)
-    def wrapper(river_network, field, locations, *args, **kwargs):
-        xp = get_array_backend(river_network.groups[0])
-        stations_1d, _, _ = locations_to_1d(xp, river_network, locations)
-
-        result = func(river_network, field, stations_1d, *args, **kwargs)
-
-        return result
-
-    return wrapper
-
-
-@_convert_locations
 @xarray
-def min(river_network, field, locations, upstream=False, downstream=True):
+def min(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+):
     r"""
     Calculates the minimum distance to all points from a set of start
     locations.
@@ -64,12 +53,18 @@ def min(river_network, field, locations, upstream=False, downstream=True):
     array-like or xarray object
         Array of minimum distances for every node in the river network.
     """
-    return array.min(river_network, field, locations, upstream, downstream)
+    return array.min(river_network, locations, field, upstream, downstream, return_grid)
 
 
-@_convert_locations
 @xarray
-def max(river_network, field, locations, upstream=False, downstream=True):
+def max(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+):
     r"""
     Calculates the maximum distance to all points from a set of start
     locations.
@@ -112,7 +107,7 @@ def max(river_network, field, locations, upstream=False, downstream=True):
     array-like or xarray object
         Array of maximum distances for every node in the river network.
     """
-    return array.max(river_network, field, locations, upstream, downstream)
+    return array.max(river_network, locations, field, upstream, downstream, return_grid)
 
 
 def to_source(*args, **kwargs):

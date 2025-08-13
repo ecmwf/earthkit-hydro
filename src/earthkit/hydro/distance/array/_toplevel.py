@@ -1,7 +1,14 @@
 from earthkit.hydro.distance.array import _operations
 
 
-def min(river_network, field, locations, upstream=False, downstream=True):
+def min(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+):
     r"""
     Calculates the minimum distance to all points from a set of start
     locations.
@@ -27,10 +34,19 @@ def min(river_network, field, locations, upstream=False, downstream=True):
     array
         Array of distances.
     """
-    return _operations.min(river_network, field, locations, upstream, downstream)
+    return _operations.min(
+        river_network, field, locations, upstream, downstream, return_grid
+    )
 
 
-def max(river_network, field, locations, upstream=False, downstream=True):
+def max(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+):
     r"""
     Calculates the maximum distance to all points from a set of start
     locations.
@@ -56,7 +72,9 @@ def max(river_network, field, locations, upstream=False, downstream=True):
     array
         Array of distances.
     """
-    return _operations.max(river_network, field, locations, upstream, downstream)
+    return _operations.max(
+        river_network, field, locations, upstream, downstream, return_grid
+    )
 
 
 def to_source(*args, **kwargs):

@@ -3,7 +3,14 @@ from earthkit.hydro.move import array
 
 
 @xarray
-def upstream(river_network, field, node_weights=None, edge_weights=None, metric="sum"):
+def upstream(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+    metric="sum",
+    return_grid=True,
+):
     r"""
     Moves a field upstream.
 
@@ -47,12 +54,19 @@ def upstream(river_network, field, node_weights=None, edge_weights=None, metric=
     array-like or xarray object
         Field after movement up the river network.
     """
-    return array.upstream(river_network, field, node_weights, edge_weights, metric)
+    return array.upstream(
+        river_network, field, node_weights, edge_weights, metric, return_grid
+    )
 
 
 @xarray
 def downstream(
-    river_network, field, node_weights=None, edge_weights=None, metric="sum"
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+    metric="sum",
+    return_grid=True,
 ):
     r"""
     Moves a field downstream.
@@ -97,4 +111,6 @@ def downstream(
     array-like or xarray object
         Field after movement down the river network.
     """
-    return array.downstream(river_network, field, node_weights, edge_weights, metric)
+    return array.downstream(
+        river_network, field, node_weights, edge_weights, metric, return_grid
+    )

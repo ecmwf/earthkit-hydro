@@ -36,7 +36,7 @@ def create(path, river_network_format, source="file"):
         Supported formats are "precomputed", "cama", "pcr_d8", "esri_d8"
         and "merit_d8".
     source : str
-        The source of the river network data.
+        The source of the river network data. Default is `'file'`.
         For possible sources see:
         https://earthkit-data.readthedocs.io/en/latest/guide/sources.html.
 

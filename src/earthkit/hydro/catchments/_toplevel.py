@@ -12,6 +12,7 @@ def var(
     locations,
     node_weights=None,
     edge_weights=None,
+    input_core_dims=None,
 ):
     r"""
     Computes the weighted variance of a field over the upstream
@@ -49,22 +50,27 @@ def var(
 
     Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population variance.
 
+
     Parameters
     ----------
     river_network : RiverNetwork
         A river network object.
     field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+        An array containing field values defined on river network nodes or gridcells.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of nodes at which to compute.
     node_weights : array-like or xarray object, optional
-        Array of weights for each node.
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
-        Array of weights for each edge.
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
+    xarray object
         Array of variance values for each location in `locations`.
     """
     return array.var(river_network, field, locations, node_weights, edge_weights)
@@ -77,6 +83,7 @@ def std(
     locations,
     node_weights=None,
     edge_weights=None,
+    input_core_dims=None,
 ):
     r"""
     Computes the weighted standard deviation of a field over the
@@ -121,17 +128,21 @@ def std(
     river_network : RiverNetwork
         A river network object.
     field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+        An array containing field values defined on river network nodes or gridcells.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of nodes at which to compute.
     node_weights : array-like or xarray object, optional
-        Array of weights for each node.
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
-        Array of weights for each edge.
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
+    xarray object
         Array of standard deviation values for each location in `locations`.
     """
     return array.std(river_network, field, locations, node_weights, edge_weights)
@@ -144,6 +155,7 @@ def mean(
     locations,
     node_weights=None,
     edge_weights=None,
+    input_core_dims=None,
 ):
     r"""
     Computes the weighted mean of a field over the upstream catchment of
@@ -181,17 +193,21 @@ def mean(
     river_network : RiverNetwork
         A river network object.
     field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+        An array containing field values defined on river network nodes or gridcells.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of nodes at which to compute.
     node_weights : array-like or xarray object, optional
-        Array of weights for each node.
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
-        Array of weights for each edge.
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
+    xarray object
         Array of mean values for each location in `locations`.
     """
     return array.mean(river_network, field, locations, node_weights, edge_weights)
@@ -204,6 +220,7 @@ def sum(
     locations,
     node_weights=None,
     edge_weights=None,
+    input_core_dims=None,
 ):
     r"""
     Computes the weighted sum of a field over the upstream catchment of
@@ -237,17 +254,21 @@ def sum(
     river_network : RiverNetwork
         A river network object.
     field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+        An array containing field values defined on river network nodes or gridcells.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of nodes at which to compute.
     node_weights : array-like or xarray object, optional
-        Array of weights for each node.
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
-        Array of weights for each edge.
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
+    xarray object
         Array of sum values for each location in `locations`.
     """
     return array.sum(river_network, field, locations, node_weights, edge_weights)
@@ -260,6 +281,7 @@ def min(
     locations,
     node_weights=None,
     edge_weights=None,
+    input_core_dims=None,
 ):
     r"""
     Computes the weighted minimum of a field over the upstream catchment
@@ -291,17 +313,21 @@ def min(
     river_network : RiverNetwork
         A river network object.
     field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+        An array containing field values defined on river network nodes or gridcells.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of nodes at which to compute.
     node_weights : array-like or xarray object, optional
-        Array of weights for each node.
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
-        Array of weights for each edge.
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
+    xarray object
         Array of minimum values for each location in `locations`.
     """
     return array.min(river_network, field, locations, node_weights, edge_weights)
@@ -314,6 +340,7 @@ def max(
     locations,
     node_weights=None,
     edge_weights=None,
+    input_core_dims=None,
 ):
     r"""
     Computes the weighted maximum of a field over the upstream catchment
@@ -345,24 +372,30 @@ def max(
     river_network : RiverNetwork
         A river network object.
     field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+        An array containing field values defined on river network nodes or gridcells.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of nodes at which to compute.
     node_weights : array-like or xarray object, optional
-        Array of weights for each node.
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
-        Array of weights for each edge.
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
+    xarray object
         Array of maximum values for each location in `locations`.
     """
     return array.max(river_network, field, locations, node_weights, edge_weights)
 
 
 @find_xarray
-def find(river_network, locations, overwrite=True, return_grid=True):
+def find(
+    river_network, locations, overwrite=True, return_grid=True, input_core_dims=None
+):
     r"""
     Delineates catchment areas.
 
@@ -373,12 +406,21 @@ def find(river_network, locations, overwrite=True, return_grid=True):
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+    locations : array-like or dict
+        A list of catchment sink nodes (start locations).
+    overwrite : bool, optional
+        Whether to overwrite subcatchments or not. Default is True.
+    return_grid : bool, optional
+        If True (default), return results on the full grid with nans at missing gridcells.
+        If False, return a 1D array with values only on the river network graph.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
     array-like or xarray object
-        Array of labelled nodes.
+        Array of labelled catchments for every river network node or gridcell, depending on `return_grid`.
     """
     return find_func(river_network, locations, overwrite, return_grid)

@@ -2,6 +2,7 @@ from earthkit.hydro._core.move import calculate_move_metric
 
 
 def upstream(xp, river_network, field, node_weights, edge_weights, metric):
+    assert metric == "sum"
     return (
         calculate_move_metric(
             xp,
@@ -17,6 +18,7 @@ def upstream(xp, river_network, field, node_weights, edge_weights, metric):
 
 
 def downstream(xp, river_network, field, node_weights, edge_weights, metric):
+    assert metric == "sum"
     return (
         calculate_move_metric(
             xp,

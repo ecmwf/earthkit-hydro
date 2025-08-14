@@ -79,11 +79,11 @@ def xarray(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
 
-        input_core_dims = kwargs.pop("input_core_dims", None)
-        output_core_dims = kwargs.pop("output_core_dims", None)
-
         # Inspect the function signature and bind all arguments
         all_args = get_full_signature(func, *args, **kwargs)
+
+        input_core_dims = all_args.pop("input_core_dims", None)
+        output_core_dims = None
 
         assert_xr_compatible_backend(all_args["river_network"])
 

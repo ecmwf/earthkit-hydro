@@ -16,11 +16,11 @@ def from_mask(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=
     river_network : RiverNetwork
         Original river network from which to create a subnetwork.
     node_mask : array, optional
-        A mask of the network nodes.
+        A mask of the network nodes or gridcells. Default is None (all True).
     edge_mask : array, optional
-        A mask of the network edges.
+        A mask of the network edges. Default is None (all True).
     copy : bool, optional
-        Whether or not to modify the original river network or return a copy.
+        Whether or not to modify the original river network or return a copy. Default is True.
 
     Returns
     -------

@@ -111,7 +111,7 @@ html_theme_options = {
     "dark_logo": "earthkit-hydro-dark.svg",
     "source_repository": "https://github.com/ecmwf/earthkit-hydro/",
     "source_branch": source_branch,
-    "path_to_docs": "docs/source",
+    "source_directory": "docs/source",
     "footer_icons": [
         {
             "name": "GitHub",

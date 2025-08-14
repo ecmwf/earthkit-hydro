@@ -18,7 +18,7 @@ else:
     version = "dev"
     release = "dev"
 
-rtd_version = os.environ.get("READTHEDOCS_VERSION", "main")
+rtd_version = version if version != "latest" else "develop"
 rtd_version_type = os.environ.get("READTHEDOCS_VERSION_TYPE", "branch")
 
 if rtd_version_type in ("branch", "tag"):

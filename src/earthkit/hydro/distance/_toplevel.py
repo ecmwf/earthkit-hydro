@@ -1,47 +1,17 @@
-from functools import wraps
-
-import numpy as np
-import xarray as xr
-
-import earthkit.hydro.distance.array._operations as array
-from earthkit.hydro._backends.find import get_array_backend
+import earthkit.hydro.distance.array as array
 from earthkit.hydro._utils.decorators import xarray
-from earthkit.hydro.catchments.array._operations import preprocess_stations
 
 
-def _convert_locations(func):
-    @wraps(func)
-    def wrapper(river_network, field, locations, *args, **kwargs):
-        xp = get_array_backend(river_network.groups[0])
-        orig_locations = locations
-        xr_present = isinstance(field, (xr.DataArray, xr.Dataset))
-        dict_locations = isinstance(locations, dict)
-        if dict_locations:
-            assert xr_present
-
-            lats = field.lat.data
-            lons = field.lon.data
-
-            # TODO: decide if acceptable to always use np here
-            locations = []
-            for lat_val, lon_val in orig_locations.values():
-                ilat = np.abs(lats - lat_val).argmin()
-                ilon = np.abs(lons - lon_val).argmin()
-                locations.append((int(ilat), int(ilon)))
-
-        locations = xp.asarray(locations, device=river_network.device)
-        stations_1d = preprocess_stations(xp, river_network, locations)
-
-        result = func(river_network, field, stations_1d, *args, **kwargs)
-
-        return result
-
-    return wrapper
-
-
-@_convert_locations
 @xarray
-def min(river_network, field, locations, upstream=False, downstream=True):
+def min(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+    input_core_dims=None,
+):
     r"""
     Calculates the minimum distance to all points from a set of start
     locations.
@@ -70,26 +40,41 @@ def min(river_network, field, locations, upstream=False, downstream=True):
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array-like or xarray object
-        An array containing distance values defined on edges of the river network.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of source nodes.
+    field : array-like or xarray object, optional
+        An array containing length values defined on river network edges.
+        Default is `xp.ones(river_network.n_edges)`.
     upstream : bool, optional
-        Whether or not to consider upstream distances.
+        Whether or not to consider upstream distances. Default is False.
     downstream : bool, optional
-        Whether or not to consider downstream distances.
+        Whether or not to consider downstream distances. Default is True.
+    return_grid : bool, optional
+        If True (default), return results on the full grid with nans at missing gridcells.
+        If False, return a 1D array with values only on the river network graph.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
-        Array of minimum distances for every node in the river network.
+    xarray object
+        Array of minimum distances for every river network node or gridcell, depending on `return_grid`.
     """
-    return array.min(river_network, field, locations, upstream, downstream)
+    return array.min(river_network, locations, field, upstream, downstream, return_grid)
 
 
-@_convert_locations
 @xarray
-def max(river_network, field, locations, upstream=False, downstream=True):
+def max(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+    input_core_dims=None,
+):
     r"""
     Calculates the maximum distance to all points from a set of start
     locations.
@@ -118,21 +103,29 @@ def max(river_network, field, locations, upstream=False, downstream=True):
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array-like or xarray object
-        An array containing distance values defined on edges of the river network.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of source nodes.
+    field : array-like or xarray object, optional
+        An array containing length values defined on river network edges.
+        Default is `xp.ones(river_network.n_edges)`.
     upstream : bool, optional
-        Whether or not to consider upstream distances.
+        Whether or not to consider upstream distances. Default is False.
     downstream : bool, optional
-        Whether or not to consider downstream distances.
+        Whether or not to consider downstream distances. Default is True.
+    return_grid : bool, optional
+        If True (default), return results on the full grid with nans at missing gridcells.
+        If False, return a 1D array with values only on the river network graph.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
-        Array of maximum distances for every node in the river network.
+    xarray object
+        Array of maximum distances for every river network node or gridcell, depending on `return_grid`.
     """
-    return array.max(river_network, field, locations, upstream, downstream)
+    return array.max(river_network, locations, field, upstream, downstream, return_grid)
 
 
 def to_source(*args, **kwargs):

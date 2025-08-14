@@ -41,14 +41,14 @@ In earthkit-hydro, all of these different quantities are easily computed via
     }
 
     # lengths take node-level information
-    field = np.ones(network.n_nodes)
-    max_length = ekh.length.max(network, field, locations)
-    min_length = ekh.length.min(network, field, locations)
+    field = np.random.rand(network.n_nodes)
+    max_length = ekh.length.max(network, locations, field)
+    min_length = ekh.length.min(network, locations, field)
 
     # distances take edge-level information
-    field = np.ones(network.n_edges)
-    max_distance = ekh.distance.max(network, field, locations)
-    min_distance = ekh.distance.min(network, field, locations)
+    field = np.random.rand(network.n_edges)
+    max_distance = ekh.distance.max(network, locations, field)
+    min_distance = ekh.distance.min(network, locations, field)
 
 Directed and undirected distances or lengths
 --------------------------------------------
@@ -58,9 +58,9 @@ This is easily specified by the `upstream` and `downstream` arguments.
 
 .. code-block:: python
 
-    min_length_upstream = ekh.length.min(network, field, locations, upstream=True, downstream=False)
-    min_length_downstream = ekh.length.min(network, field, locations, upstream=False, downstream=True)
-    min_length_undirected = ekh.length.min(network, field, locations, upstream=True, downstream=True)
+    min_length_upstream = ekh.length.min(network, locations, field, upstream=True, downstream=False)
+    min_length_downstream = ekh.length.min(network, locations, field, upstream=False, downstream=True)
+    min_length_undirected = ekh.length.min(network, locations, field, upstream=True, downstream=True)
 
 As shorthands, earthkit-hydro also provides the means of automatically computing starting from the sources or the sinks with
 

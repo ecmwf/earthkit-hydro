@@ -1,5 +1,10 @@
 def get_array_backend(x):
-    mod = type(x).__module__
+
+    if type(x) is str:
+        mod = x
+    else:
+        mod = type(x).__module__
+
     if "torch" in mod:
         from .torch_backend import TorchBackend
 

@@ -273,7 +273,7 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     return _operations.max(river_network, field, locations, node_weights, edge_weights)
 
 
-def find(river_network, field):
+def find(river_network, locations, overwrite=True, return_grid=True):
     r"""
     Delineates catchment boundaries.
 
@@ -295,4 +295,4 @@ def find(river_network, field):
     -----
     - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
     """
-    return _operations.find(river_network, field)
+    return _operations.find(river_network, locations, overwrite, return_grid)

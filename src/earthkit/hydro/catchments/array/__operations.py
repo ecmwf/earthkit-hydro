@@ -1,5 +1,5 @@
 from earthkit.hydro._core._find import _flow_find
-from earthkit.hydro._utils.decorators import mask, multi_backend
+from earthkit.hydro._utils.decorators import mask
 from earthkit.hydro.upstream.array._operations import calculate_upstream_metric
 
 
@@ -23,9 +23,8 @@ def calculate_catchment_metric(
     return xp.gather(upstream_metric_field, stations_1d, axis=-1)
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
-def var(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def var(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -37,9 +36,8 @@ def var(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
-def std(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def std(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -51,9 +49,8 @@ def std(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
-def mean(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def mean(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -65,9 +62,8 @@ def mean(xp, river_network, field, locations, node_weights=None, edge_weights=No
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
-def sum(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def sum(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -79,9 +75,8 @@ def sum(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
-def min(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def min(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -93,9 +88,8 @@ def min(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend(allow_jax_jit=False)
 @mask(unmask=False)
-def max(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def max(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,
         river_network,
@@ -107,8 +101,6 @@ def max(xp, river_network, field, locations, node_weights=None, edge_weights=Non
     )
 
 
-@multi_backend()
-@mask()
-def find(xp, river_network, field):
-    field = xp.copy(field)
-    return _flow_find(xp, river_network, field)
+def find(xp, river_network, field, overwrite, return_grid):
+    decorated_flow_find = mask(return_grid)(_flow_find)
+    return decorated_flow_find(xp, river_network, field, overwrite)

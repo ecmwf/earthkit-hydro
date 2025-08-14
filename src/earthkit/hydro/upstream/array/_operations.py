@@ -22,15 +22,9 @@ def calculate_upstream_metric(
 
 
 @multi_backend()
-@mask()
-def var(
-    xp,
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
-    return calculate_upstream_metric(
+def var(xp, river_network, field, node_weights, edge_weights, return_grid):
+    decorated_calculate_upstream_metric = mask(return_grid)(calculate_upstream_metric)
+    return decorated_calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -41,15 +35,16 @@ def var(
 
 
 @multi_backend()
-@mask()
 def std(
     xp,
     river_network,
     field,
-    node_weights=None,
-    edge_weights=None,
+    node_weights,
+    edge_weights,
+    return_grid,
 ):
-    return calculate_upstream_metric(
+    decorated_calculate_upstream_metric = mask(return_grid)(calculate_upstream_metric)
+    return decorated_calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -60,15 +55,9 @@ def std(
 
 
 @multi_backend()
-@mask()
-def mean(
-    xp,
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
-    return calculate_upstream_metric(
+def mean(xp, river_network, field, node_weights, edge_weights, return_grid):
+    decorated_calculate_upstream_metric = mask(return_grid)(calculate_upstream_metric)
+    return decorated_calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -79,15 +68,9 @@ def mean(
 
 
 @multi_backend()
-@mask()
-def sum(
-    xp,
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
-    return calculate_upstream_metric(
+def sum(xp, river_network, field, node_weights, edge_weights, return_grid):
+    decorated_calculate_upstream_metric = mask(return_grid)(calculate_upstream_metric)
+    return decorated_calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -98,15 +81,9 @@ def sum(
 
 
 @multi_backend()
-@mask()
-def min(
-    xp,
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
-    return calculate_upstream_metric(
+def min(xp, river_network, field, node_weights, edge_weights, return_grid):
+    decorated_calculate_upstream_metric = mask(return_grid)(calculate_upstream_metric)
+    return decorated_calculate_upstream_metric(
         xp,
         river_network,
         field,
@@ -117,15 +94,9 @@ def min(
 
 
 @multi_backend()
-@mask()
-def max(
-    xp,
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
-    return calculate_upstream_metric(
+def max(xp, river_network, field, node_weights, edge_weights, return_grid):
+    decorated_calculate_upstream_metric = mask(return_grid)(calculate_upstream_metric)
+    return decorated_calculate_upstream_metric(
         xp,
         river_network,
         field,

@@ -3,7 +3,15 @@ from earthkit.hydro.move import array
 
 
 @xarray
-def upstream(river_network, field, node_weights=None, edge_weights=None, metric="sum"):
+def upstream(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+    metric="sum",
+    return_grid=True,
+    input_core_dims=None,
+):
     r"""
     Moves a field upstream.
 
@@ -33,26 +41,41 @@ def upstream(river_network, field, node_weights=None, edge_weights=None, metric=
     river_network : RiverNetwork
         A river network object.
     field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+        An array containing field values defined on river network nodes or gridcells.
     node_weights : array-like or xarray object, optional
-        Array of weights for each node.
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
-        Array of weights for each edge.
+        Array of weights for each edge. Default is None (unweighted).
     metric : str, optional
-        Aggregation function to apply.
+        Aggregation function to apply. Options are 'var', 'std', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
+    return_grid : bool, optional
+        If True (default), return results on the full grid with nans at missing gridcells.
+        If False, return a 1D array with values only on the river network graph.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
 
     Returns
     -------
-    array-like or xarray object
-        Field after movement up the river network.
+    xarray object
+        Array of values after movement up the river network for every river network node or gridcell, depending on `return_grid`.
     """
-    return array.upstream(river_network, field, node_weights, edge_weights, metric)
+    return array.upstream(
+        river_network, field, node_weights, edge_weights, metric, return_grid
+    )
 
 
 @xarray
 def downstream(
-    river_network, field, node_weights=None, edge_weights=None, metric="sum"
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+    metric="sum",
+    return_grid=True,
+    input_core_dims=None,
 ):
     r"""
     Moves a field downstream.
@@ -83,18 +106,27 @@ def downstream(
     river_network : RiverNetwork
         A river network object.
     field : array-like or xarray object
-        An array containing field values defined on nodes of the river network.
+        An array containing field values defined on river network nodes or gridcells.
     node_weights : array-like or xarray object, optional
-        Array of weights for each node.
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
-        Array of weights for each edge.
+        Array of weights for each edge. Default is None (unweighted).
     metric : str, optional
-        Aggregation function to apply.
+        Aggregation function to apply. Options are 'var', 'std', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
+    return_grid : bool, optional
+        If True (default), return results on the full grid with nans at missing gridcells.
+        If False, return a 1D array with values only on the river network graph.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
 
     Returns
     -------
-    array-like or xarray object
-        Field after movement down the river network.
+    xarray object
+        Array of values after movement down the river network for every river network node or gridcell, depending on `return_grid`.
     """
-    return array.downstream(river_network, field, node_weights, edge_weights, metric)
+    return array.downstream(
+        river_network, field, node_weights, edge_weights, metric, return_grid
+    )

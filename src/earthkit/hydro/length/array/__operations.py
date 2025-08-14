@@ -1,9 +1,7 @@
 from earthkit.hydro._core.accumulate import flow_downstream, flow_upstream
 from earthkit.hydro._core.metrics import metrics_func_finder
-from earthkit.hydro._utils.decorators import mask
 
 
-@mask()
 def min(xp, river_network, field, locations, upstream, downstream):
 
     func_obj = metrics_func_finder("min", xp)
@@ -36,7 +34,6 @@ def min(xp, river_network, field, locations, upstream, downstream):
     return out
 
 
-@mask()
 def max(xp, river_network, field, locations, upstream, downstream):
 
     func_obj = metrics_func_finder("min", xp)

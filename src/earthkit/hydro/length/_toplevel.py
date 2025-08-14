@@ -1,11 +1,17 @@
-import earthkit.hydro.length.array._operations as array
+import earthkit.hydro.length.array as array
 from earthkit.hydro._utils.decorators import xarray
-from earthkit.hydro.distance._toplevel import _convert_locations
 
 
-@_convert_locations
 @xarray
-def min(river_network, field, locations, upstream=False, downstream=True):
+def min(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+    input_core_dims=None,
+):
     r"""
     Calculates the minimum length to all points from a set of start
     locations.
@@ -34,26 +40,41 @@ def min(river_network, field, locations, upstream=False, downstream=True):
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array-like or xarray object
-        An array containing length values defined on nodes of the river network.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of source nodes.
+    field : array-like or xarray object, optional
+        An array containing length values defined on river network nodes or gridcells.
+        Default is `xp.ones(river_network.n_nodes)`.
     upstream : bool, optional
-        Whether or not to consider upstream lengths.
+        Whether or not to consider upstream lengths. Default is False.
     downstream : bool, optional
-        Whether or not to consider downstream lengths.
+        Whether or not to consider downstream lengths. Default is True.
+    return_grid : bool, optional
+        If True (default), return results on the full grid with nans at missing gridcells.
+        If False, return a 1D array with values only on the river network graph.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
-        Array of minimum lengths for every node in the river network.
+    xarray object
+        Array of minimum lengths for every river network node or gridcell, depending on `return_grid`.
     """
-    return array.min(river_network, field, locations, upstream, downstream)
+    return array.min(river_network, locations, field, upstream, downstream, return_grid)
 
 
-@_convert_locations
 @xarray
-def max(river_network, field, locations, upstream=False, downstream=True):
+def max(
+    river_network,
+    locations,
+    field=None,
+    upstream=False,
+    downstream=True,
+    return_grid=True,
+    input_core_dims=None,
+):
     r"""
     Calculates the maximum length to all points from a set of start
     locations.
@@ -82,21 +103,29 @@ def max(river_network, field, locations, upstream=False, downstream=True):
     ----------
     river_network : RiverNetwork
         A river network object.
-    field : array-like or xarray object
-        An array containing length values defined on nodes of the river network.
     locations : array-like or dict
-        A list of node indices at which to compute.
+        A list of source nodes.
+    field : array-like or xarray object, optional
+        An array containing length values defined on river network nodes or gridcells.
+        Default is `xp.ones(river_network.n_nodes)`.
     upstream : bool, optional
-        Whether or not to consider upstream lengths.
+        Whether or not to consider upstream lengths. Default is False.
     downstream : bool, optional
-        Whether or not to consider downstream lengths.
+        Whether or not to consider downstream lengths. Default is True.
+    return_grid : bool, optional
+        If True (default), return results on the full grid with nans at missing gridcells.
+        If False, return a 1D array with values only on the river network graph.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------
-    array-like or xarray object
-        Array of maximum lengths for every node in the river network.
+    xarray object
+        Array of maximum lengths for every river network node or gridcell, depending on `return_grid`.
     """
-    return array.max(river_network, field, locations, upstream, downstream)
+    return array.max(river_network, locations, field, upstream, downstream, return_grid)
 
 
 def to_source(*args, **kwargs):

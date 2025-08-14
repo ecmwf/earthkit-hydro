@@ -1,40 +1,16 @@
-from earthkit.hydro._core.move import calculate_move_metric
+import earthkit.hydro.move.array.__operations as array
 from earthkit.hydro._utils.decorators import mask, multi_backend
 
 
 @multi_backend()
-@mask()
-def upstream(
-    xp, river_network, field, node_weights=None, edge_weights=None, metric="sum"
-):
-    return (
-        calculate_move_metric(
-            xp,
-            river_network,
-            field,
-            metric,
-            node_weights,
-            edge_weights,
-            flow_direction="up",
-        )
-        - field
-    )
+def upstream(xp, river_network, field, node_weights, edge_weights, metric, return_grid):
+    decorated_func = mask(return_grid)(array.upstream)
+    return decorated_func(xp, river_network, field, node_weights, edge_weights, metric)
 
 
 @multi_backend()
-@mask()
 def downstream(
-    xp, river_network, field, node_weights=None, edge_weights=None, metric="sum"
+    xp, river_network, field, node_weights, edge_weights, metric, return_grid
 ):
-    return (
-        calculate_move_metric(
-            xp,
-            river_network,
-            field,
-            metric,
-            node_weights,
-            edge_weights,
-            flow_direction="down",
-        )
-        - field
-    )
+    decorated_func = mask(return_grid)(array.downstream)
+    return decorated_func(xp, river_network, field, node_weights, edge_weights, metric)

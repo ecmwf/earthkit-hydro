@@ -24,6 +24,10 @@ class RiverNetwork:
         The size of the river network grid. None if the network is vector-based.
     mask : array-like
         Flattened 1D indices on the raster grid corresponding to river network nodes.
+    array_backend : str
+        The array backend of the river network.
+    device : str
+        The device of the river network.
     """
 
     def __init__(self, river_network_storage: RiverNetworkStorage):
@@ -60,10 +64,11 @@ class RiverNetwork:
         Parameters
         ----------
         device : str, optional
-            The device to transfer to.
+            The device to which to transfer. Default is None, which is `'cpu'` for all backends except cupy, which is `'gpu'`.
         array_backend : str, optional
             The array backend.
-            One of "numpy", "np", "cupy", "cp", "pytorch", "torch", "jax", "jnp", "tensorflow", "tf".
+            One of "numpy", "np", "cupy", "cp", "pytorch", "torch", "jax", "jnp", "tensorflow" or "tf".
+            Default is None, which uses `self.array_backend`.
 
         Returns
         -------
@@ -72,7 +77,9 @@ class RiverNetwork:
         """
 
         # TODO: use xp.asarray
-        if array_backend == "np":
+        if array_backend is None:
+            array_backend = self.array_backend
+        elif array_backend == "np":
             array_backend = "numpy"
         elif array_backend == "cp":
             array_backend = "cupy"
@@ -127,9 +134,9 @@ class RiverNetwork:
         Parameters
         ----------
         fpath : str, optional
-            The filepath specifying where to save the RiverNetwork.
+            The filepath specifying where to save the RiverNetwork. Default is `'river_network.joblib'`.
         compression : str, optional
-            The compression factor used for saving.
+            The compression factor used for saving. Default is 1.
 
         Returns
         -------

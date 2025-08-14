@@ -17,6 +17,10 @@ The following methods are available:
     field = np.ones(network.n_nodes)
     node_weights = np.ones(network.n_nodes)  # optional weights for the nodes
     edge_weights = np.ones(network.n_edges)  # optional weights for the edges
+    locations = {
+        "station1": (10, 10),
+        "station2": (20, 20)
+    }
 
     upstream_sum = ekh.catchments.sum(network, field, locations, node_weights, edge_weights)
     upstream_mean = ekh.catchments.mean(network, field, locations, node_weights, edge_weights)
@@ -24,34 +28,3 @@ The following methods are available:
     upstream_min = ekh.catchments.min(network, field, locations, node_weights, edge_weights)
     upstream_std = ekh.catchments.std(network, field, locations, node_weights, edge_weights)
     upstream_var = ekh.catchments.var(network, field, locations, node_weights, edge_weights)
-
-Specifying gauge locations
---------------------------
-
-The most convenient and common way to specify a gauge location is by its latitude and longitude.
-
-.. code-block:: python
-
-    locations = {
-        "station1": (10, 10),
-        "station2": (10, 10),
-        "station3": (10, 10)
-    }
-
-    labelled_field = ekh.catchments.sum(network, field, locations)
-
-However, for more performance, it is also possible to specify directly a grid index.
-
-.. code-block:: python
-
-    locations = [(10,10), (50, 30), (80, 70)]
-
-    labelled_field = ekh.catchments.sum(network, field, locations)
-
-Or, for maximum performance, it is possible to also specify node labels.
-
-.. code-block:: python
-
-    locations = [10, 5, 6]
-
-    labelled_field = ekh.catchments.sum(network, field, locations)

@@ -1,7 +1,14 @@
 from earthkit.hydro.move.array import _operations
 
 
-def upstream(river_network, field, node_weights=None, edge_weights=None, metric="sum"):
+def upstream(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+    metric="sum",
+    return_grid=True,
+):
     r"""
     Moves a field up a river network one step.
 
@@ -25,12 +32,17 @@ def upstream(river_network, field, node_weights=None, edge_weights=None, metric=
         Field after movement up the river network.
     """
     return _operations.upstream(
-        river_network, field, node_weights, edge_weights, metric
+        river_network, field, node_weights, edge_weights, metric, return_grid
     )
 
 
 def downstream(
-    river_network, field, node_weights=None, edge_weights=None, metric="sum"
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+    metric="sum",
+    return_grid=True,
 ):
     r"""
     Moves a field down a river network one step.
@@ -55,5 +67,5 @@ def downstream(
         Field after movement down the river network.
     """
     return _operations.downstream(
-        river_network, field, node_weights, edge_weights, metric
+        river_network, field, node_weights, edge_weights, metric, return_grid
     )

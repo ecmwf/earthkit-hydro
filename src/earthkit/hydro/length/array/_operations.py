@@ -1,26 +1,24 @@
-from earthkit.hydro._utils.decorators import multi_backend
-from earthkit.hydro.catchments.array._operations import preprocess_stations
+from earthkit.hydro._utils.decorators import mask, multi_backend
+from earthkit.hydro._utils.locations import locations_to_1d
 from earthkit.hydro.length.array import __operations as _operations
 
 
 @multi_backend()
-def min(xp, river_network, field, locations, upstream=False, downstream=True):
-    locations = xp.asarray(locations, device=river_network.device)
-    locations = preprocess_stations(xp, river_network, locations)
-    # TODO: add back when we have default xarray with correct lat lon
-    # if weights is None:
-    #     weights = xp.ones(river_network.shape)
-    return _operations.min(xp, river_network, field, locations, upstream, downstream)
+def min(xp, river_network, field, locations, upstream, downstream, return_grid):
+    if field is None:
+        field = xp.ones(river_network.n_nodes)
+    locations, _, _ = locations_to_1d(xp, river_network, locations)
+    decorated_func = mask(return_grid)(_operations.min)
+    return decorated_func(xp, river_network, field, locations, upstream, downstream)
 
 
 @multi_backend()
-def max(xp, river_network, field, locations, upstream=False, downstream=True):
-    locations = xp.asarray(locations, device=river_network.device)
-    locations = preprocess_stations(xp, river_network, locations)
-    # TODO: add back when we have default xarray with correct lat lon
-    # if weights is None:
-    #     weights = xp.ones(river_network.shape)
-    return _operations.max(xp, river_network, field, locations, upstream, downstream)
+def max(xp, river_network, field, locations, upstream, downstream, return_grid):
+    if field is None:
+        field = xp.ones(river_network.n_nodes)
+    locations, _, _ = locations_to_1d(xp, river_network, locations)
+    decorated_func = mask(return_grid)(_operations.max)
+    return decorated_func(xp, river_network, field, locations, upstream, downstream)
 
 
 def to_source(*args, **kwargs):

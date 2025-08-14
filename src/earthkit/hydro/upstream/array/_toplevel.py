@@ -1,12 +1,7 @@
 from earthkit.hydro.upstream.array import _operations
 
 
-def var(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def var(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted variance of a field over all upstream nodes.
 
@@ -45,19 +40,11 @@ def var(
     - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
     """
     return _operations.var(
-        river_network,
-        field,
-        node_weights,
-        edge_weights,
+        river_network, field, node_weights, edge_weights, return_grid
     )
 
 
-def std(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def std(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted standard deviation of a field over all
     upstream nodes.
@@ -97,19 +84,11 @@ def std(
     - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
     """
     return _operations.std(
-        river_network,
-        field,
-        node_weights,
-        edge_weights,
+        river_network, field, node_weights, edge_weights, return_grid
     )
 
 
-def mean(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def mean(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted mean of a field over all upstream nodes.
 
@@ -148,19 +127,11 @@ def mean(
     - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
     """
     return _operations.mean(
-        river_network,
-        field,
-        node_weights,
-        edge_weights,
+        river_network, field, node_weights, edge_weights, return_grid
     )
 
 
-def sum(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def sum(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted sum of a field over all upstream nodes.
 
@@ -199,19 +170,11 @@ def sum(
     - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
     """
     return _operations.sum(
-        river_network,
-        field,
-        node_weights,
-        edge_weights,
+        river_network, field, node_weights, edge_weights, return_grid
     )
 
 
-def min(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def min(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted minimum of a field over all upstream nodes.
 
@@ -250,19 +213,11 @@ def min(
     - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
     """
     return _operations.min(
-        river_network,
-        field,
-        node_weights,
-        edge_weights,
+        river_network, field, node_weights, edge_weights, return_grid
     )
 
 
-def max(
-    river_network,
-    field,
-    node_weights=None,
-    edge_weights=None,
-):
+def max(river_network, field, node_weights=None, edge_weights=None, return_grid=True):
     r"""
     Computes the weighted maximum of a field over all upstream nodes.
 
@@ -301,8 +256,5 @@ def max(
     - The function includes the location itself in its upstream set :math:`\mathcal{U}(v)`.
     """
     return _operations.max(
-        river_network,
-        field,
-        node_weights,
-        edge_weights,
+        river_network, field, node_weights, edge_weights, return_grid
     )

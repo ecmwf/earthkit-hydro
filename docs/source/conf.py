@@ -26,12 +26,6 @@ if rtd_version_type in ("branch", "tag"):
 else:
     source_branch = "main"
 
-html_theme_options = {
-    "source_repository": "https://github.com/yourusername/yourrepo/",
-    "source_branch": source_branch,
-    "path_to_docs": "docs/source",
-}
-
 sys.path.insert(0, os.path.abspath("../../src"))
 
 project = "earthkit-hydro"
@@ -113,6 +107,9 @@ html_theme_options = {
         "color-brand-primary": "#00D9FF",
         "color-brand-content": "#5f8dd3",
     },
-    "light_logo": "earthkit-hydro-dark.svg",  # "codex_dark.png",
-    "dark_logo": "earthkit-hydro-dark.svg",  # "codex_dark.png",
+    "light_logo": "earthkit-hydro-dark.svg",
+    "dark_logo": "earthkit-hydro-dark.svg",
+    "source_repository": "https://github.com/yourusername/yourrepo/",
+    "source_branch": source_branch,
+    "path_to_docs": "docs/source",
 }

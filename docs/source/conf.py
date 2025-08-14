@@ -18,6 +18,20 @@ else:
     version = "dev"
     release = "dev"
 
+rtd_version = os.environ.get("READTHEDOCS_VERSION", "main")
+rtd_version_type = os.environ.get("READTHEDOCS_VERSION_TYPE", "branch")
+
+if rtd_version_type in ("branch", "tag"):
+    source_branch = rtd_version
+else:
+    source_branch = "main"
+
+html_theme_options = {
+    "source_repository": "https://github.com/yourusername/yourrepo/",
+    "source_branch": source_branch,
+    "path_to_docs": "docs/source",
+}
+
 sys.path.insert(0, os.path.abspath("../../src"))
 
 project = "earthkit-hydro"

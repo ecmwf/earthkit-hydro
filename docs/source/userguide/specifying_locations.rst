@@ -6,6 +6,7 @@ Many functions are concerned with operations relating a subset of the entire riv
 The most convenient and common way to specify a gauge location is by its coordinates, typically latitude and longitude. The specified coordinates must match the river network coordinate system.
 
 For the EFAS network (which uses regular lat/lon) we can specify via the lat/lon of points of interest.
+
 .. code-block:: python
 
     locations = {

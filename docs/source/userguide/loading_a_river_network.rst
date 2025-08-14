@@ -12,11 +12,11 @@ Many river networks are commonly used for hydrological analysis and modelling, s
     # Load the EFAS version 5 river network
     network = ekh.river_network.load("efas", "5")
 
-This is the most convenient and performant way to load a river network, and is therefore recommended for most users.
+This is the most convenient and performant way to load a river network, and is therefore recommended for most users. For a full list of networks, view the API reference :doc:`../autodocs/earthkit.hydro.river_network`.
 
 Custom river networks
 ---------------------
-If a river network is not available via `ekh.river_network.load`, it is possible to create a custom river network from scratch. Many different formats and sources are supported.
+If a river network is not available via `ekh.river_network.load`, it is possible to create a custom river network from scratch. Many different formats and sources are supported, as detailed in the API reference :doc:`../autodocs/earthkit.hydro.river_network`.
 
 .. code-block:: python
 

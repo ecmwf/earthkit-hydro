@@ -44,17 +44,36 @@ In vector networks, each river segment is represented as a node, and the network
     field = np.ones(network.n_nodes)
 
     # output field is also 1D, defined on the nodes of the river network
+    output = ekh.upstream.sum(network, field, return_grid=False)
+
+Switching between vector and raster
+-----------------------------------
+
+Raster networks can also be used as if they were vector networks, since internally the raster network is represented as a vector network.
+To allow users to work with both types of networks seamlessly, earthkit-hydro has the `return_grid` function argument, which is by default True.
+This allows the user to specify whether they want a gridded output (only available for raster networks), or a 1d-vector output.
+
+Note that it is possible to mix gridded and raster inputs to functions.
+
+.. code-block:: python
+
+    # vector field (1D) defined on the nodes of the river network
+    field = np.ones(network.n_nodes)
+
+    # output field is a grid
     output = ekh.upstream.sum(network, field)
 
-Automatic detection
--------------------
-Raster networks can also be used as if they were vector networks, since internally the raster network is represented as a vector network.
-To allow users to work with both types of networks seamlessly, earthkit-hydro automatically detects which representation to use based on the input data shape.
-
-The last dimensions of the input data are used to determine the type of network:
-
-- If the last two dimensions of the input data have the same shape as the river network, it is treated as a raster network
-- Otherwise it is treated as a vector network
+Multidimensional inputs
+-----------------------
 
 Any leading dimensions of the data are treated as batch/vectorised dimensions, allowing for operations on multiple fields at once.
 This means that users can pass directly time series or other multi-dimensional data without needing to manually loop.
+The last dimensions are always assumed to be spatial i.e. either the grid dimensions, or the 1d vector dimension.
+
+.. code-block:: python
+
+    # vector field (1D) defined on the nodes of the river network
+    field = np.ones((3, 4, 5, network.n_nodes))
+
+    # output field is of shape (3, 4, 5, *network.shape)
+    output = ekh.upstream.sum(network, field)

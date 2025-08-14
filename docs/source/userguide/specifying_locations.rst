@@ -3,14 +3,9 @@ Specifying locations
 
 Many functions are concerned with operations relating a subset of the entire river network i.e. a fixed number of locations. This can range from catchment averages, to distances etc.
 
-The most convenient and common way to specify a gauge location is by its coordinates, typically latitude and longitude. The coordinates of a river network can be accessed via
+The most convenient and common way to specify a gauge location is by its coordinates, typically latitude and longitude. The specified coordinates must match the river network coordinate system.
 
-.. code-block:: python
-
-    network.coords
-
-and inspected to determine exactly the coordinates.
-
+For the EFAS network (which uses regular lat/lon) we can specify via the lat/lon of points of interest.
 .. code-block:: python
 
     locations = {

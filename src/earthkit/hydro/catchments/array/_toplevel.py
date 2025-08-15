@@ -269,7 +269,7 @@ def min(river_network, field, locations, node_weights=None, edge_weights=None):
     return _operations.min(river_network, field, locations, node_weights, edge_weights)
 
 
-def max(xp, river_network, field, locations, node_weights=None, edge_weights=None):
+def max(river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
     Computes the weighted maximum of a field over the upstream catchment
     of each specified location.

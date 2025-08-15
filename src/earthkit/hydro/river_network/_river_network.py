@@ -1,5 +1,4 @@
 import json
-import tempfile
 from io import BytesIO
 from urllib.request import Request, urlopen
 
@@ -29,7 +28,7 @@ def create(
     river_network_format,
     source="file",
     use_cache=True,
-    cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
+    cache_dir=None,
     cache_fname="{ekh_version}_{hash}.joblib",
     cache_compression=1,
 ):
@@ -39,7 +38,8 @@ def create(
     Parameters
     ----------
     path : str
-        The path to the river network data.
+        The path to the river network data. All common file formats are supported such
+        as netCDF, GRIB, GeoTIFF, zarr, etc.
     river_network_format : str
         The format of the river network data.
         Supported formats are "precomputed", "cama", "pcr_d8", "esri_d8"
@@ -51,7 +51,7 @@ def create(
     use_cache : bool, optional
         Whether to cache the loaded/created river network for quicker reloading. Default is True.
     cache_dir : str, optional
-        Where to store the cached river networks. Default is a tmpdir.
+        Where to store the cached river networks. Default is None, which uses `tempfile.mkdtemp(suffix="_earthkit_hydro")`.
     cache_fname : str, optional
         A string template for the cache filename convention.
     cache_compression : int, optional

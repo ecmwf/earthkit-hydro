@@ -9,7 +9,7 @@ def min(
     field=None,
     upstream=False,
     downstream=True,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -49,9 +49,8 @@ def min(
         Whether or not to consider upstream distances. Default is False.
     downstream : bool, optional
         Whether or not to consider downstream distances. Default is True.
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -60,9 +59,9 @@ def min(
     Returns
     -------
     xarray object
-        Array of minimum distances for every river network node or gridcell, depending on `return_grid`.
+        Array of minimum distances for every river network node or gridcell, depending on `return_type`.
     """
-    return array.min(river_network, locations, field, upstream, downstream, return_grid)
+    return array.min(river_network, locations, field, upstream, downstream, return_type)
 
 
 @xarray
@@ -72,7 +71,7 @@ def max(
     field=None,
     upstream=False,
     downstream=True,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -112,9 +111,8 @@ def max(
         Whether or not to consider upstream distances. Default is False.
     downstream : bool, optional
         Whether or not to consider downstream distances. Default is True.
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -123,9 +121,9 @@ def max(
     Returns
     -------
     xarray object
-        Array of maximum distances for every river network node or gridcell, depending on `return_grid`.
+        Array of maximum distances for every river network node or gridcell, depending on `return_type`.
     """
-    return array.max(river_network, locations, field, upstream, downstream, return_grid)
+    return array.max(river_network, locations, field, upstream, downstream, return_type)
 
 
 def to_source(*args, **kwargs):

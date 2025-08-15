@@ -8,7 +8,7 @@ def var(
     field,
     node_weights=None,
     edge_weights=None,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -56,9 +56,8 @@ def var(
         Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
         Array of weights for each edge. Default is None (unweighted).
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -67,9 +66,9 @@ def var(
     Returns
     -------
     xarray object
-        Array of variance values for every river network node or gridcell, depending on `return_grid`.
+        Array of variance values for every river network node or gridcell, depending on `return_type`.
     """
-    return array.var(river_network, field, node_weights, edge_weights, return_grid)
+    return array.var(river_network, field, node_weights, edge_weights, return_type)
 
 
 @xarray
@@ -78,7 +77,7 @@ def std(
     field,
     node_weights=None,
     edge_weights=None,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -129,9 +128,8 @@ def std(
         Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
         Array of weights for each edge. Default is None (unweighted).
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -140,9 +138,9 @@ def std(
     Returns
     -------
     xarray object
-        Array of standard deviation values for every river network node or gridcell, depending on `return_grid`.
+        Array of standard deviation values for every river network node or gridcell, depending on `return_type`.
     """
-    return array.std(river_network, field, node_weights, edge_weights, return_grid)
+    return array.std(river_network, field, node_weights, edge_weights, return_type)
 
 
 @xarray
@@ -151,7 +149,7 @@ def mean(
     field,
     node_weights=None,
     edge_weights=None,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -194,9 +192,8 @@ def mean(
         Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
         Array of weights for each edge. Default is None (unweighted).
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -205,9 +202,9 @@ def mean(
     Returns
     -------
     xarray object
-        Array of mean values for every river network node or gridcell, depending on `return_grid`.
+        Array of mean values for every river network node or gridcell, depending on `return_type`.
     """
-    return array.mean(river_network, field, node_weights, edge_weights, return_grid)
+    return array.mean(river_network, field, node_weights, edge_weights, return_type)
 
 
 @xarray
@@ -216,7 +213,7 @@ def sum(
     field,
     node_weights=None,
     edge_weights=None,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -255,9 +252,8 @@ def sum(
         Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
         Array of weights for each edge. Default is None (unweighted).
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -266,9 +262,9 @@ def sum(
     Returns
     -------
     xarray object
-        Array of sum values for every river network node or gridcell, depending on `return_grid`.
+        Array of sum values for every river network node or gridcell, depending on `return_type`.
     """
-    return array.sum(river_network, field, node_weights, edge_weights, return_grid)
+    return array.sum(river_network, field, node_weights, edge_weights, return_type)
 
 
 @xarray
@@ -277,7 +273,7 @@ def min(
     field,
     node_weights=None,
     edge_weights=None,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -316,9 +312,8 @@ def min(
         Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
         Array of weights for each edge. Default is None (unweighted).
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -327,9 +322,9 @@ def min(
     Returns
     -------
     xarray object
-        Array of minimum values for every river network node or gridcell, depending on `return_grid`.
+        Array of minimum values for every river network node or gridcell, depending on `return_type`.
     """
-    return array.min(river_network, field, node_weights, edge_weights, return_grid)
+    return array.min(river_network, field, node_weights, edge_weights, return_type)
 
 
 @xarray
@@ -338,7 +333,7 @@ def max(
     field,
     node_weights=None,
     edge_weights=None,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -377,9 +372,8 @@ def max(
         Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional
         Array of weights for each edge. Default is None (unweighted).
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -388,6 +382,6 @@ def max(
     Returns
     -------
     xarray object
-        Array of maximum values for every river network node or gridcell, depending on `return_grid`.
+        Array of maximum values for every river network node or gridcell, depending on `return_type`.
     """
-    return array.max(river_network, field, node_weights, edge_weights, return_grid)
+    return array.max(river_network, field, node_weights, edge_weights, return_type)

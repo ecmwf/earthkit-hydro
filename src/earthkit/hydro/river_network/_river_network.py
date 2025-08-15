@@ -1,4 +1,5 @@
 import json
+import tempfile
 from io import BytesIO
 from urllib.request import Request, urlopen
 
@@ -23,7 +24,15 @@ ekh_version = ".".join(ekh_version.split(".")[:2])
 
 
 @cache
-def create(path, river_network_format, source="file"):
+def create(
+    path,
+    river_network_format,
+    source="file",
+    use_cache=True,
+    cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
+    cache_fname="{ekh_version}_{hash}.joblib",
+    cache_compression=1,
+):
     """
     Creates a river network from the given path, format, and source.
 
@@ -39,6 +48,14 @@ def create(path, river_network_format, source="file"):
         The source of the river network data. Default is `'file'`.
         For possible sources see:
         https://earthkit-data.readthedocs.io/en/latest/guide/sources.html.
+    use_cache : bool, optional
+        Whether to cache the loaded/created river network for quicker reloading. Default is True.
+    cache_dir : str, optional
+        Where to store the cached river networks. Default is a tmpdir.
+    cache_fname : str, optional
+        A string template for the cache filename convention.
+    cache_compression : int, optional
+        A compression factor for the cached files.
 
     Returns
     -------

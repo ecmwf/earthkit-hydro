@@ -39,6 +39,7 @@ earthkit-hydro can be used as a drop-in replacement for PCRaster in many cases, 
 | tan, ...         | np.cos, np.tan, ...    |                                                                                                                            |
 +------------------+------------------------+----------------------------------------------------------------------------------------------------------------------------+
 
+TODO: add lddmask
 
 Points of difference
 

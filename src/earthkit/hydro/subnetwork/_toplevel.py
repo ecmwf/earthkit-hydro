@@ -69,8 +69,48 @@ def from_mask(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=
     storage.n_nodes = storage.mask.shape[0]
     storage.n_edges = storage.sorted_data.shape[1]
 
-    # TODO: add area and coords
+    return RiverNetwork(storage)
 
-    # TODO: decide if should be possible to shrink domain also
+
+def crop(river_network, copy=True):
+    """
+    Crop a gridded network to the minimum bounding grid.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        Original river network from which to create a cropped network.
+    copy : bool, optional
+        Whether or not to modify the original river network or return a copy. Default is True.
+
+    Returns
+    -------
+    RiverNetwork
+        The river network object created from the given data.
+    """
+
+    if river_network.array_backend != "numpy" or copy is not True:
+        raise NotImplementedError
+
+    storage = cp.deepcopy(river_network._storage)
+
+    rows, cols = np.unravel_index(storage.mask, shape=(storage.shape))
+
+    row_min, row_max = rows.min(), rows.max()
+    col_min, col_max = cols.min(), cols.max()
+
+    storage.shape = (row_max - row_min + 1, col_max - col_min + 1)
+
+    storage.mask = np.ravel_multi_index(
+        (rows - row_min, cols - col_min), dims=storage.shape
+    )
+
+    for i, key in enumerate(storage.coords.keys()):
+        if i == 0:
+            storage.coords[key] = storage.coords[key][row_min : row_max + 1]
+        elif i == 1:
+            storage.coords[key] = storage.coords[key][col_min : col_max + 1]
+        else:
+            raise ValueError("coords must not have more than 2 keys.")
 
     return RiverNetwork(storage)

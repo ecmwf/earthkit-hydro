@@ -28,6 +28,8 @@ class RiverNetwork:
         The array backend of the river network.
     device : str
         The device of the river network.
+    return_type : str
+        The default return type of the river network. Either "gridded" or "masked".
     """
 
     def __init__(self, river_network_storage: RiverNetworkStorage):
@@ -44,6 +46,7 @@ class RiverNetwork:
         self.shape = self._storage.shape
         self.array_backend = "numpy"
         self.device = "cpu"
+        self.return_type = "gridded"
 
         self.coords = self._storage.coords
 
@@ -127,9 +130,28 @@ class RiverNetwork:
         self.device = device
         return self
 
+    def set_default_return_type(self, return_type):
+        """
+        Set the default return type for the river network.
+
+        Parameters
+        ----------
+        return_type : str
+            The default return_type to use.
+
+        Returns
+        -------
+        None
+        """
+        if return_type not in ["gridded", "masked"]:
+            raise ValueError(
+                f'Invalid return_type {return_type}. Valid types are "gridded", "masked"'
+            )
+        self.return_type = return_type
+
     def export(self, fpath="river_network.joblib", compression=1):
         """
-        Save the RiverNetwork to a local file.
+        Save the river network to a local file.
 
         Parameters
         ----------

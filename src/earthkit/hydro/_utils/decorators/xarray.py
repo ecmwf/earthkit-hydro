@@ -90,8 +90,10 @@ def xarray(func):
         # Separate xarray and non-xarray arguments
         xr_args, non_xr_kwargs, arg_order = sort_xr_nonxr_args(all_args)
 
-        return_grid = all_args["return_grid"]
         river_network = all_args["river_network"]
+        return_type = all_args["return_type"]
+        return_type = river_network.return_type if return_type is None else return_type
+        return_grid = return_type == "gridded"
 
         if len(xr_args) == 0:
             output = func(**all_args)

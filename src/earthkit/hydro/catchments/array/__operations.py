@@ -101,6 +101,9 @@ def max(xp, river_network, field, locations, node_weights, edge_weights):
     )
 
 
-def find(xp, river_network, field, overwrite, return_grid):
-    decorated_flow_find = mask(return_grid)(_flow_find)
+def find(xp, river_network, field, overwrite, return_type):
+    return_type = river_network.return_type if return_type is None else return_type
+    if return_type not in ["gridded", "masked"]:
+        raise ValueError("return_type must be either 'gridded' or 'masked'.")
+    decorated_flow_find = mask(return_type == "gridded")(_flow_find)
     return decorated_flow_find(xp, river_network, field, overwrite)

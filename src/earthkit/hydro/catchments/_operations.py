@@ -72,8 +72,3 @@ def max(
     edge_weights,
 ):
     return array.max(xp, river_network, field, locations, node_weights, edge_weights)
-
-
-@multi_backend(allow_jax_jit=False)
-def find(xp, river_network, field):
-    array.find(xp, river_network, field)

@@ -99,7 +99,7 @@ def crop(river_network, copy=True):
     row_min, row_max = rows.min(), rows.max()
     col_min, col_max = cols.min(), cols.max()
 
-    storage.shape = (row_max - row_min + 1, col_max - col_min + 1)
+    storage.shape = (int(row_max - row_min + 1), int(col_max - col_min + 1))
 
     storage.mask = np.ravel_multi_index(
         (rows - row_min, cols - col_min), dims=storage.shape

@@ -117,15 +117,108 @@ def max(
     )
 
 
-def to_source(*args, **kwargs):
+def to_source(
+    river_network,
+    field=None,
+    path="shortest",
+    return_type=None,
+):
     r"""
-    TODO: implement
+    Calculates the maximum distance to all points from the river network sources.
+
+    For each node in the network, calculates the maximum distance starting from any source.
+
+    The distance is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        d_j &= 0 ~\text{for sources}\\
+        d_j &= \bigoplus \left(-\infty,~\bigoplus_{i \in \mathrm{Neighbour}(j)} (d_i + w_{ij}) \right)
+        \end{align*}
+
+    where:
+
+    - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\bigoplus` is the aggregation function (max for longest path or min for shortest path).
+    - :math:`d_j` is the total distance at node :math:`j`.
+
+    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum, and :math:`\infty` if :math:`\bigoplus` is a minimum.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like, optional
+        An array containing length values defined on river network edges.
+        Default is `xp.ones(river_network.n_edges)`.
+    path : str, optional
+        Whether to compute the longest or shortest path. Default is "shortest".
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+
+    Returns
+    -------
+    array-like
+        Array of maximum distances for every river network node or gridcell, depending on `return_type`.
     """
-    raise NotImplementedError
+    locations = river_network.sources
+    if path == "longest":
+        return max(river_network, locations, field, False, True, return_type)
+    elif path == "shortest":
+        return min(river_network, locations, field, False, True, return_type)
+    else:
+        raise ValueError("path must be 'longest' or 'shortest'")
 
 
-def to_sink(*args, **kwargs):
+def to_sink(river_network, field=None, path="shortest", return_type=None):
     r"""
-    TODO: implement
+    Calculates the maximum distance to all points from the river network sinks.
+
+    For each node in the network, calculates the maximum distance starting from any sink.
+
+    The distance is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        d_j &= 0 ~\text{for sinks}\\
+        d_j &= \bigoplus \left(-\infty,~\bigoplus_{i \in \mathrm{Neighbour}(j)} (d_i + w_{ij}) \right)
+        \end{align*}
+
+    where:
+
+    - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\bigoplus` is the aggregation function (max for longest path or min for shortest path).
+    - :math:`d_j` is the total distance at node :math:`j`.
+
+    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum, and :math:`\infty` if :math:`\bigoplus` is a minimum.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like, optional
+        An array containing length values defined on river network edges.
+        Default is `xp.ones(river_network.n_edges)`.
+    path : str, optional
+        Whether to compute the longest or shortest path. Default is "shortest".
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+
+    Returns
+    -------
+    array-like
+        Array of maximum distances for every river network node or gridcell, depending on `return_type`.
     """
-    raise NotImplementedError
+    locations = river_network.sinks
+    if path == "longest":
+        return max(river_network, locations, field, True, False, return_type)
+    elif path == "shortest":
+        return min(river_network, locations, field, True, False, return_type)
+    else:
+        raise ValueError("path must be 'longest' or 'shortest'")

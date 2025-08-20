@@ -5,7 +5,7 @@ Flow accumulations are a fundamental aspect of hydrological modeling, allowing f
 Fundamentally, there are two different types of flow accumulations: full flow accumulations (global aggregation) and one-step neighbor accumulations (local aggregation).
 
 Full flow accumulation (global aggregation)
---------------------------------
+-------------------------------------------
 
 A full flow accumulation is a global aggregation of flow across the entire river network.
 

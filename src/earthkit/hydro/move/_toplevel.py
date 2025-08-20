@@ -9,7 +9,7 @@ def upstream(
     node_weights=None,
     edge_weights=None,
     metric="sum",
-    return_type=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""

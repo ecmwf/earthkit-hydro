@@ -33,6 +33,8 @@ def upstream(
     - :math:`\bigoplus` is the aggregation function (e.g. a summation).
     - :math:`n_j` is the weighted aggregated value at node :math:`j`.
 
+    Sinks are given a value of 0.
+
     Parameters
     ----------
     river_network : RiverNetwork
@@ -65,7 +67,7 @@ def downstream(
     node_weights=None,
     edge_weights=None,
     metric="sum",
-    return_type=True,
+    return_type=None,
 ):
     r"""
     Moves a field downstream.
@@ -90,6 +92,8 @@ def downstream(
     - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
     - :math:`\bigoplus` is the aggregation function (e.g. a summation).
     - :math:`n_j` is the weighted aggregated value at node :math:`j`.
+
+    Sources are given a value of 0.
 
     Parameters
     ----------

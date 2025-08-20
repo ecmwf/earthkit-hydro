@@ -63,6 +63,4 @@ def max(xp, river_network, field, locations, upstream, downstream):
             node_modifier_use_upstream=True,
         )
 
-    # TODO: convert -xp.inf to xp.inf
-
     return out

@@ -64,4 +64,11 @@ This is easily specified by the `upstream` and `downstream` arguments.
 
 As shorthands, earthkit-hydro also provides the means of automatically computing starting from the sources or the sinks with
 
-TODO: finish when implemented
+.. code-block:: python
+
+    ekh.length.to_sink(network, field, path="shortest")
+    ekh.length.to_source(network, field, path="shortest")
+    ekh.distance.to_sink(network, field, path="shortest")
+    ekh.distance.to_source(network, field, path="shortest")
+
+Longest path versions are also available with `path="longest"`.

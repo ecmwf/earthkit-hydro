@@ -13,7 +13,7 @@ def calculate_move_metric(
 ):
     if flow_direction == "up":
         invert_graph = True
-        node_modifier_use_upstream = False
+        node_modifier_use_upstream = True
     elif flow_direction == "down":
         invert_graph = False
         node_modifier_use_upstream = True

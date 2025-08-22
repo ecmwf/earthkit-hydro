@@ -124,7 +124,7 @@ def load(
     domain,
     river_network_version,
     data_source=(
-        "https://github.com/ecmwf/earthkit-hydro-store/raw/refs/heads/feat/prep_v1.0.0/"
+        "https://github.com/ecmwf/earthkit-hydro-store/raw/refs/heads/main/"
         "{ekh_version}/{domain}/{river_network_version}/river_network.joblib"
     ),
     *args,

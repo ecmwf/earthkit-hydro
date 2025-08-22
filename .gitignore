@@ -9,3 +9,6 @@ Cargo.lock
 .DS_Store
 *.so
 autodocs/
+
+*.joblib
+*.nc

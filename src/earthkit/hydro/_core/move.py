@@ -13,14 +13,14 @@ def calculate_move_metric(
 ):
     if flow_direction == "up":
         invert_graph = True
+        node_modifier_use_upstream = True
     elif flow_direction == "down":
         invert_graph = False
+        node_modifier_use_upstream = True
     else:
         raise ValueError(
             f"flow_direction must be 'up' or 'down', got {flow_direction}."
         )
-
-    field = xp.copy(field)
 
     if node_weights is None:
         if metric == "mean" or metric == "std" or metric == "var":
@@ -36,9 +36,11 @@ def calculate_move_metric(
     weighted_field = flow(
         xp,
         river_network,
-        field if node_weights is None else field * node_weights,
+        xp.zeros(field.shape),
         func,
         invert_graph,
+        node_additive_weight=field if node_weights is None else field * node_weights,
+        node_modifier_use_upstream=node_modifier_use_upstream,
         edge_multiplicative_weight=edge_weights,
     )
 
@@ -46,9 +48,11 @@ def calculate_move_metric(
         counts = flow(
             xp,
             river_network,
-            xp.copy(node_weights),
+            xp.zeros(field.shape),
             func,
             invert_graph,
+            node_additive_weight=xp.copy(node_weights),
+            node_modifier_use_upstream=node_modifier_use_upstream,
             edge_multiplicative_weight=edge_weights,
         )
 
@@ -59,9 +63,13 @@ def calculate_move_metric(
             weighted_sum_of_squares = flow(
                 xp,
                 river_network,
-                field**2 if node_weights is None else field**2 * node_weights,
+                xp.zeros(field.shape),
                 func,
                 invert_graph,
+                node_additive_weight=(
+                    field**2 if node_weights is None else field**2 * node_weights
+                ),
+                node_modifier_use_upstream=node_modifier_use_upstream,
                 edge_multiplicative_weight=edge_weights,
             )
             mean = weighted_field / counts

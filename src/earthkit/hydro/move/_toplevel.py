@@ -9,7 +9,7 @@ def upstream(
     node_weights=None,
     edge_weights=None,
     metric="sum",
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -48,9 +48,8 @@ def upstream(
         Array of weights for each edge. Default is None (unweighted).
     metric : str, optional
         Aggregation function to apply. Options are 'var', 'std', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -60,10 +59,10 @@ def upstream(
     Returns
     -------
     xarray object
-        Array of values after movement up the river network for every river network node or gridcell, depending on `return_grid`.
+        Array of values after movement up the river network for every river network node or gridcell, depending on `return_type`.
     """
     return array.upstream(
-        river_network, field, node_weights, edge_weights, metric, return_grid
+        river_network, field, node_weights, edge_weights, metric, return_type
     )
 
 
@@ -74,7 +73,7 @@ def downstream(
     node_weights=None,
     edge_weights=None,
     metric="sum",
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -113,9 +112,8 @@ def downstream(
         Array of weights for each edge. Default is None (unweighted).
     metric : str, optional
         Aggregation function to apply. Options are 'var', 'std', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -125,8 +123,8 @@ def downstream(
     Returns
     -------
     xarray object
-        Array of values after movement down the river network for every river network node or gridcell, depending on `return_grid`.
+        Array of values after movement down the river network for every river network node or gridcell, depending on `return_type`.
     """
     return array.downstream(
-        river_network, field, node_weights, edge_weights, metric, return_grid
+        river_network, field, node_weights, edge_weights, metric, return_type
     )

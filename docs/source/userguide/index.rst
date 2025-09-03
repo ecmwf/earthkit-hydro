@@ -11,6 +11,8 @@ At its core, **earthkit-hydro** is a library for conducting operations on river 
 
 In this user guide, we provide detailed instructions for such steps.
 
+Basics:
+
 .. toctree::
    :maxdepth: 200
    :titlesonly:
@@ -18,11 +20,25 @@ In this user guide, we provide detailed instructions for such steps.
    loading_a_river_network
    xarray_array_backend
    raster_vector_inputs
+
+Operations:
+
+.. toctree::
+   :maxdepth: 200
+   :titlesonly:
+
    flow_accumulations
    specifying_locations
    catchment_delineation
    catchment_statistics
    distance_length_calculations
    subnetwork_creation
+
+Misc:
+
+.. toctree::
+   :maxdepth: 200
+   :titlesonly:
+
    earthkit
    pcraster

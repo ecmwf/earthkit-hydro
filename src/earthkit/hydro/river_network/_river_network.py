@@ -17,20 +17,35 @@ from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._cache import cache
 
-# read in only up to second decimal point
-# i.e. 0.1.dev90+gfdf4e33.d20250107 -> 0.1
-ekh_version = ".".join(ekh_version.split(".")[:2])
+# read in major version
+# if dev version, try add +1 to major version
+# i.e. 0.1.dev90+gfdf4e33.d20250107 -> 1
+# i.e. 0.1.0 -> 0
+ekh_version = (
+    int(ekh_version.split(".")[0]) + 1
+    if "dev" in ekh_version
+    else int(ekh_version.split(".")[0])
+)
 
 
 @cache
-def create(path, river_network_format, source="file"):
+def create(
+    path,
+    river_network_format,
+    source="file",
+    use_cache=True,
+    cache_dir=None,
+    cache_fname="{ekh_version}_{hash}.joblib",
+    cache_compression=1,
+):
     """
     Creates a river network from the given path, format, and source.
 
     Parameters
     ----------
     path : str
-        The path to the river network data.
+        The path to the river network data. All common file formats are supported such
+        as netCDF, GRIB, GeoTIFF, zarr, etc.
     river_network_format : str
         The format of the river network data.
         Supported formats are "precomputed", "cama", "pcr_d8", "esri_d8"
@@ -39,6 +54,14 @@ def create(path, river_network_format, source="file"):
         The source of the river network data. Default is `'file'`.
         For possible sources see:
         https://earthkit-data.readthedocs.io/en/latest/guide/sources.html.
+    use_cache : bool, optional
+        Whether to cache the loaded/created river network for quicker reloading. Default is True.
+    cache_dir : str, optional
+        Where to store the cached river networks. Default is None, which uses `tempfile.mkdtemp(suffix="_earthkit_hydro")`.
+    cache_fname : str, optional
+        A string template for the cache filename convention.
+    cache_compression : int, optional
+        A compression factor for the cached files.
 
     Returns
     -------
@@ -163,12 +186,21 @@ def load(
     .. [3] Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M. (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets. Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873
     .. [4] Lehner, Bernhard; Verdin, Kristine; Jarvis, Andy (2008): New global hydrography derived from spaceborne elevation data. Eos, Transactions, 89(10): 93-94. Data available at https://www.hydrosheds.org.
     """
-    uri = data_source.format(
-        ekh_version=ekh_version,
-        domain=domain,
-        river_network_version=river_network_version,
-    )
-    network = create(uri, "precomputed", "url", *args, **kwargs)
+
+    try:
+        uri = data_source.format(
+            ekh_version=ekh_version,
+            domain=domain,
+            river_network_version=river_network_version,
+        )
+        network = create(uri, "precomputed", "url", *args, **kwargs)
+    except Exception:
+        uri = data_source.format(
+            ekh_version=ekh_version - 1,
+            domain=domain,
+            river_network_version=river_network_version,
+        )
+        network = create(uri, "precomputed", "url", *args, **kwargs)
 
     return network
 

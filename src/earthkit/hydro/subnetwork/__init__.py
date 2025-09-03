@@ -1,3 +1,3 @@
-from ._toplevel import from_mask
+from ._toplevel import crop, from_mask
 
-__all__ = ["from_mask"]
+__all__ = ["from_mask", "crop"]

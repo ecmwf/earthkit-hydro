@@ -79,7 +79,7 @@ def get_numpy_function(function_name):
 )
 def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
     output_field = ekh.upstream.array.sum(
-        river_network, input_field, node_weights=None, return_grid=False
+        river_network, input_field, node_weights=None, return_type="masked"
     )
     print(output_field)
     print(flow_downstream)
@@ -162,7 +162,7 @@ def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
 )
 def test_calculate_upstream_metric_max(river_network, input_field, flow_downstream, mv):
     output_field = ekh.upstream.array.max(
-        river_network, input_field, node_weights=None, return_grid=False
+        river_network, input_field, node_weights=None, return_type="masked"
     )
     print(output_field)
     print(flow_downstream)
@@ -232,7 +232,7 @@ def test_calculate_upstream_metric_max(river_network, input_field, flow_downstre
 )
 def test_calculate_upstream_metric_min(river_network, input_field, flow_downstream, mv):
     output_field = ekh.upstream.array.min(
-        river_network, input_field, node_weights=None, return_grid=False
+        river_network, input_field, node_weights=None, return_type="masked"
     )
     print(output_field)
     print(flow_downstream)
@@ -380,7 +380,7 @@ def test_calculate_upstream_metric_mean(
     river_network, input_field, flow_downstream, mv
 ):
     output_field = ekh.upstream.array.mean(
-        river_network, input_field, node_weights=None, return_grid=False
+        river_network, input_field, node_weights=None, return_type="masked"
     )
     assert output_field.dtype == flow_downstream.dtype
     np.testing.assert_allclose(output_field, flow_downstream)

@@ -9,7 +9,7 @@ def min(
     field=None,
     upstream=False,
     downstream=True,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -49,9 +49,8 @@ def min(
         Whether or not to consider upstream distances. Default is False.
     downstream : bool, optional
         Whether or not to consider downstream distances. Default is True.
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -60,9 +59,9 @@ def min(
     Returns
     -------
     xarray object
-        Array of minimum distances for every river network node or gridcell, depending on `return_grid`.
+        Array of minimum distances for every river network node or gridcell, depending on `return_type`.
     """
-    return array.min(river_network, locations, field, upstream, downstream, return_grid)
+    return array.min(river_network, locations, field, upstream, downstream, return_type)
 
 
 @xarray
@@ -72,7 +71,7 @@ def max(
     field=None,
     upstream=False,
     downstream=True,
-    return_grid=True,
+    return_type=None,
     input_core_dims=None,
 ):
     r"""
@@ -112,9 +111,8 @@ def max(
         Whether or not to consider upstream distances. Default is False.
     downstream : bool, optional
         Whether or not to consider downstream distances. Default is True.
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -123,20 +121,118 @@ def max(
     Returns
     -------
     xarray object
-        Array of maximum distances for every river network node or gridcell, depending on `return_grid`.
+        Array of maximum distances for every river network node or gridcell, depending on `return_type`.
     """
-    return array.max(river_network, locations, field, upstream, downstream, return_grid)
+    return array.max(river_network, locations, field, upstream, downstream, return_type)
 
 
-def to_source(*args, **kwargs):
+@xarray
+def to_source(
+    river_network,
+    field=None,
+    path="shortest",
+    return_type=None,
+    input_core_dims=None,
+):
     r"""
-    TODO: implement
+    Calculates the maximum distance to all points from the river network sources.
+
+    For each node in the network, calculates the maximum distance starting from any source.
+
+    The distance is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        d_j &= 0 ~\text{for sources}\\
+        d_j &= \bigoplus \left(-\infty,~\bigoplus_{i \in \mathrm{Neighbour}(j)} (d_i + w_{ij}) \right)
+        \end{align*}
+
+    where:
+
+    - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\bigoplus` is the aggregation function (max for longest path or min for shortest path).
+    - :math:`d_j` is the total distance at node :math:`j`.
+
+    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum, and :math:`\infty` if :math:`\bigoplus` is a minimum.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object, optional
+        An array containing length values defined on river network edges.
+        Default is `xp.ones(river_network.n_edges)`.
+    path : str, optional
+        Whether to compute the longest or shortest path. Default is "shortest".
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of maximum distances for every river network node or gridcell, depending on `return_type`.
     """
-    raise NotImplementedError
+    return array.to_source(river_network, field, path, return_type)
 
 
-def to_sink(*args, **kwargs):
+@xarray
+def to_sink(
+    river_network,
+    field=None,
+    path="shortest",
+    return_type=None,
+    input_core_dims=None,
+):
     r"""
-    TODO: implement
+    Calculates the maximum distance to all points from the river network sinks.
+
+    For each node in the network, calculates the maximum distance starting from any sink.
+
+    The distance is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        d_j &= 0 ~\text{for sinks}\\
+        d_j &= \bigoplus \left(-\infty,~\bigoplus_{i \in \mathrm{Neighbour}(j)} (d_i + w_{ij}) \right)
+        \end{align*}
+
+    where:
+
+    - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\bigoplus` is the aggregation function (max for longest path or min for shortest path).
+    - :math:`d_j` is the total distance at node :math:`j`.
+
+    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum, and :math:`\infty` if :math:`\bigoplus` is a minimum.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object, optional
+        An array containing length values defined on river network edges.
+        Default is `xp.ones(river_network.n_edges)`.
+    path : str, optional
+        Whether to compute the longest or shortest path. Default is "shortest".
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of maximum distances for every river network node or gridcell, depending on `return_type`.
     """
-    raise NotImplementedError
+    return array.to_sink(river_network, field, path, return_type)

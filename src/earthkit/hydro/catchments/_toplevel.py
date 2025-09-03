@@ -394,7 +394,7 @@ def max(
 
 @find_xarray
 def find(
-    river_network, locations, overwrite=True, return_grid=True, input_core_dims=None
+    river_network, locations, overwrite=True, return_type=None, input_core_dims=None
 ):
     r"""
     Delineates catchment areas.
@@ -410,9 +410,8 @@ def find(
         A list of catchment sink nodes (start locations).
     overwrite : bool, optional
         Whether to overwrite subcatchments or not. Default is True.
-    return_grid : bool, optional
-        If True (default), return results on the full grid with nans at missing gridcells.
-        If False, return a 1D array with values only on the river network graph.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
         List of core dimensions on each input xarray argument that should not be broadcast.
         Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
@@ -423,4 +422,4 @@ def find(
     array-like or xarray object
         Array of labelled catchments for every river network node or gridcell, depending on `return_grid`.
     """
-    return find_func(river_network, locations, overwrite, return_grid)
+    return find_func(river_network, locations, overwrite, return_type)

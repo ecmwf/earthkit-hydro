@@ -1,3 +1,6 @@
+import numpy as np
+
+
 def locations_to_1d(xp, river_network, locations):
 
     orig_locations = locations
@@ -16,8 +19,8 @@ def locations_to_1d(xp, river_network, locations):
                 locations.append(int(indx))
         else:
             for coord1_val, coord2_val in orig_locations.values():
-                indx = xp.argmin((coord1_val - coord1_network_vals) ** 2)
-                indy = xp.argmin((coord2_val - coord2_network_vals) ** 2)
+                indx = np.argmin((coord1_val - coord1_network_vals) ** 2)
+                indy = np.argmin((coord2_val - coord2_network_vals) ** 2)
                 locations.append((int(indx), int(indy)))
 
     locations = xp.asarray(locations, device=river_network.device)
@@ -39,7 +42,7 @@ def locations_to_1d(xp, river_network, locations):
             raise ValueError(
                 "Some station points are not included in the masked array."
             )
-        stations = masked_indices
+        stations = xp.asarray(masked_indices, device=river_network.device)
     else:
         assert stations.ndim == 1
 

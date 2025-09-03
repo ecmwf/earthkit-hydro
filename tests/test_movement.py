@@ -20,7 +20,7 @@ import earthkit.hydro as ekh
 )
 def test_upstream(river_network, upstream):
     field = np.arange(1, river_network.n_nodes + 1)
-    ups = ekh.move.array.downstream(river_network, field, return_grid=False)
+    ups = ekh.move.array.downstream(river_network, field, return_type="masked")
     np.testing.assert_array_equal(ups, upstream)
 
 
@@ -38,7 +38,7 @@ def test_upstream(river_network, upstream):
 )
 def test_downstream(river_network, downstream):
     field = np.arange(1, river_network.n_nodes + 1)
-    down = ekh.move.array.upstream(river_network, field, return_grid=False)
+    down = ekh.move.array.upstream(river_network, field, return_type="masked")
     print(down)
     print(downstream)
     np.testing.assert_array_equal(down, downstream)
@@ -59,7 +59,7 @@ def test_downstream(river_network, downstream):
 def test_upstream_ND(river_network, upstream):
     field = np.arange(1, river_network.n_nodes + 1)
     field = np.stack([field, field], axis=0)
-    ups = ekh.move.array.downstream(river_network, field, return_grid=False)
+    ups = ekh.move.array.downstream(river_network, field, return_type="masked")
     np.testing.assert_array_equal(ups, np.stack([upstream, upstream], axis=0))
 
 
@@ -79,5 +79,5 @@ def test_downstream_ND(river_network, downstream):
     field = np.arange(1, river_network.n_nodes + 1)
     field = np.stack([field, field], axis=0)
     print(field.shape)
-    ups = ekh.move.array.upstream(river_network, field, return_grid=False)
+    ups = ekh.move.array.upstream(river_network, field, return_type="masked")
     np.testing.assert_array_equal(ups, np.stack([downstream, downstream], axis=0))

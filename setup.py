@@ -14,7 +14,7 @@ elif use_rust == 1:  # rust extension
 else:  # (default) try rust extension, if fail fallback to python
     # print("Building with rust bindings, and if failing reverting to pure Python.")
     rust_extensions = [
-        RustExtension("earthkit.hydro._rust", "Cargo.toml", optional=True)
+        RustExtension("earthkit.hydro._rust", "Cargo.toml", optional=True),
     ]
 
 setup(rust_extensions=rust_extensions)

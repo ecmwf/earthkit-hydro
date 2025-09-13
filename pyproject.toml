@@ -40,7 +40,7 @@ dependencies = [
 
 [project.urls]
     repository = "https://github.com/ecmwf/earthkit-hydro"
-    documentation = "https://github.com/ecmwf/earthkit-hydro"
+    documentation = "https://earthkit-hydro.readthedocs.io/"
     issues = "https://github.com/ecmwf/earthkit-hydro/issues"
 
 [project.optional-dependencies]

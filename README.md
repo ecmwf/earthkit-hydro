@@ -40,8 +40,8 @@
 
 <table>
   <tr>
-    <td><img src="./docs/images/glofas.png" height="300" alt="Adapted from: doc_figure" /></td>
-    <td><img src="./docs/images/array_backends_with_xr.png" height="300" alt="Array backends with xr" /></td>
+    <td><img src="https://raw.githubusercontent.com/ecmwf/earthkit-hydro/refs/tags/1.0.0/docs/images/glofas.png" height="300" alt="Adapted from: doc_figure" /></td>
+    <td><img src="https://raw.githubusercontent.com/ecmwf/earthkit-hydro/refs/tags/1.0.0/docs/images/array_backends_with_xr.png" height="300" alt="Array backends with xr" /></td>
   </tr>
 </table>
 

@@ -7,19 +7,6 @@ class CuPyBackend(ArrayBackend):
     def __init__(self):
         super().__init__(cp)
 
-    def __getattr__(self, name):
-        attr = getattr(self._mod, name)
-
-        if callable(attr):
-
-            def wrapped(*args, **kwargs):
-                kwargs.pop("device", None)
-                return attr(*args, **kwargs)
-
-            return wrapped
-
-        return attr
-
     @property
     def name(self):
         return "cupy"

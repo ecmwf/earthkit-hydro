@@ -124,7 +124,7 @@ class RiverNetwork:
             raise NotImplementedError
 
         self.array_backend = array_backend
-        self.device = device
+        self.device = self.groups[0].device
         return self
 
     def set_default_return_type(self, return_type):

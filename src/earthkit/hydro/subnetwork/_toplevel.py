@@ -72,7 +72,7 @@ def from_mask(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=
     return RiverNetwork(storage)
 
 
-def crop(river_network, copy=True):
+def crop(river_network: RiverNetwork, copy=True):
     """
     Crop a gridded network to the minimum bounding grid.
 

@@ -50,7 +50,6 @@ def var(
 
     Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population variance.
 
-
     Parameters
     ----------
     river_network : RiverNetwork
@@ -308,6 +307,8 @@ def min(
     - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
     - :math:`m_j` is the weighted minimum at node :math:`j`.
 
+    Accumulation proceeds in topological order from the sources to the sinks.
+
     Parameters
     ----------
     river_network : RiverNetwork
@@ -366,6 +367,8 @@ def max(
     - :math:`w_{ij}` is the edge weight from node :math:`i` to node :math:`j` (e.g. discharge partitioning ratio),
     - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
     - :math:`m_j` is the weighted maximum at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sources to the sinks.
 
     Parameters
     ----------

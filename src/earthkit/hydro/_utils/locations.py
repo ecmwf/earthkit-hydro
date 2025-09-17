@@ -27,7 +27,7 @@ def locations_to_1d(xp, river_network, locations):
     stations = locations
 
     if stations.ndim == 2 and stations.shape[1] == 2:
-        if xp.name not in ["numpy", "cupy"]:
+        if xp.name not in ["numpy", "cupy", "torch"]:
             raise NotImplementedError
         # TODO: make this code actually xp agnostic
         rows, cols = stations[:, 0], stations[:, 1]

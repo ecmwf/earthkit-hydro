@@ -53,6 +53,17 @@ class RiverNetwork:
         self.data = [self._storage.sorted_data]
         self.groups = np.split(self._storage.sorted_data, self._storage.splits, axis=1)
 
+        # if self.bifurcates:
+        #     from earthkit.hydro._core._move import move_python
+        #     from earthkit.hydro._core.metrics import metrics_func_finder
+        #     from earthkit.hydro._backends.numpy_backend import NumPyBackend
+        #     numpy_backend = NumPyBackend()
+        #     func = metrics_func_finder("sum", numpy_backend).func
+        #     edge_value_at_nodes = move_python(numpy_backend, self, np.zeros(self.n_nodes), func, invert_graph=True, edge_additive_weight=self.edge_weights)
+        #     print(edge_value_at_nodes)
+        #     print(edge_value_at_nodes[self._storage.sorted_data[1]])
+        #     self.edge_weights /= edge_value_at_nodes[self._storage.sorted_data[1]]
+
     def __str__(self):
         return f"RiverNetwork with {self.n_nodes} nodes and {self.n_edges} edges."
 

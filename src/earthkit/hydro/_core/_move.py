@@ -66,7 +66,6 @@ def move_python(
     edge_additive_weight=None,
     edge_multiplicative_weight=None,
 ):
-    print("emw", edge_multiplicative_weight)
     op = _ufunc_to_downstream
 
     def operation(
@@ -80,7 +79,6 @@ def move_python(
         edge_additive_weight,
         edge_multiplicative_weight,
     ):
-        print("op emw", edge_multiplicative_weight)
         return op(
             field,
             did,

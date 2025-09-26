@@ -300,3 +300,99 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     )
 
     return store
+
+
+def from_grit(path):
+    import geopandas as gpd
+    import numpy as np
+    import pandas as pd
+
+    from earthkit.hydro._readers._grit import compute_topological_labels_bifurcations
+
+    gdf = gpd.read_file(path, layer="nodes")
+    try:
+        gdf["x"] = gdf.geometry.x
+        gdf["y"] = gdf.geometry.y
+    except Exception:
+        gdf["geometry"] = gdf["geometry"].apply(lambda geom: geom.geoms[0])
+        gdf["x"] = gdf.geometry.x
+        gdf["y"] = gdf.geometry.y
+    x_spacing = pd.Series(np.diff(np.sort(gdf["x"].unique()))).mode().iloc[0]
+    y_spacing = pd.Series(np.diff(np.sort(gdf["y"].unique()))).mode().iloc[0]
+    x_origin = gdf["x"].min()
+    y_origin = gdf["y"].min()
+    gdf["grid_col"] = ((gdf["x"] - x_origin) // x_spacing).astype(int)
+    gdf["grid_row"] = ((gdf["y"] - y_origin) // y_spacing).astype(int)
+    n_cols = gdf["grid_col"].max() + 1
+    gdf["flat_index"] = gdf["grid_row"] * n_cols + gdf["grid_col"]
+    gdf.sort_values(by=["flat_index"], inplace=True)
+    gdf.reset_index(inplace=True)
+    rows = gdf["grid_row"].to_numpy()
+    cols = gdf["grid_col"].to_numpy()
+    # grid_ids = (rows[::-1], cols)
+
+    lines = gpd.read_file(path, layer="lines")
+    ref = gdf["global_id"]
+    value_to_index = dict(zip(ref.values, ref.index.values))
+    lines["UPID"] = lines["upstream_node_id"].map(value_to_index)
+    lines["DOWNID"] = lines["downstream_node_id"].map(value_to_index)
+    lines.sort_values(by=["UPID"], inplace=True)
+    up_ids = lines["UPID"].to_numpy()
+    down_ids = lines["DOWNID"].to_numpy()
+    nodes = ref.index.values
+    edge_weights = lines["width_adjusted"].to_numpy()
+    np.nan_to_num(edge_weights, copy=False, nan=1)
+
+    shape = rows.max() + 1, cols.max() + 1
+
+    n_nodes = len(nodes)
+    n_edges = len(up_ids)
+
+    pixarea = None
+    bifurcates = True
+    mask = None
+    coords = {"y": gdf["y"].to_numpy(), "x": gdf["x"].to_numpy()}
+
+    sources = get_sources(n_nodes, down_ids)
+    sinks = get_sources(n_nodes, up_ids)
+
+    assert np.all(np.isin(np.setdiff1d(sinks, sources), down_ids))
+
+    counts = np.bincount(up_ids, minlength=n_nodes)
+    offsets = np.zeros(n_nodes + 1, dtype=int)
+    offsets[1:] = np.cumsum(counts)
+    del counts
+
+    topological_labels = compute_topological_labels_bifurcations(
+        down_ids, offsets, sources, sinks
+    )
+    topological_labels = topological_labels[up_ids]
+
+    sort_indices = np.argsort(topological_labels)
+    sorted_distances = topological_labels[sort_indices]  # from source to sink
+
+    edge_indices = np.arange(n_edges).astype(np.uintp)
+
+    up_ids_sort = up_ids[sort_indices]
+    down_ids_sort = down_ids[sort_indices]
+    edge_ids_sort = edge_indices[sort_indices]
+
+    _, splits = np.unique(sorted_distances, return_index=True)
+    splits = splits[1:]
+
+    store = RiverNetworkStorage(
+        n_nodes,
+        n_edges,
+        np.vstack([down_ids_sort, up_ids_sort, edge_ids_sort]).astype(np.int64),
+        sources,
+        sinks,
+        coords,
+        splits,
+        pixarea,
+        mask,
+        shape,
+        bifurcates,
+        edge_weights,
+    )
+
+    return store

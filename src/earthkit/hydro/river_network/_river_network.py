@@ -4,10 +4,11 @@ from urllib.request import Request, urlopen
 
 import joblib
 
-from earthkit.hydro._readers import (  # cache, from_grit,
+from earthkit.hydro._readers import (
     find_main_var,
     from_cama_nextxy,
     from_d8,
+    from_grit,
     import_earthkit_or_prompt_install,
 )
 from earthkit.hydro._utils.coords import get_core_grid_dims
@@ -48,7 +49,7 @@ def create(
         as netCDF, GRIB, GeoTIFF, zarr, etc.
     river_network_format : str
         The format of the river network data.
-        Supported formats are "precomputed", "cama", "pcr_d8", "esri_d8"
+        Supported formats are "precomputed", "cama", "pcr_d8", "esri_d8", "grit"
         and "merit_d8".
     source : str
         The source of the river network data. Default is `'file'`.
@@ -111,9 +112,9 @@ def create(
                 coord1: data[coord1].values,
                 coord2: data[coord2].values,
             }
-    # elif river_network_format == "grit":
-    #     assert path.endswith(".gpkg")
-    #     river_network_storage = from_grit(path)
+    elif river_network_format == "grit":
+        assert path.endswith(".gpkg")
+        river_network_storage = from_grit(path)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
 

@@ -333,7 +333,7 @@ def from_grit(path):
 
     lines = gpd.read_file(path, layer="lines")
     ref = gdf["global_id"]
-    value_to_index = pd.Series(ref.index, index=ref).to_dict()
+    value_to_index = dict(zip(ref.values, ref.index.values))
     lines["UPID"] = lines["upstream_node_id"].map(value_to_index)
     lines["DOWNID"] = lines["downstream_node_id"].map(value_to_index)
     lines.sort_values(by=["UPID"], inplace=True)
@@ -341,6 +341,7 @@ def from_grit(path):
     down_ids = lines["DOWNID"].to_numpy()
     nodes = ref.index.values
     edge_weights = lines["width_adjusted"].to_numpy()
+    np.nan_to_num(edge_weights, copy=False, nan=1)
 
     shape = rows.max() + 1, cols.max() + 1
 

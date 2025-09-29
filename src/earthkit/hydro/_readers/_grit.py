@@ -4,12 +4,10 @@ import numpy as np
 def get_edge_indices(offsets, grouping):
     lengths = offsets[grouping + 1] - offsets[grouping]
     total_len = np.sum(lengths)
-    result = np.empty(total_len, dtype=np.int64)
+    result = np.empty(total_len, dtype=int)
     pos = 0
 
-    for i in range(len(grouping)):
-        node = grouping[i]
-        length = lengths[i]
+    for node, length in zip(grouping, lengths):
         start = offsets[node]
         for j in range(length):
             result[pos + j] = start + j

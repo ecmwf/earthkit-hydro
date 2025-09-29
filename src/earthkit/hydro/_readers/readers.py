@@ -304,54 +304,43 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
 
 def from_grit(path):
     import geopandas as gpd
-    import numpy as np
-    import pandas as pd
 
     from earthkit.hydro._readers._grit import compute_topological_labels_bifurcations
 
-    gdf = gpd.read_file(path, layer="nodes")
-    try:
-        gdf["x"] = gdf.geometry.x
-        gdf["y"] = gdf.geometry.y
-    except Exception:
-        gdf["geometry"] = gdf["geometry"].apply(lambda geom: geom.geoms[0])
-        gdf["x"] = gdf.geometry.x
-        gdf["y"] = gdf.geometry.y
-    x_spacing = pd.Series(np.diff(np.sort(gdf["x"].unique()))).mode().iloc[0]
-    y_spacing = pd.Series(np.diff(np.sort(gdf["y"].unique()))).mode().iloc[0]
-    x_origin = gdf["x"].min()
-    y_origin = gdf["y"].min()
-    gdf["grid_col"] = ((gdf["x"] - x_origin) // x_spacing).astype(int)
-    gdf["grid_row"] = ((gdf["y"] - y_origin) // y_spacing).astype(int)
-    n_cols = gdf["grid_col"].max() + 1
-    gdf["flat_index"] = gdf["grid_row"] * n_cols + gdf["grid_col"]
-    gdf.sort_values(by=["flat_index"], inplace=True)
-    gdf.reset_index(inplace=True)
-    rows = gdf["grid_row"].to_numpy()
-    cols = gdf["grid_col"].to_numpy()
-    # grid_ids = (rows[::-1], cols)
+    nodes_df = gpd.read_file(path, layer="nodes")
+    lines_df = gpd.read_file(path, layer="lines")
 
-    lines = gpd.read_file(path, layer="lines")
-    ref = gdf["global_id"]
+    try:
+        nodes_df["x"] = nodes_df.geometry.x
+        nodes_df["y"] = nodes_df.geometry.y
+    except Exception:
+        nodes_df["geometry"] = nodes_df["geometry"].apply(lambda geom: geom.geoms[0])
+        nodes_df["x"] = nodes_df.geometry.x
+        nodes_df["y"] = nodes_df.geometry.y
+
+    nodes_df.sort_values(by=["y", "x"], inplace=True, ascending=[False, True])
+    nodes_df.reset_index(inplace=True)
+
+    ref = nodes_df["global_id"]
+
     value_to_index = dict(zip(ref.values, ref.index.values))
-    lines["UPID"] = lines["upstream_node_id"].map(value_to_index)
-    lines["DOWNID"] = lines["downstream_node_id"].map(value_to_index)
-    lines.sort_values(by=["UPID"], inplace=True)
-    up_ids = lines["UPID"].to_numpy()
-    down_ids = lines["DOWNID"].to_numpy()
-    nodes = ref.index.values
-    edge_weights = lines["width_adjusted"].to_numpy()
+    lines_df["UPID"] = lines_df["upstream_node_id"].map(value_to_index)
+    lines_df["DOWNID"] = lines_df["downstream_node_id"].map(value_to_index)
+    lines_df.sort_values(by=["UPID", "DOWNID"], inplace=True)
+    up_ids = lines_df["UPID"].to_numpy()
+    down_ids = lines_df["DOWNID"].to_numpy()
+    edge_weights = lines_df["width_adjusted"].to_numpy()
     np.nan_to_num(edge_weights, copy=False, nan=1)
 
-    shape = rows.max() + 1, cols.max() + 1
-
-    n_nodes = len(nodes)
-    n_edges = len(up_ids)
-
+    shape = None
+    n_nodes = nodes_df.shape[0]
+    n_edges = lines_df.shape[0]
     pixarea = None
     bifurcates = True
     mask = None
-    coords = {"y": gdf["y"].to_numpy(), "x": gdf["x"].to_numpy()}
+    coords = {"y": nodes_df["y"].to_numpy(), "x": nodes_df["x"].to_numpy()}
+
+    del nodes_df, lines_df
 
     sources = get_sources(n_nodes, down_ids)
     sinks = get_sources(n_nodes, up_ids)
@@ -371,7 +360,7 @@ def from_grit(path):
     sort_indices = np.argsort(topological_labels)
     sorted_distances = topological_labels[sort_indices]  # from source to sink
 
-    edge_indices = np.arange(n_edges).astype(np.uintp)
+    edge_indices = np.arange(n_edges)
 
     up_ids_sort = up_ids[sort_indices]
     down_ids_sort = down_ids[sort_indices]

@@ -1,21 +1,13 @@
-try:
-    import numba
-except (ModuleNotFoundError, ImportError):
-    raise ImportError("numba is required for loading river network format grit")
-
 import numpy as np
 
 
-@numba.njit(numba.int64[:](numba.int64[:], numba.int64[:]))
-def get_edge_indices_numba(offsets, grouping):
+def get_edge_indices(offsets, grouping):
     lengths = offsets[grouping + 1] - offsets[grouping]
     total_len = np.sum(lengths)
-    result = np.empty(total_len, dtype=np.int64)
+    result = np.empty(total_len, dtype=int)
     pos = 0
 
-    for i in range(len(grouping)):
-        node = grouping[i]
-        length = lengths[i]
+    for node, length in zip(grouping, lengths):
         start = offsets[node]
         for j in range(length):
             result[pos + j] = start + j
@@ -29,7 +21,7 @@ def compute_topological_labels_bifurcations(down_ids, offsets, sources, sinks):
     inlets = sources
 
     for n in range(1, n_nodes + 1):
-        inlets = np.unique(down_ids[get_edge_indices_numba(offsets, inlets)])
+        inlets = np.unique(down_ids[get_edge_indices(offsets, inlets)])
         if inlets.size == 0:
             labels[sinks] = n - 1
             break

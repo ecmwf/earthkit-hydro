@@ -47,6 +47,10 @@ dependencies = [
     readers = [
         "earthkit-data[geotiff]>=0.13.8",
         ]
+    grit = [
+        "geopandas",
+        "pandas",
+    ]
     tests = [
         "pytest",
         ]

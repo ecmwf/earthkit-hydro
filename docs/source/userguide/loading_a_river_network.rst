@@ -1,7 +1,7 @@
 Loading a river network
 =======================
 
-earthkit-hydro provides a straightforward way to load river networks from various formats. The library supports multiple river network formats, including those used by PCRaster, CaMa-Flood, HydroSHEDS, and MERIT-Hydro.
+earthkit-hydro provides a straightforward way to load river networks from various formats. The library supports multiple river network formats, including those used by PCRaster, CaMa-Flood, HydroSHEDS, MERIT-Hydro and GRIT.
 
 Many river networks are commonly used for hydrological analysis and modelling, such as the EFAS river network. earthkit-hydro provides precomputed versions of such river networks which are available via
 

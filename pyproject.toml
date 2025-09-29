@@ -50,7 +50,6 @@ dependencies = [
     grit = [
         "geopandas",
         "pandas",
-        "numba"
     ]
     tests = [
         "pytest",

@@ -40,7 +40,7 @@ Main Features
    :width: 300px
    :align: right
 
-- Support for PCRaster, CaMa-Flood, HydroSHEDS and MERIT-Hydro river network formats
+- Support for PCRaster, CaMa-Flood, HydroSHEDS, MERIT-Hydro and GRIT river network formats
 - Compatible with major array-backends: xarray, numpy, cupy, torch, jax and tensorflow
 - GPU support
 - Differentiable operations suitable for machine learning

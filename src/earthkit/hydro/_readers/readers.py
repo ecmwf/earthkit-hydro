@@ -380,6 +380,14 @@ def from_grit(path):
     _, splits = np.unique(sorted_distances, return_index=True)
     splits = splits[1:]
 
+    edge_weights_per_node = np.zeros(n_nodes)
+    np.add.at(edge_weights_per_node, up_ids_sort, edge_weights[sort_indices])
+    edge_weights_norm = np.empty(n_edges)
+    edge_weights_norm[edge_ids_sort] = edge_weights_per_node[up_ids_sort]
+    del edge_weights_per_node
+    edge_weights /= edge_weights_norm
+    del edge_weights_norm
+
     store = RiverNetworkStorage(
         n_nodes,
         n_edges,

@@ -53,22 +53,6 @@ class RiverNetwork:
         self.data = [self._storage.sorted_data]
         self.groups = np.split(self._storage.sorted_data, self._storage.splits, axis=1)
 
-        if self.bifurcates:
-            from earthkit.hydro.move.array import upstream
-
-            edge_weights_per_node = upstream(
-                self,
-                np.ones(self.n_nodes),
-                edge_weights=self.edge_weights,
-                return_type="masked",
-            )
-            edge_weights_norm = np.empty(self.n_edges)
-            edge_weights_norm[self._storage.sorted_data[2]] = edge_weights_per_node[
-                self._storage.sorted_data[1]
-            ]
-            del edge_weights_per_node
-            self.edge_weights /= edge_weights_norm
-
     def __str__(self):
         return f"RiverNetwork with {self.n_nodes} nodes and {self.n_edges} edges."
 

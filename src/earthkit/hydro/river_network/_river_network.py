@@ -1,6 +1,5 @@
-import json
 from io import BytesIO
-from urllib.request import Request, urlopen
+from urllib.request import urlopen
 
 import joblib
 
@@ -125,7 +124,7 @@ def load(
     domain,
     river_network_version,
     data_source=(
-        "https://github.com/ecmwf/earthkit-hydro-store/raw/refs/heads/main/"
+        "https://sites.ecmwf.int/repository/earthkit-hydro/"
         "{ekh_version}/{domain}/{river_network_version}/river_network.joblib"
     ),
     *args,
@@ -210,8 +209,7 @@ def load(
 
 
 def available(
-    data_source="https://api.github.com/repos/ecmwf/earthkit-hydro-store/git",
-    token=None,
+    data_source="https://sites.ecmwf.int/repository/earthkit-hydro/available.txt",
 ):
     """
     Prints the available precomputed networks.
@@ -220,48 +218,9 @@ def available(
     ----------
     data_source : str, optional
         Base github URI to query from.
-    token : str, optional
-        Github access token.
     """
 
-    base_headers = {
-        "Accept": "application/vnd.github+json",
-        "User-Agent": "python-urllib-client",
-    }
-    if token:
-        base_headers["Authorization"] = f"Bearer {token}"
+    with urlopen(data_source) as response:
+        html = response.read()
 
-    def github_api_request(url):
-        req = Request(url, headers=base_headers)
-        with urlopen(req) as response:
-            if response.status != 200:
-                raise Exception(f"GitHub API error {response.status}")
-            return json.loads(response.read().decode())
-
-    # get commit sha for main branch
-    commit_sha = github_api_request(f"{data_source}/refs/heads/main")["object"]["sha"]
-
-    # get entire tree
-    tree_sha = github_api_request(f"{data_source}/commits/{commit_sha}")["tree"]["sha"]
-
-    # get recursive tree
-    tree_data = github_api_request(f"{data_source}/trees/{tree_sha}?recursive=1")[
-        "tree"
-    ]
-
-    def is_valid_path(obj):
-        return (
-            ".joblib" in obj["path"].split("/")[-1]
-            and ekh_version in obj["path"].split("/")[0]
-        )
-
-    print(
-        "Available precomputed networks are:\n",
-        *[
-            '`ekh.river_network.load("{0}", "{1}")`\n'.format(
-                *obj["path"].split("/")[1:3]
-            )
-            for obj in tree_data
-            if is_valid_path(obj)
-        ],
-    )
+    print("Available precomputed networks are:\n", html.decode("utf-8"))

@@ -8,7 +8,7 @@
 
 use pyo3::prelude::*;
 use rayon::prelude::*;
-use numpy::{PyArray1};
+use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
 use std::sync::atomic::{AtomicI64, Ordering};
 use fixedbitset::FixedBitSet;
@@ -16,29 +16,19 @@ use fixedbitset::FixedBitSet;
 #[pyfunction]
 fn compute_topological_labels_rust<'py>(
     py: Python<'py>,
-    sources: &PyArray1<usize>,
-    sinks: &PyArray1<usize>,
-    downstream_nodes: &PyArray1<usize>,
+    sources: PyReadonlyArray1<'py, usize>,
+    sinks: PyReadonlyArray1<'py, usize>,
+    downstream_nodes: PyReadonlyArray1<'py, usize>,
     n_nodes: usize,
-) -> PyResult<&'py PyArray1<i64>> {
+) -> PyResult<Py<PyArray1<i64>>> {
 
-    let mut labels: Vec<AtomicI64> = (0..n_nodes)
+    let labels: Vec<AtomicI64> = (0..n_nodes)
         .map(|_| AtomicI64::new(0))
         .collect();
 
-    let downstream = unsafe { downstream_nodes
-        .as_slice()
-        .expect("Failed to get downstream_nodes slice")};
-
-    let mut current = unsafe { sources
-        .as_slice()
-        .expect("Failed to get sources slice")
-        .to_vec() };
-
-    let sinks = unsafe { sinks
-            .as_slice()
-            .expect("Failed to get sinks slice")
-            .to_vec() };
+    let mut current = sources.as_slice()?.to_vec();
+    let sinks = sinks.as_slice()?;
+    let downstream = downstream_nodes.as_slice()?;
 
     let mut next = Vec::with_capacity(current.len());
     let mut visited = FixedBitSet::with_capacity(n_nodes);
@@ -83,11 +73,12 @@ fn compute_topological_labels_rust<'py>(
     let result: Vec<i64> = labels.iter()
         .map(|a| a.load(Ordering::Relaxed))
         .collect();
-    Ok(PyArray1::from_vec(py, result))
+    let array = PyArray1::from_vec(py, result);
+    Ok(array.to_owned().into())
 }
 
 #[pymodule]
-fn _rust(_py: Python, m: &PyModule) -> PyResult<()> {
+fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
     Ok(())
 }

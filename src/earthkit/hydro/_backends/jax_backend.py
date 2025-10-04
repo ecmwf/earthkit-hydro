@@ -23,7 +23,7 @@ class JAXBackend(ArrayBackend):
         return target.at[..., indices].set(updates)
 
     def scatter_add(self, target, indices, updates):
-        return target.at[(*[slice(None)] * (target.ndim - 1), indices)].add(updates)
+        return target.at[..., indices].add(updates)
 
     def asarray(self, arr, dtype=None, device=None, copy=None):
         for d in jax.devices():

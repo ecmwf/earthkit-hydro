@@ -56,7 +56,11 @@ def var(river_network, field, node_weights=None, edge_weights=None, return_type=
         Array of variance values for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.var(
-        river_network, field, node_weights, edge_weights, return_type
+        river_network=river_network,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        return_type=return_type,
     )
 
 
@@ -118,7 +122,11 @@ def std(river_network, field, node_weights=None, edge_weights=None, return_type=
         Array of standard deviation values for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.std(
-        river_network, field, node_weights, edge_weights, return_type
+        river_network=river_network,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        return_type=return_type,
     )
 
 
@@ -172,7 +180,11 @@ def mean(river_network, field, node_weights=None, edge_weights=None, return_type
         Array of mean values for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.mean(
-        river_network, field, node_weights, edge_weights, return_type
+        river_network=river_network,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        return_type=return_type,
     )
 
 
@@ -222,7 +234,11 @@ def sum(river_network, field, node_weights=None, edge_weights=None, return_type=
         Array of sum values for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.sum(
-        river_network, field, node_weights, edge_weights, return_type
+        river_network=river_network,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        return_type=return_type,
     )
 
 
@@ -272,7 +288,11 @@ def min(river_network, field, node_weights=None, edge_weights=None, return_type=
         Array of minimum values for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.min(
-        river_network, field, node_weights, edge_weights, return_type
+        river_network=river_network,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        return_type=return_type,
     )
 
 
@@ -322,5 +342,9 @@ def max(river_network, field, node_weights=None, edge_weights=None, return_type=
         Array of maximum values for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.max(
-        river_network, field, node_weights, edge_weights, return_type
+        river_network=river_network,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        return_type=return_type,
     )

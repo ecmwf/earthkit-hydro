@@ -21,7 +21,7 @@ def calculate_upstream_metric(
     )
 
 
-@multi_backend()
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def var(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -39,7 +39,7 @@ def var(xp, river_network, field, node_weights, edge_weights, return_type):
     )
 
 
-@multi_backend()
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def std(
     xp,
     river_network,
@@ -64,7 +64,7 @@ def std(
     )
 
 
-@multi_backend()
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def mean(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -82,7 +82,7 @@ def mean(xp, river_network, field, node_weights, edge_weights, return_type):
     )
 
 
-@multi_backend()
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def sum(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -100,7 +100,7 @@ def sum(xp, river_network, field, node_weights, edge_weights, return_type):
     )
 
 
-@multi_backend()
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def min(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -118,7 +118,7 @@ def min(xp, river_network, field, node_weights, edge_weights, return_type):
     )
 
 
-@multi_backend()
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def max(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:

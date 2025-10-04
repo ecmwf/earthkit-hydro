@@ -3,7 +3,7 @@ from earthkit.hydro._utils.locations import locations_to_1d
 from earthkit.hydro.distance.array import __operations as _operations
 
 
-@multi_backend()
+@multi_backend(allow_jax_jit=False)
 def min(xp, river_network, field, locations, upstream, downstream, return_type):
     if field is None:
         field = xp.ones(river_network.n_edges)
@@ -15,7 +15,7 @@ def min(xp, river_network, field, locations, upstream, downstream, return_type):
     return decorated_func(xp, river_network, field, locations, upstream, downstream)
 
 
-@multi_backend()
+@multi_backend(allow_jax_jit=False)
 def max(xp, river_network, field, locations, upstream, downstream, return_type):
     if field is None:
         field = xp.ones(river_network.n_edges)

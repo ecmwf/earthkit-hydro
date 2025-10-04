@@ -28,7 +28,7 @@ def mask(unmask=True):
             else:
                 out_1d = func(xp, river_network, field, *args, **kwargs)
                 if unmask:
-                    out_shape = field.shape[:-2] + river_network.shape
+                    out_shape = field.shape[:-1] + river_network.shape
                     return scatter_and_reshape(
                         xp,
                         river_network.mask,

@@ -2,7 +2,7 @@ import earthkit.hydro.move.array.__operations as array
 from earthkit.hydro._utils.decorators import mask, multi_backend
 
 
-@multi_backend()
+@multi_backend(jax_static_args=["xp", "river_network", "return_type", "metric"])
 def upstream(xp, river_network, field, node_weights, edge_weights, metric, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -11,7 +11,7 @@ def upstream(xp, river_network, field, node_weights, edge_weights, metric, retur
     return decorated_func(xp, river_network, field, node_weights, edge_weights, metric)
 
 
-@multi_backend()
+@multi_backend(jax_static_args=["xp", "river_network", "return_type", "metric"])
 def downstream(
     xp, river_network, field, node_weights, edge_weights, metric, return_type
 ):

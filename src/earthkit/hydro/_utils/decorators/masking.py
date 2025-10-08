@@ -56,7 +56,7 @@ def scatter_and_reshape(xp, mask, out_1d, target_shape, device):
     B = target_shape[:-2]
     M, N = target_shape[-2], target_shape[-1]
     flat_shape = B + (M * N,)
-    out_flat = xp.full(flat_shape, xp.nan, device=device)
+    out_flat = xp.full(flat_shape, xp.nan, device=device, dtype=out_1d.dtype)
     out_flat = xp.scatter_assign(out_flat, mask, out_1d)
     return xp.reshape(out_flat, target_shape)
 

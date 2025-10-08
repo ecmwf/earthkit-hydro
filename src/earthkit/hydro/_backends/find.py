@@ -25,5 +25,9 @@ def get_array_backend(x):
         from .numpy_backend import NumPyBackend
 
         return NumPyBackend()
+    elif "dask" in mod:
+        from .dask_backend import DaskBackend
+
+        return DaskBackend()
     else:
         raise TypeError(f"Unsupported array type: {type(x)}")

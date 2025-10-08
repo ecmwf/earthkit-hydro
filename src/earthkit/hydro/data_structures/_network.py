@@ -120,11 +120,21 @@ class RiverNetwork:
             self.groups = [tf.convert_to_tensor(x, dtype=tf.int32) for x in self.groups]
             self.mask = tf.convert_to_tensor(self.mask, dtype=tf.int32)
             self.data = [tf.convert_to_tensor(self.data[0], dtype=tf.int32)]
+        elif array_backend == "dask":
+            assert device == "cpu"
+            import dask.array as da
+
+            self.groups = [da.from_array(x) for x in self.groups]
+            self.mask = da.from_array(self.mask)
+            self.data = [da.from_array(self.data[0])]
         else:
             raise NotImplementedError
 
         self.array_backend = array_backend
-        self.device = self.groups[0].device
+        if self.array_backend != "dask":
+            self.device = self.groups[0].device
+        else:
+            self.device = None
         return self
 
     def set_default_return_type(self, return_type):

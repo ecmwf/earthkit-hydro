@@ -72,7 +72,11 @@ dependencies = [
     all = [
         "earthkit-data[geotiff]>=0.13.8",
         "pytest",
-        "pre-commit"
+        "pre-commit",
+        "torch",
+        "tensorflow",
+        "jax",
+        "mlx[cpu]"
         ]
 
 [tool.black]

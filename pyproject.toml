@@ -55,7 +55,7 @@ dependencies = [
         "torch",
         "tensorflow",
         "jax",
-        "mlx"
+        "mlx[cpu]"
         ]
     dev = [
         "pytest",

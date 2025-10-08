@@ -77,14 +77,23 @@ def get_numpy_function(function_name):
     ],
     indirect=["river_network"],
 )
-def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
+@pytest.mark.parametrize(
+    "array_backend", ["numpy", "torch", "jax", "mlx", "tensorflow"]
+)
+def test_upstream_metric_sum(
+    river_network, input_field, flow_downstream, mv, array_backend
+):
+    river_network = river_network.to_device("cpu", array_backend)
+    xp = ekh._backends.find.get_array_backend(array_backend)
     output_field = ekh.upstream.array.sum(
-        river_network, input_field, node_weights=None, return_type="masked"
+        river_network, xp.asarray(input_field), node_weights=None, return_type="masked"
     )
+    output_field = np.asarray(output_field)
+    flow_downstream_out = np.asarray(xp.asarray(flow_downstream))
     print(output_field)
-    print(flow_downstream)
-    assert output_field.dtype == flow_downstream.dtype
-    np.testing.assert_allclose(output_field, flow_downstream)
+    print(flow_downstream_out)
+    assert output_field.dtype == flow_downstream_out.dtype
+    np.testing.assert_allclose(output_field, flow_downstream, rtol=1e-6)
 
     print(input_field)
     input_field = convert_to_2d(river_network, input_field, 0)
@@ -92,12 +101,14 @@ def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv):
     print(mv, input_field.dtype)
     print(input_field, flow_downstream)
     output_field = ekh.upstream.array.sum(
-        river_network, input_field, node_weights=None
-    ).flatten()
+        river_network, xp.asarray(input_field), node_weights=None
+    )
+    output_field = np.asarray(output_field).flatten()
+    flow_downstream = np.asarray(xp.asarray(flow_downstream))
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype
-    np.testing.assert_allclose(output_field, flow_downstream)
+    np.testing.assert_allclose(output_field, flow_downstream, rtol=1e-6)
 
 
 @pytest.mark.parametrize(

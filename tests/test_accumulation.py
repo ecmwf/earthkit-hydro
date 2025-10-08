@@ -77,9 +77,7 @@ def get_numpy_function(function_name):
     ],
     indirect=["river_network"],
 )
-@pytest.mark.parametrize(
-    "array_backend", ["numpy", "torch", "jax", "mlx", "tensorflow"]
-)
+@pytest.mark.parametrize("array_backend", ["numpy", "torch", "jax", "tensorflow"])
 def test_upstream_metric_sum(
     river_network, input_field, flow_downstream, mv, array_backend
 ):

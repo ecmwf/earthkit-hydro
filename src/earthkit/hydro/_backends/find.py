@@ -25,5 +25,9 @@ def get_array_backend(x):
         from .numpy_backend import NumPyBackend
 
         return NumPyBackend()
+    elif "mlx" in mod:
+        from .mlx_backend import MLXBackend
+
+        return MLXBackend()
     else:
         raise TypeError(f"Unsupported array type: {type(x)}")

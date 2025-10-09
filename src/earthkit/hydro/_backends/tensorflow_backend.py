@@ -68,15 +68,25 @@ class TFBackend(ArrayBackend):
     def gather(self, arr, indices, axis=-1):
         return tf.gather(arr, indices, axis=axis)
 
-    def full_like(self, arr, value):
-        return tf.fill(tf.shape(arr), value)
+    def full_like(self, arr, value, *args, **kwargs):
+        return tf.fill(tf.shape(arr), value, *args, **kwargs)
 
-    def full(self, shape, value):
-        return tf.fill(shape, value)
+    def full(self, shape, value, *args, **kwargs):
+        kwargs.pop("device")
+        dtype = kwargs.pop("dtype")
+        out = tf.fill(shape, value, *args, **kwargs)
+        if dtype:
+            return tf.cast(out, dtype)
+        else:
+            return out
 
     @property
     def nan(self):
         return float("nan")
+
+    @property
+    def inf(self):
+        return float("inf")
 
     def asarray(self, arr, dtype=None, device=None, copy=None):
         tensor = tf.convert_to_tensor(arr, dtype=dtype)

@@ -52,6 +52,9 @@ dependencies = [
     ]
     tests = [
         "pytest",
+        "torch",
+        "tensorflow",
+        "jax",
         ]
     dev = [
         "pytest",
@@ -68,7 +71,10 @@ dependencies = [
     all = [
         "earthkit-data[geotiff]>=0.13.8",
         "pytest",
-        "pre-commit"
+        "pre-commit",
+        "torch",
+        "tensorflow",
+        "jax",
         ]
 
 [tool.black]

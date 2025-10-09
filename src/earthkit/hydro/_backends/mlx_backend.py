@@ -9,13 +9,17 @@ class MLXBackend(ArrayBackend):
 
     @property
     def name(self):
-        return "cupy"
+        return "mlx"
 
     def copy(self, x):
         return x
 
     def asarray(self, x, *args, **kwargs):
         return mx.array(x)
+
+    def full(self, *args, **kwargs):
+        kwargs.pop("device")
+        return mx.full(*args, **kwargs)
 
     def gather(self, arr, indices, axis=-1):
         assert axis == -1

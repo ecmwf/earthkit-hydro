@@ -44,17 +44,17 @@ dependencies = [
 
 [project.optional-dependencies]
     readers = [
-        "earthkit-data[geotiff]>=0.13.8",
+        "earthkit-data[geotiff]>=0.13.8"
         ]
     grit = [
         "geopandas",
-        "pandas",
+        "pandas"
     ]
     tests = [
         "pytest",
         "torch",
         "tensorflow",
-        "jax",
+        "jax"
         ]
     dev = [
         "pytest",
@@ -71,10 +71,7 @@ dependencies = [
     all = [
         "earthkit-data[geotiff]>=0.13.8",
         "pytest",
-        "pre-commit",
-        "torch",
-        "tensorflow",
-        "jax",
+        "pre-commit"
         ]
 
 [tool.black]

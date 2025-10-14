@@ -149,7 +149,7 @@ def xarray(func):
             )
 
             if len(output_core_dims[0]) == 1:
-                coords_grid = np.meshgrid(*river_network.coords.values())
+                coords_grid = np.meshgrid(*river_network.coords.values()[::-1])[::-1]
                 assign_dict = {
                     k: (output_core_dims[0], v.flat[river_network.mask])
                     for k, v in zip(river_network.coords.keys(), coords_grid)

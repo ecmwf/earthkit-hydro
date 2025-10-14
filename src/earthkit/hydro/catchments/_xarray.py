@@ -88,8 +88,7 @@ def xarray(func):
             }
             result = result.assign_coords(**assign_dict)
 
-        coord1, coord2 = river_network.coords.values()
-        coords_grid = np.meshgrid(coord2, coord1)
+        coords_grid = np.meshgrid(*river_network.coords.values()[::-1])[::-1]
         assign_dict = {
             k: (node_default_coord, v.flat[river_network.mask][stations_1d])
             for k, v in zip(river_network.coords.keys(), coords_grid)

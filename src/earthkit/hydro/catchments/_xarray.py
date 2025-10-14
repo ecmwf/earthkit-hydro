@@ -92,7 +92,7 @@ def xarray(func):
         coords_grid = np.meshgrid(coord2, coord1)
         assign_dict = {
             k: (node_default_coord, v.flat[river_network.mask][stations_1d])
-            for k, v in zip(river_network.coords.keys(), coords_grid)
+            for k, v in zip(river_network.coords.keys(), coords_grid[::-1])
         }
         if isinstance(orig_locations, dict):
             assign_dict["name"] = (node_default_coord, list(orig_locations.keys()))

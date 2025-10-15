@@ -53,7 +53,7 @@
 - Bifurcation handling
 - Custom weighting and decay support
 - Support for PCRaster, CaMa-Flood, HydroSHEDS, MERIT-Hydro and GRIT river network formats
-- Compatible with major array-backends: xarray, numpy, cupy, torch, jax and tensorflow
+- Compatible with major array-backends: xarray, numpy, cupy, torch, jax, mlx and tensorflow
 - GPU support
 - Differentiable operations suitable for machine learning
 

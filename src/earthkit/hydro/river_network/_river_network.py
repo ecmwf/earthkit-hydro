@@ -72,7 +72,8 @@ def create(
         if source == "file":
             river_network_storage = joblib.load(path)
         elif source == "url":
-            river_network_storage = joblib.load(BytesIO(urlopen(path).read()))
+            with urlopen(path) as response:
+                river_network_storage = joblib.load(BytesIO(response.read()))
         else:
             raise ValueError(
                 "Unsupported source for river network format"

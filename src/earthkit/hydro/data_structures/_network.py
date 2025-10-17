@@ -70,7 +70,7 @@ class RiverNetwork:
             The device to which to transfer. Default is None, which is `'cpu'` for all backends except cupy, which is `'gpu'`.
         array_backend : str, optional
             The array backend.
-            One of "numpy", "np", "cupy", "cp", "pytorch", "torch", "jax", "jnp", "tensorflow" or "tf".
+            One of "numpy", "np", "cupy", "cp", "pytorch", "torch", "jax", "jnp", "tensorflow", "tf", "mlx" or "mx".
             Default is None, which uses `self.array_backend`.
 
         Returns
@@ -90,6 +90,8 @@ class RiverNetwork:
             array_backend = "tensorflow"
         elif array_backend == "pytorch":
             array_backend = "torch"
+        elif array_backend == "mx":
+            array_backend = "mlx"
 
         if device is None:
             device = "cpu" if array_backend != "cupy" else "gpu"
@@ -120,11 +122,20 @@ class RiverNetwork:
             self.groups = [tf.convert_to_tensor(x, dtype=tf.int32) for x in self.groups]
             self.mask = tf.convert_to_tensor(self.mask, dtype=tf.int32)
             self.data = [tf.convert_to_tensor(self.data[0], dtype=tf.int32)]
+        elif array_backend == "mlx":
+            import mlx.core as mx
+
+            self.groups = [mx.array(x) for x in self.groups]
+            self.mask = mx.array(self.mask)
+            self.data = [mx.array(self.data[0])]
         else:
             raise NotImplementedError
 
         self.array_backend = array_backend
-        self.device = device
+        if self.array_backend != "mlx":
+            self.device = self.groups[0].device
+        else:
+            self.device = None
         return self
 
     def set_default_return_type(self, return_type):

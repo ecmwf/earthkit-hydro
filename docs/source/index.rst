@@ -3,7 +3,7 @@ earthkit-hydro
 
 .. important::
 
-    This software is **Emerging** and subject to ECMWF's guidelines on `Software Maturity <https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity>`_.
+    This software is **Incubating** and subject to ECMWF's guidelines on `Software Maturity <https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity>`_.
 
 **earthkit-hydro** is a Python library for common hydrological functions. It is the hydrological component of earthkit :cite:`earthkit`.
 
@@ -40,8 +40,8 @@ Main Features
    :width: 300px
    :align: right
 
-- Support for PCRaster, CaMa-Flood, HydroSHEDS and MERIT-Hydro river network formats
-- Compatible with major array-backends: xarray, numpy, cupy, torch, jax and tensorflow
+- Support for PCRaster, CaMa-Flood, HydroSHEDS, MERIT-Hydro and GRIT river network formats
+- Compatible with major array-backends: xarray, numpy, cupy, torch, jax, mlx and tensorflow
 - GPU support
 - Differentiable operations suitable for machine learning
 

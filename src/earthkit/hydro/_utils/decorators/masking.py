@@ -17,16 +17,24 @@ def mask(unmask=True):
                 if unmask:
                     out_shape = field.shape
                     return scatter_and_reshape(
-                        xp, river_network.mask, out_1d, out_shape
+                        xp,
+                        river_network.mask,
+                        out_1d,
+                        out_shape,
+                        device=river_network.device,
                     )
                 else:
                     return out_1d
             else:
                 out_1d = func(xp, river_network, field, *args, **kwargs)
                 if unmask:
-                    out_shape = field.shape[:-2] + river_network.shape
+                    out_shape = field.shape[:-1] + river_network.shape
                     return scatter_and_reshape(
-                        xp, river_network.mask, out_1d, out_shape
+                        xp,
+                        river_network.mask,
+                        out_1d,
+                        out_shape,
+                        device=river_network.device,
                     )
                 else:
                     return out_1d
@@ -44,11 +52,11 @@ def mask_last2_dims(xp, tensor, mask, target_shape):
     return xp.gather(tensor_flat, mask, axis=-1)
 
 
-def scatter_and_reshape(xp, mask, out_1d, target_shape):
+def scatter_and_reshape(xp, mask, out_1d, target_shape, device):
     B = target_shape[:-2]
     M, N = target_shape[-2], target_shape[-1]
     flat_shape = B + (M * N,)
-    out_flat = xp.full(flat_shape, xp.nan)
+    out_flat = xp.full(flat_shape, xp.nan, device=device, dtype=out_1d.dtype)
     out_flat = xp.scatter_assign(out_flat, mask, out_1d)
     return xp.reshape(out_flat, target_shape)
 

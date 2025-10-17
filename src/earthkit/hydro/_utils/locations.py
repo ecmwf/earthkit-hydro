@@ -27,16 +27,20 @@ def locations_to_1d(xp, river_network, locations):
     stations = locations
 
     if stations.ndim == 2 and stations.shape[1] == 2:
-        if xp.name not in ["numpy", "cupy"]:
+        if xp.name not in ["numpy", "cupy", "torch"]:
             raise NotImplementedError
         # TODO: make this code actually xp agnostic
         rows, cols = stations[:, 0], stations[:, 1]
         flat_indices = rows * river_network.shape[1] + cols
         flat_mask = river_network.mask
         reverse_map = -xp.ones(
-            river_network.shape[0] * river_network.shape[1], dtype=int
+            river_network.shape[0] * river_network.shape[1],
+            dtype=int,
+            device=river_network.device,
         )
-        reverse_map[flat_mask] = xp.arange(flat_mask.shape[0])
+        reverse_map[flat_mask] = xp.arange(
+            flat_mask.shape[0], device=river_network.device
+        )
         masked_indices = reverse_map[flat_indices]
         if xp.any(masked_indices < 0):
             raise ValueError(

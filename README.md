@@ -10,7 +10,7 @@
     <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/ESEE/foundation_badge.svg" alt="ECMWF Software EnginE">
   </a>
   <a href="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity">
-    <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity/emerging_badge.svg" alt="Maturity Level">
+    <img src="https://github.com/ecmwf/codex/raw/refs/heads/main/Project Maturity/incubating_badge.svg" alt="Maturity Level">
   </a>
   <!-- <a href="https://codecov.io/gh/ecmwf/earthkit-hydro">
     <img src="https://codecov.io/gh/ecmwf/earthkit-hydro/branch/develop/graph/badge.svg" alt="Code Coverage">
@@ -32,7 +32,7 @@
 </p>
 
 > \[!IMPORTANT\]
-> This software is **Emerging** and subject to ECMWF's guidelines on [Software Maturity](https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity).
+> This software is **Incubating** and subject to ECMWF's guidelines on [Software Maturity](https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity).
 
 **earthkit-hydro** is a Python library for common hydrological functions. It is the hydrological component of [earthkit](https://github.com/ecmwf/earthkit).
 
@@ -40,8 +40,8 @@
 
 <table>
   <tr>
-    <td><img src="./docs/images/glofas.png" height="300" alt="Adapted from: doc_figure" /></td>
-    <td><img src="./docs/images/array_backends_with_xr.png" height="300" alt="Array backends with xr" /></td>
+    <td><img src="https://raw.githubusercontent.com/ecmwf/earthkit-hydro/refs/tags/1.0.0/docs/images/glofas.png" height="300" alt="Adapted from: doc_figure" /></td>
+    <td><img src="https://raw.githubusercontent.com/ecmwf/earthkit-hydro/refs/tags/1.0.0/docs/images/array_backends_with_xr.png" height="300" alt="Array backends with xr" /></td>
   </tr>
 </table>
 
@@ -52,8 +52,8 @@
 - Upstream/downstream field propagation
 - Bifurcation handling
 - Custom weighting and decay support
-- Support for PCRaster, CaMa-Flood, HydroSHEDS and MERIT-Hydro river network formats
-- Compatible with major array-backends: xarray, numpy, cupy, torch, jax and tensorflow
+- Support for PCRaster, CaMa-Flood, HydroSHEDS, MERIT-Hydro and GRIT river network formats
+- Compatible with major array-backends: xarray, numpy, cupy, torch, jax, mlx and tensorflow
 - GPU support
 - Differentiable operations suitable for machine learning
 

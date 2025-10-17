@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthkit-hydro"
-requires-python = ">=3.8"
+requires-python = ">=3.9"
 authors = [
     { name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int" }
     ]
@@ -21,12 +21,12 @@ classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Topic :: Scientific/Engineering"
     ]
 dynamic = ["version", "readme"]
@@ -40,15 +40,22 @@ dependencies = [
 
 [project.urls]
     repository = "https://github.com/ecmwf/earthkit-hydro"
-    documentation = "https://github.com/ecmwf/earthkit-hydro"
+    documentation = "https://earthkit-hydro.readthedocs.io/"
     issues = "https://github.com/ecmwf/earthkit-hydro/issues"
 
 [project.optional-dependencies]
     readers = [
-        "earthkit-data[geotiff]>=0.13.8",
+        "earthkit-data[geotiff]>=0.13.8"
         ]
+    grit = [
+        "geopandas",
+        "pandas"
+    ]
     tests = [
         "pytest",
+        "torch",
+        "tensorflow",
+        "jax"
         ]
     dev = [
         "pytest",
@@ -110,18 +117,13 @@ where = [ "src/" ]
 
 [tool.setuptools_scm]
 version_file = "src/earthkit/hydro/_version.py"
-version_file_template = '''# Do not change! Do not track in version control!
+version_file_template = '''
+# Do not change! Do not track in version control!
 __version__ = "{version}"
 '''
 parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs
 fallback_version='0.1.0'
 local_scheme = "no-local-version"
-
-# Logic is done in setup.py for more flexibility
-# [[tool.setuptools-rust.ext-modules]]
-# target = "earthkit.hydro._rust"  # The last part of the name (e.g. "_rust") has to match lib.name in Cargo.toml
-# path = "Cargo.toml"
-# binding = "PyO3"
 
 # takes inspiration from https://github.com/pypa/cibuildwheel/discussions/1814
 [tool.cibuildwheel]

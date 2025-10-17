@@ -50,7 +50,6 @@ def var(
 
     Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population variance.
 
-
     Parameters
     ----------
     river_network : RiverNetwork
@@ -73,7 +72,13 @@ def var(
     xarray object
         Array of variance values for each location in `locations`.
     """
-    return array.var(river_network, field, locations, node_weights, edge_weights)
+    return array.var(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 @xarray
@@ -145,7 +150,13 @@ def std(
     xarray object
         Array of standard deviation values for each location in `locations`.
     """
-    return array.std(river_network, field, locations, node_weights, edge_weights)
+    return array.std(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 @xarray
@@ -210,7 +221,13 @@ def mean(
     xarray object
         Array of mean values for each location in `locations`.
     """
-    return array.mean(river_network, field, locations, node_weights, edge_weights)
+    return array.mean(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 @xarray
@@ -271,7 +288,13 @@ def sum(
     xarray object
         Array of sum values for each location in `locations`.
     """
-    return array.sum(river_network, field, locations, node_weights, edge_weights)
+    return array.sum(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 @xarray
@@ -308,6 +331,8 @@ def min(
     - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
     - :math:`m_j` is the weighted minimum at node :math:`j`.
 
+    Accumulation proceeds in topological order from the sources to the sinks.
+
     Parameters
     ----------
     river_network : RiverNetwork
@@ -330,7 +355,13 @@ def min(
     xarray object
         Array of minimum values for each location in `locations`.
     """
-    return array.min(river_network, field, locations, node_weights, edge_weights)
+    return array.min(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 @xarray
@@ -367,6 +398,8 @@ def max(
     - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
     - :math:`m_j` is the weighted maximum at node :math:`j`.
 
+    Accumulation proceeds in topological order from the sources to the sinks.
+
     Parameters
     ----------
     river_network : RiverNetwork
@@ -389,7 +422,13 @@ def max(
     xarray object
         Array of maximum values for each location in `locations`.
     """
-    return array.max(river_network, field, locations, node_weights, edge_weights)
+    return array.max(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 @find_xarray

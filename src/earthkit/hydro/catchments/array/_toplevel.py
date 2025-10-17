@@ -38,7 +38,6 @@ def var(river_network, field, locations, node_weights=None, edge_weights=None):
 
     Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population variance.
 
-
     Parameters
     ----------
     river_network : RiverNetwork
@@ -57,7 +56,13 @@ def var(river_network, field, locations, node_weights=None, edge_weights=None):
     array-like
         Array of variance values for each location in `locations`.
     """
-    return _operations.var(river_network, field, locations, node_weights, edge_weights)
+    return _operations.var(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 def std(river_network, field, locations, node_weights=None, edge_weights=None):
@@ -117,7 +122,13 @@ def std(river_network, field, locations, node_weights=None, edge_weights=None):
     array-like
         Array of standard deviation values for each location in `locations`.
     """
-    return _operations.std(river_network, field, locations, node_weights, edge_weights)
+    return _operations.std(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 def mean(river_network, field, locations, node_weights=None, edge_weights=None):
@@ -170,7 +181,13 @@ def mean(river_network, field, locations, node_weights=None, edge_weights=None):
     array-like
         Array of mean values for each location in `locations`.
     """
-    return _operations.mean(river_network, field, locations, node_weights, edge_weights)
+    return _operations.mean(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 def sum(river_network, field, locations, node_weights=None, edge_weights=None):
@@ -219,7 +236,13 @@ def sum(river_network, field, locations, node_weights=None, edge_weights=None):
     array-like
         Array of sum values for each location in `locations`.
     """
-    return _operations.sum(river_network, field, locations, node_weights, edge_weights)
+    return _operations.sum(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 def min(river_network, field, locations, node_weights=None, edge_weights=None):
@@ -248,6 +271,8 @@ def min(river_network, field, locations, node_weights=None, edge_weights=None):
     - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
     - :math:`m_j` is the weighted minimum at node :math:`j`.
 
+    Accumulation proceeds in topological order from the sources to the sinks.
+
     Parameters
     ----------
     river_network : RiverNetwork
@@ -266,7 +291,13 @@ def min(river_network, field, locations, node_weights=None, edge_weights=None):
     array-like
         Array of minimum values for each location in `locations`.
     """
-    return _operations.min(river_network, field, locations, node_weights, edge_weights)
+    return _operations.min(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 def max(river_network, field, locations, node_weights=None, edge_weights=None):
@@ -295,6 +326,8 @@ def max(river_network, field, locations, node_weights=None, edge_weights=None):
     - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
     - :math:`m_j` is the weighted maximum at node :math:`j`.
 
+    Accumulation proceeds in topological order from the sources to the sinks.
+
     Parameters
     ----------
     river_network : RiverNetwork
@@ -313,7 +346,13 @@ def max(river_network, field, locations, node_weights=None, edge_weights=None):
     array-like
         Array of maximum values for each location in `locations`.
     """
-    return _operations.max(river_network, field, locations, node_weights, edge_weights)
+    return _operations.max(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
 
 
 def find(river_network, locations, overwrite=True, return_type=None):
@@ -339,4 +378,9 @@ def find(river_network, locations, overwrite=True, return_type=None):
     array-like
         Array of labelled catchments for every river network node or gridcell, depending on `return_grid`.
     """
-    return _operations.find(river_network, locations, overwrite, return_type)
+    return _operations.find(
+        river_network=river_network,
+        locations=locations,
+        overwrite=overwrite,
+        return_type=return_type,
+    )

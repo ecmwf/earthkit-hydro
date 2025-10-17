@@ -44,15 +44,16 @@ def _ufunc_to_downstream(
     modifier_group = uid if node_modifier_use_upstream else did
 
     modifier_field = xp.gather(field, uid, axis=-1)
-    if node_multiplicative_weight is not None:
-        modifier_field *= node_multiplicative_weight[..., modifier_group]
-    if edge_multiplicative_weight is not None:
-        modifier_field *= edge_multiplicative_weight[..., eid]
+    # ADD HAPPENS BEFORE MULT
+    # TODO: add an option to switch order
     if node_additive_weight is not None:
         modifier_field += node_additive_weight[..., modifier_group]
     if edge_additive_weight is not None:
         modifier_field += edge_additive_weight[..., eid]
-
+    if node_multiplicative_weight is not None:
+        modifier_field *= node_multiplicative_weight[..., modifier_group]
+    if edge_multiplicative_weight is not None:
+        modifier_field *= edge_multiplicative_weight[..., eid]
     return func(
         field,
         did,

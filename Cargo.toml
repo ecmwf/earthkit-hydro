@@ -4,8 +4,8 @@ version = "0.0.0" # placeholder, will be overwritten
 edition = "2021"
 
 [dependencies]
-pyo3 = { version = "0.19", features = ["extension-module"] }
-numpy = "0.19"
+pyo3 = { version = "0.26", features = ["extension-module"] }
+numpy = "0.26"
 rayon = "1.7"
 fixedbitset = "0.5"
 

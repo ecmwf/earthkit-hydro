@@ -55,7 +55,12 @@ def min(
         Array of minimum lengths for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.min(
-        river_network, field, locations, upstream, downstream, return_type
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        upstream=upstream,
+        downstream=downstream,
+        return_type=return_type,
     )
 
 
@@ -113,7 +118,12 @@ def max(
         Array of maximum lengths for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.max(
-        river_network, field, locations, upstream, downstream, return_type
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        upstream=upstream,
+        downstream=downstream,
+        return_type=return_type,
     )
 
 

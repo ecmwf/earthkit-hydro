@@ -8,10 +8,16 @@
 
 use pyo3::prelude::*;
 use rayon::prelude::*;
-use numpy::{PyArray1, PyReadonlyArray1};
+use numpy::{PyArray1, PyReadonlyArray1, PyReadonlyArray2};
 use pyo3::exceptions::PyValueError;
 use std::sync::atomic::{AtomicI64, Ordering};
 use fixedbitset::FixedBitSet;
+
+// use pyo3::prelude::*;
+// use numpy::{PyReadonlyArray1, PyReadonlyArray2};
+use dashmap::DashMap;
+// use rayon::prelude::*;
+use std::collections::HashMap;
 
 #[pyfunction]
 fn compute_topological_labels_rust<'py>(
@@ -77,8 +83,205 @@ fn compute_topological_labels_rust<'py>(
     Ok(array.to_owned().into())
 }
 
+fn insert_sorted_unique(dest: &mut Vec<i64>, src: &[i64]) {
+    let mut i = 0; // index for dest
+    let mut j = 0; // index for src
+
+    let mut new_vec = Vec::with_capacity(dest.len() + src.len());
+
+    while i < dest.len() && j < src.len() {
+        if dest[i] < src[j] {
+            new_vec.push(dest[i]);
+            i += 1;
+        } else if dest[i] > src[j] {
+            new_vec.push(src[j]);
+            j += 1;
+        } else {
+            // equal, push once and advance both
+            new_vec.push(dest[i]);
+            i += 1;
+            j += 1;
+        }
+    }
+
+    if i < dest.len() {
+        new_vec.extend_from_slice(&dest[i..]);
+    }
+    if j < src.len() {
+        new_vec.extend_from_slice(&src[j..]);
+    }
+
+    *dest = new_vec;
+}
+
+#[pyfunction]
+fn test_rust<'py>(
+    _py: Python<'py>,
+    topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
+    _field: PyReadonlyArray1<'py, f64>,
+) -> PyResult<HashMap<i64, Vec<i64>>> {
+
+    let mut upstream_map: HashMap<i64, Vec<i64>> = HashMap::new();
+
+    for group in topo_groups.iter() {
+        let arr = group.as_array();
+        let did_vec = arr.row(0);
+        let uid_vec = arr.row(1);
+        // let eid_vec = arr.row(2);
+
+        for (&did, &uid) in did_vec.iter().zip(uid_vec.iter()) {
+            // Get uid upstream additions (or fallback to [uid])
+            let uid_upstream_additions = upstream_map.get(&uid).cloned().unwrap_or_else(|| vec![uid]);
+
+            // Insert did upstream if missing and extend it with uid upstream additions
+            upstream_map.entry(did).or_insert_with(|| vec![did])
+                .extend(uid_upstream_additions.into_iter());
+
+            // Remove uid upstream set now that we merged it
+            upstream_map.remove(&uid);
+        }
+
+        // for (&did, &uid) in did_vec.iter().zip(uid_vec.iter()) {
+        //     // Make sure uid has an upstream set including itself
+        //     upstream_map.entry(uid).or_insert_with(|| vec![uid]);
+
+        //     // Immutable borrow scope: get uid's upstream (which includes uid itself now)
+        //     let uid_upstream_additions = {
+        //         if let Some(uid_upstream) = upstream_map.get(&uid) {
+        //             // Clone additions to avoid borrow checker issues
+        //             let mut additions = uid_upstream.clone(); // includes uid itself
+        //             additions.sort_unstable();
+        //             // additions.dedup();
+        //             additions
+        //         } else {
+        //             vec![uid] // fallback, should never happen after entry above
+        //         }
+        //     }; // immutable borrow dropped here
+
+        //     // Ensure did also has its upstream initialized (with itself)
+        //     upstream_map.entry(did).or_insert_with(|| vec![did]);
+
+        //     // Now mutable borrow to did_upstream safe
+        //     let did_upstream = upstream_map.entry(did).or_default();
+        //     insert_sorted_unique(did_upstream, &uid_upstream_additions);
+        // }
+
+}
+    Ok(upstream_map)
+}
+
+// // Utility: insert elements while keeping dest sorted & unique
+// fn insert_sorted_unique(dest: &mut Vec<i64>, additions: &[i64]) {
+//     dest.extend_from_slice(additions);
+//     dest.sort_unstable();
+//     dest.dedup();
+// }
+
+// #[pyfunction]
+// fn build_upstream<'py>(
+//     _py: Python<'py>,
+//     topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
+// ) -> PyResult<()> {
+//     use rayon::prelude::*;
+//     use dashmap::DashMap;
+
+//     // Step 1: Convert all Python arrays into a flat Vec of edges: (did, uid)
+//     let all_edges: Vec<(i64, i64)> = topo_groups
+//         .iter()
+//         .flat_map(|group| {
+//             let array = group.as_array(); // shape: (3, N)
+//             let n_edges = array.shape()[1];
+//             let dids = array.row(0);
+//             let uids = array.row(1);
+//             (0..n_edges).map(move |i| (dids[i], uids[i])).collect::<Vec<_>>()
+//         })
+//         .collect();
+
+//     // Step 2: Collect all node IDs
+//     let all_nodes: Vec<i64> = all_edges
+//         .iter()
+//         .flat_map(|(did, uid)| vec![*did, *uid])
+//         .collect();
+
+//     let upstream_map = DashMap::<i64, Vec<i64>>::new();
+
+//     // Step 3: Pre-fill with self-refs
+//     all_nodes.par_iter().for_each(|&node| {
+//         upstream_map.entry(node).or_insert_with(|| vec![node]);
+//     });
+
+//     // Step 4: Process all edges in parallel
+//     all_edges.par_iter().for_each(|&(did, uid)| {
+//         let uid_upstream = upstream_map
+//             .get(&uid)
+//             .map(|v| v.clone())
+//             .unwrap_or_else(|| vec![uid]);
+
+//         let mut did_upstream = upstream_map.entry(did).or_insert_with(|| vec![did]);
+//         insert_sorted_unique(&mut did_upstream, &uid_upstream);
+
+//         upstream_map.remove(&uid);
+//     });
+
+//     // Done!
+//     Ok(())
+// }
+
+#[pyfunction]
+fn process_nodes<'py>(
+    _py: Python<'py>,
+    topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
+    _field: PyReadonlyArray1<'py, f64>,
+) -> PyResult<HashMap<i64, Vec<i64>>> {
+
+    let upstream_map: DashMap<i64, Vec<i64>> = DashMap::new();
+
+    for group in &topo_groups {
+        process_level_and_cleanup(group, &upstream_map);
+    }
+
+    let result: HashMap<i64, Vec<i64>> = upstream_map.iter()
+        .map(|entry| (*entry.key(), entry.value().clone()))
+        .collect();
+
+    Ok(result)
+}
+
+fn process_level_and_cleanup(
+    topo_group: &PyReadonlyArray2<'_, i64>,
+    upstream_map: &DashMap<i64, Vec<i64>>,
+) {
+    let arr = topo_group.as_array();
+    let did_vec = arr.row(0);
+    let uid_vec = arr.row(1);
+
+    let did_slice = did_vec.as_slice().expect("Expected contiguous did_vec slice");
+    let uid_slice = uid_vec.as_slice().expect("Expected contiguous uid_vec slice");
+
+    did_slice.par_iter().zip(uid_slice.par_iter()).for_each(|(&did, &uid)| {
+        let uid_upstream = {
+            // Get uid upstream vector by removing it from the map, so you can move it without cloning
+            // If it doesn't exist, fallback to vec![uid]
+            upstream_map.remove(&uid).map(|entry| entry.1).unwrap_or_else(|| vec![uid])
+        };
+
+        // Insert or extend did's upstream vector
+        upstream_map.entry(did)
+            .and_modify(|did_upstream| did_upstream.extend(&uid_upstream))
+            .or_insert_with(|| {
+                let mut v = uid_upstream;
+                v.push(did); // Include `did` when inserting
+                v
+            });
+        });
+}
+
+
+
 #[pymodule]
 fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(test_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(process_nodes, m)?)?;
     Ok(())
 }

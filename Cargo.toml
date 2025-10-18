@@ -9,6 +9,9 @@ numpy = "0.26"
 rayon = "1.7"
 fixedbitset = "0.5"
 
+dashmap = "5"
+ndarray = "0.15"
+
 [lib]
 # See https://github.com/PyO3/pyo3 for details
 name = "_rust"  # private module to be nested into Python package

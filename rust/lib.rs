@@ -231,7 +231,7 @@ fn test_rust<'py>(
 fn process_nodes<'py>(
     _py: Python<'py>,
     topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
-    _field: PyReadonlyArray1<'py, f64>,
+    _field: PyReadonlyArray1<'py, f64>
 ) -> PyResult<HashMap<i64, Vec<i64>>> {
 
     let upstream_map: DashMap<i64, Vec<i64>> = DashMap::new();
@@ -243,7 +243,6 @@ fn process_nodes<'py>(
     let result: HashMap<i64, Vec<i64>> = upstream_map.iter()
         .map(|entry| (*entry.key(), entry.value().clone()))
         .collect();
-
     Ok(result)
 }
 
@@ -267,15 +266,52 @@ fn process_level_and_cleanup(
 
         // Insert or extend did's upstream vector
         upstream_map.entry(did)
-            .and_modify(|did_upstream| did_upstream.extend(&uid_upstream))
+            .and_modify(|did_upstream| {
+                merge_sorted_unique(did_upstream, &uid_upstream);
+            })
             .or_insert_with(|| {
-                let mut v = uid_upstream;
-                v.push(did); // Include `did` when inserting
-                v
+                    let mut v = uid_upstream;
+
+                    // Avoid duplicate insertions — optional if you're sure there's no dupes.
+                    match v.binary_search(&did) {
+                        Ok(_) => {} // already exists, do nothing
+                        Err(pos) => v.insert(pos, did), // insert at correct position
+                    }
+
+                    v
             });
-        });
+});
 }
 
+
+fn merge_sorted_unique(a: &mut Vec<i64>, b: &[i64]) {
+    let mut i = 0;
+    let mut j = 0;
+    let mut result = Vec::with_capacity(a.len() + b.len());
+
+    while i < a.len() && j < b.len() {
+        match a[i].cmp(&b[j]) {
+            std::cmp::Ordering::Less => {
+                result.push(a[i]);
+                i += 1;
+            }
+            std::cmp::Ordering::Greater => {
+                result.push(b[j]);
+                j += 1;
+            }
+            std::cmp::Ordering::Equal => {
+                result.push(a[i]);
+                i += 1;
+                j += 1;
+            }
+        }
+    }
+
+    result.extend_from_slice(&a[i..]);
+    result.extend_from_slice(&b[j..]);
+
+    *a = result;
+}
 
 
 #[pymodule]

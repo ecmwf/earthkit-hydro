@@ -1,0 +1,21 @@
+.sidebar-drawer {
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at center, #424270 0%, #131320 100%);
+  background-blend-mode: normal;
+  opacity: 1;
+  background-attachment: fixed;
+  color: #fff;
+}
+
+.sidebar-drawer::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url("octahedral-grid.svg") repeat top center / 100vw auto;
+  opacity: 0.3;
+  pointer-events: none;
+  z-index: 0;
+  background-attachment: fixed;
+}

@@ -84,14 +84,6 @@ html_css_files = [
     "custom.css",
 ]
 
-# html_context = {
-#     "display_github": True,
-#     "github_user": "ecmwf",         # GitHub username
-#     "github_repo": "docsample",             # GitHub repository name
-#     "github_version": "main",               # Branch (e.g., 'main', 'master')
-#     "conf_py_path": "/docs/",               # Path to your docs root in the repo
-# }
-
 bibtex_bibfiles = ["references.bib"]
 
 html_theme_options = {

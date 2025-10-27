@@ -6,7 +6,6 @@
   background-blend-mode: normal;
   opacity: 1;
   background-attachment: fixed;
-  color: #fff;
 }
 
 .sidebar-drawer::before {

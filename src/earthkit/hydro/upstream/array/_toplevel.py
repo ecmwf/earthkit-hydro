@@ -12,6 +12,10 @@ def percentile(
         raise NotImplementedError(
             "Only numpy backend is currently supported for percentiles."
         )
+    if p < 0 or p > 1:
+        raise ValueError(
+            "The requested percentile `p` must be between 0 and 1 inclusive."
+        )
     return _operations.percentile(
         river_network=river_network,
         field=field.astype("float64"),

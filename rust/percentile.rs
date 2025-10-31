@@ -7,7 +7,7 @@
 // nor does it submit to any jurisdiction.
 
 use dashmap::DashMap;
-use ndarray::ArrayView1;
+use numpy::ndarray::ArrayView1;
 use numpy::{PyArray1, PyReadonlyArray1, PyReadonlyArray2};
 use pyo3::prelude::*;
 use rayon::prelude::*;

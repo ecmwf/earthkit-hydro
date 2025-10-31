@@ -3,6 +3,19 @@ from earthkit.hydro.upstream import array
 
 
 @xarray
+def percentile(
+    river_network, field, p, node_weights=None, edge_weights=None, return_type=None
+):
+    if node_weights is not None or edge_weights is not None:
+        raise NotImplementedError(
+            "node_weights and edge_weights are currently unsupported."
+        )
+    return array.percentile(
+        river_network, field, p, node_weights, edge_weights, return_type
+    )
+
+
+@xarray
 def var(
     river_network,
     field,

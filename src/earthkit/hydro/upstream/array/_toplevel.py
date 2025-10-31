@@ -14,7 +14,7 @@ def percentile(
         )
     return _operations.percentile(
         river_network=river_network,
-        field=field.astype("f64"),
+        field=field.astype("float64"),
         p=p,
         return_type=return_type,
     )

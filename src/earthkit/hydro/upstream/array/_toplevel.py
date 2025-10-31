@@ -8,6 +8,10 @@ def percentile(
         raise NotImplementedError(
             "node_weights and edge_weights are currently unsupported."
         )
+    if river_network.array_backend != "numpy":
+        raise NotImplementedError(
+            "Only numpy backend is currently supported for percentiles."
+        )
     return _operations.percentile(
         river_network=river_network,
         field=field,

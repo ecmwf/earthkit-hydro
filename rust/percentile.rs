@@ -1,17 +1,16 @@
-use pyo3::prelude::*;
-use rayon::prelude::*;
 use dashmap::DashMap;
 use ndarray::ArrayView1;
 use numpy::{PyArray1, PyReadonlyArray1, PyReadonlyArray2};
+use pyo3::prelude::*;
+use rayon::prelude::*;
 
 #[pyfunction]
 pub fn calc_perc<'py>(
     py: Python<'py>,
     topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
     field: PyReadonlyArray1<'py, f64>,
-    p: f64
+    p: f64,
 ) -> PyResult<Py<PyArray1<f64>>> {
-
     let upstream_map: DashMap<i64, Vec<f64>> = DashMap::new();
 
     let field_array: ArrayView1<f64> = field.as_array();
@@ -29,30 +28,41 @@ pub fn calc_perc<'py>(
 fn process_level_and_cleanup(
     topo_group: &PyReadonlyArray2<'_, i64>,
     upstream_map: &DashMap<i64, Vec<f64>>,
-    field : &ArrayView1<f64>,
-    result : &mut Vec<f64>,
-    p : f64
+    field: &ArrayView1<f64>,
+    result: &mut Vec<f64>,
+    p: f64,
 ) {
     let arr = topo_group.as_array();
     let did_vec = arr.row(0);
     let uid_vec = arr.row(1);
 
-    let did_slice = did_vec.as_slice().expect("Expected contiguous did_vec slice");
-    let uid_slice = uid_vec.as_slice().expect("Expected contiguous uid_vec slice");
+    let did_slice = did_vec
+        .as_slice()
+        .expect("Expected contiguous did_vec slice");
+    let uid_slice = uid_vec
+        .as_slice()
+        .expect("Expected contiguous uid_vec slice");
 
-    did_slice.par_iter().zip(uid_slice.par_iter()).for_each(|(&did, &uid)| {
-        let uid_upstream = {
-            // Get uid upstream vector by removing it from the map, so you can move it without cloning
-            // If it doesn't exist, fallback to vec![uid]
-            upstream_map.remove(&uid).map(|entry| entry.1).unwrap_or_else(|| vec![field[uid as usize]])
-        };
+    did_slice
+        .par_iter()
+        .zip(uid_slice.par_iter())
+        .for_each(|(&did, &uid)| {
+            let uid_upstream = {
+                // Get uid upstream vector by removing it from the map, so you can move it without cloning
+                // If it doesn't exist, fallback to vec![uid]
+                upstream_map
+                    .remove(&uid)
+                    .map(|entry| entry.1)
+                    .unwrap_or_else(|| vec![field[uid as usize]])
+            };
 
-        // Insert or extend did's upstream vector
-        upstream_map.entry(did)
-            .and_modify(|did_upstream| {
-                merge_sorted_unique_f64(did_upstream, &uid_upstream);
-            })
-            .or_insert_with(|| {
+            // Insert or extend did's upstream vector
+            upstream_map
+                .entry(did)
+                .and_modify(|did_upstream| {
+                    merge_sorted_unique_f64(did_upstream, &uid_upstream);
+                })
+                .or_insert_with(|| {
                     let mut v = uid_upstream;
                     match binary_search_f64(&v, field[did as usize]) {
                         Ok(_) => {}
@@ -60,16 +70,17 @@ fn process_level_and_cleanup(
                     }
 
                     v
-            });
+                });
         });
 
-    let pct_results: Vec<(i64, f64)> = did_slice.par_iter()
-    .map(|&did| {
-        let values = upstream_map.get(&did).unwrap();
-        let pct = percentile(values.as_slice(), p);
-        (did, pct)
-    })
-    .collect();
+    let pct_results: Vec<(i64, f64)> = did_slice
+        .par_iter()
+        .map(|&did| {
+            let values = upstream_map.get(&did).unwrap();
+            let pct = percentile(values.as_slice(), p);
+            (did, pct)
+        })
+        .collect();
 
     for (did, pct) in pct_results {
         let idx = did as usize;
@@ -77,11 +88,9 @@ fn process_level_and_cleanup(
             result[idx] = pct;
         }
     }
-
 }
 
 fn percentile(sorted_values: &[f64], percentile: f64) -> f64 {
-
     let n = sorted_values.len();
     let rank = percentile * (n as f64 - 1.0);
     let lower = rank.floor() as usize;
@@ -117,8 +126,6 @@ fn binary_search_f64(slice: &[f64], target: f64) -> Result<usize, usize> {
     }
     Err(base)
 }
-
-
 
 fn merge_sorted_unique_f64(a: &mut Vec<f64>, b: &[f64]) {
     let mut i = 0;

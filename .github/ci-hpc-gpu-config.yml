@@ -1,0 +1,7 @@
+build:
+  modules:
+  - rust
+  python_dependencies:
+  - ecmwf/earthkit-data@develo
+  queue: ng
+  gpus: 1

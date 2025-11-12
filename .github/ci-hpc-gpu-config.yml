@@ -5,3 +5,4 @@ build:
   - ecmwf/earthkit-data@develop
   queue: ng
   gpus: 1
+  toml_opt_dep_sections: all,tests

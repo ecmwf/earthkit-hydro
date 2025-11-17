@@ -132,7 +132,7 @@ def xarray(func):
             )
 
             output_sizes = (
-                {output_core_dims[0]: river_network.n_nodes}
+                {output_core_dims[0][0]: river_network.n_nodes}
                 if len(output_core_dims[0]) == 1
                 else {k: v for k, v in zip(output_core_dims[0], river_network.shape)}
             )

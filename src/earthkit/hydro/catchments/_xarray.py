@@ -76,7 +76,7 @@ def xarray(func):
                 input_core_dims=input_core_dims,
                 output_core_dims=[[node_default_coord]],
                 dask_gufunc_kwargs={
-                    "output_sizes": {"node_default_coord": stations_1d.shape[0]}
+                    "output_sizes": {node_default_coord: stations_1d.shape[0]}
                 },
                 output_dtypes=[float],
                 dask="parallelized",

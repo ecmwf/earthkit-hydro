@@ -1,5 +1,5 @@
 import numpy as np
-from earthkit.utils.array import convert
+from earthkit.utils.array.convert import convert
 
 from ._network_storage import RiverNetworkStorage
 

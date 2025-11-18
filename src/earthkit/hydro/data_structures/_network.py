@@ -1,5 +1,5 @@
 import numpy as np
-from earthkit.utils.array import to_device
+from earthkit.utils.array import convert
 
 from ._network_storage import RiverNetworkStorage
 
@@ -103,11 +103,13 @@ class RiverNetwork:
 
         if array_backend in ["torch", "cupy", "numpy"]:
             self.groups = [
-                to_device(group, device, array_backend=array_backend)
+                convert(group, device=device, array_namespace=array_backend)
                 for group in self.groups
             ]
-            self.mask = to_device(self.mask, device, array_backend=array_backend)
-            self.data = [to_device(self.data[0], device, array_backend=array_backend)]
+            self.mask = convert(self.mask, device=device, array_namespace=array_backend)
+            self.data = [
+                convert(self.data[0], device=device, array_namespace=array_backend)
+            ]
         elif array_backend == "jax":
             assert device == "cpu"
             import jax.numpy as jnp

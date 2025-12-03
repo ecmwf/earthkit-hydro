@@ -28,7 +28,7 @@ def min(xp, river_network, field, locations, upstream, downstream):
             out,
             func,
             node_additive_weight=field,
-            node_modifier_use_upstream=True,
+            node_modifier_use_upstream=False,
         )
 
     return out
@@ -36,7 +36,7 @@ def min(xp, river_network, field, locations, upstream, downstream):
 
 def max(xp, river_network, field, locations, upstream, downstream):
 
-    func_obj = metrics_func_finder("min", xp)
+    func_obj = metrics_func_finder("max", xp)
 
     out = xp.full(river_network.n_nodes, func_obj.base_val)
 
@@ -60,7 +60,7 @@ def max(xp, river_network, field, locations, upstream, downstream):
             out,
             func,
             node_additive_weight=field,
-            node_modifier_use_upstream=True,
+            node_modifier_use_upstream=False,
         )
 
     return out

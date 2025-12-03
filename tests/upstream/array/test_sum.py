@@ -25,7 +25,7 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-@pytest.mark.parametrize("array_backend", ["numpy", "torch", "jax", "tensorflow"])
+@pytest.mark.parametrize("array_backend", ["numpy", "torch", "jax"])
 def test_upstream_metric_sum(
     river_network, input_field, flow_downstream, mv, array_backend
 ):

@@ -12,11 +12,6 @@ def min(xp, river_network, field, locations, upstream, downstream):
 
     func = func_obj.func
 
-    # make xp-agnostic
-    mask = xp.full(river_network.n_nodes, False)
-    mask[river_network.sinks] = True
-    field = field[~mask]
-
     if downstream:
         out = flow_downstream(xp, river_network, out, func, edge_additive_weight=field)
 
@@ -35,11 +30,6 @@ def max(xp, river_network, field, locations, upstream, downstream):
     out[locations] = 0
 
     func = func_obj.func
-
-    # make xp-agnostic
-    mask = xp.full(river_network.n_nodes, False)
-    mask[river_network.sinks] = True
-    field = field[~mask]
 
     if downstream:
         out = flow_downstream(xp, river_network, out, func, edge_additive_weight=field)

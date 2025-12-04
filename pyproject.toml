@@ -54,7 +54,6 @@ dependencies = [
     tests = [
         "pytest",
         "torch",
-        "tensorflow",
         "jax"
         ]
     dev = [

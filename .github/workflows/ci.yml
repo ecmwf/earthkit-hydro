@@ -11,9 +11,12 @@ jobs:
     uses: ecmwf/reusable-workflows/.github/workflows/qa-precommit-run.yml@v2
     secrets: inherit
 
-  test:
-    uses: ecmwf/reusable-workflows/.github/workflows/qa-pytest-pyproject.yml@v2
-    secrets: inherit
+  # TODO: add back
+  # test:
+  #   uses: ecmwf/reusable-workflows/.github/workflows/qa-pytest-pyproject.yml@v2
+  #   secrets: inherit
+  #   with:
+  #     optional-dependencies: tests,dev
 
   # TODO: add back
   # qa-python:

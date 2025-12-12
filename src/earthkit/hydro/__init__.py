@@ -27,5 +27,6 @@ __all__ = [
     "river_network",
     "upstream",
     "subnetwork",
+    "streamorder",
     "__version__",
 ]

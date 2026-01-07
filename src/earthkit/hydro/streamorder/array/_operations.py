@@ -13,10 +13,12 @@ def _ufunc_strahler(
     maxes, counts = field
     up_maxes = xp.gather(maxes, uid, axis=-1)
     old_maxes = xp.gather(maxes, did, axis=-1)
-    xp.maximum.at(maxes, did, up_maxes)
-    counts[did] = (old_maxes == maxes[did]).astype(int) * counts[uid]
-    xp.add.at(counts, did, (up_maxes == maxes[did]).astype(int))
-    maxes[did] = maxes[did] + (counts[did] > 1).astype(int)
+    maxes = xp.scatter_max(maxes, did, up_maxes)
+    counts = xp.scatter_assign(
+        counts, did, (old_maxes == maxes[did]).astype(int) * counts[uid]
+    )
+    counts = xp.scatter_add(counts, did, (up_maxes == maxes[did]).astype(int))
+    maxes = xp.scatter_assign(maxes, did, maxes[did] + (counts[did] > 1).astype(int))
     return (maxes, counts)
 
 
@@ -58,8 +60,9 @@ def flow_strahler(
 def strahler(xp, river_network, return_type):
 
     field = xp.zeros(river_network.n_nodes, dtype=int)
-    # TODO: make xp-agnostic
-    field[river_network.sources] = 1
+    field = xp.scatter_assign(
+        field, river_network.sources, xp.ones(river_network.sources.shape, dtype=int)
+    )
     counts = xp.zeros(river_network.n_nodes, dtype=int)
 
     decorated_func = mask(return_type == "gridded")(flow_strahler)
@@ -69,8 +72,9 @@ def strahler(xp, river_network, return_type):
 @multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def shreve(xp, river_network, return_type):
     field = xp.zeros(river_network.n_nodes, dtype=int)
-    # TODO: make xp-agnostic
-    field[river_network.sources] = 1
+    field = xp.scatter_assign(
+        field, river_network.sources, xp.ones(river_network.sources.shape, dtype=int)
+    )
 
     return upstream_sum(
         river_network=river_network,

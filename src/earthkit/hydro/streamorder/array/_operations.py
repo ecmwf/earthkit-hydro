@@ -14,11 +14,14 @@ def _ufunc_strahler(
     up_maxes = xp.gather(maxes, uid, axis=-1)
     old_maxes = xp.gather(maxes, did, axis=-1)
     maxes = xp.scatter_max(maxes, did, up_maxes)
+    maxes_did = xp.gather(maxes, did)
+    counts_uid = xp.gather(counts, uid)
     counts = xp.scatter_assign(
-        counts, did, (old_maxes == maxes[did]).astype(int) * counts[uid]
+        counts, did, (old_maxes == maxes_did).astype(int) * counts_uid
     )
-    counts = xp.scatter_add(counts, did, (up_maxes == maxes[did]).astype(int))
-    maxes = xp.scatter_assign(maxes, did, maxes[did] + (counts[did] > 1).astype(int))
+    counts = xp.scatter_add(counts, did, (up_maxes == maxes_did).astype(int))
+    counts_did = xp.gather(counts, did)
+    maxes = xp.scatter_assign(maxes, did, maxes_did + (counts_did > 1).astype(int))
     return (maxes, counts)
 
 

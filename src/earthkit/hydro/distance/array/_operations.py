@@ -7,6 +7,11 @@ from earthkit.hydro.distance.array import __operations as _operations
 def min(xp, river_network, field, locations, upstream, downstream, return_type):
     if field is None:
         field = xp.ones(river_network.n_edges)
+    else:
+        # make xp-agnostic
+        arr_mask = xp.full(river_network.n_nodes, False)
+        arr_mask[river_network.sinks] = True
+        field = field[~arr_mask]
     locations, _, _ = locations_to_1d(xp, river_network, locations)
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -19,6 +24,11 @@ def min(xp, river_network, field, locations, upstream, downstream, return_type):
 def max(xp, river_network, field, locations, upstream, downstream, return_type):
     if field is None:
         field = xp.ones(river_network.n_edges)
+    else:
+        # make xp-agnostic
+        arr_mask = xp.full(river_network.n_nodes, False)
+        arr_mask[river_network.sinks] = True
+        field = field[~arr_mask]
     locations, _, _ = locations_to_1d(xp, river_network, locations)
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:

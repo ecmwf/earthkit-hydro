@@ -176,9 +176,9 @@ def to_source(
     """
     locations = river_network.sources
     if path == "longest":
-        return max(river_network, locations, field, True, False, return_type)
+        return max(river_network, locations, field, False, True, return_type)
     elif path == "shortest":
-        return min(river_network, locations, field, True, False, return_type)
+        return min(river_network, locations, field, False, True, return_type)
     else:
         raise ValueError("path must be 'longest' or 'shortest'")
 

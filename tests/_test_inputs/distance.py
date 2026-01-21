@@ -63,19 +63,19 @@ length_1_min_down = np.array(
 
 distance_1_max_up = np.array(
     [
-        [0.0, 1.0, np.inf, np.inf, np.inf],
-        [np.inf, 0.0, np.inf, np.inf, np.inf],
-        [np.inf, np.inf, np.inf, np.inf, np.inf],
-        [np.inf, np.inf, np.inf, 0.0, 4.0],
+        [0.0, 1.0, -np.inf, -np.inf, -np.inf],
+        [-np.inf, 0.0, -np.inf, -np.inf, -np.inf],
+        [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf],
+        [-np.inf, -np.inf, -np.inf, 0.0, 4.0],
     ]
 )
 
 distance_1_max_down = np.array(
     [
-        [0.0, np.inf, np.inf, np.inf, np.inf],
-        [6.0, 0.0, np.inf, np.inf, np.inf],
-        [13.0, 1.0, np.inf, np.inf, np.inf],
-        [np.inf, 19.0, 6.0, 0.0, np.inf],
+        [0.0, -np.inf, -np.inf, -np.inf, -np.inf],
+        [6.0, 0.0, -np.inf, -np.inf, -np.inf],
+        [13.0, 1.0, -np.inf, -np.inf, -np.inf],
+        [-np.inf, 19.0, 6.0, 0.0, -np.inf],
     ]
 )
 
@@ -84,19 +84,19 @@ distance_1_max_down = np.array(
 
 length_1_max_up = np.array(
     [
-        [6.0, 2.0, np.inf, np.inf, np.inf],
-        [np.inf, 1.0, np.inf, np.inf, np.inf],
-        [np.inf, np.inf, np.inf, np.inf, np.inf],
-        [np.inf, np.inf, np.inf, 6.0, 10.0],
+        [6.0, 2.0, -np.inf, -np.inf, -np.inf],
+        [-np.inf, 1.0, -np.inf, -np.inf, -np.inf],
+        [-np.inf, -np.inf, -np.inf, -np.inf, -np.inf],
+        [-np.inf, -np.inf, -np.inf, 6.0, 10.0],
     ]
 )
 
 
 length_1_max_down = np.array(
     [
-        [6.0, np.inf, np.inf, np.inf, np.inf],
-        [13.0, 1.0, np.inf, np.inf, np.inf],
-        [19.0, 2.0, np.inf, np.inf, np.inf],
-        [np.inf, 22.0, 6.0, 6.0, np.inf],
+        [6.0, -np.inf, -np.inf, -np.inf, -np.inf],
+        [13.0, 1.0, -np.inf, -np.inf, -np.inf],
+        [19.0, 2.0, -np.inf, -np.inf, -np.inf],
+        [-np.inf, 22.0, 6.0, 6.0, -np.inf],
     ]
 )

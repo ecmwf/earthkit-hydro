@@ -66,6 +66,7 @@ def calculate_online_metric(
             )
             mean = weighted_field / counts
             weighted_sum_of_squares = weighted_sum_of_squares / counts - mean**2
+            weighted_sum_of_squares = xp.clip(weighted_sum_of_squares, 0, xp.inf)
             if metric == "var":
                 return weighted_sum_of_squares
             elif metric == "std":

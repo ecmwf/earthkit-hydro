@@ -26,6 +26,7 @@ def mask(unmask=True):
                 else:
                     return out_1d
             else:
+                args, kwargs = process_args_kwargs(xp, river_network, args, kwargs)
                 out_1d = func(xp, river_network, field, *args, **kwargs)
                 if unmask:
                     out_shape = field.shape[:-1] + river_network.shape

@@ -62,11 +62,11 @@ def flow_strahler(
 @multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def strahler(xp, river_network, return_type):
 
-    field = xp.zeros(river_network.n_nodes, dtype=int)
+    field = xp.zeros(river_network.n_nodes, dtype=float)
     field = xp.scatter_assign(
-        field, river_network.sources, xp.ones(river_network.sources.shape, dtype=int)
+        field, river_network.sources, xp.ones(river_network.sources.shape, dtype=float)
     )
-    counts = xp.zeros(river_network.n_nodes, dtype=int)
+    counts = xp.zeros(river_network.n_nodes, dtype=float)
 
     decorated_func = mask(return_type == "gridded")(flow_strahler)
     return decorated_func(xp, river_network, field, counts)
@@ -74,9 +74,9 @@ def strahler(xp, river_network, return_type):
 
 @multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def shreve(xp, river_network, return_type):
-    field = xp.zeros(river_network.n_nodes, dtype=int)
+    field = xp.zeros(river_network.n_nodes, dtype=float)
     field = xp.scatter_assign(
-        field, river_network.sources, xp.ones(river_network.sources.shape, dtype=int)
+        field, river_network.sources, xp.ones(river_network.sources.shape, dtype=float)
     )
 
     return upstream_sum(

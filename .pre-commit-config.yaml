@@ -1,8 +1,8 @@
 default_language_version:
     python: python3
 default_stages:
-    - commit
-    - push
+    - pre-commit
+    - pre-push
 repos:
     - repo: https://github.com/charliermarsh/ruff-pre-commit
       rev: v0.5.6

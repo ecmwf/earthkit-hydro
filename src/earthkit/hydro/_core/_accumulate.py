@@ -47,13 +47,17 @@ def _ufunc_to_downstream(
     # ADD HAPPENS BEFORE MULT
     # TODO: add an option to switch order
     if node_additive_weight is not None:
-        modifier_field += node_additive_weight[..., modifier_group]
+        update = xp.gather(node_additive_weight, modifier_group, axis=-1)
+        modifier_field += update
     if edge_additive_weight is not None:
-        modifier_field += edge_additive_weight[..., eid]
+        update = xp.gather(edge_additive_weight, eid, axis=-1)
+        modifier_field += update
     if node_multiplicative_weight is not None:
-        modifier_field *= node_multiplicative_weight[..., modifier_group]
+        update = xp.gather(node_multiplicative_weight, modifier_group, axis=-1)
+        modifier_field *= update
     if edge_multiplicative_weight is not None:
-        modifier_field *= edge_multiplicative_weight[..., eid]
+        update = xp.gather(edge_multiplicative_weight, eid, axis=-1)
+        modifier_field *= update
     return func(
         field,
         did,

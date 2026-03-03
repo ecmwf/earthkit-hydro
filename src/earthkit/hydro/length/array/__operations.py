@@ -8,7 +8,8 @@ def min(xp, river_network, field, locations, upstream, downstream):
 
     out = xp.full(river_network.n_nodes, func_obj.base_val)
 
-    out[locations] = field[locations]
+    updates = xp.gather(field, locations)
+    out = xp.scatter_assign(out, locations, updates)
 
     func = func_obj.func
 
@@ -40,7 +41,8 @@ def max(xp, river_network, field, locations, upstream, downstream):
 
     out = xp.full(river_network.n_nodes, func_obj.base_val)
 
-    out[locations] = field[locations]
+    updates = xp.gather(field, locations)
+    out = xp.scatter_assign(out, locations, updates)
 
     func = func_obj.func
 

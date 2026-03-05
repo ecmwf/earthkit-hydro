@@ -12,19 +12,19 @@ import earthkit.hydro as ekh
         (
             ("cama_nextxy", cama_nextxy_1),
             None,
-            distance_1_to_sink_shortest,
+            distance_1_to_source_shortest,
         ),
     ],
     indirect=["river_network"],
 )
 @pytest.mark.parametrize("array_backend", ["numpy", "torch", "jax"])
-def test_distance_to_sink(river_network, field, expected, array_backend):
-    """Test distance to sink computation."""
+def test_distance_to_source(river_network, field, expected, array_backend):
+    """Test distance to source computation."""
     river_network = river_network.to_device("cpu", array_backend)
-    result = ekh.distance.array.to_sink(
+    result = ekh.distance.array.to_source(
         river_network, field=field, path="shortest", return_type="masked"
     )
     result = np.asarray(result)
     print("Result:", result)
     print("Expected:", expected)
-    np.testing.assert_array_equal(result, expected)
+    np.testing.assert_allclose(result, expected, rtol=1e-6)

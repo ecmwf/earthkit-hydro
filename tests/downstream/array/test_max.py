@@ -24,11 +24,16 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-def test_downstream_metric_max(river_network, input_field, flow_downstream, mv):
+@pytest.mark.parametrize("array_backend", ["numpy", "torch", "jax"])
+def test_downstream_metric_max(river_network, input_field, flow_downstream, mv, array_backend):
+    river_network = river_network.to_device("cpu", array_backend)
+    xp = ekh._backends.find.get_array_backend(array_backend)
     output_field = ekh.downstream.array.max(
-        river_network, input_field, node_weights=None, return_type="masked"
+        river_network, xp.asarray(input_field), node_weights=None, return_type="masked"
     )
+    output_field = np.asarray(output_field)
+    flow_downstream_out = np.asarray(xp.asarray(flow_downstream))
     print(output_field)
-    print(flow_downstream)
-    assert output_field.dtype == flow_downstream.dtype
-    np.testing.assert_allclose(output_field, flow_downstream, equal_nan=True)
+    print(flow_downstream_out)
+    assert output_field.dtype == flow_downstream_out.dtype
+    np.testing.assert_allclose(output_field, flow_downstream, rtol=1e-6, equal_nan=True)

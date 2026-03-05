@@ -84,12 +84,28 @@ def test_crop(river_network):
     if river_network._storage.coords is None:
         pytest.skip("River network does not have coordinates required for crop")
 
-    cropped = ekh.subnetwork.crop(river_network)
+    # First create a subnetwork with a specific node mask that leaves empty borders
+    # This ensures the crop will actually reduce the grid dimensions
+    node_mask = np.zeros(river_network.n_nodes, dtype=bool)
+    # Select nodes in the middle of the grid to leave empty rows/columns at edges
+    # Use a smaller subset to ensure there's space to crop
+    n_select = min(10, river_network.n_nodes // 2)
+    node_mask[:n_select] = True
 
-    # Check that cropped network has the same or fewer gridcells
-    assert cropped.n_nodes == river_network.n_nodes
-    assert cropped.shape[0] <= river_network.shape[0]
-    assert cropped.shape[1] <= river_network.shape[1]
+    subnetwork = ekh.subnetwork.from_mask(river_network, node_mask=node_mask)
+
+    # Skip if subnetwork doesn't have coords
+    if subnetwork._storage.coords is None:
+        pytest.skip("Subnetwork does not have coordinates required for crop")
+
+    # Now crop the subnetwork
+    cropped = ekh.subnetwork.crop(subnetwork)
+
+    # Check that number of nodes is preserved (crop doesn't remove nodes)
+    assert cropped.n_nodes == subnetwork.n_nodes
+
+    # Check that the grid dimensions are reduced (actual cropping happened)
+    assert (cropped.shape[0] < subnetwork.shape[0]) or (cropped.shape[1] < subnetwork.shape[1])
 
     # Check that it's a different object
-    assert cropped is not river_network
+    assert cropped is not subnetwork

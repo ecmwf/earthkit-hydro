@@ -19,9 +19,13 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-def test_catchments_min(river_network, field, locations, expected):
+@pytest.mark.parametrize("array_backend", ["numpy", "torch", "jax"])
+def test_catchments_min(river_network, field, locations, expected, array_backend):
     """Test catchment min aggregation."""
-    result = ekh.catchments.array.min(river_network, field, locations=locations)
+    river_network = river_network.to_device("cpu", array_backend)
+    xp = ekh._backends.find.get_array_backend(array_backend)
+    result = ekh.catchments.array.min(river_network, xp.asarray(field), locations=locations)
+    result = np.asarray(result)
     print("Result:", result)
     print("Expected:", expected)
     np.testing.assert_allclose(result, expected, rtol=1e-6)

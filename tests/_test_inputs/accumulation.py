@@ -655,3 +655,70 @@ mv_2g = -1
 upstream_metric_sum_2g = np.array(
     [-1, 2, -1, 4, 5, 11, -1, -1, 9, 10, -1, -1, -1, -1, 15, 31], dtype=int
 )
+
+# DOWNSTREAM ACCUMULATION RESULTS
+
+# Downstream sum for network 1, field 1c
+downstream_metric_sum_1c = np.array(
+    [7.7, 20.9, 18.8, 10.0, 9.9, 6.2, 13.6, 13.2, 9.8,
+     9.1, 1.1, 2.5, 4.3, 7.6, 3.1, -11.0, -2.1, 3.1,
+     7.5, 8.6],
+    dtype=float,
+)
+
+# Downstream sum for network 1, field 1e (with NaN values)
+downstream_metric_sum_1e = np.array(
+    [7.7, 20.9, np.nan, np.nan, 9.9, 6.2, 13.6, np.nan, 9.8,
+     9.1, 1.1, 2.5, 4.3, 7.6, 3.1, -11.0, -2.1, 3.1,
+     np.nan, np.nan],
+    dtype=float,
+)
+
+# Downstream sum for network 2, field 2g (with missing value -1)
+downstream_metric_sum_2g = np.array(
+    [1.0, 53.0, 51.0, 4.0, 36.0, 31.0, 32.0, 52.0, 23.0, 24.0, 25.0, 44.0, 0.0,
+     14.0, 75.0, 60.0],
+    dtype=float,
+)
+
+# Downstream min for network 1, field 1c
+downstream_metric_min_1c = np.array(
+    [-2.1, -2.1, -2.1, -3.2, -2.1, -2.1, -2.1, -2.1, -2.1, -2.1, -2.1,
+     -2.1, -2.1, -2.1, -4.5, -8.9, -2.1, -2.1, -2.1, -2.1],
+    dtype=float,
+)
+
+# Downstream min for network 1, field 1e (with NaN values)
+downstream_metric_min_1e = np.array(
+    [-2.1, -2.1, np.nan, np.nan, -2.1, -2.1, -2.1, np.nan, -2.1, -2.1, -2.1,
+     -2.1, -2.1, -2.1, -4.5, -8.9, -2.1, -2.1, np.nan, np.nan],
+    dtype=float,
+)
+
+# Downstream max for network 1, field 1c
+downstream_metric_max_1c = np.array(
+    [5.1, 11.1, 8.9, 8.9, 6.4, 5.1, 11.1, 8.9, 6.4, 6.4, 3.2,
+     4.6, 6.4, 6.4, 6.4, -2.1, -2.1, 5.2, 5.2, 5.2],
+    dtype=float,
+)
+
+# Downstream max for network 1, field 1e (with NaN values)
+downstream_metric_max_1e = np.array(
+    [5.1, 11.1, np.nan, np.nan, 6.4, 5.1, 11.1, np.nan, 6.4, 6.4, 3.2,
+     4.6, 6.4, 6.4, 6.4, -2.1, -2.1, 5.2, np.nan, np.nan],
+    dtype=float,
+)
+
+# Downstream mean for network 1, field 1c
+downstream_metric_mean_1c = np.array(
+    [1.925, 5.225, 4.7, 2.5, 2.475, 2.06666667, 4.53333333, 4.4, 3.26666667, 2.275,
+     0.55, 1.25, 2.15, 2.53333333, 0.775, -5.5, -2.1, 1.55, 2.5, 2.15],
+    dtype=float,
+)
+
+# Downstream mean for network 1, field 1e (with NaN values)
+downstream_metric_mean_1e = np.array(
+    [1.925, 5.225, np.nan, np.nan, 2.475, 2.06666667, 4.53333333, np.nan, 3.26666667, 2.275,
+     0.55, 1.25, 2.15, 2.53333333, 0.775, -5.5, -2.1, 1.55, np.nan, np.nan],
+    dtype=float,
+)

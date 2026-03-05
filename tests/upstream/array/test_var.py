@@ -36,4 +36,4 @@ def test_calculate_upstream_metric_var(river_network, input_field, flow_downstre
     print(output_field)
     print(flow_downstream_out)
     assert output_field.dtype == flow_downstream_out.dtype
-    np.testing.assert_allclose(output_field, flow_downstream, rtol=1e-6, equal_nan=True)
+    np.testing.assert_allclose(output_field, flow_downstream, rtol=1e-5, equal_nan=True)

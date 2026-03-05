@@ -100,3 +100,25 @@ length_1_max_down = np.array(
         [-np.inf, 22.0, 6.0, 6.0, -np.inf],
     ]
 )
+
+# Distance to sink/source (no field weights, shortest path by number of edges)
+distance_1_to_sink_shortest = np.array(
+    [3.0, 3.0, 3.0, 3.0, 3.0, 2.0, 2.0, 2.0, 2.0, 3.0, 1.0, 1.0, 1.0, 2.0, 3.0, 1.0, 0.0,
+     1.0, 2.0, 3.0]
+)
+
+distance_1_to_source_shortest = np.array(
+    [0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 2.0, 2.0, 2.0, 1.0,
+     0.0, 0.0, 1.0, 2.0, 1.0, 0.0]
+)
+
+# Length to sink (with field weights, shortest path)
+length_1_to_sink_shortest = np.array(
+    [22.0, 6.0, 10.0, 11.0, 12.0, 16.0, 5.0, 8.0, 8.0, 12.0, 9.0, 4.0, 3.0,
+     12.0, 21.0, 11.0, 3.0, 3.0, 9.0, 13.0]
+)
+
+length_1_to_source_shortest = np.array(
+    [6.0, 1.0, 2.0, 3.0, 4.0, 13.0, 2.0, 7.0, 9.0, 0.0, 19.0, 3.0, 7.0,
+     9.0, 9.0, 8.0, 6.0, 10.0, 10.0, 4.0]
+)

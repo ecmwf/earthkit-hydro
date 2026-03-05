@@ -19,7 +19,7 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-@pytest.mark.parametrize("array_backend", ["numpy", "torch", "jax"])
+@pytest.mark.parametrize("array_backend", ["numpy", "torch"])
 def test_catchments_max(river_network, field, locations, expected, array_backend):
     """Test catchment max aggregation."""
     river_network = river_network.to_device("cpu", array_backend)

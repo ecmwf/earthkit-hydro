@@ -259,6 +259,22 @@ upstream_metric_product_1c = np.array(
     dtype=float,
 )
 
+upstream_metric_var_1c = np.array(
+    [0.0, 0.0, 0.0, 0.0, 0.0,
+     3.24, 3.61, 26.08222222, 7.29, 0.0,
+     2.16222222, 7.10888889, 18.17061728, 11.12, 0.0,
+     0.0, 21.772475, 3.14888889, 2.7225, 0.0],
+    dtype=float,
+)
+
+upstream_metric_std_1c = np.array(
+    [0.0, 0.0, 0.0, 0.0, 0.0,
+     1.8, 1.9, 5.1070757, 2.7, 0.0,
+     1.47044967, 2.66624997, 4.2627007, 3.3346664, 0.0,
+     0.0, 4.66609848, 1.77451089, 1.65, 0.0],
+    dtype=float,
+)
+
 # 1d: bool field input
 input_field_1d = np.array(
     [
@@ -478,6 +494,22 @@ upstream_metric_product_1e = np.array(
         np.nan,
         1.10000e00,
     ],
+    dtype=float,
+)
+
+upstream_metric_var_1e = np.array(
+    [0.0, 0.0, 0.0, 0.0, 0.0,
+     3.24, 3.61, np.nan, 7.29, 0.0,
+     2.16222222, 7.10888889, np.nan, 11.12, 0.0,
+     0.0, np.nan, np.nan, np.nan, 0.0],
+    dtype=float,
+)
+
+upstream_metric_std_1e = np.array(
+    [0.0, 0.0, 0.0, 0.0, 0.0,
+     1.8, 1.9, np.nan, 2.7, 0.0,
+     1.47044967, 2.66624997, np.nan, 3.3346664, 0.0,
+     0.0, np.nan, np.nan, np.nan, 0.0],
     dtype=float,
 )
 

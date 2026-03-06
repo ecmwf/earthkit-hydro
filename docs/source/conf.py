@@ -88,7 +88,8 @@ bibtex_bibfiles = ["references.bib"]
 
 html_theme_options = {
     "light_css_variables": {
-        "color-sidebar-background": "#001F3F",
+        "color-sidebar-background": "#131320",
+        # "color-background-primary": "",
         "color-sidebar-link-text": "#ffffff",
         "color-sidebar-brand-text": "#ffffff",
         "color-sidebar-caption-text": "#ffffff",
@@ -98,7 +99,8 @@ html_theme_options = {
         "color-sidebar-item-expander-background--hover": "#001F3F",
     },
     "dark_css_variables": {
-        "color-sidebar-background": "#001F3F",
+        "color-sidebar-background": "#131320",
+        "color-background-primary": "#131320",
         "color-sidebar-link-text": "#ffffff",
         "color-sidebar-brand-text": "#ffffff",
         "color-sidebar-caption-text": "#ffffff",

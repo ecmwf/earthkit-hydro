@@ -1,6 +1,15 @@
 @import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 
+:root {
+  --font-stack: "Nunito", sans-serif;
+  --font-stack--monospace: "Nunito", sans-serif;
+}
+
 body {
+  font-family: "Nunito", sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
   font-family: "Nunito", sans-serif;
 }
 

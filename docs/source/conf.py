@@ -89,7 +89,7 @@ bibtex_bibfiles = ["references.bib"]
 html_theme_options = {
     "light_css_variables": {
         "color-sidebar-background": "#131320",
-        # "color-background-primary": "",
+        # "color-background-primary": "", # leave as default to avoid overriding the light theme background
         "color-sidebar-link-text": "#ffffff",
         "color-sidebar-brand-text": "#ffffff",
         "color-sidebar-caption-text": "#ffffff",

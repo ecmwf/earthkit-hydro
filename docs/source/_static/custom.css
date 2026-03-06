@@ -5,29 +5,7 @@ body {
 }
 
 .sidebar-drawer {
-  background: #262640;
-  background-blend-mode: normal;
+  background: url("octahedral-grid.svg") repeat top center / 100vw auto, #262640;
   opacity: 1;
-  background-attachment: scroll;
-}
-
-/* Only set position: relative on desktop (above Furo's 63em mobile breakpoint).
-   Below 63em, Furo sets .sidebar-drawer to position: fixed to create a slide-out
-   drawer. Overriding that with position: relative keeps it in the document flow
-   and creates a large gap. */
-@media screen and (min-width: 63em) {
-  .sidebar-drawer {
-    position: relative;
-  }
-}
-
-.sidebar-drawer::before {
-  content: "";
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: url("octahedral-grid.svg") repeat top center / 100vw auto;
-  opacity: 0.25;
-  pointer-events: none;
-  z-index: 0;
   background-attachment: scroll;
 }

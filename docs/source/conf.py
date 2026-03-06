@@ -94,6 +94,8 @@ html_theme_options = {
         "color-sidebar-caption-text": "#ffffff",
         "color-brand-primary": "#FCE54B",
         "color-brand-content": "#5f8dd3",
+        "color-sidebar-item-background--hover": "#001F3F",
+        "color-sidebar-item-expander-background--hover": "#001F3F",
     },
     "dark_css_variables": {
         "color-sidebar-background": "#001F3F",
@@ -102,6 +104,8 @@ html_theme_options = {
         "color-sidebar-caption-text": "#ffffff",
         "color-brand-primary": "#FCE54B",
         "color-brand-content": "#5f8dd3",
+        "color-sidebar-item-background--hover": "#001F3F",
+        "color-sidebar-item-expander-background--hover": "#001F3F",
     },
     "light_logo": "earthkit-hydro-dark.svg",
     "dark_logo": "earthkit-hydro-dark.svg",

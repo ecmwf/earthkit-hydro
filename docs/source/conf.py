@@ -31,7 +31,6 @@ sys.path.insert(0, os.path.abspath("../../src"))
 project = "earthkit-hydro"
 copyright = "2025, European Centre for Medium-Range Weather Forecasts (ECMWF)"
 author = "European Centre for Medium-Range Weather Forecasts (ECMWF)"
-# release = '0.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -67,6 +66,8 @@ extensions = [
     # "sphinx_autodoc_typehints",
     # Integrates Jupyter Notebooks into Sphinx
     "nbsphinx",
+    # Simplifies linking to external resources with short aliases
+    # "sphinx.ext.extlinks"
 ]
 
 templates_path = ["_templates"]

@@ -53,3 +53,34 @@ h1, h2, h3, h4, h5, h6 {
     width: calc(50% - 26em);
   }
 }
+
+/* ── xarray dark-mode fix for Furo "auto" theme ──────────────────────
+   xarray's inline <style> only targets explicit body[data-theme="dark"],
+   but Furo's auto mode keeps data-theme="auto" and relies on
+   @media (prefers-color-scheme: dark).  Mirror the dark palette here
+   so xarray widgets remain readable when the OS is in dark mode.
+   ─────────────────────────────────────────────────────────────────── */
+@media (prefers-color-scheme: dark) {
+  body:not([data-theme="light"]) {
+    --xr-font-color0: rgba(255, 255, 255, 1);
+    --xr-font-color2: rgba(255, 255, 255, 0.54);
+    --xr-font-color3: rgba(255, 255, 255, 0.38);
+    --xr-border-color: #555;
+    --xr-disabled-color: #888;
+    --xr-background-color: var(--color-background-primary, #131416);
+    --xr-background-color-row-even: var(--color-background-secondary, #1a1c1e);
+    --xr-background-color-row-odd: var(--color-background-hover, #1e2124);
+  }
+}
+
+/* Also cover the explicit dark toggle (belt-and-suspenders) */
+body[data-theme="dark"] {
+  --xr-font-color0: rgba(255, 255, 255, 1);
+  --xr-font-color2: rgba(255, 255, 255, 0.54);
+  --xr-font-color3: rgba(255, 255, 255, 0.38);
+  --xr-border-color: #555;
+  --xr-disabled-color: #888;
+  --xr-background-color: var(--color-background-primary, #131416);
+  --xr-background-color-row-even: var(--color-background-secondary, #1a1c1e);
+  --xr-background-color-row-odd: var(--color-background-hover, #1e2124);
+}

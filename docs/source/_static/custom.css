@@ -132,3 +132,14 @@ body[data-theme="dark"] table.dataframe tbody tr:nth-child(odd) td {
 body[data-theme="dark"] table.dataframe tbody tr:hover td {
   background-color: #2a2d31;
 }
+
+/* (to be checked) remove error output in a notebook cell */
+.nboutput .stderr {
+    display: none;
+}
+
+/* (to be checked) allows the use of multi-line text cells in a list-table */
+.wy-table-responsive table td,
+.wy-table-responsive table th {
+    white-space: inherit;
+}

@@ -98,3 +98,6 @@ class TFBackend(ArrayBackend):
             with tf.device(device):
                 tensor = tf.identity(tensor)
         return tensor
+
+    def clip(self, *args, **kwargs):
+        return tf.clip_by_value(*args, **kwargs)

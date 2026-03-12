@@ -31,7 +31,6 @@ sys.path.insert(0, os.path.abspath("../../src"))
 project = "earthkit-hydro"
 copyright = "2025, European Centre for Medium-Range Weather Forecasts (ECMWF)"
 author = "European Centre for Medium-Range Weather Forecasts (ECMWF)"
-# release = '0.0.0'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
@@ -67,6 +66,8 @@ extensions = [
     # "sphinx_autodoc_typehints",
     # Integrates Jupyter Notebooks into Sphinx
     "nbsphinx",
+    # Simplifies linking to external resources with short aliases
+    # "sphinx.ext.extlinks"
 ]
 
 templates_path = ["_templates"]
@@ -80,32 +81,34 @@ html_theme = "furo"
 
 html_static_path = ["_static"]
 
-# html_context = {
-#     "display_github": True,
-#     "github_user": "ecmwf",         # GitHub username
-#     "github_repo": "docsample",             # GitHub repository name
-#     "github_version": "main",               # Branch (e.g., 'main', 'master')
-#     "conf_py_path": "/docs/",               # Path to your docs root in the repo
-# }
+html_css_files = [
+    "custom.css",
+]
 
 bibtex_bibfiles = ["references.bib"]
 
 html_theme_options = {
     "light_css_variables": {
-        "color-sidebar-background": "#001F3F",
+        "color-sidebar-background": "#131320",
+        # "color-background-primary": "", # leave as default to avoid overriding the light theme background
         "color-sidebar-link-text": "#ffffff",
         "color-sidebar-brand-text": "#ffffff",
         "color-sidebar-caption-text": "#ffffff",
-        "color-brand-primary": "#00D9FF",
+        "color-brand-primary": "#FCE54B",
         "color-brand-content": "#5f8dd3",
+        "color-sidebar-item-background--hover": "#001F3F",
+        "color-sidebar-item-expander-background--hover": "#001F3F",
     },
     "dark_css_variables": {
-        "color-sidebar-background": "#001F3F",
+        "color-sidebar-background": "#131320",
+        "color-background-primary": "#131320",
         "color-sidebar-link-text": "#ffffff",
         "color-sidebar-brand-text": "#ffffff",
         "color-sidebar-caption-text": "#ffffff",
-        "color-brand-primary": "#00D9FF",
+        "color-brand-primary": "#FCE54B",
         "color-brand-content": "#5f8dd3",
+        "color-sidebar-item-background--hover": "#001F3F",
+        "color-sidebar-item-expander-background--hover": "#001F3F",
     },
     "light_logo": "earthkit-hydro-dark.svg",
     "dark_logo": "earthkit-hydro-dark.svg",

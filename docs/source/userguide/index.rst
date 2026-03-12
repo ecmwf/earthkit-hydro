@@ -32,6 +32,7 @@ Operations:
    catchment_delineation
    catchment_statistics
    distance_length_calculations
+   streamorder
    subnetwork_creation
 
 Misc:

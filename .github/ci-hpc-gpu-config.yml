@@ -1,0 +1,9 @@
+build:
+  modules:
+  - rust
+  python_dependencies:
+  - ecmwf/earthkit-data@develop
+  - ecmwf/earthkit-utils@develop
+  queue: ng
+  gpus: 1
+  toml_opt_dep_sections: all,tests

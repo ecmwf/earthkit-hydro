@@ -5,10 +5,10 @@ earthkit-hydro
 
     This software is **Incubating** and subject to ECMWF's guidelines on `Software Maturity <https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity>`_.
 
-**earthkit-hydro** is a Python library for common hydrological functions. It is the hydrological component of earthkit :cite:`earthkit`.
+**earthkit-hydro** is a Python library for common hydrological functions.
+It is the hydrological component of earthkit :cite:`earthkit`.
 
-Main Features
--------------
+**Main Features**
 
 .. raw:: html
 
@@ -45,32 +45,56 @@ Main Features
 - GPU support
 - Differentiable operations suitable for machine learning
 
-.. raw:: html
+.. grid:: 1
+   :gutter: 2
 
-   <br style="clear: both">
+   .. grid-item-card:: Installation and Getting Started
+      :img-top: _static/rocket.svg
+      :link: getting-started
+      :link-type: doc
+      :class-card: sd-shadow-sm
 
-Installation
-------------
+      New to earthkit-hydro? Start here with installation and a quick overview.
 
-Try it out! earthkit-hydro is readily available on PyPI.
+.. grid:: 1 1 2 2
+   :gutter: 2
 
-.. code-block:: bash
+   .. grid-item-card:: Tutorials
+      :img-top: _static/book.svg
+      :link: tutorials/index
+      :link-type: doc
+      :class-card: sd-shadow-sm
 
-   pip install earthkit-hydro
+      Step-by-step guides to learn earthkit-hydro.
 
-Support
--------
+   .. grid-item-card:: How-tos
+      :img-top: _static/tool.svg
+      :link: how-tos/index
+      :link-type: doc
+      :class-card: sd-shadow-sm
+
+      Practical recipes for common tasks.
+
+   .. grid-item-card:: Concepts and Explanations
+      :img-top: _static/bulb.svg
+      :link: userguide/index
+      :link-type: doc
+      :class-card: sd-shadow-sm
+
+      Understand the core ideas behind earthkit-hydro.
+
+   .. grid-item-card:: API Reference Guide
+      :img-top: _static/brackets-contain.svg
+      :link: autodocs/earthkit.hydro
+      :link-type: doc
+      :class-card: sd-shadow-sm
+
+      Detailed documentation of all functions and classes.
+
+
+
+**Support**
+
 Have a feature request or found a bug? Feel free to open an
 `issue <https://github.com/ecmwf/earthkit-hydro/issues/new/choose>`_.
 
-Documentation
--------------
-.. toctree::
-   :maxdepth: 2
-   :titlesonly:
-
-   userguide/index
-   tutorials/index
-   autodocs/earthkit.hydro
-   contributing
-   references

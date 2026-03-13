@@ -351,3 +351,6 @@ Cargo.lock
 _version.py
 .DS_Store
 autodocs/
+
+*.joblib
+*.nc

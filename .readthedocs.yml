@@ -8,7 +8,7 @@ build:
     pre_build:
       - rm -rf _build
       - rm -rf docs/_build
-      - cd docs && make rst
+      - cd docs && make autodocs
 
 python:
   install:

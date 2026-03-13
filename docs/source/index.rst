@@ -98,3 +98,42 @@ It is the hydrological component of earthkit :cite:`earthkit`.
 Have a feature request or found a bug? Feel free to open an
 `issue <https://github.com/ecmwf/earthkit-hydro/issues/new/choose>`_.
 
+
+.. toctree::
+   :caption: User guide
+   :maxdepth: 2
+   :hidden:
+
+   getting-started
+   tutorials/index
+   userguide/index
+   autodocs/earthkit.hydro
+
+
+.. toctree::
+   :caption: Developer guide
+   :maxdepth: 2
+   :hidden:
+
+   contributing
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Extras
+   :hidden:
+
+   references
+   genindex
+
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Related projects
+   :hidden:
+
+   earthkit <https://earthkit.readthedocs.io/en/latest>
+   earthkit-data <https://earthkit-data.readthedocs.io/en/latest>
+   earthkit-plots <https://earthkit-plots.readthedocs.io/en/latest>
+   earthkit-meteo <https://earthkit-meteo.readthedocs.io/en/latest>
+   earthkit-transforms <https://earthkit-transforms.readthedocs.io/en/latest>

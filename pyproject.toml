@@ -104,9 +104,6 @@ select = [
   "D",  # pydocstyle
 ]
 
-[tool.ruff.lint.isort]
-force-single-line = true
-
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = [
     "F401", # unused imports

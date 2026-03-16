@@ -143,3 +143,28 @@ body[data-theme="dark"] table.dataframe tbody tr:hover td {
 .wy-table-responsive table th {
     white-space: inherit;
 }
+
+
+/* Homepage card styling */
+.sd-card .sd-card-img-top {
+  height: 100px;
+  width: auto;
+  object-fit: contain;
+  margin: 1rem auto 0 auto;
+  display: block;
+  background: transparent;
+  filter: brightness(0.8) invert(0.1);
+  transition: filter 0.2s ease;
+}
+
+/* Dark mode when user explicitly selects dark */
+[data-theme="dark"] .sd-card .sd-card-img-top {
+  filter: invert(1) brightness(0.6);
+}
+
+/* Dark mode when theme = auto and system prefers dark */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sd-card .sd-card-img-top {
+    filter: invert(1) brightness(0.6);
+  }
+}

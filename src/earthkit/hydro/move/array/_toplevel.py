@@ -54,7 +54,8 @@ def upstream(
     Returns
     -------
     array-like
-        Array of values after movement up the river network for every river network node or gridcell, depending on `return_type`.
+        Array of values after movement up the river network for every river network node or gridcell,
+        depending on `return_type`.
     """
     return _operations.upstream(
         river_network=river_network,
@@ -119,7 +120,8 @@ def downstream(
     Returns
     -------
     array-like
-        Array of values after movement down the river network for every river network node or gridcell, depending on `return_type`.
+        Array of values after movement down the river network for every river network node or gridcell,
+        depending on `return_type`.
     """
     return _operations.downstream(
         river_network=river_network,

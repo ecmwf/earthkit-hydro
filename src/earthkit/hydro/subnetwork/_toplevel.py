@@ -35,9 +35,7 @@ def from_mask(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=
 
     if node_mask is not None:
         if node_mask.shape[-2:] == river_network.shape:
-            node_mask = mask_last2_dims(
-                np, node_mask, river_network.mask, node_mask.shape
-            )
+            node_mask = mask_last2_dims(np, node_mask, river_network.mask, node_mask.shape)
 
     node_relabel = np.empty(river_network.n_nodes, dtype=int)
     node_relabel[node_mask] = np.arange(node_mask.sum())
@@ -48,9 +46,7 @@ def from_mask(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=
             node_mask[storage.sorted_data[0]] & node_mask[storage.sorted_data[1]]
         )
     elif edge_mask is None:
-        valid_edges = (
-            node_mask[storage.sorted_data[0]] & node_mask[storage.sorted_data[1]]
-        )
+        valid_edges = node_mask[storage.sorted_data[0]] & node_mask[storage.sorted_data[1]]
     else:
         valid_edges = edge_mask[storage.sorted_data[2]]
 
@@ -88,7 +84,6 @@ def crop(river_network: RiverNetwork, copy=True):
     RiverNetwork
         The river network object created from the given data.
     """
-
     if river_network.array_backend != "numpy" or copy is not True:
         raise NotImplementedError
 
@@ -101,9 +96,7 @@ def crop(river_network: RiverNetwork, copy=True):
 
     storage.shape = (int(row_max - row_min + 1), int(col_max - col_min + 1))
 
-    storage.mask = np.ravel_multi_index(
-        (rows - row_min, cols - col_min), dims=storage.shape
-    )
+    storage.mask = np.ravel_multi_index((rows - row_min, cols - col_min), dims=storage.shape)
 
     for i, key in enumerate(storage.coords.keys()):
         if i == 0:

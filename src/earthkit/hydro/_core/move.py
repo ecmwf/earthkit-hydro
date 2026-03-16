@@ -18,9 +18,7 @@ def calculate_move_metric(
         invert_graph = False
         node_modifier_use_upstream = True
     else:
-        raise ValueError(
-            f"flow_direction must be 'up' or 'down', got {flow_direction}."
-        )
+        raise ValueError(f"flow_direction must be 'up' or 'down', got {flow_direction}.")
 
     if node_weights is None:
         if metric == "mean" or metric == "std" or metric == "var":
@@ -66,9 +64,7 @@ def calculate_move_metric(
                 xp.zeros(field.shape),
                 func,
                 invert_graph,
-                node_additive_weight=(
-                    field**2 if node_weights is None else field**2 * node_weights
-                ),
+                node_additive_weight=(field**2 if node_weights is None else field**2 * node_weights),
                 node_modifier_use_upstream=node_modifier_use_upstream,
                 edge_multiplicative_weight=edge_weights,
             )

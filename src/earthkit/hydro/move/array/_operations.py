@@ -12,9 +12,7 @@ def upstream(xp, river_network, field, node_weights, edge_weights, metric, retur
 
 
 @multi_backend(jax_static_args=["xp", "river_network", "return_type", "metric"])
-def downstream(
-    xp, river_network, field, node_weights, edge_weights, metric, return_type
-):
+def downstream(xp, river_network, field, node_weights, edge_weights, metric, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")

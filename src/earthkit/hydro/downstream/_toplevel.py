@@ -44,7 +44,8 @@ def var(
     - :math:`\bar{x}_j` is the weighted average at node :math:`j`,
     - :math:`\mathrm{Var}(x)_j` is the weighted variance at node :math:`j`.
 
-    Accumulation proceeds in inverse topological order from the sinks to the sources. This formulation computes the population variance.
+    Accumulation proceeds in inverse topological order from the sinks to the sources.
+    This formulation computes the population variance.
 
     Parameters
     ----------
@@ -116,7 +117,8 @@ def std(
     - :math:`\mathrm{Var}(x)_j` is the weighted variance at node :math:`j`.
     - :math:`\mathrm{Std}(x)_j` is the weighted standard deviation at node :math:`j`.
 
-    Accumulation proceeds in inverse topological order from the sinks to the sources. This formulation computes the population standard deviation.
+    Accumulation proceeds in inverse topological order from the sinks to the sources.
+    This formulation computes the population standard deviation.
 
     Parameters
     ----------

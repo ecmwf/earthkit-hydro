@@ -26,9 +26,7 @@ def var(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_downstream_metric = mask(return_type == "gridded")(
-        calculate_downstream_metric
-    )
+    decorated_calculate_downstream_metric = mask(return_type == "gridded")(calculate_downstream_metric)
     return decorated_calculate_downstream_metric(
         xp,
         river_network,
@@ -44,9 +42,7 @@ def std(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_downstream_metric = mask(return_type == "gridded")(
-        calculate_downstream_metric
-    )
+    decorated_calculate_downstream_metric = mask(return_type == "gridded")(calculate_downstream_metric)
     return decorated_calculate_downstream_metric(
         xp,
         river_network,
@@ -62,9 +58,7 @@ def mean(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_downstream_metric = mask(return_type == "gridded")(
-        calculate_downstream_metric
-    )
+    decorated_calculate_downstream_metric = mask(return_type == "gridded")(calculate_downstream_metric)
     return decorated_calculate_downstream_metric(
         xp,
         river_network,
@@ -80,9 +74,7 @@ def sum(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_downstream_metric = mask(return_type == "gridded")(
-        calculate_downstream_metric
-    )
+    decorated_calculate_downstream_metric = mask(return_type == "gridded")(calculate_downstream_metric)
     return decorated_calculate_downstream_metric(
         xp,
         river_network,
@@ -98,9 +90,7 @@ def min(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_downstream_metric = mask(return_type == "gridded")(
-        calculate_downstream_metric
-    )
+    decorated_calculate_downstream_metric = mask(return_type == "gridded")(calculate_downstream_metric)
     return decorated_calculate_downstream_metric(
         xp,
         river_network,
@@ -116,9 +106,7 @@ def max(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_downstream_metric = mask(return_type == "gridded")(
-        calculate_downstream_metric
-    )
+    decorated_calculate_downstream_metric = mask(return_type == "gridded")(calculate_downstream_metric)
     return decorated_calculate_downstream_metric(
         xp,
         river_network,

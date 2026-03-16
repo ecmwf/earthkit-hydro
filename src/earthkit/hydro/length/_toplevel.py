@@ -31,7 +31,8 @@ def min(
     where:
 
     - :math:`w_i` is the node length (e.g., pixel length),
-    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`,
+      which can include upstream and/or downstream nodes depending on passed arguments.
     - :math:`l_j` is the total length at node :math:`j`.
 
     Unreachable nodes are given a length of :math:`\infty`.
@@ -93,7 +94,8 @@ def max(
     where:
 
     - :math:`w_i` is the node length (e.g., pixel length),
-    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`,
+      which can include upstream and/or downstream nodes depending on passed arguments.
     - :math:`l_j` is the total length at node :math:`j`.
 
     Unreachable nodes are given a length of :math:`-\infty`.
@@ -152,11 +154,13 @@ def to_source(
     where:
 
     - :math:`w_i` is the node length (e.g., pixel length),
-    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`,
+      which can include upstream and/or downstream nodes depending on passed arguments.
     - :math:`\bigoplus` is the aggregation function (max for longest path or min for shortest path).
     - :math:`l_j` is the total length at node :math:`j`.
 
-    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum, and :math:`\infty` if :math:`\bigoplus` is a minimum.
+    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum,
+    and :math:`\infty` if :math:`\bigoplus` is a minimum.
 
     Parameters
     ----------
@@ -208,11 +212,13 @@ def to_sink(
     where:
 
     - :math:`w_i` is the node length (e.g., pixel length),
-    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`,
+      which can include upstream and/or downstream nodes depending on passed arguments.
     - :math:`\bigoplus` is the aggregation function (max for longest path or min for shortest path).
     - :math:`l_j` is the total length at node :math:`j`.
 
-    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum, and :math:`\infty` if :math:`\bigoplus` is a minimum.
+    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum,
+    and :math:`\infty` if :math:`\bigoplus` is a minimum.
 
     Parameters
     ----------

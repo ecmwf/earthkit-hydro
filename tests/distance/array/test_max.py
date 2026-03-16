@@ -28,9 +28,7 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-def test_distance_max(
-    river_network, stations_list, upstream, downstream, weights, result
-):
+def test_distance_max(river_network, stations_list, upstream, downstream, weights, result):
     dist = ekh.distance.array.max(
         river_network,
         stations_list,

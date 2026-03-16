@@ -36,9 +36,7 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-def test_distance_min(
-    river_network, stations_list, upstream, downstream, weights, result
-):
+def test_distance_min(river_network, stations_list, upstream, downstream, weights, result):
     dist = ekh.distance.array.min(
         river_network,
         stations_list,

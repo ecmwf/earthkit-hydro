@@ -1,13 +1,13 @@
 import numpy as np
 
 # catchment_query_field_1 = np.array(
-#     [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 1, np.nan, 5, 4, 2, 3, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan], dtype="int"
+#     [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 1, np.nan, 5, 4, 2, 3, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan], dtype="int"  # noqa: E501
 # )
 catchment_query_field_1 = [8, 12, 13, 11, 10]
 
 
 # catchment_query_field_2 = np.array(
-#     [4, np.nan, 1, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 3, np.nan, 2, np.nan, np.nan], dtype="int"
+#     [4, np.nan, 1, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, np.nan, 3, np.nan, 2, np.nan, np.nan], dtype="int"  # noqa: E501
 # )
 catchment_query_field_2 = [2, 13, 11, 0]
 

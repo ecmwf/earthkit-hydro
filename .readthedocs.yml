@@ -6,16 +6,16 @@ build:
     python: "3.11"
   jobs:
     pre_build:
-      - rm -rf _build
-      - rm -rf docs/_build
-      - cd docs && make rst
+    - rm -rf _build
+    - rm -rf docs/_build
+    - cd docs && make rst
 
 python:
   install:
-    - method: pip
-      path: .
-      extra_requirements:
-      - docs
+  - method: pip
+    path: .
+    extra_requirements:
+    - docs
 
 sphinx:
   configuration: docs/source/conf.py

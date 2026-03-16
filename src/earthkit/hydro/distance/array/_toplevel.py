@@ -28,7 +28,8 @@ def min(
     where:
 
     - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
-    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`,
+      which can include upstream and/or downstream nodes depending on passed arguments.
     - :math:`d_j` is the total distance at node :math:`j`.
 
     Unreachable nodes are given a distance of :math:`\infty`.
@@ -91,7 +92,8 @@ def max(
     where:
 
     - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
-    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`,
+      which can include upstream and/or downstream nodes depending on passed arguments.
     - :math:`d_j` is the total distance at node :math:`j`.
 
     Unreachable nodes are given a distance of :math:`-\infty`.
@@ -151,11 +153,13 @@ def to_source(
     where:
 
     - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
-    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`,
+      which can include upstream and/or downstream nodes depending on passed arguments.
     - :math:`\bigoplus` is the aggregation function (max for longest path or min for shortest path).
     - :math:`d_j` is the total distance at node :math:`j`.
 
-    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum, and :math:`\infty` if :math:`\bigoplus` is a minimum.
+    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum,
+    and :math:`\infty` if :math:`\bigoplus` is a minimum.
 
     Parameters
     ----------
@@ -202,11 +206,13 @@ def to_sink(river_network, field=None, path="shortest", return_type=None):
     where:
 
     - :math:`w_{ij}` is the edge distance (e.g., downstream distance),
-    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`, which can include upstream and/or downstream nodes depending on passed arguments.
+    - :math:`\mathrm{Neighbour}(j)` is the set of neighbouring nodes to node :math:`j`,
+      which can include upstream and/or downstream nodes depending on passed arguments.
     - :math:`\bigoplus` is the aggregation function (max for longest path or min for shortest path).
     - :math:`d_j` is the total distance at node :math:`j`.
 
-    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum, and :math:`\infty` if :math:`\bigoplus` is a minimum.
+    Unreachable nodes are given a distance of :math:`-\infty` if :math:`\bigoplus` is a maximum,
+    and :math:`\infty` if :math:`\bigoplus` is a minimum.
 
     Parameters
     ----------

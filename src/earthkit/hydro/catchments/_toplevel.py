@@ -48,7 +48,8 @@ def var(
     - :math:`\bar{x}_j` is the weighted average at node :math:`j`,
     - :math:`\mathrm{Var}(x)_j` is the weighted variance at node :math:`j`.
 
-    Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population variance.
+    Accumulation proceeds in topological order from the sources to the sinks.
+    This formulation computes the population variance.
 
     Parameters
     ----------
@@ -126,7 +127,8 @@ def std(
     - :math:`\mathrm{Var}(x)_j` is the weighted variance at node :math:`j`.
     - :math:`\mathrm{Std}(x)_j` is the weighted standard deviation at node :math:`j`.
 
-    Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population standard deviation.
+    Accumulation proceeds in topological order from the sources to the sinks.
+    This formulation computes the population standard deviation.
 
     Parameters
     ----------
@@ -432,14 +434,13 @@ def max(
 
 
 @find_xarray
-def find(
-    river_network, locations, overwrite=True, return_type=None, input_core_dims=None
-):
+def find(river_network, locations, overwrite=True, return_type=None, input_core_dims=None):
     r"""
     Delineates catchment areas.
 
     Given a field indicating one or more start locations (e.g., outlet points or pour points),
-    this function delineates the catchments upstream of each start location by grouping all cells that flow into these points.
+    this function delineates the catchments upstream of each start location
+    by grouping all cells that flow into these points.
 
     Parameters
     ----------

@@ -1,18 +1,18 @@
-[package]
-name = "earthkit-hydro"
-version = "0.0.0" # placeholder, will be overwritten
-edition = "2021"
-
 [dependencies]
-pyo3 = { version = "0.26", features = ["extension-module"] }
-numpy = "0.26"
-rayon = "1.7"
 fixedbitset = "0.5"
+numpy = "0.26"
+pyo3 = {version = "0.26", features = ["extension-module"]}
+rayon = "1.7"
 
 [lib]
+crate-type = ["cdylib"]
 # See https://github.com/PyO3/pyo3 for details
 name = "_rust"  # private module to be nested into Python package
 path = "rust/lib.rs"
-crate-type = ["cdylib"]
+
+[package]
+edition = "2021"
+name = "earthkit-hydro"
+version = "0.0.0"  # placeholder, will be overwritten
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html

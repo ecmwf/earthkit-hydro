@@ -1,13 +1,9 @@
 import numpy as np
 
-upstream_1 = np.array(
-    [0, 0, 0, 0, 0, 1, 2, 7, 5, 0, 6, 7, 31, 25, 0, 0, 70, 19, 20, 0], dtype=float
-)
+upstream_1 = np.array([0, 0, 0, 0, 0, 1, 2, 7, 5, 0, 6, 7, 31, 25, 0, 0, 70, 19, 20, 0], dtype=float)
 
 
-upstream_2 = np.array(
-    [13, 0, 2, 0, 0, 5, 12, 3, 0, 0, 13, 24, 0, 30, 0, 15], dtype=float
-)
+upstream_2 = np.array([13, 0, 2, 0, 0, 5, 12, 3, 0, 0, 13, 24, 0, 30, 0, 15], dtype=float)
 
 
 downstream_1 = np.array(
@@ -16,6 +12,4 @@ downstream_1 = np.array(
 )
 
 
-downstream_2 = np.array(
-    [0, 3, 8, 0, 6, 11, 11, 12, 14, 14, 14, 7, 1, 0, 16, 12], dtype=float
-)
+downstream_2 = np.array([0, 3, 8, 0, 6, 11, 11, 12, 14, 14, 14, 7, 1, 0, 16, 12], dtype=float)

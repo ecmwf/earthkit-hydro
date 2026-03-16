@@ -41,9 +41,7 @@ def xarray(func):
 
         locations = all_args["locations"]
 
-        stations_1d, locations, orig_locations = locations_to_1d(
-            xp, river_network, locations
-        )
+        stations_1d, locations, orig_locations = locations_to_1d(xp, river_network, locations)
 
         all_args["locations"] = stations_1d
 
@@ -55,9 +53,7 @@ def xarray(func):
 
             ndim = output.ndim
             dim_names = [f"axis{i + 1}" for i in range(ndim - 1)]
-            coords = {
-                dim: np.arange(size) for dim, size in zip(dim_names, output.shape[:-1])
-            }
+            coords = {dim: np.arange(size) for dim, size in zip(dim_names, output.shape[:-1])}
 
             coords[node_default_coord] = np.arange(river_network.n_nodes)[stations_1d]
             dim_names.append(node_default_coord)
@@ -65,7 +61,6 @@ def xarray(func):
             result = xr.DataArray(output, dims=dim_names, coords=coords, name="out")
 
         else:
-
             reshuffled_func = get_reshuffled_func(func, arg_order)
 
             input_core_dims = get_input_core_dims(input_core_dims, xr_args)
@@ -75,9 +70,7 @@ def xarray(func):
                 *xr_args,
                 input_core_dims=input_core_dims,
                 output_core_dims=[[node_default_coord]],
-                dask_gufunc_kwargs={
-                    "output_sizes": {node_default_coord: stations_1d.shape[0]}
-                },
+                dask_gufunc_kwargs={"output_sizes": {node_default_coord: stations_1d.shape[0]}},
                 output_dtypes=[float],
                 dask="parallelized",
                 kwargs=non_xr_kwargs,

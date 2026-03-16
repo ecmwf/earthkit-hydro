@@ -49,9 +49,7 @@ def get_reshuffled_func(func, arg_order):
     return reshuffled_func
 
 
-def get_input_output_core_dims(
-    input_core_dims, output_core_dims, xr_args, river_network, return_grid
-):
+def get_input_output_core_dims(input_core_dims, output_core_dims, xr_args, river_network, return_grid):
     if input_core_dims is None:
         input_core_dims = [get_core_dims(xr_arg) for xr_arg in xr_args]
     elif len(input_core_dims) == 1:
@@ -62,9 +60,7 @@ def get_input_output_core_dims(
             if len(input_core_dims[0]) == 2:  # grid in and out
                 output_core_dims = [input_core_dims[0]]
             else:
-                output_core_dims = [
-                    list(river_network.coords.keys())
-                ]  # 1d in, grid out
+                output_core_dims = [list(river_network.coords.keys())]  # 1d in, grid out
         else:
             if len(input_core_dims[0]) == 1:  # 1d in and out
                 output_core_dims = [input_core_dims[0]]
@@ -101,10 +97,7 @@ def xarray(func):
             offset = 2 if return_grid else 1
             ndim = output.ndim
             dim_names = [f"axis{i + 1}" for i in range(ndim - offset)]
-            coords = {
-                dim: np.arange(size)
-                for dim, size in zip(dim_names, output.shape[:-offset])
-            }
+            coords = {dim: np.arange(size) for dim, size in zip(dim_names, output.shape[:-offset])}
 
             if return_grid:
                 for k, v in river_network.coords.items():
@@ -124,7 +117,6 @@ def xarray(func):
                 }
                 result = result.assign_coords(**assign_dict)
         else:
-
             reshuffled_func = get_reshuffled_func(func, arg_order)
 
             input_core_dims, output_core_dims = get_input_output_core_dims(

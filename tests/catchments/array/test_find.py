@@ -21,12 +21,8 @@ import earthkit.hydro as ekh
 def test_find_catchments_2d(river_network, query_field, find_catchments):
     # field = np.zeros(river_network.mask.shape, dtype="int")
     # field[river_network.mask] = query_field
-    network_find_catchments = ekh.catchments.array.find(
-        river_network, locations=query_field
-    )
+    network_find_catchments = ekh.catchments.array.find(river_network, locations=query_field)
     print(find_catchments)
     print(network_find_catchments)
-    np.testing.assert_array_equal(
-        network_find_catchments.flat[river_network.mask], find_catchments
-    )
+    np.testing.assert_array_equal(network_find_catchments.flat[river_network.mask], find_catchments)
     # np.testing.assert_array_equal(network_find_catchments[~river_network.mask], 0)

@@ -77,7 +77,6 @@ class RiverNetwork:
         RiverNetwork
             The modified RiverNetwork.
         """
-
         from earthkit.utils.array.convert import convert
 
         # TODO: use xp.asarray
@@ -103,14 +102,9 @@ class RiverNetwork:
                 array_backend = self.array_backend
 
         if array_backend in ["torch", "cupy", "numpy"]:
-            self.groups = [
-                convert(group, device=device, array_namespace=array_backend)
-                for group in self.groups
-            ]
+            self.groups = [convert(group, device=device, array_namespace=array_backend) for group in self.groups]
             self.mask = convert(self.mask, device=device, array_namespace=array_backend)
-            self.data = [
-                convert(self.data[0], device=device, array_namespace=array_backend)
-            ]
+            self.data = [convert(self.data[0], device=device, array_namespace=array_backend)]
         elif array_backend == "jax":
             assert device == "cpu"
             import jax.numpy as jnp
@@ -155,9 +149,7 @@ class RiverNetwork:
         None
         """
         if return_type not in ["gridded", "masked"]:
-            raise ValueError(
-                f'Invalid return_type {return_type}. Valid types are "gridded", "masked"'
-            )
+            raise ValueError(f'Invalid return_type {return_type}. Valid types are "gridded", "masked"')
         self.return_type = return_type
 
     def export(self, fpath="river_network.joblib", compression=1):

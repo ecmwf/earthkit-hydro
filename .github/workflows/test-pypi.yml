@@ -2,7 +2,7 @@ name: test-cd
 
 on:
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 jobs:
   pypi_binwheels:

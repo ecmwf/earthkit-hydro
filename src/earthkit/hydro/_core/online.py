@@ -16,9 +16,7 @@ def calculate_online_metric(
     elif flow_direction == "down":
         invert_graph = False
     else:
-        raise ValueError(
-            f"flow_direction must be 'up' or 'down', got {flow_direction}."
-        )
+        raise ValueError(f"flow_direction must be 'up' or 'down', got {flow_direction}.")
 
     field = xp.copy(field)
 

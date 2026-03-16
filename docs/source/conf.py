@@ -110,6 +110,10 @@ html_css_files = [
     "custom.css",
 ]
 
+html_favicon = (
+    "https://raw.githubusercontent.com/ecmwf/logos/refs/heads/main/logos/earthkit/earthkit-logo-only.svg"
+)
+
 bibtex_bibfiles = ["references.bib"]
 
 d_thing = (

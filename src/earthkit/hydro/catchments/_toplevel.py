@@ -6,6 +6,28 @@ from ._xarray import xarray
 
 
 @xarray
+def percentile(
+    river_network,
+    field,
+    p,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+    input_core_dims=None,
+):
+    from earthkit.hydro.catchments.array._operations import percentile as perc
+
+    return perc(
+        river_network=river_network,
+        field=field,
+        p=p,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
+
+
+@xarray
 def var(
     river_network,
     field,

@@ -3,6 +3,15 @@ from earthkit.hydro.upstream import array
 
 
 @xarray
+def percentile(
+    river_network, field, p, node_weights=None, edge_weights=None, return_type=None
+):
+    return array.percentile(
+        river_network, field, p, node_weights, edge_weights, return_type
+    )
+
+
+@xarray
 def var(
     river_network,
     field,

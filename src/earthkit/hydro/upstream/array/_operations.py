@@ -21,6 +21,27 @@ def calculate_upstream_metric(
     )
 
 
+# TODO: clean up
+def percentile(river_network, field, p, return_type):
+    from earthkit.hydro import _rust
+
+    def calculate_percentile(xp, river_network, field, p):
+        return _rust.calc_perc(river_network.groups, field, p)
+
+    return_type = river_network.return_type if return_type is None else return_type
+    if return_type not in ["gridded", "masked"]:
+        raise ValueError("return_type must be either 'gridded' or 'masked'.")
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
+        calculate_percentile
+    )
+    # TODO: assert inputs are numpy
+    from earthkit.hydro._backends.numpy_backend import NumPyBackend
+
+    return decorated_calculate_upstream_metric(
+        NumPyBackend(), river_network, field, p  # ignored
+    )
+
+
 @multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def var(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type

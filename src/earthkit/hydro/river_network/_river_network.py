@@ -53,7 +53,8 @@ def create(
     use_cache : bool, optional
         Whether to cache the loaded/created river network for quicker reloading. Default is True.
     cache_dir : str, optional
-        Where to store the cached river networks. Default is None, which uses `tempfile.mkdtemp(suffix="_earthkit_hydro")`.
+        Where to store the cached river networks.
+        Default is None, which uses `tempfile.mkdtemp(suffix="_earthkit_hydro")`.
     cache_fname : str, optional
         A string template for the cache filename convention.
     cache_compression : int, optional
@@ -173,11 +174,26 @@ def load(
 
     References
     ----------
-    .. [1] Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Grimaldi, Stefania; Disperati, Juliana; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for Europe. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/f572c443-7466-4adf-87aa-c0847a169f23
-    .. [2] Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Disperati, Juliana; Grimaldi, Stefania; Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS. European Commission, Joint Research Centre (JRC) [Dataset] PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
-    .. [3] Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M. (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets. Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873
-    .. [4] Lehner, Bernhard; Verdin, Kristine; Jarvis, Andy (2008): New global hydrography derived from spaceborne elevation data. Eos, Transactions, 89(10): 93-94. Data available at https://www.hydrosheds.org.
-    .. [5] Wortmann, Michel; Slater, Louise; Hawker, Laurence; Liu, Yinxue; Neal, Jeffrey; Zhang, Boen; Schwenk, Jon; Allen, George H.; Ashworth, Philip; Boothroyd, Richard; Cloke, Hannah; Delorme, Pauline; Gebrechorkos, Solomon H.; Griffith, Helen; Leyland, Julian; McLelland, Stuart; Nicholas, Andrew P.; Sambrook-Smith, Gregory; Vahidi, Elham; Parsons, Daniel; Darby, Stephen E. (2025). Global River Topology (GRIT): A bifurcating river hydrography. Water Resources Research, 61(5), DOI: 10.1029/2024WR038308
+    .. [1] Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Grimaldi, Stefania; Disperati, Juliana;
+           Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for Europe.
+           European Commission, Joint Research Centre (JRC) [Dataset]
+           PID: http://data.europa.eu/89h/f572c443-7466-4adf-87aa-c0847a169f23
+    .. [2] Choulga, Margarita; Moschini, Francesca; Mazzetti, Cinzia; Disperati, Juliana; Grimaldi, Stefania;
+           Beck, Hylke; Salamon, Peter; Prudhomme, Christel (2023): LISFLOOD static and parameter maps for GloFAS.
+           European Commission, Joint Research Centre (JRC) [Dataset]
+           PID: http://data.europa.eu/89h/68050d73-9c06-499c-a441-dc5053cb0c86
+    .. [3] Yamazaki, Dai; Ikeshima, Daiki; Sosa, Jeison; Bates, Paul D.; Allen, George H.; Pavelsky, Tamlin M.
+           (2019): MERIT Hydro: A high-resolution global hydrography map based on latest topography datasets.
+           Water Resources Research, vol.55, pp.5053-5073, 2019, DOI: 10.1029/2019WR024873
+    .. [4] Lehner, Bernhard; Verdin, Kristine; Jarvis, Andy (2008): New global hydrography derived from
+           spaceborne elevation data. Eos, Transactions, 89(10): 93-94.
+           Data available at https://www.hydrosheds.org.
+    .. [5] Wortmann, Michel; Slater, Louise; Hawker, Laurence; Liu, Yinxue; Neal, Jeffrey; Zhang, Boen;
+           Schwenk, Jon; Allen, George H.; Ashworth, Philip; Boothroyd, Richard; Cloke, Hannah; Delorme,
+           Pauline; Gebrechorkos, Solomon H.; Griffith, Helen; Leyland, Julian; McLelland, Stuart; Nicholas,
+           Andrew P.; Sambrook-Smith, Gregory; Vahidi, Elham; Parsons, Daniel; Darby, Stephen E. (2025).
+           Global River Topology (GRIT): A bifurcating river hydrography.
+           Water Resources Research, 61(5), DOI: 10.1029/2024WR038308
     """
     try:
         uri = data_source.format(

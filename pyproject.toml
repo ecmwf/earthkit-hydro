@@ -121,6 +121,9 @@ select = [
 "__init__.py" = [
   "F401"  # unused imports
 ]
+"docs/source/conf.py" = [
+  "E501"  # SVG path data cannot be split
+]
 "tests/*" = [
   "F405",  # variable may be undefined, or defined from star imports
   "F403"  # use of wildcard imports

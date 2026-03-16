@@ -66,7 +66,8 @@ class RiverNetwork:
         Parameters
         ----------
         device : str, optional
-            The device to which to transfer. Default is None, which is `'cpu'` for all backends except cupy, which is `'gpu'`.
+            The device to which to transfer.
+            Default is None, which is `'cpu'` for all backends except cupy, which is `'gpu'`.
         array_backend : str, optional
             The array backend.
             One of "numpy", "np", "cupy", "cp", "pytorch", "torch", "jax", "jnp", "tensorflow", "tf", "mlx" or "mx".

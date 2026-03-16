@@ -59,7 +59,8 @@ def upstream(
     Returns
     -------
     xarray object
-        Array of values after movement up the river network for every river network node or gridcell, depending on `return_type`.
+        Array of values after movement up the river network for every river network node or gridcell,
+        depending on `return_type`.
     """
     return array.upstream(river_network, field, node_weights, edge_weights, metric, return_type)
 
@@ -121,6 +122,7 @@ def downstream(
     Returns
     -------
     xarray object
-        Array of values after movement down the river network for every river network node or gridcell, depending on `return_type`.
+        Array of values after movement down the river network for every river network node or gridcell,
+        depending on `return_type`.
     """
     return array.downstream(river_network, field, node_weights, edge_weights, metric, return_type)

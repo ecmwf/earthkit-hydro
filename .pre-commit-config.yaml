@@ -25,13 +25,14 @@ repos:
           - --exit-non-zero-on-fix
           - --preview
       - id: ruff-format
-  - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-    rev: v2.16.0
+  - repo: https://github.com/google/yamlfmt
+    rev: v0.13.0
     hooks:
-      - id: pretty-format-yaml
-        args: [--autofix, --preserve-quotes]
-      - id: pretty-format-toml
-        args: [--autofix]
+      - id: yamlfmt
+  - repo: https://github.com/tox-dev/pyproject-fmt
+    rev: "v2.5.0"
+    hooks:
+      - id: pyproject-fmt
   - repo: local
     hooks:
       - id: forbid-to-commit

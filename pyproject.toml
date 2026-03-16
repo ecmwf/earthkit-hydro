@@ -74,17 +74,11 @@ dependencies = [
         "pre-commit"
         ]
 
-[tool.black]
-line-length = 88
-skip-string-normalization = false
-
-[tool.isort]
-profile = "black"  # Ensures compatibility with Black's formatting.
-line_length = 88  # Same as Black's line length for consistency.
-
 # Linting settings
 [tool.ruff]
-line-length = 88
+line-length = 120
+lint.select = [ "E", "F", "I" ]
+lint.isort.force-single-line = true
 
 [tool.ruff.format]
 quote-style = "double"

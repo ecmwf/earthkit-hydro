@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=65", "setuptools-rust", "setuptools_scm[toml]>=8"]
+requires = ["setuptools>=77", "setuptools-rust", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -13,12 +13,13 @@ maintainers = [
     {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
     ]
 description = "A Python library for common hydrological functions"
-license = { text = "Apache License Version 2.0" }
+license = "Apache-2.0"
+license-files = [ "LICENSE" ]
 classifiers = [
     "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Natural Language :: English",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
     "Programming Language :: Python :: 3.9",

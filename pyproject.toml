@@ -1,6 +1,6 @@
 [build-system]
 build-backend = "setuptools.build_meta"
-requires = ["setuptools>=65", "setuptools-rust", "setuptools_scm[toml]>=8"]
+requires = ["setuptools>=77", "setuptools-rust", "setuptools_scm[toml]>=8"]
 
 [project]
 authors = [
@@ -8,9 +8,9 @@ authors = [
 ]
 classifiers = [
   "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
   "Intended Audience :: Science/Research",
   "Natural Language :: English",
-  "License :: OSI Approved :: Apache Software License",
   "Operating System :: OS Independent",
   "Programming Language :: Python :: 3 :: Only",
   "Programming Language :: Python :: 3.9",
@@ -29,7 +29,8 @@ dependencies = [
 ]
 description = "A Python library for common hydrological functions"
 dynamic = ["version", "readme"]
-license = {text = "Apache License Version 2.0"}
+license = "Apache-2.0"
+license-files = ["LICENSE"]
 maintainers = [
   {name = "Oisín M. Morrison", email = "oisin.morrison@ecmwf.int"},
   {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
@@ -84,7 +85,7 @@ windows.before-all = "rustup target add aarch64-pc-windows-msvc i686-pc-windows-
 
 # Testing
 [tool.pytest]
-addopts = "--pdbcls=IPython.terminal.debugger:Pdb"
+adopts = "--pdbcls=IPython.terminal.debugger:Pdb"
 testpaths = ["tests"]
 
 # Linting settings

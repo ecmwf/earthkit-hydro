@@ -8,44 +8,18 @@ earthkit-hydro
 **earthkit-hydro** is a Python library for common hydrological functions.
 It is the hydrological component of earthkit :cite:`earthkit`.
 
-**Main Features**
-
-.. raw:: html
-
-   <div style="float: left; margin-right: 30px;">
-
-.. https://agupubs.onlinelibrary.wiley.com/cms/asset/e10b31b2-7a5c-498d-bb27-49966867e6a8/wrcr70124-fig-0002-m.jpg
-.. figure:: ../images/glofas.png
-   :width: 300px
-
-   *Adapted from:* :cite:`doc_figure`
-
-.. raw:: html
-
-   </div>
-
-- Catchment delineation
-- Catchment-based statistics
-- Directional flow-based accumulations
-- River network distance calculations
-- Upstream/downstream field propagation
-- Bifurcation handling
-- Custom weighting and decay support
-
-.. raw:: html
-
-   <br style="clear: both">
-
-.. image:: ../images/array_backends_with_xr.png
-   :width: 300px
-   :align: right
-
-- Support for PCRaster, CaMa-Flood, HydroSHEDS, MERIT-Hydro and GRIT river network formats
-- Compatible with major array-backends: xarray, numpy, cupy, torch, jax, mlx and tensorflow
-- GPU support
-- Differentiable operations suitable for machine learning
-
 .. grid:: 1
+   :gutter: 2
+
+   .. grid-item-card:: Why earthkit-hydro?
+      :img-top:  _static/earthkit-hydro-grey.svg
+      :link: why
+      :link-type: doc
+      :class-card: sd-shadow-sm
+
+      The motivation and key features of earthkit-hydro.
+
+.. grid:: 1 1 2 2
    :gutter: 2
 
    .. grid-item-card:: Installation and Getting Started
@@ -54,10 +28,15 @@ It is the hydrological component of earthkit :cite:`earthkit`.
       :link-type: doc
       :class-card: sd-shadow-sm
 
-      New to earthkit-hydro? Start here with installation and a quick overview.
+      New? Start here to get up and running.
 
-.. grid:: 1 1 2 2
-   :gutter: 2
+   .. grid-item-card:: Frequently Asked Questions
+      :img-top: _static/message-question.svg
+      :link: getting-started
+      :link-type: doc
+      :class-card: sd-shadow-sm
+
+      The most common questions, answered.
 
    .. grid-item-card:: Tutorials
       :img-top: _static/book.svg
@@ -65,9 +44,9 @@ It is the hydrological component of earthkit :cite:`earthkit`.
       :link-type: doc
       :class-card: sd-shadow-sm
 
-      Step-by-step guides to learn earthkit-hydro.
+      Step-by-step guides to learn.
 
-   .. grid-item-card:: How-tos
+   .. grid-item-card:: How-Tos
       :img-top: _static/tool.svg
       :link: how-tos/index
       :link-type: doc
@@ -75,15 +54,15 @@ It is the hydrological component of earthkit :cite:`earthkit`.
 
       Practical recipes for common tasks.
 
-   .. grid-item-card:: Concepts and Explanations
+   .. grid-item-card:: Concepts
       :img-top: _static/bulb.svg
       :link: userguide/index
       :link-type: doc
       :class-card: sd-shadow-sm
 
-      Understand the core ideas behind earthkit-hydro.
+      Explanations of core concepts and design decisions.
 
-   .. grid-item-card:: API Reference Guide
+   .. grid-item-card:: API Reference
       :img-top: _static/brackets-contain.svg
       :link: autodocs/earthkit.hydro
       :link-type: doc
@@ -98,6 +77,11 @@ It is the hydrological component of earthkit :cite:`earthkit`.
 Have a feature request or found a bug? Feel free to open an
 `issue <https://github.com/ecmwf/earthkit-hydro/issues/new/choose>`_.
 
+.. toctree::
+   :maxdepth: 2
+   :hidden:
+
+   why
 
 .. toctree::
    :caption: User guide
@@ -105,8 +89,10 @@ Have a feature request or found a bug? Feel free to open an
    :hidden:
 
    getting-started
+   faq
    tutorials/index
-   userguide/index
+   howto/index
+   explanation/index
    autodocs/earthkit.hydro
 
 

@@ -22,11 +22,15 @@ def calculate_upstream_metric(
 
 
 # TODO: clean up
-def percentile(river_network, field, p, return_type):
+def percentile(river_network, field, weights, p, return_type):
     from earthkit.hydro import _rust
 
-    def calculate_percentile(xp, river_network, field, p):
-        return _rust.calc_perc(river_network.groups, field, p)
+    def calculate_percentile(xp, river_network, field, weights, p):
+        if weights is not None:
+            print("weights are not None, using weighted percentile")
+            return _rust.calc_weighted_perc(river_network.groups, field, weights, p)
+        else:
+            return _rust.calc_perc(river_network.groups, field, p)
 
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -38,7 +42,7 @@ def percentile(river_network, field, p, return_type):
     from earthkit.hydro._backends.numpy_backend import NumPyBackend
 
     return decorated_calculate_upstream_metric(
-        NumPyBackend(), river_network, field, p  # ignored
+        NumPyBackend(), river_network, field, weights, p  # ignored
     )
 
 

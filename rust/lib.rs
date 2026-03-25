@@ -13,6 +13,7 @@ use pyo3::prelude::*;
 use rayon::prelude::*;
 use std::sync::atomic::{AtomicI64, Ordering};
 mod percentile;
+mod weighted_percentile;
 
 #[pyfunction]
 fn compute_topological_labels_rust<'py>(
@@ -79,5 +80,9 @@ fn compute_topological_labels_rust<'py>(
 fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
     m.add_function(wrap_pyfunction!(percentile::calc_perc, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        weighted_percentile::calc_weighted_perc,
+        m
+    )?)?;
     Ok(())
 }

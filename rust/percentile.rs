@@ -68,15 +68,14 @@ fn process_level_and_cleanup(
             upstream_map
                 .entry(did)
                 .and_modify(|did_upstream| {
-                    merge_sorted_unique_f64(did_upstream, &uid_upstream);
+                    merge_sorted_f64(did_upstream, &uid_upstream);
                 })
                 .or_insert_with(|| {
                     let mut v = uid_upstream;
-                    match binary_search_f64(&v, field[did as usize]) {
-                        Ok(_) => {}
-                        Err(pos) => v.insert(pos, field[did as usize]),
-                    }
-
+                    let pos = match binary_search_f64(&v, field[did as usize]) {
+                        Ok(pos) | Err(pos) => pos,
+                    };
+                    v.insert(pos, field[did as usize]);
                     v
                 });
         });
@@ -135,26 +134,18 @@ fn binary_search_f64(slice: &[f64], target: f64) -> Result<usize, usize> {
     Err(base)
 }
 
-fn merge_sorted_unique_f64(a: &mut Vec<f64>, b: &[f64]) {
+fn merge_sorted_f64(a: &mut Vec<f64>, b: &[f64]) {
     let mut i = 0;
     let mut j = 0;
     let mut result = Vec::with_capacity(a.len() + b.len());
 
     while i < a.len() && j < b.len() {
-        match a[i].partial_cmp(&b[j]).unwrap() {
-            std::cmp::Ordering::Less => {
-                result.push(a[i]);
-                i += 1;
-            }
-            std::cmp::Ordering::Greater => {
-                result.push(b[j]);
-                j += 1;
-            }
-            std::cmp::Ordering::Equal => {
-                result.push(a[i]);
-                i += 1;
-                j += 1;
-            }
+        if a[i] <= b[j] {
+            result.push(a[i]);
+            i += 1;
+        } else {
+            result.push(b[j]);
+            j += 1;
         }
     }
 

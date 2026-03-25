@@ -164,7 +164,7 @@ body[data-theme="dark"] table.dataframe tbody tr:hover td {
 
 /* Dark mode when theme = auto and system prefers dark */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .sd-card .sd-card-img-top {
+  body:not([data-theme="light"]) .sd-card .sd-card-img-top {
     filter: invert(1) brightness(0.6);
   }
 }

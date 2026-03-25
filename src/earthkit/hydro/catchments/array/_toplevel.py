@@ -1,6 +1,14 @@
 from earthkit.hydro.catchments.array import _operations
 
 
+def percentile(
+    river_network, field, p, locations, node_weights=None, edge_weights=None
+):
+    return _operations.percentile(
+        river_network, field, p, locations, node_weights, edge_weights
+    )
+
+
 def var(river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
     Computes the weighted variance of a field over the upstream

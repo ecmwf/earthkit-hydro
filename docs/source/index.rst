@@ -32,7 +32,7 @@ It is the hydrological component of earthkit :cite:`earthkit`.
 
    .. grid-item-card:: Frequently Asked Questions
       :img-top: _static/message-question.svg
-      :link: getting-started
+      :link: faq
       :link-type: doc
       :class-card: sd-shadow-sm
 
@@ -46,21 +46,21 @@ It is the hydrological component of earthkit :cite:`earthkit`.
 
       Step-by-step guides to learn.
 
-   .. grid-item-card:: How-Tos
+   .. grid-item-card:: How-to Guides
       :img-top: _static/tool.svg
-      :link: how-tos/index
+      :link: howto/index
       :link-type: doc
       :class-card: sd-shadow-sm
 
       Practical recipes for common tasks.
 
-   .. grid-item-card:: Concepts
+   .. grid-item-card:: Explanation
       :img-top: _static/bulb.svg
-      :link: userguide/index
+      :link: explanation/index
       :link-type: doc
       :class-card: sd-shadow-sm
 
-      Explanations of core concepts and design decisions.
+      Background concepts and design decisions.
 
    .. grid-item-card:: API Reference
       :img-top: _static/brackets-contain.svg
@@ -102,6 +102,7 @@ Have a feature request or found a bug? Feel free to open an
    :hidden:
 
    contributing
+   writing-guidelines
 
 
 .. toctree::

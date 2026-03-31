@@ -7,8 +7,11 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import datetime
+import json
 import os
 import sys
+
+import yaml
 
 on_rtd = os.environ.get("READTHEDOCS") == "True"
 
@@ -30,6 +33,8 @@ else:
 sys.path.insert(0, os.path.abspath("../../src"))
 
 project = "earthkit-hydro"
+module_prefix = project.replace("-", ".")
+autodocs_dir = "autodocs"
 copyright = f"{datetime.datetime.now().year}, European Centre for Medium-Range Weather Forecasts (ECMWF)"
 author = "European Centre for Medium-Range Weather Forecasts (ECMWF)"
 
@@ -41,6 +46,8 @@ extensions = [
     "sphinx.ext.autodoc",
     # Supports Google-style and NumPy-style docstrings
     "sphinx.ext.napoleon",
+    # Generate summary pages for documented objects
+    "sphinx.ext.autosummary",
     # Renders LaTeX math in HTML using MathJax
     "sphinx.ext.mathjax",
     # Option to click viewcode
@@ -73,16 +80,13 @@ extensions = [
     "sphinx_design",
 ]
 
-# # autodoc options
-# autodoc_inherit_docstrings = True
-# autodoc_default_options = {
-#     "members": True,
-#     "imported-members": True,
-#     "undoc-members": False,
-#     "show-inheritance": True,
+# GitHub links configuration
+# extlinks = {
+#     "pr": ("https://github.com/ecmwf/earthkit-transforms/pull/%s", "PR #%s"),
+#     "issue": ("https://github.com/ecmwf/earthkit-transforms/issues/%s", "Issue #%s"),
 # }
 
-# # intersphinx configuration, to automatically link to upstream documentation.
+# intersphinx configuration, to automatically link to upstream documentation.
 # intersphinx_mapping = {
 #     "python": ("https://docs.python.org/3/", None),
 #     "numpy": ("https://numpy.org/doc/stable/", None),
@@ -94,6 +98,24 @@ extensions = [
 #     "earthkit-data": ("https://earthkit-data.readthedocs.io/en/latest/", None),
 #     "earthkit-plots": ("https://earthkit-plots.readthedocs.io/en/latest/", None),
 # }
+
+# clean_autodocs.py feature flags
+# Set to False/None to disable or soften the corresponding processing step.
+autodocs_delete_hidden = True  # delete RST files for private/hidden modules
+autodocs_replace_automodule = (
+    False  # replace automodule directives with autosummary tables
+)
+autodocs_short_display_names = (
+    True  # shorten toctree labels to the last module component
+)
+autodocs_top_level_maxdepth = (
+    1  # :maxdepth: on top-level page (None = keep sphinx-apidoc value)
+)
+autodocs_rename_titles = True  # strip " package"/" module" from RST page headings
+autodocs_top_level_title = (
+    "API Reference"  # top-level page heading (used when rename_titles=True)
+)
+autodocs_titlesonly = False  # inject :titlesonly: into toctree directives
 
 templates_path = ["_templates"]
 exclude_patterns = []
@@ -110,9 +132,12 @@ html_css_files = [
     "custom.css",
 ]
 
-html_favicon = (
-    "https://raw.githubusercontent.com/ecmwf/logos/refs/heads/main/logos/earthkit/earthkit-logo-only.svg"
-)
+html_js_files = [
+    "earthkit-packages.js",  # generated from earthkit-packages.yml at build time
+    "custom.js",
+]
+
+html_favicon = "https://github.com/ecmwf/logos/raw/refs/heads/feat/grey_notext_logos/logos/earthkit/earthkit-hydro-notext.svg"
 
 bibtex_bibfiles = ["references.bib"]
 
@@ -165,3 +190,38 @@ html_theme_options = {
         },
     ],
 }
+
+# Do not execute Jupyter notebooks during the build (prevents build-time errors
+# when kernels or optional dependencies are missing) and keep nbsphinx strictness
+# moderate so the docs can be built in CI without requiring heavy kernels.
+nbsphinx_execute = "never"
+nbsphinx_allow_errors = False
+
+# Autosummary: generate the stub pages for documented members when requested.
+autosummary_generate = True
+
+# Exclude build directories from the source search to avoid accidental
+# inclusion of generated files during incremental builds.
+exclude_patterns = ["_build", "build"]
+
+# Suppress a small set of expected warnings that are not actionable in this
+# repository. Keep this list minimal to avoid hiding real problems.
+# Example entries: 'image.nonlocal_uri' or 'toc.excluded'
+suppress_warnings = []
+
+
+def _write_earthkit_packages_js(app):
+    """Read earthkit-packages.yml and write a JS data file into the output _static dir."""
+    config_path = os.path.join(os.path.dirname(__file__), "earthkit-packages.yml")
+    with open(config_path, encoding="utf-8") as fh:
+        config = yaml.safe_load(fh)
+    packages = config.get("packages", [])
+    static_dir = os.path.join(app.outdir, "_static")
+    os.makedirs(static_dir, exist_ok=True)
+    js_path = os.path.join(static_dir, "earthkit-packages.js")
+    with open(js_path, "w", encoding="utf-8") as fh:
+        fh.write(f"window.earthkitPackages = {json.dumps(packages)};\n")
+
+
+def setup(app):
+    app.connect("builder-inited", _write_earthkit_packages_js)

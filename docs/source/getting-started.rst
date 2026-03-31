@@ -1,25 +1,63 @@
 Installation and Getting Started
 ================================
 
-Installing from PyPi
---------------------
+Installation
+------------
 
-It is recommended that you use the latest version of python3 and pip for
-the installation of earthkit-hydro.
+Install earthkit-hydro from PyPI:
 
-.. code:: bash
+.. code-block:: bash
 
    pip install earthkit-hydro
 
-To make use of the interoperable functionality you should ensure that
-you have installed the *earthkit-data* dependency.
+For GPU support, also install the relevant array backend (e.g. ``pip install cupy`` or ``pip install torch``).
 
 
-Import and use
---------------
+Quick start
+-----------
 
-.. code:: python
+earthkit-hydro works by loading a river network and then performing hydrological operations on it.
+
+**1. Load a river network**
+
+.. code-block:: python
 
     import earthkit.hydro as ekh
 
-    daily_mean = ekh.temporal.daily_mean(MY_DATA)
+    network = ekh.river_network.load("efas", "5")
+
+This loads the EFAS (European Flood Awareness System) version 5 river network. Several pre-computed networks are available (EFAS, GloFAS, CaMa-Flood, HydroSHEDS, MERIT-Hydro, GRIT).
+
+**2. Compute a flow accumulation**
+
+.. code-block:: python
+
+    import numpy as np
+
+    # A field of ones: the upstream sum gives the number of upstream cells
+    field = np.ones(network.n_nodes)
+    upstream_area = ekh.upstream.sum(network, field)
+
+**3. Find catchments**
+
+.. code-block:: python
+
+    # Specify outlet locations by coordinate
+    locations = {"outlet_A": (48.0, 12.0), "outlet_B": (50.0, 8.0)}
+
+    catchments = ekh.catchments.find(network, locations)
+
+**4. Compute catchment statistics**
+
+.. code-block:: python
+
+    catchment_means = ekh.catchments.mean(network, field, locations)
+
+
+What next?
+----------
+
+- :doc:`tutorials/index` — Work through hands-on notebooks covering each feature.
+- :doc:`howto/index` — Find recipes for specific tasks.
+- :doc:`explanation/index` — Understand the core concepts and design decisions.
+- :doc:`autodocs/earthkit.hydro` — Full API reference.

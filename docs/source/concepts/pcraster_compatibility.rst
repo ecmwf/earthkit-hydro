@@ -1,9 +1,52 @@
-Migrating from PCRaster
-=======================
+PCRaster compatibility
+======================
 
-earthkit-hydro can be used as a drop-in replacement for PCRaster in many cases, offering a substantial speedup. As a design decision, it does not attempt to match PCRaster's API, meaning that migrated code may look slightly different.
+If you're familiar with PCRaster, this guide explains how earthkit-hydro relates to it and helps you translate concepts.
 
-Here is a useful summary table of some common translations between earthkit-hydro and PCRaster.
+Why earthkit-hydro differs from PCRaster
+-----------------------------------------
+
+PCRaster has been a cornerstone of hydrological modeling for decades. earthkit-hydro takes a different approach:
+
+**Design philosophy:**
+
+- **PCRaster:** Comprehensive GIS-like environment with its own data format
+- **earthkit-hydro:** Focused library that integrates with the scientific Python ecosystem
+
+**Performance characteristics:**
+
+- **PCRaster:** C++ backend, mature optimizations
+- **earthkit-hydro:** Vectorized Python operations, often faster for large datasets
+
+**Ecosystem integration:**
+
+- **PCRaster:** Standalone tool with Python bindings
+- **earthkit-hydro:** Native Python, works with NumPy/xarray/PyTorch/etc.
+
+When to use each
+----------------
+
+**Use PCRaster if:**
+
+- You have existing PCRaster workflows
+- You need PCRaster-specific functionality
+- You work primarily with PCRaster map formats
+
+**Use earthkit-hydro if:**
+
+- You want better integration with Python scientific stack
+- You need GPU acceleration or ML framework integration
+- You want faster performance for large-scale operations
+- You work with xarray or other modern data structures
+
+**Use both:**
+
+earthkit-hydro can work with PCRaster-format river networks, so you can combine tools as needed.
+
+Function mapping
+----------------
+
+Here's how common PCRaster operations translate to earthkit-hydro:
 
 +------------------+------------------------+-------------------------------------------------------------------------------------------------------------------------+
 | **PCRaster**     | **earthkit-hydro**     | **Note**                                                                                                                |
@@ -35,7 +78,24 @@ Here is a useful summary table of some common translations between earthkit-hydr
 +------------------+------------------------+-------------------------------------------------------------------------------------------------------------------------+
 
 
-Points of difference
+Key differences to keep in mind
+--------------------------------
 
-- earthkit-hydro treats missing values as np.nans i.e. any arithmetic involving a missing value will return a missing value. PCRaster does not always handle missing values exactly the same.
-- earthkit-hydro can handle vector fields.
+**Missing value handling:**
+
+earthkit-hydro treats missing values as ``np.nan``. Any arithmetic involving a missing value returns a missing value. PCRaster's missing value behavior can differ in some operations.
+
+**Vector field support:**
+
+earthkit-hydro can work with vector (multi-dimensional) fields, while PCRaster operations are typically scalar.
+
+**API philosophy:**
+
+earthkit-hydro uses a functional API (pass data to functions) rather than PCRaster's map algebra syntax. This means slightly different code structure even for equivalent operations.
+
+See also
+--------
+
+- :doc:`../howto/load_river_network` - Loading PCRaster-format networks
+- :doc:`river_network_concepts` - Understanding river network representation
+- :doc:`flow_direction_systems` - Flow direction encoding details

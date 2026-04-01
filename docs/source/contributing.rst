@@ -33,3 +33,10 @@ To run the tests, you can use pytest. Make sure you have all dependencies instal
 .. code-block:: bash
 
     pytest
+
+Documentation
+-------------
+To contribute to the documentation, see the developer
+resources in the docs:
+
+- :doc:`writing-guidelines` — short guidance for authors (Diátaxis)

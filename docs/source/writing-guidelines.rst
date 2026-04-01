@@ -1,5 +1,5 @@
-Writing guidelines — Diátaxis in practice
-=========================================
+Guidelines for Writing Documentation
+====================================
 
 A short guide for authors on applying the Diátaxis framework to earthkit-hydro
 documentation. Diátaxis organizes documentation into four complementary types:

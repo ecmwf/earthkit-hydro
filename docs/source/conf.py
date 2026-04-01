@@ -106,7 +106,7 @@ autodocs_replace_automodule = (
     False  # replace automodule directives with autosummary tables
 )
 autodocs_short_display_names = (
-    True  # shorten toctree labels to the last module component
+    False  # shorten toctree labels to the last module component
 )
 autodocs_top_level_maxdepth = (
     1  # :maxdepth: on top-level page (None = keep sphinx-apidoc value)

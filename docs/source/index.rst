@@ -58,13 +58,13 @@ It is the hydrological component of earthkit :cite:`earthkit`.
 
       Practical recipes for common tasks.
 
-   .. grid-item-card:: Explanation
+   .. grid-item-card:: Concepts
       :img-top: _static/bulb.svg
-      :link: explanation/index
+      :link: concepts/index
       :link-type: doc
       :class-card: sd-shadow-sm
 
-      Background concepts and design decisions.
+      Background concepts, explanations and design decisions.
 
    .. grid-item-card:: API Reference
       :img-top: _static/brackets-contain.svg

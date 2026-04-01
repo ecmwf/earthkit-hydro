@@ -66,7 +66,7 @@ Writing examples
   This difference matters at confluences where multiple edges meet a node."
 
 Keeping documentation high quality
----------------------------------
+----------------------------------
 
 - Link to a single canonical location for each topic. Avoid duplicate
   content across Tutorials, How-to and User Guide pages.

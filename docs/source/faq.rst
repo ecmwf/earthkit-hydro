@@ -47,12 +47,12 @@ Creating a river network from a raw flow direction file requires topological sor
 
 **How are missing values handled?**
 
-earthkit-hydro follows the NumPy convention: missing values are represented as ``np.nan`` and propagate through all operations. See :doc:`explanation/missing_value_handling` for the rationale behind this design.
+earthkit-hydro follows the NumPy convention: missing values are represented as ``np.nan`` and propagate through all operations. See :doc:`concepts/missing_value_handling` for the rationale behind this design.
 
 **I'm migrating from PCRaster. Where do I start?**
 
-See the :doc:`explanation/pcraster_compatibility` page for a function-by-function translation table and a summary of the key differences.
+See the :doc:`concepts/pcraster_compatibility` page for a function-by-function translation table and a summary of the key differences.
 
 **What is the difference between distance and length?**
 
-In earthkit-hydro, *distances* are edge properties (the cost of traversing a connection between two nodes) while *lengths* are node properties (the extent associated with each node). This distinction matters at confluences and bifurcations. See :doc:`explanation/distance_vs_length_concepts` for a full explanation.
+In earthkit-hydro, *distances* are edge properties (the cost of traversing a connection between two nodes) while *lengths* are node properties (the extent associated with each node). This distinction matters at confluences and bifurcations. See :doc:`concepts/distance_vs_length_concepts` for a full explanation.

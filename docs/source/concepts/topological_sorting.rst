@@ -265,6 +265,6 @@ See also
 --------
 
 - :doc:`../howto/load_river_network` - Loading and caching networks
-- :doc:`../explanation/river_network_concepts` - River network representation
-- :doc:`../explanation/performance_considerations` - Optimization strategies
+- :doc:`river_network_concepts` - River network representation
+- :doc:`performance_considerations` - Optimization strategies
 - :doc:`../howto/optimize_performance` - Practical performance tips

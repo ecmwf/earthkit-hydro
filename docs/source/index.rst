@@ -116,15 +116,3 @@ Have a feature request or found a bug? Feel free to open an
 
    references
    genindex
-
-
-.. toctree::
-   :maxdepth: 2
-   :caption: Related projects
-   :hidden:
-
-   earthkit <https://earthkit.readthedocs.io/en/latest>
-   earthkit-data <https://earthkit-data.readthedocs.io/en/latest>
-   earthkit-plots <https://earthkit-plots.readthedocs.io/en/latest>
-   earthkit-meteo <https://earthkit-meteo.readthedocs.io/en/latest>
-   earthkit-transforms <https://earthkit-transforms.readthedocs.io/en/latest>

@@ -10,7 +10,7 @@ Install earthkit-hydro from PyPI:
 
    pip install earthkit-hydro
 
-For GPU support, also install the relevant array backend (e.g. ``pip install cupy`` or ``pip install torch``).
+For GPU support, also install the desired array backend e.g. cupy, torch etc..
 
 
 Quick start

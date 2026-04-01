@@ -36,8 +36,7 @@ To run the tests, you can use pytest. Make sure you have all dependencies instal
 
 Documentation
 -------------
-To contribute to the documentation or to build it locally, see the developer
+To contribute to the documentation, see the developer
 resources in the docs:
 
-- :doc:`building` — instructions to set up a local build environment
 - :doc:`writing-guidelines` — short guidance for authors (Diátaxis)

@@ -11,7 +11,7 @@ PCRaster D8, ArcGIS/ESRI D8, CaMa-Flood, HydroSHEDS, MERIT-Hydro and GRIT format
 
 **What array backends are supported?**
 
-NumPy, xarray, CuPy, PyTorch, JAX, MLX and TensorFlow. The default backend is NumPy. You can switch backends via ``network.to_device(array_backend="torch")``. See :doc:`howto/use_different_array_backends` for details.
+NumPy, xarray, CuPy, PyTorch, JAX, MLX and TensorFlow. The default backend is NumPy. You can switch backends via ``network.to_device(array_backend=chosen_array_backend)``. See :doc:`howto/use_different_array_backends` for details.
 
 **Does earthkit-hydro support GPU acceleration?**
 
@@ -19,7 +19,7 @@ Yes. Any backend with GPU support (CuPy, PyTorch, JAX, etc.) can be used directl
 
 **Can I use earthkit-hydro with xarray datasets?**
 
-Yes. All top-level functions accept xarray DataArrays and return xarray objects with coordinates preserved. This integrates naturally with common climate and weather data workflows.
+Yes. All top-level functions accept xarray and return xarray objects with coordinates preserved. This integrates naturally with common climate and weather data workflows.
 
 **Does earthkit-hydro handle bifurcating river networks?**
 
@@ -31,11 +31,11 @@ Installation
 
 **What Python version do I need?**
 
-Python 3.9 or later is recommended. Install with ``pip install earthkit-hydro``.
+We adopt stable Python versions. Check the [status of Python versions](https://devguide.python.org/versions/) for the latest information. As of April 2025, Python 3.10+ is required.
 
 **How do I install GPU support?**
 
-Install the GPU backend of your choice separately (e.g. ``pip install cupy-cuda12x`` or ``pip install torch``), then convert your river network with ``network.to_device(array_backend="cupy")``.
+Install the GPU backend of your choice separately (e.g. ``pip install torch``), then convert your river network with ``network.to_device(array_backend=chosen_array_backend, device=chosen_device)``.
 
 
 Data and performance

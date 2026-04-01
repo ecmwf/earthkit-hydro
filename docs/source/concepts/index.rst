@@ -1,5 +1,5 @@
-Explanation
-===========
+Concepts
+========
 
 Background knowledge and conceptual understanding. These articles explain *why* things work the way they do.
 

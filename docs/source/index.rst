@@ -96,7 +96,7 @@ Have a feature request or found a bug? Feel free to open an
    faq
    tutorials/index
    howto/index
-   explanation/index
+   concepts/index
    autodocs/earthkit.hydro
 
 

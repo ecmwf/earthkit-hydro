@@ -8,7 +8,7 @@ Install earthkit-hydro from PyPI:
 
 .. code-block:: bash
 
-   pip install earthkit-hydro==1.0.0rc0
+   pip install earthkit-hydro==1.3.0rc0
 
 For GPU support, also install the desired array backend e.g. cupy, torch etc..
 

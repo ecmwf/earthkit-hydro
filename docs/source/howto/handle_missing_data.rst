@@ -1,7 +1,7 @@
 Handling missing data
 =====================
 
-earthkit-hydro uses NumPy's ``np.nan`` convention for missing values. Any operation involving ``np.nan`` returns ``np.nan`` — this is known as NaN propagation. If you are coming from PCRaster, note that the missing value conventions differ; see :doc:`../explanation/missing_value_handling` for background.
+earthkit-hydro uses NumPy's ``np.nan`` convention for missing values. Any operation involving ``np.nan`` returns ``np.nan`` — this is known as NaN propagation. If you are coming from PCRaster, note that the missing value conventions differ; see :doc:`../concepts/missing_value_handling` for background.
 
 .. code-block:: python
 
@@ -58,4 +58,4 @@ Data that uses sentinel values (e.g. -999 or -9999) must be converted to NaN bef
 See also
 --------
 
-- :doc:`../explanation/missing_value_handling` — Design rationale for the NaN convention
+- :doc:`../concepts/missing_value_handling` — Design rationale for the NaN convention

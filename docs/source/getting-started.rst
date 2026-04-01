@@ -59,5 +59,5 @@ What next?
 
 - :doc:`tutorials/index` — Work through hands-on notebooks covering each feature.
 - :doc:`howto/index` — Find recipes for specific tasks.
-- :doc:`explanation/index` — Understand the core concepts and design decisions.
+- :doc:`concepts/index` — Understand the core concepts and design decisions.
 - :doc:`autodocs/earthkit.hydro` — Full API reference.

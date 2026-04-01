@@ -62,6 +62,6 @@ Most analyses do not need float64 precision. Halving the data type halves memory
 See also
 --------
 
-- :doc:`../explanation/performance_considerations` — Performance characteristics in depth
-- :doc:`../explanation/array_backend_design` — Choosing the right backend
+- :doc:`../concepts/performance_considerations` — Performance characteristics in depth
+- :doc:`../concepts/array_backend_design` — Choosing the right backend
 - :doc:`use_different_array_backends` — Switching backends

@@ -42,5 +42,5 @@ See also
 --------
 
 - :doc:`../tutorials/loading_river_networks` — Tutorial walkthrough
-- :doc:`../explanation/river_network_concepts` — How river networks are represented
+- :doc:`../concepts/river_network_concepts` — How river networks are represented
 - :doc:`../autodocs/earthkit.hydro.river_network` — API reference

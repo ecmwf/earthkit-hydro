@@ -67,7 +67,8 @@ dependencies = [
         "sphinxcontrib-bibtex",
         "nbsphinx",
         "nbconvert",
-        "ipykernel"
+        "ipykernel",
+        "sphinx_design"
     ]
     all = [
         "earthkit-data[geotiff]==1.0.0rc0",

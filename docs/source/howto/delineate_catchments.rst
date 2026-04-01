@@ -47,7 +47,7 @@ See also
 --------
 
 - :doc:`../tutorials/finding_catchments` — Tutorial walkthrough
-- :doc:`../explanation/catchment_concepts` — Catchment concepts explained
+- :doc:`../concepts/catchment_concepts` — Catchment concepts explained
 - :doc:`specify_locations` — How to specify outlet locations
 - :doc:`compute_catchment_statistics` — Compute statistics over catchments
 - :doc:`../autodocs/earthkit.hydro.catchments` — API reference

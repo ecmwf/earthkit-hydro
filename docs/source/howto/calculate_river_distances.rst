@@ -66,7 +66,7 @@ Longest path versions are available with ``path="longest"``.
 See also
 --------
 
-- :doc:`../explanation/distance_vs_length_concepts` — Full conceptual explanation
+- :doc:`../concepts/distance_vs_length_concepts` — Full conceptual explanation
 - :doc:`../tutorials/distance_length` — Tutorial walkthrough
 - :doc:`../autodocs/earthkit.hydro.distance` — Distance API reference
 - :doc:`../autodocs/earthkit.hydro.length` — Length API reference

@@ -1,108 +1,134 @@
 [build-system]
-requires = ["setuptools>=77", "setuptools-rust", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
+requires = ["setuptools>=77", "setuptools-rust", "setuptools_scm[toml]>=8"]
 
 [project]
-name = "earthkit-hydro"
-requires-python = ">=3.10"
 authors = [
-    { name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int" }
-    ]
-maintainers = [
-    {name = "Oisín M. Morrison", email = "oisin.morrison@ecmwf.int"},
-    {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
-    ]
-description = "A Python library for common hydrological functions"
-license = "Apache-2.0"
-license-files = [ "LICENSE" ]
+  {name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int"}
+]
 classifiers = [
-    "Development Status :: 4 - Beta",
-    "Intended Audience :: Developers",
-    "Intended Audience :: Science/Research",
-    "Natural Language :: English",
-    "Operating System :: OS Independent",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "Programming Language :: Python :: 3.14",
-    "Topic :: Scientific/Engineering"
-    ]
-dynamic = ["version", "readme"]
-
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "Intended Audience :: Science/Research",
+  "Natural Language :: English",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Scientific/Engineering"
+]
 dependencies = [
-    "numpy",
-    "joblib",
-    "xarray",
-    "earthkit-utils>=1.0.0rc0"
+  "numpy",
+  "joblib",
+  "xarray",
+  "earthkit-utils>=0.2.1"
+]
+description = "A Python library for common hydrological functions"
+dynamic = ["version", "readme"]
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+maintainers = [
+  {name = "Oisín M. Morrison", email = "oisin.morrison@ecmwf.int"},
+  {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
+]
+name = "earthkit-hydro"
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+all = [
+  "earthkit-data[geotiff]>=0.13.8",
+  "pytest",
+  "pre-commit"
+]
+dev = [
+  "pytest",
+  "pre-commit"
+]
+docs = [
+  "sphinx",
+  "furo",
+  "sphinxcontrib-bibtex",
+  "nbsphinx",
+  "nbconvert",
+  "ipykernel"
+]
+grit = [
+  "geopandas",
+  "pandas"
+]
+readers = [
+  "earthkit-data[geotiff]>=0.13.8"
+]
+tests = [
+  "pytest",
+  "torch",
+  "jax"
 ]
 
 [project.urls]
-    repository = "https://github.com/ecmwf/earthkit-hydro"
-    documentation = "https://earthkit-hydro.readthedocs.io/"
-    issues = "https://github.com/ecmwf/earthkit-hydro/issues"
+documentation = "https://earthkit-hydro.readthedocs.io/"
+issues = "https://github.com/ecmwf/earthkit-hydro/issues"
+repository = "https://github.com/ecmwf/earthkit-hydro"
 
-[project.optional-dependencies]
-    readers = [
-        "earthkit-data[geotiff]>=1.0.0rc0"
-        ]
-    grit = [
-        "geopandas",
-        "pandas"
-    ]
-    tests = [
-        "pytest",
-        "torch",
-        "jax"
-        ]
-    dev = [
-        "pytest",
-        "pre-commit"
-        ]
-    docs = [
-        "sphinx",
-        "furo",
-        "sphinxcontrib-bibtex",
-        "nbsphinx",
-        "nbconvert",
-        "ipykernel",
-        "sphinx_design"
-    ]
-    all = [
-        "earthkit-data[geotiff]>=1.0.0rc0",
-        "pytest",
-        "pre-commit"
-        ]
+# takes inspiration from https://github.com/pypa/cibuildwheel/discussions/1814
+[tool.cibuildwheel]
+skip = ["*musl*", "*-win_arm64"]  # ignore some problematic platforms
+linux.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
+linux.environment = {PATH = "$HOME/.cargo/bin:$PATH"}
+macos.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
+windows.archs = "all"
+windows.before-all = "rustup target add aarch64-pc-windows-msvc i686-pc-windows-msvc x86_64-pc-windows-msvc"
 
-[tool.black]
-line-length = 88
-skip-string-normalization = false
-
-[tool.isort]
-profile = "black"  # Ensures compatibility with Black's formatting.
-line_length = 88  # Same as Black's line length for consistency.
+# Testing
+[tool.pytest]
+adopts = "--pdbcls=IPython.terminal.debugger:Pdb"
+testpaths = ["tests"]
 
 # Linting settings
 [tool.ruff]
-line-length = 88
+line-length = 120
 
 [tool.ruff.format]
 quote-style = "double"
 
+[tool.ruff.lint]
+ignore = [
+  "D1",  # pydocstyle: Missing Docstrings
+  "D107",  # pydocstyle: numpy convention
+  "D203",
+  "D205",
+  "D212",
+  "D213",
+  "D401",
+  "D402",
+  "D413",
+  "D415",
+  "D416",
+  "D417"
+]
+select = [
+  "F",  # pyflakes
+  "E",  # pycodestyle
+  "W",  # pycodestyle warnings
+  "I",  # isort
+  "D"  # pydocstyle
+]
+
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = [
-    "F401", # unused imports
-    ]
+  "F401"  # unused imports
+]
+"docs/source/conf.py" = [
+  "E501"  # SVG path data cannot be split
+]
 "tests/*" = [
-    "F405", # variable may be undefined, or defined from star imports
-    "F403", # use of wildcard imports
-    ]
-
-# Testing
-[tool.pytest]
-addopts = "--pdbcls=IPython.terminal.debugger:Pdb"
-testpaths = ["tests"]
+  "F405",  # variable may be undefined, or defined from star imports
+  "F403"  # use of wildcard imports
+]
 
 # Packaging/setuptools options
 [tool.setuptools]
@@ -112,24 +138,15 @@ include-package-data = true
 readme = {file = ["README.md"], content-type = "text/markdown"}
 
 [tool.setuptools.packages.find]
-include = [ "earthkit.hydro" ]
-where = [ "src/" ]
+include = ["earthkit.hydro"]
+where = ["src/"]
 
 [tool.setuptools_scm]
+fallback_version = '0.1.0'
+local_scheme = "no-local-version"
+parentdir_prefix_version = 'earthkit-hydro-'  # get version from GitHub-like tarballs
 version_file = "src/earthkit/hydro/_version.py"
 version_file_template = '''
 # Do not change! Do not track in version control!
 __version__ = "{version}"
 '''
-parentdir_prefix_version='earthkit-hydro-'  # get version from GitHub-like tarballs
-fallback_version='0.1.0'
-local_scheme = "no-local-version"
-
-# takes inspiration from https://github.com/pypa/cibuildwheel/discussions/1814
-[tool.cibuildwheel]
-skip = ["*musl*", "*-win_arm64"] # ignore some problematic platforms
-linux.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
-linux.environment = { PATH="$HOME/.cargo/bin:$PATH" }
-macos.before-all = "curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y --profile minimal"
-windows.before-all = "rustup target add aarch64-pc-windows-msvc i686-pc-windows-msvc x86_64-pc-windows-msvc"
-windows.archs = "all"

@@ -385,3 +385,62 @@ def max(
         Array of maximum values for every river network node or gridcell, depending on `return_type`.
     """
     return array.max(river_network, field, node_weights, edge_weights, return_type)
+
+
+@xarray
+def mode(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+    return_type=None,
+    input_core_dims=None,
+):
+    r"""
+    Computes the mode (most frequent value) of a categorical field over all downstream nodes.
+
+    For each node in the river network, this function identifies all downstream nodes and
+    determines the most frequently occurring category value.
+
+    For categorical data (e.g., land cover classes, soil types), the mode represents
+    the dominant downstream category. Ties are broken by selecting the smallest category value.
+
+    Accumulation proceeds in inverse topological order from the sinks to the sources.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array of categorical (integer) values defined on river network nodes or gridcells.
+    node_weights : array-like or xarray object, optional
+        Not supported for mode calculation. Must be None.
+    edge_weights : array-like or xarray object, optional
+        Not supported for mode calculation. Must be None.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of mode (most frequent category) values for every river network node or gridcell,
+        depending on `return_type`.
+
+    Notes
+    -----
+    - Mode calculation does not support node or edge weights.
+    - Input field must contain integer categorical values.
+    - Currently only supported for numpy backend.
+
+    Examples
+    --------
+    Computing dominant downstream land cover class:
+
+    >>> land_cover = np.array([1, 2, 2, 3, 2])  # Land cover categories
+    >>> result = mode(river_network, land_cover)
+    """
+    return array.mode(river_network, field, node_weights, edge_weights, return_type)

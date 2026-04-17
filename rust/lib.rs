@@ -13,6 +13,8 @@ use pyo3::exceptions::PyValueError;
 use std::sync::atomic::{AtomicI64, Ordering};
 use fixedbitset::FixedBitSet;
 
+mod mode;
+
 #[pyfunction]
 fn compute_topological_labels_rust<'py>(
     py: Python<'py>,
@@ -80,5 +82,7 @@ fn compute_topological_labels_rust<'py>(
 #[pymodule]
 fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(mode::compute_upstream_mode_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(mode::compute_mode_rust, m)?)?;
     Ok(())
 }

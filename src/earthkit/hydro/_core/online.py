@@ -2,6 +2,51 @@ from .accumulate import flow
 from .metrics import metrics_func_finder
 
 
+def _calculate_mode_upstream(xp, river_network, field):
+    """
+    Calculate upstream mode using Rust implementation for performance.
+
+    For categorical data, computes the most common (mode) value among all
+    upstream nodes for each node in the river network.
+    """
+    # Mode only supported for numpy backend with Rust
+    if xp.name != "numpy":
+        raise NotImplementedError(
+            "Mode calculation currently only supported for numpy backend"
+        )
+
+    # Import Rust function
+    try:
+        from earthkit.hydro import _rust
+    except ImportError:
+        raise ImportError(
+            "Rust extension not available. Mode requires the Rust extension for performance."
+        )
+
+    # Convert field to int64 for categorical data
+    import numpy as np
+    field_int = np.asarray(field, dtype=np.int64)
+
+    # Get network topology from sorted_data
+    # sorted_data has shape (3, n_edges): [downstream_ids, upstream_ids, edge_ids]
+    sorted_data = river_network._storage.sorted_data
+    downstream_nodes = np.asarray(sorted_data[0, :], dtype=np.uintp)
+    upstream_nodes = np.asarray(sorted_data[1, :], dtype=np.uintp)
+    sources = np.asarray(river_network.sources, dtype=np.uintp)
+    n_nodes = river_network.n_nodes
+
+    # Call Rust function
+    result = _rust.compute_upstream_mode_rust(
+        field_int,
+        upstream_nodes,
+        downstream_nodes,
+        sources,
+        n_nodes
+    )
+
+    return xp.asarray(result)
+
+
 def calculate_online_metric(
     xp,
     river_network,
@@ -21,6 +66,14 @@ def calculate_online_metric(
         )
 
     field = xp.copy(field)
+
+    # Special handling for mode - uses Rust implementation
+    if metric == "mode":
+        if flow_direction != "down":
+            raise ValueError("Mode calculation only supports upstream aggregation (flow_direction='down').")
+        if node_weights is not None or edge_weights is not None:
+            raise ValueError("Mode calculation does not support weights.")
+        return _calculate_mode_upstream(xp, river_network, field)
 
     if node_weights is None:
         if metric == "mean" or metric == "std" or metric == "var":

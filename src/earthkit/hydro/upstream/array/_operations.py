@@ -134,3 +134,21 @@ def max(xp, river_network, field, node_weights, edge_weights, return_type):
         node_weights,
         edge_weights,
     )
+
+
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
+def mode(xp, river_network, field, node_weights, edge_weights, return_type):
+    return_type = river_network.return_type if return_type is None else return_type
+    if return_type not in ["gridded", "masked"]:
+        raise ValueError("return_type must be either 'gridded' or 'masked'.")
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
+        calculate_upstream_metric
+    )
+    return decorated_calculate_upstream_metric(
+        xp,
+        river_network,
+        field,
+        "mode",
+        node_weights,
+        edge_weights,
+    )

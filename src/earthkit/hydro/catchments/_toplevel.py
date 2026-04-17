@@ -6,6 +6,62 @@ from ._xarray import xarray
 
 
 @xarray
+def percentile(
+    river_network,
+    field,
+    p,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+    input_core_dims=None,
+):
+    r"""
+    Computes the weighted percentile of a field over the upstream
+    catchment of each specified location.
+
+    For each location, this function identifies all upstream nodes in the river network
+    and computes the requested percentile from upstream field values, optionally weighted
+    by both node and edge weights.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array containing field values defined on river network nodes or gridcells.
+    p : float
+        Requested percentile expressed as a fraction between 0 and 1 inclusive
+        (e.g. 0.5 for median, 0.95 for the 95th percentile).
+    locations : array-like or dict
+        Locations at which to compute. Accepts a list/array of nodes or a mapping
+        from dimension names to coordinate labels, consistent with other catchments APIs.
+    node_weights : array-like or xarray object, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like or xarray object, optional
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of percentile values for each location in `locations`.
+    """
+    from earthkit.hydro.catchments.array._operations import percentile as perc
+
+    return perc(
+        river_network=river_network,
+        field=field,
+        p=p,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
+
+
+@xarray
 def var(
     river_network,
     field,

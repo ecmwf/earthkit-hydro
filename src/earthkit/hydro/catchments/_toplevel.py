@@ -15,6 +15,38 @@ def percentile(
     edge_weights=None,
     input_core_dims=None,
 ):
+    r"""
+    Computes the weighted percentile of a field over the upstream
+    catchment of each specified location.
+
+    For each location, this function identifies all upstream nodes in the river network
+    and computes the requested percentile from upstream field values, optionally weighted
+    by both node and edge weights.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array containing field values defined on river network nodes or gridcells.
+    p : float
+        Requested percentile expressed as a fraction between 0 and 1 inclusive.
+    locations : array-like or dict
+        A list of nodes at which to compute.
+    node_weights : array-like or xarray object, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like or xarray object, optional
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of percentile values for each location in `locations`.
+    """
     from earthkit.hydro.catchments.array._operations import percentile as perc
 
     return perc(

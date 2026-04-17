@@ -30,9 +30,11 @@ def percentile(
     field : array-like or xarray object
         An array containing field values defined on river network nodes or gridcells.
     p : float
-        Requested percentile expressed as a fraction between 0 and 1 inclusive.
+        Requested percentile expressed as a fraction between 0 and 1 inclusive
+        (e.g. 0.5 for median, 0.95 for the 95th percentile).
     locations : array-like or dict
-        A list of nodes at which to compute.
+        Locations at which to compute. Accepts a list/array of nodes or a mapping
+        from dimension names to coordinate labels, consistent with other catchments APIs.
     node_weights : array-like or xarray object, optional
         Array of weights for each river network node or gridcell. Default is None (unweighted).
     edge_weights : array-like or xarray object, optional

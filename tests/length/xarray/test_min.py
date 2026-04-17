@@ -1,0 +1,35 @@
+import numpy as np
+import pytest
+import xarray as xr
+from _test_inputs.distance import *
+from _test_inputs.readers import *
+
+import earthkit.hydro as ekh
+
+
+@pytest.mark.parametrize(
+    "river_network, stations_list, upstream, downstream, weights, result",
+    [
+        (
+            ("cama_nextxy", cama_nextxy_1),
+            stations,
+            True,
+            True,
+            weights_1,
+            length_1_min_up_down,
+        ),
+    ],
+    indirect=["river_network"],
+)
+def test_length_min_xarray(river_network, stations_list, upstream, downstream, weights, result):
+    """Test length min with xarray input."""
+    weights_da = xr.DataArray(weights, dims=["node_index"], coords={"node_index": np.arange(len(weights))})
+    dist = ekh.length.min(
+        river_network,
+        stations_list,
+        upstream=upstream,
+        downstream=downstream,
+        field=weights_da,
+    )
+    assert isinstance(dist, xr.DataArray)
+    np.testing.assert_allclose(dist.values, result)

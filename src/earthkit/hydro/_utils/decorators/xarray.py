@@ -50,26 +50,48 @@ def get_reshuffled_func(func, arg_order):
 
 
 def get_input_output_core_dims(
-    input_core_dims, output_core_dims, xr_args, river_network, return_grid
+    input_core_dims, output_core_dims, xr_args, river_network, return_grid, locations=None
 ):
+    print(f"DEBUG get_input_output_core_dims: locations={locations}, output_core_dims={output_core_dims}")  # TEMPORARY
     if input_core_dims is None:
         input_core_dims = [get_core_dims(xr_arg) for xr_arg in xr_args]
     elif len(input_core_dims) == 1:
         input_core_dims *= len(xr_args)
 
+    print(f"DEBUG: input_core_dims={input_core_dims}")  # TEMPORARY
     if output_core_dims is None:
-        if return_grid:
+        print(f"DEBUG: output_core_dims is None, determining... return_grid={return_grid}")  # TEMPORARY
+        # For distance/length functions with locations, output is (n_locations, n_nodes)
+        # This overrides return_grid
+        if locations is not None and len(input_core_dims[0]) == 1:
+            output_core_dims = [['station_index', input_core_dims[0][0]]]
+            print(f"DEBUG: Using station_index for distance/length: {output_core_dims}")  # TEMPORARY
+        elif return_grid:
             if len(input_core_dims[0]) == 2:  # grid in and out
                 output_core_dims = [input_core_dims[0]]
-            else:
+            elif river_network.coords is not None:
                 output_core_dims = [
                     list(river_network.coords.keys())
                 ]  # 1d in, grid out
+            else:
+                # Cannot return grid without coordinates
+                output_core_dims = [[node_default_coord]]
         else:
+            print(f"DEBUG: return_grid={return_grid}, len(input_core_dims[0])={len(input_core_dims[0])}")  # TEMPORARY
             if len(input_core_dims[0]) == 1:  # 1d in and out
-                output_core_dims = [input_core_dims[0]]
+                # Check if this is a distance/length function that returns 2D
+                # These functions have 'locations' parameter and return (n_locations, n_nodes)
+                print(f"DEBUG: locations = {locations}, is not None = {locations is not None}")  # TEMPORARY DEBUG
+                if locations is not None:
+                    # Add station_index dimension for distance/length functions
+                    output_core_dims = [['station_index', input_core_dims[0][0]]]
+                    print(f"DEBUG: Setting output_core_dims to {output_core_dims}")  # TEMPORARY
+                else:
+                    output_core_dims = [input_core_dims[0]]
+                    print(f"DEBUG: Setting output_core_dims to {output_core_dims} (no locations)")  # TEMPORARY
             else:
                 output_core_dims = [[node_default_coord]]
+                print(f"DEBUG: Setting output_core_dims to {output_core_dims} (not 1d)")  # TEMPORARY
 
     return input_core_dims, output_core_dims
 
@@ -106,7 +128,7 @@ def xarray(func):
                 for dim, size in zip(dim_names, output.shape[:-offset])
             }
 
-            if return_grid:
+            if return_grid and river_network.coords is not None:
                 for k, v in river_network.coords.items():
                     coords[k] = v
                     dim_names.append(k)
@@ -116,7 +138,7 @@ def xarray(func):
 
             result = xr.DataArray(output, dims=dim_names, coords=coords, name="out")
 
-            if not return_grid:
+            if not return_grid and river_network.coords is not None:
                 coords_grid = np.meshgrid(*river_network.coords.values())
                 assign_dict = {
                     k: (node_default_coord, v.flat[river_network.mask])
@@ -128,14 +150,23 @@ def xarray(func):
             reshuffled_func = get_reshuffled_func(func, arg_order)
 
             input_core_dims, output_core_dims = get_input_output_core_dims(
-                input_core_dims, output_core_dims, xr_args, river_network, return_grid
+                input_core_dims, output_core_dims, xr_args, river_network, return_grid,
+                locations=all_args.get('locations')
             )
 
-            output_sizes = (
-                {output_core_dims[0][0]: river_network.n_nodes}
-                if len(output_core_dims[0]) == 1
-                else {k: v for k, v in zip(output_core_dims[0], river_network.shape)}
-            )
+            # Set output sizes based on output dimensions
+            if len(output_core_dims[0]) == 1:
+                output_sizes = {output_core_dims[0][0]: river_network.n_nodes}
+            elif output_core_dims[0][0] == 'station_index':
+                # Distance/length functions: (n_stations, n_nodes)
+                n_locations = len(all_args['locations']) if isinstance(all_args['locations'], (list, tuple, np.ndarray)) else 1
+                output_sizes = {
+                    'station_index': n_locations,
+                    output_core_dims[0][1]: river_network.n_nodes
+                }
+            else:
+                # Gridded output
+                output_sizes = {k: v for k, v in zip(output_core_dims[0], river_network.shape)}
 
             result = xr.apply_ufunc(
                 reshuffled_func,
@@ -148,7 +179,7 @@ def xarray(func):
                 kwargs=non_xr_kwargs,
             )
 
-            if len(output_core_dims[0]) == 1:
+            if len(output_core_dims[0]) == 1 and river_network.coords is not None:
                 coords = list(river_network.coords.values())[::-1]
                 coords_grid = np.meshgrid(*coords)[::-1]
                 assign_dict = {

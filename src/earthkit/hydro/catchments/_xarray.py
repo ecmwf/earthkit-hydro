@@ -90,15 +90,19 @@ def xarray(func):
             }
             result = result.assign_coords(**assign_dict)
 
-        coords = list(river_network.coords.values())[::-1]
-        coords_grid = np.meshgrid(*coords)[::-1]
-        assign_dict = {
-            k: (node_default_coord, v.flat[river_network.mask][stations_1d])
-            for k, v in zip(river_network.coords.keys(), coords_grid)
-        }
-        if isinstance(orig_locations, dict):
-            assign_dict["name"] = (node_default_coord, list(orig_locations.keys()))
-        result = result.assign_coords(**assign_dict)
+        if river_network.coords is not None:
+            coords = list(river_network.coords.values())[::-1]
+            coords_grid = np.meshgrid(*coords)[::-1]
+            assign_dict = {
+                k: (node_default_coord, v.flat[river_network.mask][stations_1d])
+                for k, v in zip(river_network.coords.keys(), coords_grid)
+            }
+            if isinstance(orig_locations, dict):
+                assign_dict["name"] = (node_default_coord, list(orig_locations.keys()))
+            result = result.assign_coords(**assign_dict)
+        elif isinstance(orig_locations, dict):
+            assign_dict = {"name": (node_default_coord, list(orig_locations.keys()))}
+            result = result.assign_coords(**assign_dict)
 
         return result
 

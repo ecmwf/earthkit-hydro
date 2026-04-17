@@ -16,14 +16,14 @@ import earthkit.hydro as ekh
             True,
             True,
             weights_1,
-            distance_1_min_both,
+            distance_1_min_up_down,
         ),
     ],
     indirect=["river_network"],
 )
 def test_distance_min_xarray(river_network, stations_list, upstream, downstream, weights, result):
     """Test distance min with xarray input."""
-    weights_da = xr.DataArray(weights, dims=["node"])
+    weights_da = xr.DataArray(weights, dims=["node_index"], coords={"node_index": np.arange(len(weights))})
     dist = ekh.distance.min(
         river_network,
         stations_list,

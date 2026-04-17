@@ -21,7 +21,7 @@ import earthkit.hydro as ekh
 )
 def test_catchments_std_xarray(river_network, field, locations):
     """Test catchment standard deviation with xarray input."""
-    field_da = xr.DataArray(field, dims=["node"])
+    field_da = xr.DataArray(field, dims=["node_index"], coords={"node_index": np.arange(len(field))})
     result = ekh.catchments.std(river_network, field_da, locations=locations)
     assert isinstance(result, xr.DataArray)
     assert np.all(result.values >= 0)

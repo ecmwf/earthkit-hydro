@@ -17,7 +17,7 @@ import earthkit.hydro as ekh
 def test_move_downstream_xarray(river_network, expected):
     """Test move downstream with xarray input."""
     field = np.arange(1, river_network.n_nodes + 1)
-    field_da = xr.DataArray(field, dims=["node"])
+    field_da = xr.DataArray(field, dims=["node_index"], coords={"node_index": np.arange(len(field))})
     result = ekh.move.downstream(river_network, field_da, return_type="masked")
     assert isinstance(result, xr.DataArray)
     np.testing.assert_allclose(result.values, expected)

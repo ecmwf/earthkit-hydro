@@ -21,7 +21,7 @@ import earthkit.hydro as ekh
 def test_upstream_var_xarray(river_network, input_field, mv):
     """Test upstream variance with xarray input."""
     # Convert input to xarray DataArray
-    field_da = xr.DataArray(input_field, dims=["node"])
+    field_da = xr.DataArray(input_field, dims=["node_index"], coords={"node_index": np.arange(len(input_field))})
 
     # Call xarray-wrapped function
     result = ekh.upstream.var(river_network, field_da, return_type="masked")
@@ -33,6 +33,6 @@ def test_upstream_var_xarray(river_network, input_field, mv):
     assert np.all(result.values[~np.isnan(result.values)] >= 0)
 
     # Test that variance is 0 for uniform fields
-    uniform_da = xr.DataArray(np.ones(river_network.n_nodes), dims=["node"])
+    uniform_da = xr.DataArray(np.ones(river_network.n_nodes), dims=["node_index"], coords={"node_index": np.arange(river_network.n_nodes)})
     var_uniform = ekh.upstream.var(river_network, uniform_da, return_type="masked")
     np.testing.assert_allclose(var_uniform.values, 0, atol=1e-10)

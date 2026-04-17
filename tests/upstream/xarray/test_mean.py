@@ -22,7 +22,7 @@ import earthkit.hydro as ekh
 def test_upstream_mean_xarray(river_network, input_field, expected, mv):
     """Test upstream mean with xarray input."""
     # Convert input to xarray DataArray
-    field_da = xr.DataArray(input_field, dims=["node"])
+    field_da = xr.DataArray(input_field, dims=["node_index"], coords={"node_index": np.arange(len(input_field))})
 
     # Call xarray-wrapped function
     result = ekh.upstream.mean(river_network, field_da, return_type="masked")

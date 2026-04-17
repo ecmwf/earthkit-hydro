@@ -20,7 +20,7 @@ import earthkit.hydro as ekh
 )
 def test_downstream_std_xarray(river_network, input_field, mv):
     """Test downstream standard deviation with xarray input."""
-    field_da = xr.DataArray(input_field, dims=["node"])
+    field_da = xr.DataArray(input_field, dims=["node_index"], coords={"node_index": np.arange(len(input_field))})
     result = ekh.downstream.std(river_network, field_da, return_type="masked")
     assert isinstance(result, xr.DataArray)
     assert np.all(result.values[~np.isnan(result.values)] >= 0)

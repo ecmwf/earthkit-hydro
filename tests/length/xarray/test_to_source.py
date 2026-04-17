@@ -20,7 +20,7 @@ import earthkit.hydro as ekh
 )
 def test_length_to_source_xarray(river_network, field, expected):
     """Test length to source with xarray input."""
-    field_da = xr.DataArray(field, dims=["node"])
+    field_da = xr.DataArray(field, dims=["node_index"], coords={"node_index": np.arange(len(field))})
     result = ekh.length.to_source(river_network, field=field_da, path="shortest", return_type="masked")
     assert isinstance(result, xr.DataArray)
     np.testing.assert_allclose(result.values, expected, rtol=1e-6)

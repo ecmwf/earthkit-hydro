@@ -83,5 +83,6 @@ fn compute_topological_labels_rust<'py>(
 fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
     m.add_function(wrap_pyfunction!(mode::compute_upstream_mode_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(mode::compute_mode_rust, m)?)?;
     Ok(())
 }

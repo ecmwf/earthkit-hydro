@@ -2,12 +2,28 @@ from .accumulate import flow
 from .metrics import metrics_func_finder
 
 
-def _calculate_mode_upstream(xp, river_network, field):
+def _calculate_mode(xp, river_network, field, invert_graph):
     """
-    Calculate upstream mode using Rust implementation for performance.
+    Calculate mode using Rust implementation for performance.
 
     For categorical data, computes the most common (mode) value among all
-    upstream nodes for each node in the river network.
+    connected nodes for each node in the river network.
+
+    Parameters
+    ----------
+    xp : array_namespace
+        Array namespace (e.g., numpy)
+    river_network : RiverNetwork
+        River network structure
+    field : array
+        Categorical field values at each node
+    invert_graph : bool
+        If True, invert graph direction for downstream aggregation
+
+    Returns
+    -------
+    array
+        Mode values for each node
     """
     # Mode only supported for numpy backend with Rust
     if xp.name != "numpy":
@@ -32,19 +48,40 @@ def _calculate_mode_upstream(xp, river_network, field):
     sorted_data = river_network._storage.sorted_data
     downstream_nodes = np.asarray(sorted_data[0, :], dtype=np.uintp)
     upstream_nodes = np.asarray(sorted_data[1, :], dtype=np.uintp)
-    sources = np.asarray(river_network.sources, dtype=np.uintp)
+
+    # Determine sources based on flow direction
+    if invert_graph:
+        # For downstream aggregation, start from sinks
+        sources = np.asarray(river_network.sinks, dtype=np.uintp)
+    else:
+        # For upstream aggregation, start from sources
+        sources = np.asarray(river_network.sources, dtype=np.uintp)
+
     n_nodes = river_network.n_nodes
 
-    # Call Rust function
-    result = _rust.compute_upstream_mode_rust(
+    # Call Rust function with invert_graph parameter
+    result = _rust.compute_mode_rust(
         field_int,
         upstream_nodes,
         downstream_nodes,
         sources,
-        n_nodes
+        n_nodes,
+        invert_graph
     )
 
     return xp.asarray(result)
+
+
+def _calculate_mode_upstream(xp, river_network, field):
+    """
+    Calculate upstream mode using Rust implementation for performance.
+
+    For categorical data, computes the most common (mode) value among all
+    upstream nodes for each node in the river network.
+
+    This is a convenience wrapper around _calculate_mode with invert_graph=False.
+    """
+    return _calculate_mode(xp, river_network, field, invert_graph=False)
 
 
 def calculate_online_metric(
@@ -69,11 +106,9 @@ def calculate_online_metric(
 
     # Special handling for mode - uses Rust implementation
     if metric == "mode":
-        if flow_direction != "down":
-            raise ValueError("Mode calculation only supports upstream aggregation (flow_direction='down').")
         if node_weights is not None or edge_weights is not None:
             raise ValueError("Mode calculation does not support weights.")
-        return _calculate_mode_upstream(xp, river_network, field)
+        return _calculate_mode(xp, river_network, field, invert_graph)
 
     if node_weights is None:
         if metric == "mean" or metric == "std" or metric == "var":

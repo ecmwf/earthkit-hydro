@@ -3,6 +3,101 @@ import pytest
 from _test_inputs.readers import *
 
 import earthkit.hydro as ekh
+from earthkit.hydro._readers import from_cama_nextxy
+from earthkit.hydro.data_structures import RiverNetwork
+
+
+def test_upstream_mode_manual_verification():
+    """
+    Test mode with manually constructed network and verified expected output.
+
+    This test creates a simple network with known topology and manually
+    computes the expected mode values to robustly verify the implementation.
+
+    Network topology (linear): 0 -> 1 -> 2 -> 3 (in a 1x4 grid)
+    Field values: [1, 2, 1, 3]
+
+    Expected upstream mode:
+    - Node 0 (source): mode([1]) = 1
+    - Node 1: mode([1, 2]) = 1 (tie broken by smallest)
+    - Node 2: mode([1, 2, 1]) = 1 (appears twice)
+    - Node 3: mode([1, 2, 1, 3]) = 1 (appears twice)
+    """
+    # Create a simple linear network in a 1x4 grid: [0,0] -> [0,1] -> [0,2] -> [0,3]
+    # nextxy format uses 1-indexed coordinates for downstream cells
+    # Cell (row, col) flows to nextxy_y[row,col], nextxy_x[row,col]
+    nextxy_x = np.array([[2, 3, 4, -9]])  # x-coords (columns, 1-indexed)
+    nextxy_y = np.array([[1, 1, 1, -9]])  # y-coords (rows, 1-indexed), -9 means sink
+
+    # Create river network
+    river_network_storage = from_cama_nextxy(nextxy_x, nextxy_y)
+    rn = RiverNetwork(river_network_storage)
+
+    # Field values at each node
+    field = np.array([1, 2, 1, 3], dtype=np.int64)
+
+    # Expected mode values (manually computed)
+    expected_mode = np.array([1, 1, 1, 1], dtype=np.int64)
+
+    # Compute mode
+    result = ekh.upstream.array.mode(rn, field, return_type="masked")
+
+    # Verify exact match
+    np.testing.assert_array_equal(result, expected_mode,
+        err_msg=f"Mode mismatch: expected {expected_mode}, got {result}")
+
+    print("Manual verification test passed!")
+    print(f"Field: {field}")
+    print(f"Expected mode: {expected_mode}")
+    print(f"Computed mode: {result}")
+
+
+def test_upstream_mode_branching_network():
+    r"""
+    Test mode with a branching network topology.
+
+    Network:         0
+                    / \
+                   1   2
+                    \ /
+                     3
+
+    Field: [1, 2, 2, ?]
+    Node 3 should have mode([1, 2, 2, field[3]])
+    """
+    # Create branching network in a 2x2 grid:
+    # [0,0]=0 -> [1,0]=2
+    # [0,1]=1 -> [1,0]=2
+    # [1,0]=2 -> [1,1]=3
+    # [1,1]=3 = sink
+    nextxy_x = np.array([
+        [1, 1],  # row 0: cells flow to column 1
+        [2, -9]  # row 1: cell 0 flows to column 2, cell 1 is sink
+    ])
+    nextxy_y = np.array([
+        [2, 2],  # row 0: cells flow to row 2
+        [2, -9]  # row 1: cell 0 flows to row 2, cell 1 is sink
+    ])
+
+    river_network_storage = from_cama_nextxy(nextxy_x, nextxy_y)
+    rn = RiverNetwork(river_network_storage)
+
+    # Field with category 2 appearing most frequently
+    field = np.array([1, 2, 2, 1], dtype=np.int64)
+
+    # Expected: sources keep their value, node 3 gets mode of all upstream
+    # Node 0: mode([1]) = 1
+    # Node 1: mode([2]) = 2
+    # Node 2: mode([2]) = 2
+    # Node 3: mode([1, 1, 2, 2]) = tie, smallest = 1
+    expected_mode = np.array([1, 2, 2, 1], dtype=np.int64)
+
+    result = ekh.upstream.array.mode(rn, field, return_type="masked")
+
+    np.testing.assert_array_equal(result, expected_mode,
+        err_msg=f"Branching network mode mismatch: expected {expected_mode}, got {result}")
+
+    print("Branching network test passed!")
 
 
 @pytest.mark.parametrize(

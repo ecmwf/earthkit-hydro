@@ -258,9 +258,7 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     sources = get_sources(n_nodes, down_ids)
     sinks = nodes[downstream == n_nodes]
 
-    # Create default coords for gridded networks
-    ny, nx = shape
-    coords = {"y": np.arange(ny), "x": np.arange(nx)}
+    coords = None
 
     assert np.all(np.isin(np.setdiff1d(sinks, sources), down_ids))
 

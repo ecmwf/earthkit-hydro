@@ -61,13 +61,10 @@ def get_input_output_core_dims(
         if return_grid:
             if len(input_core_dims[0]) == 2:  # grid in and out
                 output_core_dims = [input_core_dims[0]]
-            elif river_network.coords is not None:
+            else:
                 output_core_dims = [
                     list(river_network.coords.keys())
                 ]  # 1d in, grid out
-            else:
-                # Cannot return grid without coordinates
-                output_core_dims = [[node_default_coord]]
         else:
             if len(input_core_dims[0]) == 1:  # 1d in and out
                 output_core_dims = [input_core_dims[0]]
@@ -109,7 +106,7 @@ def xarray(func):
                 for dim, size in zip(dim_names, output.shape[:-offset])
             }
 
-            if return_grid and river_network.coords is not None:
+            if return_grid:
                 for k, v in river_network.coords.items():
                     coords[k] = v
                     dim_names.append(k)
@@ -119,7 +116,7 @@ def xarray(func):
 
             result = xr.DataArray(output, dims=dim_names, coords=coords, name="out")
 
-            if not return_grid and river_network.coords is not None:
+            if not return_grid:
                 coords_grid = np.meshgrid(*river_network.coords.values())
                 assign_dict = {
                     k: (node_default_coord, v.flat[river_network.mask])
@@ -154,7 +151,7 @@ def xarray(func):
                 kwargs=non_xr_kwargs,
             )
 
-            if len(output_core_dims[0]) == 1 and river_network.coords is not None:
+            if len(output_core_dims[0]) == 1:
                 coords = list(river_network.coords.values())[::-1]
                 coords_grid = np.meshgrid(*coords)[::-1]
                 assign_dict = {

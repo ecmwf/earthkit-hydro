@@ -1,8 +1,8 @@
 import numpy as np
 import pytest
 import xarray as xr
-from _test_inputs.catchment import *
 from _test_inputs.accumulation import input_field_1c
+from _test_inputs.catchment import *
 from _test_inputs.readers import *
 
 import earthkit.hydro as ekh
@@ -22,7 +22,9 @@ import earthkit.hydro as ekh
 )
 def test_catchments_min_xarray(river_network, field, locations, expected):
     """Test catchment min with xarray input."""
-    field_da = xr.DataArray(field, dims=["node_index"], coords={"node_index": np.arange(len(field))})
+    field_da = xr.DataArray(
+        field, dims=["node_index"], coords={"node_index": np.arange(len(field))}
+    )
     result = ekh.catchments.min(river_network, field_da, locations=locations)
     assert isinstance(result, xr.DataArray)
     np.testing.assert_allclose(result.values, expected, rtol=1e-6)

@@ -105,7 +105,9 @@ def test_crop(river_network):
     assert cropped.n_nodes == subnetwork.n_nodes
 
     # Check that the grid dimensions are reduced (actual cropping happened)
-    assert (cropped.shape[0] < subnetwork.shape[0]) or (cropped.shape[1] < subnetwork.shape[1])
+    assert (cropped.shape[0] < subnetwork.shape[0]) or (
+        cropped.shape[1] < subnetwork.shape[1]
+    )
 
     # Check that it's a different object
     assert cropped is not subnetwork

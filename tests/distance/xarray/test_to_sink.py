@@ -20,6 +20,8 @@ import earthkit.hydro as ekh
 )
 def test_distance_to_sink_xarray(river_network, field, expected):
     """Test distance to sink with xarray output."""
-    result = ekh.distance.to_sink(river_network, field=field, path="shortest", return_type="masked")
+    result = ekh.distance.to_sink(
+        river_network, field=field, path="shortest", return_type="masked"
+    )
     assert isinstance(result, xr.DataArray)
     np.testing.assert_array_equal(result.values, expected)

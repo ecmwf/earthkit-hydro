@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
-from _test_inputs.catchment import *
 from _test_inputs.accumulation import input_field_1c
+from _test_inputs.catchment import *
 from _test_inputs.readers import *
 
 import earthkit.hydro as ekh
@@ -27,7 +27,9 @@ def test_catchments_std(river_network, field, locations):
 
     # Test that std is 0 for uniform fields
     uniform_field = np.ones(river_network.n_nodes)
-    std_uniform = ekh.catchments.array.std(river_network, uniform_field, locations=locations)
+    std_uniform = ekh.catchments.array.std(
+        river_network, uniform_field, locations=locations
+    )
     np.testing.assert_allclose(std_uniform, 0, atol=1e-10)
 
     # Test relationship with variance

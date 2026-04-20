@@ -1,4 +1,3 @@
-import numpy as np
 import pytest
 import xarray as xr
 from _test_inputs.catchment import *

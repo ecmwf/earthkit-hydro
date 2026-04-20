@@ -139,7 +139,9 @@ def xarray(func):
                 output_sizes = {output_core_dims[0][0]: river_network.n_nodes}
             else:
                 # Gridded output
-                output_sizes = {k: v for k, v in zip(output_core_dims[0], river_network.shape)}
+                output_sizes = {
+                    k: v for k, v in zip(output_core_dims[0], river_network.shape)
+                }
 
             result = xr.apply_ufunc(
                 reshuffled_func,

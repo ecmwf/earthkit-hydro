@@ -56,11 +56,11 @@ pub fn compute_mode_rust<'py>(
         // For downstream aggregation: invert the graph
         // "from" nodes are downstream, "to" nodes are upstream
         let mut down_adj: Vec<Vec<usize>> = vec![Vec::new(); n_nodes];
-        let mut up_adj: Vec<Option<usize>> = vec![None; n_nodes];
+        let mut up_adj: Vec<Vec<usize>> = vec![Vec::new(); n_nodes];
         for (&u, &d) in upstream_slice.iter().zip(downstream_slice.iter()) {
             if d < n_nodes {
                 down_adj[u].push(d);  // downstream nodes from each node
-                up_adj[d] = Some(u);  // (simplified, assumes single upstream)
+                up_adj[d].push(u);    // upstream nodes to each node (can be multiple)
             }
         }
         (down_adj, up_adj)
@@ -68,11 +68,11 @@ pub fn compute_mode_rust<'py>(
         // For upstream aggregation: use normal direction
         // "from" nodes are upstream, "to" nodes are downstream
         let mut up_adj: Vec<Vec<usize>> = vec![Vec::new(); n_nodes];
-        let mut down_adj: Vec<Option<usize>> = vec![None; n_nodes];
+        let mut down_adj: Vec<Vec<usize>> = vec![Vec::new(); n_nodes];
         for (&u, &d) in upstream_slice.iter().zip(downstream_slice.iter()) {
             if d < n_nodes {
                 up_adj[d].push(u);
-                down_adj[u] = Some(d);
+                down_adj[u].push(d);
             }
         }
         (up_adj, down_adj)
@@ -97,7 +97,7 @@ pub fn compute_mode_rust<'py>(
 
     // Move to first next layer
     for &i in &current {
-        if let Some(to_node) = to_adj[i] {
+        for &to_node in &to_adj[i] {
             if !visited.contains(to_node) {
                 visited.insert(to_node);
                 next.push(to_node);
@@ -134,7 +134,7 @@ pub fn compute_mode_rust<'py>(
         next.clear();
         visited.clear();
         for &i in &current {
-            if let Some(to_node) = to_adj[i] {
+            for &to_node in &to_adj[i] {
                 if !visited.contains(to_node) {
                     visited.insert(to_node);
                     next.push(to_node);

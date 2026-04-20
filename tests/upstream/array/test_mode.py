@@ -3,7 +3,7 @@ import pytest
 from _test_inputs.readers import *
 
 import earthkit.hydro as ekh
-from earthkit.hydro._readers import from_cama_nextxy
+from earthkit.hydro._readers import from_d8
 from earthkit.hydro.data_structures import RiverNetwork
 
 
@@ -14,23 +14,25 @@ def test_upstream_mode_manual_verification():
     This test creates a simple network with known topology and manually
     computes the expected mode values to robustly verify the implementation.
 
-    Network topology (linear): 0 -> 1 -> 2 -> 3 (in a 1x4 grid)
-    Field values: [1, 2, 1, 3]
+    Network:
 
-    Expected upstream mode:
-    - Node 0 (source): mode([1]) = 1
-    - Node 1: mode([1, 2]) = 1 (tie broken by smallest)
-    - Node 2: mode([1, 2, 1]) = 1 (appears twice)
-    - Node 3: mode([1, 2, 1, 3]) = 1 (appears twice)
+    |-|-|-|x|
+
+    Field:
+
+    [1, 2, 1, 3]
+
+    Expected upstream mode calculation:
+    - 0: mode([1]) = 1
+    - 1: mode([1, 2]) = 1 (tie broken by smallest)
+    - 2: mode([1, 2, 1]) = 1 (appears twice)
+    - 3: mode([1, 2, 1, 3]) = 1 (appears twice)
     """
-    # Create a simple linear network in a 1x4 grid: [0,0] -> [0,1] -> [0,2] -> [0,3]
-    # nextxy format uses 1-indexed coordinates for downstream cells
-    # Cell (row, col) flows to nextxy_y[row,col], nextxy_x[row,col]
-    nextxy_x = np.array([[2, 3, 4, -9]])  # x-coords (columns, 1-indexed)
-    nextxy_y = np.array([[1, 1, 1, -9]])  # y-coords (rows, 1-indexed), -9 means sink
+
+    d8 = np.array([[3, 3, 3, 5]])
 
     # Create river network
-    river_network_storage = from_cama_nextxy(nextxy_x, nextxy_y)
+    river_network_storage = from_d8(d8)
     rn = RiverNetwork(river_network_storage)
 
     # Field values at each node
@@ -43,8 +45,11 @@ def test_upstream_mode_manual_verification():
     result = ekh.upstream.array.mode(rn, field, return_type="masked")
 
     # Verify exact match
-    np.testing.assert_array_equal(result, expected_mode,
-        err_msg=f"Mode mismatch: expected {expected_mode}, got {result}")
+    np.testing.assert_array_equal(
+        result,
+        expected_mode,
+        err_msg=f"Mode mismatch: expected {expected_mode}, got {result}",
+    )
 
     print("Manual verification test passed!")
     print(f"Field: {field}")
@@ -56,52 +61,40 @@ def test_upstream_mode_branching_network():
     r"""
     Test mode with a branching network topology (V-shape confluence).
 
-    Network topology:
-        0   1    (sources)
-         \ /
-          2
-          |
-          3      (sink)
+    Network:
 
-    Grid layout (2x2):
-        [0,0]=0  [0,1]=1
-        [1,0]=2  [1,1]=3
+    |||/|
+    |-|x|
 
-    Flows:
-        0 -> 2
-        1 -> 2
-        2 -> 3
-        3 = sink
+    Field:
+
+    [3, 2]
+    [3, 2]
+
+    Expected upstream mode calculation:
+    - 0: mode([1]) = 3
+    - 1: mode([2]) = 2
+    - 2: mode([3, 2, 3]) = 3
+    - 3: mode([3, 2, 3, 2]) = 2 (tie between 2 and 3, smallest wins)
     """
-    # Create branching network in a 2x2 grid
-    # nextxy format: nextxy_x[row,col] = column+1 of downstream cell (1-indexed)
-    #                nextxy_y[row,col] = row+1 of downstream cell (1-indexed)
-    nextxy_x = np.array([
-        [1, 1],  # row 0: [0,0]->col 1, [0,1]->col 1 (both flow to [1,0])
-        [2, -9]  # row 1: [1,0]->col 2 (flows to [1,1]), [1,1] is sink
-    ])
-    nextxy_y = np.array([
-        [2, 2],  # row 0: [0,0]->row 2, [0,1]->row 2 (both flow to [1,0])
-        [2, -9]  # row 1: [1,0]->row 2 (flows to [1,1]), [1,1] is sink
-    ])
 
-    river_network_storage = from_cama_nextxy(nextxy_x, nextxy_y)
+    d8 = np.array([[8, 7], [6, 5]])
+
+    river_network_storage = from_d8(d8)
     rn = RiverNetwork(river_network_storage)
 
     # Test field with known values
-    field = np.array([1, 2, 3, 4], dtype=np.int64)
+    field = np.array([3, 2, 3, 2], dtype=np.int64)
 
-    # Expected mode calculation:
-    # Node 0 (source at [0,0]): mode([1]) = 1
-    # Node 1 (source at [0,1]): mode([2]) = 2
-    # Node 2 (confluence at [1,0]): mode([1, 2, 3]) = 1 (tie broken by smallest)
-    # Node 3 (sink at [1,1]): mode([1, 2, 3, 4]) = 1 (tie broken by smallest)
-    expected_mode = np.array([1, 2, 1, 1], dtype=np.int64)
+    expected_mode = np.array([3, 2, 3, 2], dtype=np.int64)
 
     result = ekh.upstream.array.mode(rn, field, return_type="masked")
 
-    np.testing.assert_array_equal(result, expected_mode,
-        err_msg=f"Branching network mode mismatch: expected {expected_mode}, got {result}")
+    np.testing.assert_array_equal(
+        result,
+        expected_mode,
+        err_msg=f"Branching network mode mismatch: expected {expected_mode}, got {result}",
+    )
 
     print("Branching network test passed!")
 
@@ -110,61 +103,41 @@ def test_upstream_mode_complex_branching():
     r"""
     Test mode with a more complex branching network.
 
-    Network topology:
-        0   1   2    (sources)
-         \ / \ /
-          3   4
-           \ /
-            5        (sink)
+    Network:
 
-    Grid layout (2x3):
-        [0,0]=0  [0,1]=1  [0,2]=2
-        [1,0]=3  [1,1]=4  [1,2]=5
+    |||||/|
+    |-|-|x|
 
-    Flows:
-        0 -> 3
-        1 -> 3
-        1 -> 4 (note: in simple networks, each cell has one downstream)
-        Actually, in nextxy format each cell has exactly one downstream,
-        so we'll simplify:
-        0 -> 3
-        1 -> 4
-        2 -> 4
-        3 -> 5
-        4 -> 5
+    Field:
+
+    [1,1,2]
+    [5,5,5]
+
+    Expected upstream mode calculation:
+    - 0: mode([1]) = 1
+    - 1: mode([1]) = 1
+    - 2: mode([2]) = 2
+    - 3: mode([1, 5]) = 1 (tie between 1 and 5, smallest wins)
+    - 4: mode([1, 2, 5, 1, 5]) = 1 (tie between 1 and 5, smallest wins)
+    - 5: mode([1, 1, 2, 5, 5, 5]) = 5
     """
-    # Create 2x3 grid network
-    nextxy_x = np.array([
-        [1, 2, 2],  # row 0: [0,0]->col 1, [0,1]->col 2, [0,2]->col 2
-        [3, 3, -9]  # row 1: [1,0]->col 3, [1,1]->col 3, [1,2] is sink
-    ])
-    nextxy_y = np.array([
-        [2, 2, 2],  # row 0: all flow to row 2 (row 1 in 0-indexed)
-        [2, 2, -9]  # row 1: [1,0] and [1,1] flow to row 2 ([1,2]), sink
-    ])
 
-    river_network_storage = from_cama_nextxy(nextxy_x, nextxy_y)
+    d8 = np.array([[8, 8, 7], [6, 6, 5]])
+
+    river_network_storage = from_d8(d8)
     rn = RiverNetwork(river_network_storage)
 
-    # Field: use values that create a clear mode
-    # [0,0]=1, [0,1]=1, [0,2]=2, [1,0]=?, [1,1]=?, [1,2]=?
     field = np.array([1, 1, 2, 5, 5, 3], dtype=np.int64)
 
-    # Expected mode calculation:
-    # Node 0 (source): mode([1]) = 1
-    # Node 1 (source): mode([1]) = 1
-    # Node 2 (source): mode([2]) = 2
-    # Node 3: mode([1, 5]) = 1 (tie, smallest wins)
-    # Node 4: mode([1, 2, 5]) = 1 (tie between 1,2,5, smallest=1)
-    # Node 5 (sink): mode([1, 1, 2, 5, 5, 3]) = 1 (appears twice) or 5 (appears twice)?
-    #               Count: 1 appears 2 times, 2 appears 1 time, 5 appears 2 times, 3 appears 1 time
-    #               Tie between 1 and 5, smallest wins: 1
     expected_mode = np.array([1, 1, 2, 1, 1, 1], dtype=np.int64)
 
     result = ekh.upstream.array.mode(rn, field, return_type="masked")
 
-    np.testing.assert_array_equal(result, expected_mode,
-        err_msg=f"Complex branching mode mismatch: expected {expected_mode}, got {result}")
+    np.testing.assert_array_equal(
+        result,
+        expected_mode,
+        err_msg=f"Complex branching mode mismatch: expected {expected_mode}, got {result}",
+    )
 
     print("Complex branching network test passed!")
 
@@ -173,32 +146,33 @@ def test_upstream_mode_dominant_category():
     r"""
     Test mode where one category clearly dominates.
 
-    Network: Linear with 4 nodes
-        0 -> 1 -> 2 -> 3
+    Network:
 
-    Field: [2, 2, 2, 1]
+    |-|-|-|x|
+
+    Field:
+
+    [2, 2, 2, 1]
+
     Expected: Category 2 should dominate at downstream nodes.
     """
-    # Create simple linear network
-    nextxy_x = np.array([[2, 3, 4, -9]])
-    nextxy_y = np.array([[1, 1, 1, -9]])
 
-    river_network_storage = from_cama_nextxy(nextxy_x, nextxy_y)
+    d8 = np.array([[3, 3, 3, 5]])
+
+    river_network_storage = from_d8(d8)
     rn = RiverNetwork(river_network_storage)
 
     field = np.array([2, 2, 2, 1], dtype=np.int64)
 
-    # Expected mode:
-    # Node 0: mode([2]) = 2
-    # Node 1: mode([2, 2]) = 2
-    # Node 2: mode([2, 2, 2]) = 2
-    # Node 3: mode([2, 2, 2, 1]) = 2 (appears 3 times vs 1 once)
     expected_mode = np.array([2, 2, 2, 2], dtype=np.int64)
 
     result = ekh.upstream.array.mode(rn, field, return_type="masked")
 
-    np.testing.assert_array_equal(result, expected_mode,
-        err_msg=f"Dominant category mismatch: expected {expected_mode}, got {result}")
+    np.testing.assert_array_equal(
+        result,
+        expected_mode,
+        err_msg=f"Dominant category mismatch: expected {expected_mode}, got {result}",
+    )
 
     print("Dominant category test passed!")
 
@@ -211,17 +185,7 @@ def test_upstream_mode_dominant_category():
 def test_upstream_mode_simple(river_network):
     """
     Test mode calculation with a simple categorical field.
-
-    Creates a field where each node has a categorical value,
-    and verifies that the mode is computed correctly for
-    downstream accumulation.
     """
-    # Create a simple categorical field with values 1, 2, 3
-    # For a linear network: 1 -> 2 -> 3, if field is [1, 2, 1]
-    # The mode at each node should be:
-    # Node 0: mode of [1] = 1
-    # Node 1: mode of [1, 2] = 1 (tie, smallest wins)
-    # Node 2: mode of [1, 2, 1] = 1
 
     n_nodes = river_network.n_nodes
 
@@ -245,12 +209,13 @@ def test_upstream_mode_simple(river_network):
 
     # For source nodes, the mode should be the node's own value
     for source in river_network.sources:
-        assert output_field[source] == input_field[source], \
-            f"Source node {source}: expected {input_field[source]}, got {output_field[source]}"
+        assert (
+            output_field[source] == input_field[source]
+        ), f"Source node {source}: expected {input_field[source]}, got {output_field[source]}"
 
     print(f"Input field: {input_field}")
     print(f"Output field (mode): {output_field}")
-    print(f"Test passed!")
+    print("Test passed!")
 
 
 @pytest.mark.parametrize(
@@ -272,8 +237,9 @@ def test_upstream_mode_constant(river_network):
     )
 
     # All output values should be the constant value
-    assert np.all(output_field == constant_value), \
-        f"Expected all {constant_value}, got {output_field}"
+    assert np.all(
+        output_field == constant_value
+    ), f"Expected all {constant_value}, got {output_field}"
 
     print(f"Constant field test passed! All values are {constant_value}")
 
@@ -296,14 +262,15 @@ def test_upstream_mode_binary(river_network):
     )
 
     # Check that output is binary
-    assert np.all((output_field == 0) | (output_field == 1)), \
-        f"Output should be binary, got {output_field}"
+    assert np.all(
+        (output_field == 0) | (output_field == 1)
+    ), f"Output should be binary, got {output_field}"
 
     # For source nodes, mode should be their own value
     for source in river_network.sources:
         assert output_field[source] == input_field[source]
 
-    print(f"Binary field test passed!")
+    print("Binary field test passed!")
 
 
 @pytest.mark.parametrize(
@@ -323,7 +290,7 @@ def test_upstream_mode_weights_unsupported(river_network):
             river_network, input_field, node_weights=node_weights, return_type="masked"
         )
 
-    print(f"Weights unsupported test passed!")
+    print("Weights unsupported test passed!")
 
 
 @pytest.mark.parametrize(
@@ -349,7 +316,7 @@ def test_upstream_mode_dtype_conversion(river_network):
     )
     assert output_int64.shape == input_field_int64.shape
 
-    print(f"Dtype conversion test passed!")
+    print("Dtype conversion test passed!")
 
 
 @pytest.mark.parametrize(
@@ -373,9 +340,7 @@ def test_upstream_mode_land_cover_scenario(river_network):
     # Create land cover with forest (1) being most common
     # 50% forest, 25% grassland, 15% urban, 10% water
     land_cover = np.random.choice(
-        [1, 2, 3, 4],
-        size=n_nodes,
-        p=[0.5, 0.25, 0.15, 0.10]
+        [1, 2, 3, 4], size=n_nodes, p=[0.5, 0.25, 0.15, 0.10]
     ).astype(np.int64)
 
     # Compute mode
@@ -392,7 +357,7 @@ def test_upstream_mode_land_cover_scenario(river_network):
     for source in river_network.sources:
         assert mode_result[source] == land_cover[source]
 
-    print(f"Land cover scenario test passed!")
+    print("Land cover scenario test passed!")
     print(f"Land cover distribution: {np.bincount(land_cover[land_cover > 0])}")
     print(f"Mode distribution: {np.bincount(mode_result[mode_result > 0])}")
 
@@ -413,7 +378,9 @@ def test_upstream_mode_tie_breaking(river_network):
 
     # Create a field where at some nodes we'll have ties
     # Use a pattern that creates balanced distributions
-    input_field = np.array([1 if i % 2 == 0 else 2 for i in range(n_nodes)], dtype=np.int64)
+    input_field = np.array(
+        [1 if i % 2 == 0 else 2 for i in range(n_nodes)], dtype=np.int64
+    )
 
     # Compute mode
     mode_result = ekh.upstream.array.mode(
@@ -427,7 +394,7 @@ def test_upstream_mode_tie_breaking(river_network):
     for source in river_network.sources:
         assert mode_result[source] == input_field[source]
 
-    print(f"Tie-breaking test passed!")
+    print("Tie-breaking test passed!")
 
 
 @pytest.mark.parametrize(
@@ -461,7 +428,7 @@ def test_upstream_mode_categorical_range(river_network):
     for source in river_network.sources:
         assert mode_result[source] == input_field[source]
 
-    print(f"Categorical range test passed!")
+    print("Categorical range test passed!")
     print(f"Categories used: {categories}")
     print(f"Unique modes: {np.unique(mode_result)}")
 
@@ -497,6 +464,6 @@ def test_upstream_mode_negative_categories(river_network):
     for source in river_network.sources:
         assert mode_result[source] == input_field[source]
 
-    print(f"Negative categories test passed!")
+    print("Negative categories test passed!")
     print(f"Categories: {categories}")
     print(f"Unique modes: {np.unique(mode_result)}")

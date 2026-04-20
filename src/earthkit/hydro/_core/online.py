@@ -41,6 +41,11 @@ def _calculate_mode(xp, river_network, field, invert_graph):
 
     # Convert field to int64 for categorical data
     import numpy as np
+
+    if not np.issubdtype(field.dtype, np.integer):
+        raise ValueError(
+            "Mode calculation requires integer field values for categorical data."
+        )
     field_int = np.asarray(field, dtype=np.int64)
 
     # Get network topology from sorted_data
@@ -61,27 +66,10 @@ def _calculate_mode(xp, river_network, field, invert_graph):
 
     # Call Rust function with invert_graph parameter
     result = _rust.compute_mode_rust(
-        field_int,
-        upstream_nodes,
-        downstream_nodes,
-        sources,
-        n_nodes,
-        invert_graph
+        field_int, upstream_nodes, downstream_nodes, sources, n_nodes, invert_graph
     )
 
     return xp.asarray(result)
-
-
-def _calculate_mode_upstream(xp, river_network, field):
-    """
-    Calculate upstream mode using Rust implementation for performance.
-
-    For categorical data, computes the most common (mode) value among all
-    upstream nodes for each node in the river network.
-
-    This is a convenience wrapper around _calculate_mode with invert_graph=False.
-    """
-    return _calculate_mode(xp, river_network, field, invert_graph=False)
 
 
 def calculate_online_metric(

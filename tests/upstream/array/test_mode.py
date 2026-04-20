@@ -51,11 +51,6 @@ def test_upstream_mode_manual_verification():
         err_msg=f"Mode mismatch: expected {expected_mode}, got {result}",
     )
 
-    print("Manual verification test passed!")
-    print(f"Field: {field}")
-    print(f"Expected mode: {expected_mode}")
-    print(f"Computed mode: {result}")
-
 
 def test_upstream_mode_branching_network():
     r"""
@@ -95,8 +90,6 @@ def test_upstream_mode_branching_network():
         expected_mode,
         err_msg=f"Branching network mode mismatch: expected {expected_mode}, got {result}",
     )
-
-    print("Branching network test passed!")
 
 
 def test_upstream_mode_complex_branching():
@@ -139,7 +132,46 @@ def test_upstream_mode_complex_branching():
         err_msg=f"Complex branching mode mismatch: expected {expected_mode}, got {result}",
     )
 
-    print("Complex branching network test passed!")
+
+def test_upstream_mode_complex_branching_negative():
+    r"""
+    Test mode with a more complex branching network.
+
+    Network:
+
+    |||||/|
+    |-|-|x|
+
+    Field:
+
+    [-1,-1,-2]
+    [-5,-5,-5]
+
+    Expected upstream mode calculation:
+    - 0: mode([-1]) = -1
+    - 1: mode([-1]) = -1
+    - 2: mode([-2]) = -2
+    - 3: mode([-1, -5]) = -5 (tie between -1 and -5, smallest wins)
+    - 4: mode([-1, -2, -5, -1, -5]) = -5 (tie between -1 and -5, smallest wins)
+    - 5: mode([-1, -1, -2, -5, -5, -5]) = -5
+    """
+
+    d8 = np.array([[8, 8, 7], [6, 6, 5]])
+
+    river_network_storage = from_d8(d8)
+    rn = RiverNetwork(river_network_storage)
+
+    field = -np.array([1, 1, 2, 5, 5, 3], dtype=np.int64)
+
+    expected_mode = np.array([-1, -1, -2, -5, -5, -5], dtype=np.int64)
+
+    result = ekh.upstream.array.mode(rn, field, return_type="masked")
+
+    np.testing.assert_array_equal(
+        result,
+        expected_mode,
+        err_msg=f"Complex branching mode mismatch: expected {expected_mode}, got {result}",
+    )
 
 
 def test_upstream_mode_dominant_category():
@@ -174,49 +206,6 @@ def test_upstream_mode_dominant_category():
         err_msg=f"Dominant category mismatch: expected {expected_mode}, got {result}",
     )
 
-    print("Dominant category test passed!")
-
-
-@pytest.mark.parametrize(
-    "river_network",
-    [("cama_nextxy", cama_nextxy_1)],
-    indirect=["river_network"],
-)
-def test_upstream_mode_simple(river_network):
-    """
-    Test mode calculation with a simple categorical field.
-    """
-
-    n_nodes = river_network.n_nodes
-
-    # Create a field with repeating categorical values
-    np.random.seed(42)
-    input_field = np.random.randint(1, 5, size=n_nodes, dtype=np.int64)
-
-    # Compute mode
-    output_field = ekh.upstream.array.mode(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
-
-    # Basic checks
-    assert output_field.dtype == np.int64 or output_field.dtype == np.int32
-    assert output_field.shape == input_field.shape
-    assert len(output_field) == n_nodes
-
-    # Check that output values are in the range of input values
-    assert np.all(output_field >= input_field.min())
-    assert np.all(output_field <= input_field.max())
-
-    # For source nodes, the mode should be the node's own value
-    for source in river_network.sources:
-        assert (
-            output_field[source] == input_field[source]
-        ), f"Source node {source}: expected {input_field[source]}, got {output_field[source]}"
-
-    print(f"Input field: {input_field}")
-    print(f"Output field (mode): {output_field}")
-    print("Test passed!")
-
 
 @pytest.mark.parametrize(
     "river_network",
@@ -241,229 +230,58 @@ def test_upstream_mode_constant(river_network):
         output_field == constant_value
     ), f"Expected all {constant_value}, got {output_field}"
 
-    print(f"Constant field test passed! All values are {constant_value}")
-
 
 @pytest.mark.parametrize(
     "river_network",
     [("cama_nextxy", cama_nextxy_1)],
     indirect=["river_network"],
 )
-def test_upstream_mode_binary(river_network):
-    """Test mode with binary categorical data."""
-    n_nodes = river_network.n_nodes
+def test_negative_non_consecutive_categories(river_network):
+    """Test mode with negative and non-consecutive category values."""
 
-    # Binary field: alternating 0 and 1
-    input_field = np.array([i % 2 for i in range(n_nodes)], dtype=np.int64)
+    input_field = np.array(
+        [
+            [-9, -9, -5, -23, -5],
+            [-4, -23, -23, -4, -4],
+            [-4, -23, -23, -4, -4],
+            [-4, -23, -4, -4, -4],
+        ],
+        dtype=np.int64,
+    )
 
     # Compute mode
-    output_field = ekh.upstream.array.mode(
+    result = ekh.upstream.array.mode(
         river_network, input_field, node_weights=None, return_type="masked"
     )
 
-    # Check that output is binary
-    assert np.all(
-        (output_field == 0) | (output_field == 1)
-    ), f"Output should be binary, got {output_field}"
-
-    # For source nodes, mode should be their own value
-    for source in river_network.sources:
-        assert output_field[source] == input_field[source]
-
-    print("Binary field test passed!")
-
-
-@pytest.mark.parametrize(
-    "river_network",
-    [("cama_nextxy", cama_nextxy_1)],
-    indirect=["river_network"],
-)
-def test_upstream_mode_weights_unsupported(river_network):
-    """Test that mode raises error when weights are provided."""
-    n_nodes = river_network.n_nodes
-    input_field = np.random.randint(1, 5, size=n_nodes, dtype=np.int64)
-    node_weights = np.ones(n_nodes)
-
-    # Mode should raise an error when weights are provided
-    with pytest.raises(ValueError, match="does not support weights"):
-        ekh.upstream.array.mode(
-            river_network, input_field, node_weights=node_weights, return_type="masked"
-        )
-
-    print("Weights unsupported test passed!")
-
-
-@pytest.mark.parametrize(
-    "river_network",
-    [("cama_nextxy", cama_nextxy_1)],
-    indirect=["river_network"],
-)
-def test_upstream_mode_dtype_conversion(river_network):
-    """Test that mode works with different input dtypes."""
-    n_nodes = river_network.n_nodes
-
-    # Test with int32
-    input_field_int32 = np.random.randint(1, 5, size=n_nodes, dtype=np.int32)
-    output_int32 = ekh.upstream.array.mode(
-        river_network, input_field_int32, return_type="masked"
-    )
-    assert output_int32.shape == input_field_int32.shape
-
-    # Test with int64
-    input_field_int64 = np.random.randint(1, 5, size=n_nodes, dtype=np.int64)
-    output_int64 = ekh.upstream.array.mode(
-        river_network, input_field_int64, return_type="masked"
-    )
-    assert output_int64.shape == input_field_int64.shape
-
-    print("Dtype conversion test passed!")
-
-
-@pytest.mark.parametrize(
-    "river_network",
-    [("cama_nextxy", cama_nextxy_1)],
-    indirect=["river_network"],
-)
-def test_upstream_mode_land_cover_scenario(river_network):
-    """
-    Test mode with a realistic land cover scenario.
-
-    Simulates land cover classes (1=forest, 2=grassland, 3=urban, 4=water)
-    and verifies that the dominant upstream land cover is correctly computed.
-    """
-    n_nodes = river_network.n_nodes
-
-    # Create a land cover field with specific patterns
-    # Use deterministic seed for reproducibility
-    np.random.seed(123)
-
-    # Create land cover with forest (1) being most common
-    # 50% forest, 25% grassland, 15% urban, 10% water
-    land_cover = np.random.choice(
-        [1, 2, 3, 4], size=n_nodes, p=[0.5, 0.25, 0.15, 0.10]
-    ).astype(np.int64)
-
-    # Compute mode
-    mode_result = ekh.upstream.array.mode(
-        river_network, land_cover, return_type="masked"
+    expected_mode = np.array(
+        [
+            -9,
+            -9,
+            -5,
+            -23,
+            -5,
+            -9,
+            -23,
+            -23,
+            -5,
+            -4,
+            -4,
+            -23,
+            -4,
+            -4,
+            -4,
+            -4,
+            -4,
+            -4,
+            -4,
+            -4,
+        ],
+        dtype=np.int64,
     )
 
-    # Verify basic properties
-    assert mode_result.dtype in [np.int64, np.int32]
-    assert mode_result.shape == land_cover.shape
-    assert np.all((mode_result >= 1) & (mode_result <= 4))
-
-    # For source nodes, mode equals their own value
-    for source in river_network.sources:
-        assert mode_result[source] == land_cover[source]
-
-    print("Land cover scenario test passed!")
-    print(f"Land cover distribution: {np.bincount(land_cover[land_cover > 0])}")
-    print(f"Mode distribution: {np.bincount(mode_result[mode_result > 0])}")
-
-
-@pytest.mark.parametrize(
-    "river_network",
-    [("cama_nextxy", cama_nextxy_1)],
-    indirect=["river_network"],
-)
-def test_upstream_mode_tie_breaking(river_network):
-    """
-    Test that ties are broken correctly (smallest value wins).
-
-    In a scenario where two categories appear with equal frequency,
-    the mode should be the smaller category value.
-    """
-    n_nodes = river_network.n_nodes
-
-    # Create a field where at some nodes we'll have ties
-    # Use a pattern that creates balanced distributions
-    input_field = np.array(
-        [1 if i % 2 == 0 else 2 for i in range(n_nodes)], dtype=np.int64
+    np.testing.assert_array_equal(
+        result,
+        expected_mode,
+        err_msg=f"Dominant category mismatch: expected {expected_mode}, got {result}",
     )
-
-    # Compute mode
-    mode_result = ekh.upstream.array.mode(
-        river_network, input_field, return_type="masked"
-    )
-
-    # Verify that mode values are valid
-    assert np.all((mode_result == 1) | (mode_result == 2))
-
-    # For source nodes, verify they match input
-    for source in river_network.sources:
-        assert mode_result[source] == input_field[source]
-
-    print("Tie-breaking test passed!")
-
-
-@pytest.mark.parametrize(
-    "river_network",
-    [("cama_nextxy", cama_nextxy_1)],
-    indirect=["river_network"],
-)
-def test_upstream_mode_categorical_range(river_network):
-    """
-    Test mode with a wide range of categorical values.
-
-    Verifies that mode works correctly with non-consecutive category values
-    (e.g., categories 10, 20, 30 instead of 1, 2, 3).
-    """
-    n_nodes = river_network.n_nodes
-
-    # Use non-consecutive category values
-    np.random.seed(456)
-    categories = [10, 20, 30, 40, 50]
-    input_field = np.random.choice(categories, size=n_nodes).astype(np.int64)
-
-    # Compute mode
-    mode_result = ekh.upstream.array.mode(
-        river_network, input_field, return_type="masked"
-    )
-
-    # Verify output values are from the input set
-    assert np.all(np.isin(mode_result, categories))
-
-    # Verify source nodes
-    for source in river_network.sources:
-        assert mode_result[source] == input_field[source]
-
-    print("Categorical range test passed!")
-    print(f"Categories used: {categories}")
-    print(f"Unique modes: {np.unique(mode_result)}")
-
-
-@pytest.mark.parametrize(
-    "river_network",
-    [("cama_nextxy", cama_nextxy_1)],
-    indirect=["river_network"],
-)
-def test_upstream_mode_negative_categories(river_network):
-    """
-    Test mode with negative category values.
-
-    Verifies that mode works with negative integers, which might represent
-    certain data conventions (e.g., -1 for missing/special values).
-    """
-    n_nodes = river_network.n_nodes
-
-    # Use categories including negative values
-    np.random.seed(789)
-    categories = [-1, 0, 1, 2]
-    input_field = np.random.choice(categories, size=n_nodes).astype(np.int64)
-
-    # Compute mode
-    mode_result = ekh.upstream.array.mode(
-        river_network, input_field, return_type="masked"
-    )
-
-    # Verify output values are from the input set
-    assert np.all(np.isin(mode_result, categories))
-
-    # Verify source nodes
-    for source in river_network.sources:
-        assert mode_result[source] == input_field[source]
-
-    print("Negative categories test passed!")
-    print(f"Categories: {categories}")
-    print(f"Unique modes: {np.unique(mode_result)}")

@@ -25,7 +25,7 @@ def test_downstream_std_xarray(river_network, input_field, mv):
     assert isinstance(result, xr.DataArray)
     assert np.all(result.values[~np.isnan(result.values)] >= 0)
 
-    uniform_da = xr.DataArray(np.ones(river_network.n_nodes), dims=["node"])
+    uniform_da = xr.DataArray(np.ones(river_network.n_nodes), dims=["node_index"], coords={"node_index": np.arange(river_network.n_nodes)})
     std_uniform = ekh.downstream.std(river_network, uniform_da, return_type="masked")
     np.testing.assert_allclose(std_uniform.values, 0, atol=1e-10)
 

@@ -19,9 +19,6 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-@pytest.mark.skip(
-    reason="Bug: catchments xarray decorator doesn't handle dimension size changes correctly (20 nodes → 5 locations)"
-)
 def test_catchments_var_xarray(river_network, field, locations):
     """Test catchment variance with xarray input."""
     field_da = xr.DataArray(
@@ -31,6 +28,10 @@ def test_catchments_var_xarray(river_network, field, locations):
     assert isinstance(result, xr.DataArray)
     assert np.all(result.values >= 0)
 
-    uniform_da = xr.DataArray(np.ones(river_network.n_nodes), dims=["node"])
+    uniform_da = xr.DataArray(
+        np.ones(river_network.n_nodes),
+        dims=["node_index"],
+        coords={"node_index": np.arange(river_network.n_nodes)},
+    )
     var_uniform = ekh.catchments.var(river_network, uniform_da, locations=locations)
     np.testing.assert_allclose(var_uniform.values, 0, atol=1e-10)

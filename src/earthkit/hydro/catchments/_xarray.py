@@ -75,6 +75,7 @@ def xarray(func):
                 *xr_args,
                 input_core_dims=input_core_dims,
                 output_core_dims=[[node_default_coord]],
+                exclude_dims={node_default_coord},
                 dask_gufunc_kwargs={
                     "output_sizes": {node_default_coord: stations_1d.shape[0]}
                 },
@@ -90,19 +91,15 @@ def xarray(func):
             }
             result = result.assign_coords(**assign_dict)
 
-        if river_network.coords is not None:
-            coords = list(river_network.coords.values())[::-1]
-            coords_grid = np.meshgrid(*coords)[::-1]
-            assign_dict = {
-                k: (node_default_coord, v.flat[river_network.mask][stations_1d])
-                for k, v in zip(river_network.coords.keys(), coords_grid)
-            }
-            if isinstance(orig_locations, dict):
-                assign_dict["name"] = (node_default_coord, list(orig_locations.keys()))
-            result = result.assign_coords(**assign_dict)
-        elif isinstance(orig_locations, dict):
-            assign_dict = {"name": (node_default_coord, list(orig_locations.keys()))}
-            result = result.assign_coords(**assign_dict)
+        coords = list(river_network.coords.values())[::-1]
+        coords_grid = np.meshgrid(*coords)[::-1]
+        assign_dict = {
+            k: (node_default_coord, v.flat[river_network.mask][stations_1d])
+            for k, v in zip(river_network.coords.keys(), coords_grid)
+        }
+        if isinstance(orig_locations, dict):
+            assign_dict["name"] = (node_default_coord, list(orig_locations.keys()))
+        result = result.assign_coords(**assign_dict)
 
         return result
 

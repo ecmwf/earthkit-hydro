@@ -21,9 +21,6 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-@pytest.mark.skip(
-    reason="Bug: distance xarray wrapper doesn't handle 2D output (n_stations, n_nodes) correctly"
-)
 def test_distance_min_xarray(
     river_network, stations_list, upstream, downstream, weights, result
 ):

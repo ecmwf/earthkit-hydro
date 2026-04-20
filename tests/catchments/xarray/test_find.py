@@ -17,13 +17,10 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-@pytest.mark.skip(
-    reason="Bug: catchments xarray decorator doesn't handle dimension size changes correctly (20 nodes → 5 locations)"
-)
 def test_catchments_find_xarray(river_network, locations, expected):
     """Test catchment find with xarray input."""
     # For find, locations is the input, not field
     result = ekh.catchments.find(river_network, locations=locations)
     assert isinstance(result, xr.DataArray)
-    # Basic check that result has right shape
-    assert len(result.values) == river_network.n_nodes
+    # Result should have gridded dimensions (y, x)
+    assert result.shape == river_network.shape

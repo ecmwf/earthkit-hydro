@@ -4,7 +4,13 @@ from earthkit.hydro.upstream import array
 
 @xarray
 def percentile(
-    river_network, field, p, node_weights=None, edge_weights=None, return_type=None
+    river_network,
+    field,
+    p,
+    node_weights=None,
+    edge_weights=None,
+    return_type=None,
+    input_core_dims=None,
 ):
     r"""
     Computes the weighted percentile of a field over all upstream nodes.
@@ -47,6 +53,10 @@ def percentile(
         Currently unsupported.
     return_type : str, optional
         Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
 
     Returns
     -------

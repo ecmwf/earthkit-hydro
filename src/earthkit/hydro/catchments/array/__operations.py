@@ -101,6 +101,19 @@ def max(xp, river_network, field, locations, node_weights, edge_weights):
     )
 
 
+@mask(unmask=False)
+def mode(xp, river_network, field, locations, node_weights, edge_weights):
+    return calculate_catchment_metric(
+        xp,
+        river_network,
+        field,
+        locations,
+        "mode",
+        node_weights,
+        edge_weights,
+    )
+
+
 def find(xp, river_network, field, overwrite, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:

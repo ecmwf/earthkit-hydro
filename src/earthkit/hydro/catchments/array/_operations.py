@@ -51,6 +51,14 @@ def max(xp, river_network, field, locations, node_weights, edge_weights):
     )
 
 
+@multi_backend(allow_jax_jit=False)
+def mode(xp, river_network, field, locations, node_weights, edge_weights):
+    stations_1d, _, _ = locations_to_1d(xp, river_network, locations)
+    return _operations.mode(
+        xp, river_network, field, stations_1d, node_weights, edge_weights
+    )
+
+
 @multi_backend()
 def find(xp, river_network, locations, overwrite, return_type):
     stations1d, _, _ = locations_to_1d(xp, river_network, locations)

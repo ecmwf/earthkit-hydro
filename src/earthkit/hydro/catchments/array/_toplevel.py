@@ -355,6 +355,64 @@ def max(river_network, field, locations, node_weights=None, edge_weights=None):
     )
 
 
+def mode(river_network, field, locations, node_weights=None, edge_weights=None):
+    r"""
+    Computes the mode (most frequent categorical value) of a field over
+    the upstream catchment of each specified location.
+
+    For each location, this function identifies all upstream nodes in the river network
+    and computes the mode (spatial majority) of categorical values.
+
+    The mode is defined as the categorical value that appears most frequently in the
+    upstream catchment. For categorical data (e.g., land use classes, soil types),
+    mode provides the dominant category. When multiple categories have the same
+    maximum frequency (a tie), the smallest category value is returned.
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        \mathrm{Mode}(x)_j &= \mathrm{arg\,max}_c \left( \sum_{i \in C_j} \mathbb{1}_{x_i = c} \right)
+        \end{align*}
+
+    where:
+
+    - :math:`x_i` is the categorical value at node :math:`i` (e.g., land use class),
+    - :math:`C_j` is the set of all upstream nodes in the catchment of location :math:`j`,
+    - :math:`\mathbb{1}_{x_i = c}` is an indicator function (1 if :math:`x_i = c`, 0 otherwise),
+    - :math:`\mathrm{Mode}(x)_j` is the most frequent category in catchment :math:`j`.
+
+    Note: Mode calculation does not support node weights or edge weights, as it operates
+    on categorical data. If weights are provided, they will be ignored.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like
+        An array containing integer categorical values defined on river network nodes or gridcells.
+        Values must be integers representing categories (e.g., 1=forest, 2=urban, 3=water).
+    locations : array-like or dict
+        A list of nodes at which to compute the catchment mode.
+    node_weights : array-like, optional
+        Not supported for mode. Will be ignored if provided.
+    edge_weights : array-like, optional
+        Not supported for mode. Will be ignored if provided.
+
+    Returns
+    -------
+    array-like
+        Array of mode (most frequent categorical) values for each location in `locations`.
+    """
+    return _operations.mode(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
+
+
 def find(river_network, locations, overwrite=True, return_type=None):
     r"""
     Delineates catchment areas.

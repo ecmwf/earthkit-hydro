@@ -86,7 +86,10 @@ fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
         weighted_percentile::calc_weighted_perc,
         m
     )?)?;
-    m.add_function(wrap_pyfunction!(percentile_downstream::calc_perc_downstream, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        percentile_downstream::calc_perc_downstream,
+        m
+    )?)?;
     m.add_function(wrap_pyfunction!(
         weighted_percentile_downstream::calc_weighted_perc_downstream,
         m

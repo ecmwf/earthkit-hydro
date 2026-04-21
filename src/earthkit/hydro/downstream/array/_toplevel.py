@@ -72,7 +72,6 @@ def percentile(
     )
 
 
-
 def var(river_network, field, node_weights=None, edge_weights=None, return_type=None):
     r"""
     Computes the weighted variance of a field over all downstream nodes.

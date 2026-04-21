@@ -27,7 +27,9 @@ def percentile(river_network, field, weights, p, return_type):
 
     def calculate_percentile(xp, river_network, field, weights, p):
         if weights is not None:
-            return _rust.calc_weighted_perc_downstream(river_network.groups, field, weights, p)
+            return _rust.calc_weighted_perc_downstream(
+                river_network.groups, field, weights, p
+            )
         else:
             return _rust.calc_perc_downstream(river_network.groups, field, p)
 

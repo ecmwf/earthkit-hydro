@@ -21,9 +21,13 @@ def calculate_upstream_metric(
     )
 
 
-# TODO: clean up
 def percentile(river_network, field, weights, p, return_type):
-    from earthkit.hydro import _rust
+    try:
+        from earthkit.hydro import _rust
+    except Exception as e:
+        raise ImportError(
+            "Rust extension is unavailable and required for percentile computations."
+        ) from e
 
     def calculate_percentile(xp, river_network, field, weights, p):
         if weights is not None:
@@ -37,7 +41,6 @@ def percentile(river_network, field, weights, p, return_type):
     decorated_calculate_upstream_metric = mask(return_type == "gridded")(
         calculate_percentile
     )
-    # TODO: assert inputs are numpy
     from earthkit.hydro._backends.numpy_backend import NumPyBackend
 
     return decorated_calculate_upstream_metric(
@@ -162,7 +165,12 @@ def max(xp, river_network, field, node_weights, edge_weights, return_type):
 
 @multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def mode(xp, river_network, field, node_weights, edge_weights, return_type):
-    from earthkit.hydro import _rust
+    try:
+        from earthkit.hydro import _rust
+    except Exception as e:
+        raise ImportError(
+            "Rust extension is unavailable and required for mode computations."
+        ) from e
 
     def calculate_mode(xp, river_network, field, node_weights, edge_weights):
         # Mode only supported for numpy backend with Rust

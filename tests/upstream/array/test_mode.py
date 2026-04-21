@@ -6,7 +6,15 @@ import earthkit.hydro as ekh
 from earthkit.hydro._readers import from_d8
 from earthkit.hydro.data_structures import RiverNetwork
 
+try:
+    from earthkit.hydro import _rust  # noQA: F401
 
+    RUST = True
+except Exception:
+    RUST = False
+
+
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_manual_verification():
     """
     Test mode with manually constructed network and verified expected output.
@@ -52,6 +60,7 @@ def test_upstream_mode_manual_verification():
     )
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_branching_network():
     r"""
     Test mode with a branching network topology (V-shape confluence).
@@ -92,6 +101,7 @@ def test_upstream_mode_branching_network():
     )
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_complex_branching():
     r"""
     Test mode with a more complex branching network.
@@ -133,6 +143,7 @@ def test_upstream_mode_complex_branching():
     )
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_complex_branching_negative():
     r"""
     Test mode with a more complex branching network.
@@ -174,6 +185,7 @@ def test_upstream_mode_complex_branching_negative():
     )
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_dominant_category():
     r"""
     Test mode where one category clearly dominates.
@@ -207,6 +219,7 @@ def test_upstream_mode_dominant_category():
     )
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network",
     [("cama_nextxy", cama_nextxy_1)],
@@ -231,6 +244,7 @@ def test_upstream_mode_constant(river_network):
     ), f"Expected all {constant_value}, got {output_field}"
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network",
     [("cama_nextxy", cama_nextxy_1)],

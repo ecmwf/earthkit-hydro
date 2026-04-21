@@ -7,7 +7,15 @@ from _test_inputs.readers import *
 
 import earthkit.hydro as ekh
 
+try:
+    from earthkit.hydro import _rust  # noQA: F401
 
+    RUST = True
+except Exception:
+    RUST = False
+
+
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network, field, locations, expected",
     [

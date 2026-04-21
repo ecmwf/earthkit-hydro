@@ -6,7 +6,15 @@ from utils import convert_to_2d
 
 import earthkit.hydro as ekh
 
+try:
+    from earthkit.hydro import _rust  # noQA: F401
 
+    RUST = True
+except Exception:
+    RUST = False
+
+
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network, input_field, expected, p",
     [
@@ -40,6 +48,7 @@ def test_downstream_percentile_unweighted(river_network, input_field, expected, 
     np.testing.assert_allclose(output_2d, expected_2d.flatten())
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network, input_field, expected",
     [
@@ -54,11 +63,16 @@ def test_downstream_percentile_unweighted(river_network, input_field, expected, 
 def test_downstream_percentile_weighted(river_network, input_field, expected):
     node_weights = np.arange(1, river_network.n_nodes + 1, dtype="float64")
     output = ekh.downstream.array.percentile(
-        river_network, input_field, p=0.5, node_weights=node_weights, return_type="masked"
+        river_network,
+        input_field,
+        p=0.5,
+        node_weights=node_weights,
+        return_type="masked",
     )
     np.testing.assert_allclose(output, expected)
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network, input_field, expected",
     [
@@ -70,7 +84,9 @@ def test_downstream_percentile_weighted(river_network, input_field, expected):
     ],
     indirect=["river_network"],
 )
-def test_downstream_percentile_gridded_return_type(river_network, input_field, expected):
+def test_downstream_percentile_gridded_return_type(
+    river_network, input_field, expected
+):
     input_2d = convert_to_2d(river_network, input_field, 0)
     output = ekh.downstream.array.percentile(
         river_network, input_2d, p=0.5, node_weights=None, return_type="gridded"

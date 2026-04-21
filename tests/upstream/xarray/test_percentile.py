@@ -6,6 +6,13 @@ from _test_inputs.readers import *
 
 import earthkit.hydro as ekh
 
+try:
+    from earthkit.hydro import _rust  # noQA: F401
+
+    RUST = True
+except Exception:
+    RUST = False
+
 
 def make_river_network_with_coords(flow_directions):
     from earthkit.hydro._readers import from_cama_nextxy
@@ -30,6 +37,7 @@ def field_to_xarray(river_network, field_1d):
     )
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "flow_directions, input_field, expected_masked, p",
     [
@@ -59,6 +67,7 @@ def test_upstream_percentile_xarray_masked(
     np.testing.assert_allclose(result.values, expected_masked)
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "flow_directions, input_field, expected_gridded, p",
     [

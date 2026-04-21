@@ -6,7 +6,15 @@ from utils import convert_to_2d
 
 import earthkit.hydro as ekh
 
+try:
+    from earthkit.hydro import _rust  # noQA: F401
 
+    RUST = True
+except Exception:
+    RUST = False
+
+
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network, input_field, expected, p",
     [
@@ -40,6 +48,7 @@ def test_upstream_percentile_unweighted(river_network, input_field, expected, p)
     np.testing.assert_allclose(output_2d, expected_2d.flatten())
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network, input_field, expected",
     [
@@ -63,6 +72,7 @@ def test_upstream_percentile_weighted(river_network, input_field, expected):
     np.testing.assert_allclose(output, expected)
 
 
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
 @pytest.mark.parametrize(
     "river_network, input_field, expected",
     [

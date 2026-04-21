@@ -131,11 +131,14 @@ def xarray(func):
                 input_core_dims, output_core_dims, xr_args, river_network, return_grid
             )
 
-            output_sizes = (
-                {output_core_dims[0][0]: river_network.n_nodes}
-                if len(output_core_dims[0]) == 1
-                else {k: v for k, v in zip(output_core_dims[0], river_network.shape)}
-            )
+            # Set output sizes based on output dimensions
+            if len(output_core_dims[0]) == 1:
+                output_sizes = {output_core_dims[0][0]: river_network.n_nodes}
+            else:
+                # Gridded output
+                output_sizes = {
+                    k: v for k, v in zip(output_core_dims[0], river_network.shape)
+                }
 
             result = xr.apply_ufunc(
                 reshuffled_func,

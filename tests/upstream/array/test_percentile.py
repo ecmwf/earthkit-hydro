@@ -54,7 +54,11 @@ def test_upstream_percentile_unweighted(river_network, input_field, expected, p)
 def test_upstream_percentile_weighted(river_network, input_field, expected):
     node_weights = np.arange(1, river_network.n_nodes + 1, dtype="float64")
     output = ekh.upstream.array.percentile(
-        river_network, input_field, p=0.5, node_weights=node_weights, return_type="masked"
+        river_network,
+        input_field,
+        p=0.5,
+        node_weights=node_weights,
+        return_type="masked",
     )
     np.testing.assert_allclose(output, expected)
 

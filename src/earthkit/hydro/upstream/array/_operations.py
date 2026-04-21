@@ -162,17 +162,23 @@ def max(xp, river_network, field, node_weights, edge_weights, return_type):
 
 @multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def mode(xp, river_network, field, node_weights, edge_weights, return_type):
+    from earthkit.hydro import _rust
+
+    def calculate_mode(xp, river_network, field, node_weights, edge_weights):
+        # Mode only supported for numpy backend with Rust
+        if xp.name != "numpy":
+            raise NotImplementedError(
+                "Mode is only supported for numpy backend with Rust"
+            )
+        return _rust.calc_mode(river_network.groups, field)
+
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
-        calculate_upstream_metric
-    )
-    return decorated_calculate_upstream_metric(
-        xp,
-        river_network,
-        field,
-        "mode",
-        node_weights,
-        edge_weights,
+    decorated_calculate_mode = mask(return_type == "gridded")(calculate_mode)
+    # TODO: assert inputs are numpy
+    from earthkit.hydro._backends.numpy_backend import NumPyBackend
+
+    return decorated_calculate_mode(
+        NumPyBackend(), river_network, field, node_weights, edge_weights  # ignored
     )

@@ -85,6 +85,8 @@ fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
     m.add_function(wrap_pyfunction!(mode::compute_upstream_mode_rust, m)?)?;
     m.add_function(wrap_pyfunction!(mode::compute_mode_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(mode::calc_mode, m)?)?;
+    m.add_function(wrap_pyfunction!(mode::calc_mode_downstream, m)?)?;
     m.add_function(wrap_pyfunction!(percentile::calc_perc, m)?)?;
     m.add_function(wrap_pyfunction!(
         weighted_percentile::calc_weighted_perc,

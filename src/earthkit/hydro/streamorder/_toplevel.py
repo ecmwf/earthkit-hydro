@@ -8,8 +8,7 @@ def strahler(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the Strahler stream order for each node in the river network.
+    r"""Computes the Strahler stream order for each node in the river network.
 
     For each node in the river network, this algorithm identifies the upstream nodes
     and uses them to calculate the Strahler number of the current node.
@@ -53,6 +52,7 @@ def strahler(
     -------
     xarray object
         Array of Strahler stream order values for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.strahler(river_network=river_network, return_type=return_type)
 
@@ -63,8 +63,7 @@ def shreve(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the Shreve stream order for each node in the river network.
+    r"""Computes the Shreve stream order for each node in the river network.
 
     For each node in the river network, this algorithm identifies the upstream nodes
     and uses them to calculate the Shreve order of the current node.
@@ -101,5 +100,6 @@ def shreve(
     -------
     xarray object
         Array of Shreve stream order values for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.shreve(river_network=river_network, return_type=return_type)

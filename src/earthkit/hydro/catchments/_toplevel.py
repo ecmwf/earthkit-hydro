@@ -15,8 +15,7 @@ def percentile(
     edge_weights=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted percentile of a field over the upstream
+    r"""Computes the weighted percentile of a field over the upstream
     catchment of each specified location.
 
     For each location, this function identifies all upstream nodes
@@ -67,6 +66,7 @@ def percentile(
     -------
     xarray object
         Array of percentile values for each location in `locations`.
+
     """
     from earthkit.hydro.catchments.array._operations import percentile as perc
 
@@ -89,8 +89,7 @@ def var(
     edge_weights=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted variance of a field over the upstream
+    r"""Computes the weighted variance of a field over the upstream
     catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -146,6 +145,7 @@ def var(
     -------
     xarray object
         Array of variance values for each location in `locations`.
+
     """
     return array.var(
         river_network=river_network,
@@ -165,8 +165,7 @@ def std(
     edge_weights=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted standard deviation of a field over the
+    r"""Computes the weighted standard deviation of a field over the
     upstream catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -224,6 +223,7 @@ def std(
     -------
     xarray object
         Array of standard deviation values for each location in `locations`.
+
     """
     return array.std(
         river_network=river_network,
@@ -243,8 +243,7 @@ def mean(
     edge_weights=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted mean of a field over the upstream catchment of
+    r"""Computes the weighted mean of a field over the upstream catchment of
     each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -295,6 +294,7 @@ def mean(
     -------
     xarray object
         Array of mean values for each location in `locations`.
+
     """
     return array.mean(
         river_network=river_network,
@@ -314,8 +314,7 @@ def sum(
     edge_weights=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted sum of a field over the upstream catchment of
+    r"""Computes the weighted sum of a field over the upstream catchment of
     each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -362,6 +361,7 @@ def sum(
     -------
     xarray object
         Array of sum values for each location in `locations`.
+
     """
     return array.sum(
         river_network=river_network,
@@ -381,8 +381,7 @@ def min(
     edge_weights=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted minimum of a field over the upstream catchment
+    r"""Computes the weighted minimum of a field over the upstream catchment
     of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -429,6 +428,7 @@ def min(
     -------
     xarray object
         Array of minimum values for each location in `locations`.
+
     """
     return array.min(
         river_network=river_network,
@@ -448,8 +448,7 @@ def max(
     edge_weights=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted maximum of a field over the upstream catchment
+    r"""Computes the weighted maximum of a field over the upstream catchment
     of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -496,6 +495,7 @@ def max(
     -------
     xarray object
         Array of maximum values for each location in `locations`.
+
     """
     return array.max(
         river_network=river_network,
@@ -515,8 +515,7 @@ def mode(
     edge_weights=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the mode (most frequent categorical value) of a field over
+    r"""Computes the mode (most frequent categorical value) of a field over
     the upstream catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -566,8 +565,8 @@ def mode(
     -------
     xarray object
         Array of mode (most frequent categorical) values for each location in `locations`.
-    """
 
+    """
     from earthkit.hydro.catchments.array._operations import mode as m
 
     return m(
@@ -580,11 +579,8 @@ def mode(
 
 
 @find_xarray
-def find(
-    river_network, locations, overwrite=True, return_type=None, input_core_dims=None
-):
-    r"""
-    Delineates catchment areas.
+def find(river_network, locations, overwrite=True, return_type=None, input_core_dims=None):
+    r"""Delineates catchment areas.
 
     Given a field indicating one or more start locations (e.g., outlet points or pour points),
     this function delineates the catchments upstream of each start location by grouping all cells that flow into these points.
@@ -608,5 +604,6 @@ def find(
     -------
     array-like or xarray object
         Array of labelled catchments for every river network node or gridcell, depending on `return_grid`.
+
     """
     return find_func(river_network, locations, overwrite, return_type)

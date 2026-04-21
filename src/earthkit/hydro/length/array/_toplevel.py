@@ -9,8 +9,7 @@ def min(
     downstream=True,
     return_type=None,
 ):
-    r"""
-    Calculates the minimum length to all points from a set of start
+    r"""Calculates the minimum length to all points from a set of start
     locations.
 
     For each node in the network, calculates the minimum length starting from any of the start locations.
@@ -53,6 +52,7 @@ def min(
     -------
     array-like
         Array of minimum lengths for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.min(
         river_network=river_network,
@@ -72,8 +72,7 @@ def max(
     downstream=True,
     return_type=None,
 ):
-    r"""
-    Calculates the maximum length to all points from a set of start
+    r"""Calculates the maximum length to all points from a set of start
     locations.
 
     For each node in the network, calculates the maximum length starting from any of the start locations.
@@ -116,6 +115,7 @@ def max(
     -------
     array-like
         Array of maximum lengths for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.max(
         river_network=river_network,
@@ -133,8 +133,7 @@ def to_source(
     path="shortest",
     return_type=None,
 ):
-    r"""
-    Calculates the maximum length to all points from from the river network sources.
+    r"""Calculates the maximum length to all points from from the river network sources.
 
     For each node in the network, calculates the maximum length starting from any source.
 
@@ -173,6 +172,7 @@ def to_source(
     -------
     array-like
         Array of maximum lengths for every river network node or gridcell, depending on `return_type`.
+
     """
     locations = river_network.sources
     if path == "longest":
@@ -189,8 +189,7 @@ def to_sink(
     path="shortest",
     return_type=None,
 ):
-    r"""
-    Calculates the maximum length to all points from from the river network sinks.
+    r"""Calculates the maximum length to all points from from the river network sinks.
 
     For each node in the network, calculates the maximum length starting from any sink.
 
@@ -229,6 +228,7 @@ def to_sink(
     -------
     array-like
         Array of maximum lengths for every river network node or gridcell, depending on `return_type`.
+
     """
     locations = river_network.sinks
     if path == "longest":

@@ -38,6 +38,4 @@ def test_downstream_std_xarray(river_network, input_field, mv):
     np.testing.assert_allclose(std_uniform.values, 0, atol=1e-10)
 
     var_result = ekh.downstream.var(river_network, field_da, return_type="masked")
-    np.testing.assert_allclose(
-        result.values**2, var_result.values, rtol=1e-10, equal_nan=True
-    )
+    np.testing.assert_allclose(result.values**2, var_result.values, rtol=1e-10, equal_nan=True)

@@ -12,8 +12,7 @@ def min(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Calculates the minimum distance to all points from a set of start
+    r"""Calculates the minimum distance to all points from a set of start
     locations.
 
     For each node in the network, calculates the minimum distance starting from any of the start locations.
@@ -60,6 +59,7 @@ def min(
     -------
     xarray object
         Array of minimum distances for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.min(river_network, locations, field, upstream, downstream, return_type)
 
@@ -74,8 +74,7 @@ def max(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Calculates the maximum distance to all points from a set of start
+    r"""Calculates the maximum distance to all points from a set of start
     locations.
 
     For each node in the network, calculates the maximum distance starting from any of the start locations.
@@ -122,6 +121,7 @@ def max(
     -------
     xarray object
         Array of maximum distances for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.max(river_network, locations, field, upstream, downstream, return_type)
 
@@ -134,8 +134,7 @@ def to_source(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Calculates the maximum distance to all points from the river network sources.
+    r"""Calculates the maximum distance to all points from the river network sources.
 
     For each node in the network, calculates the maximum distance starting from any source.
 
@@ -178,6 +177,7 @@ def to_source(
     -------
     xarray object
         Array of maximum distances for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.to_source(river_network, field, path, return_type)
 
@@ -190,8 +190,7 @@ def to_sink(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Calculates the maximum distance to all points from the river network sinks.
+    r"""Calculates the maximum distance to all points from the river network sinks.
 
     For each node in the network, calculates the maximum distance starting from any sink.
 
@@ -234,5 +233,6 @@ def to_sink(
     -------
     xarray object
         Array of maximum distances for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.to_sink(river_network, field, path, return_type)

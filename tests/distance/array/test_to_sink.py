@@ -19,9 +19,7 @@ import earthkit.hydro as ekh
 )
 def test_distance_to_sink(river_network, field, expected):
     """Test distance to sink computation."""
-    result = ekh.distance.array.to_sink(
-        river_network, field=field, path="shortest", return_type="masked"
-    )
+    result = ekh.distance.array.to_sink(river_network, field=field, path="shortest", return_type="masked")
     print("Result:", result)
     print("Expected:", expected)
     np.testing.assert_array_equal(result, expected)

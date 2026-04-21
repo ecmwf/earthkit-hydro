@@ -12,8 +12,7 @@ def upstream(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Moves a field upstream.
+    r"""Moves a field upstream.
 
     Computes a one-step neighbor accumulation (local aggregation) moving upstream only.
 
@@ -60,10 +59,9 @@ def upstream(
     -------
     xarray object
         Array of values after movement up the river network for every river network node or gridcell, depending on `return_type`.
+
     """
-    return array.upstream(
-        river_network, field, node_weights, edge_weights, metric, return_type
-    )
+    return array.upstream(river_network, field, node_weights, edge_weights, metric, return_type)
 
 
 @xarray
@@ -76,8 +74,7 @@ def downstream(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Moves a field downstream.
+    r"""Moves a field downstream.
 
     Computes a one-step neighbor accumulation (local aggregation) moving downstream only.
 
@@ -124,7 +121,6 @@ def downstream(
     -------
     xarray object
         Array of values after movement down the river network for every river network node or gridcell, depending on `return_type`.
+
     """
-    return array.downstream(
-        river_network, field, node_weights, edge_weights, metric, return_type
-    )
+    return array.downstream(river_network, field, node_weights, edge_weights, metric, return_type)

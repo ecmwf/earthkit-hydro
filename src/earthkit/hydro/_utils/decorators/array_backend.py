@@ -13,7 +13,6 @@ def multi_backend(allow_jax_jit=True, jax_static_args=None):
             backend_name = xp.name
             kwargs["xp"] = xp
             if backend_name == "jax" and allow_jax_jit:
-
                 nonlocal compiled_jax_fn
                 if compiled_jax_fn is None:
                     from jax import jit

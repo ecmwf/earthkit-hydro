@@ -68,21 +68,16 @@ CELLREPR = {
 
 def from_file(path, mask=False):
     """Load a .map file into a numpy array."""
-
     with open(path, "rb") as f:
         bytes = f.read()
 
     nbytes_header = 64 + 2 + 2 + 8 + 8 + 8 + 8 + 4 + 4 + 8 + 8 + 8
-    _, cellRepr, _, _, _, _, nrRows, nrCols, _, _, _ = unpack(
-        "=hhddddIIddd", bytes[64:nbytes_header]
-    )
+    _, cellRepr, _, _, _, _, nrRows, nrCols, _, _, _ = unpack("=hhddddIIddd", bytes[64:nbytes_header])
 
     try:
         celltype = CELLREPR[cellRepr]
     except KeyError:
-        raise Exception(
-            "{}: invalid cellRepr value ({}) in header".format(path, cellRepr)
-        )
+        raise Exception("{}: invalid cellRepr value ({}) in header".format(path, cellRepr))
 
     dtype = celltype["dtype"]
 

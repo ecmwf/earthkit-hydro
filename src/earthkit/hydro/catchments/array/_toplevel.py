@@ -1,11 +1,8 @@
 from earthkit.hydro.catchments.array import _operations
 
 
-def percentile(
-    river_network, field, p, locations, node_weights=None, edge_weights=None
-):
-    r"""
-    Computes the weighted percentile of a field over the upstream
+def percentile(river_network, field, p, locations, node_weights=None, edge_weights=None):
+    r"""Computes the weighted percentile of a field over the upstream
     catchment of each specified location.
 
     For each location, this function identifies all upstream nodes
@@ -51,15 +48,13 @@ def percentile(
     -------
     array-like
         Array of percentile values for each location in `locations`.
+
     """
-    return _operations.percentile(
-        river_network, field, p, locations, node_weights, edge_weights
-    )
+    return _operations.percentile(river_network, field, p, locations, node_weights, edge_weights)
 
 
 def var(river_network, field, locations, node_weights=None, edge_weights=None):
-    r"""
-    Computes the weighted variance of a field over the upstream
+    r"""Computes the weighted variance of a field over the upstream
     catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -111,6 +106,7 @@ def var(river_network, field, locations, node_weights=None, edge_weights=None):
     -------
     array-like
         Array of variance values for each location in `locations`.
+
     """
     return _operations.var(
         river_network=river_network,
@@ -122,8 +118,7 @@ def var(river_network, field, locations, node_weights=None, edge_weights=None):
 
 
 def std(river_network, field, locations, node_weights=None, edge_weights=None):
-    r"""
-    Computes the weighted standard deviation of a field over the
+    r"""Computes the weighted standard deviation of a field over the
     upstream catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -177,6 +172,7 @@ def std(river_network, field, locations, node_weights=None, edge_weights=None):
     -------
     array-like
         Array of standard deviation values for each location in `locations`.
+
     """
     return _operations.std(
         river_network=river_network,
@@ -188,8 +184,7 @@ def std(river_network, field, locations, node_weights=None, edge_weights=None):
 
 
 def mean(river_network, field, locations, node_weights=None, edge_weights=None):
-    r"""
-    Computes the weighted mean of a field over the upstream catchment of
+    r"""Computes the weighted mean of a field over the upstream catchment of
     each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -236,6 +231,7 @@ def mean(river_network, field, locations, node_weights=None, edge_weights=None):
     -------
     array-like
         Array of mean values for each location in `locations`.
+
     """
     return _operations.mean(
         river_network=river_network,
@@ -247,8 +243,7 @@ def mean(river_network, field, locations, node_weights=None, edge_weights=None):
 
 
 def sum(river_network, field, locations, node_weights=None, edge_weights=None):
-    r"""
-    Computes the weighted sum of a field over the upstream catchment of
+    r"""Computes the weighted sum of a field over the upstream catchment of
     each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -291,6 +286,7 @@ def sum(river_network, field, locations, node_weights=None, edge_weights=None):
     -------
     array-like
         Array of sum values for each location in `locations`.
+
     """
     return _operations.sum(
         river_network=river_network,
@@ -302,8 +298,7 @@ def sum(river_network, field, locations, node_weights=None, edge_weights=None):
 
 
 def min(river_network, field, locations, node_weights=None, edge_weights=None):
-    r"""
-    Computes the weighted minimum of a field over the upstream catchment
+    r"""Computes the weighted minimum of a field over the upstream catchment
     of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -346,6 +341,7 @@ def min(river_network, field, locations, node_weights=None, edge_weights=None):
     -------
     array-like
         Array of minimum values for each location in `locations`.
+
     """
     return _operations.min(
         river_network=river_network,
@@ -357,8 +353,7 @@ def min(river_network, field, locations, node_weights=None, edge_weights=None):
 
 
 def max(river_network, field, locations, node_weights=None, edge_weights=None):
-    r"""
-    Computes the weighted maximum of a field over the upstream catchment
+    r"""Computes the weighted maximum of a field over the upstream catchment
     of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -401,6 +396,7 @@ def max(river_network, field, locations, node_weights=None, edge_weights=None):
     -------
     array-like
         Array of maximum values for each location in `locations`.
+
     """
     return _operations.max(
         river_network=river_network,
@@ -412,8 +408,7 @@ def max(river_network, field, locations, node_weights=None, edge_weights=None):
 
 
 def mode(river_network, field, locations, node_weights=None, edge_weights=None):
-    r"""
-    Computes the mode (most frequent categorical value) of a field over
+    r"""Computes the mode (most frequent categorical value) of a field over
     the upstream catchment of each specified location.
 
     For each location, this function identifies all upstream nodes in the river network
@@ -459,6 +454,7 @@ def mode(river_network, field, locations, node_weights=None, edge_weights=None):
     -------
     array-like
         Array of mode (most frequent categorical) values for each location in `locations`.
+
     """
     return _operations.mode(
         river_network=river_network,
@@ -470,8 +466,7 @@ def mode(river_network, field, locations, node_weights=None, edge_weights=None):
 
 
 def find(river_network, locations, overwrite=True, return_type=None):
-    r"""
-    Delineates catchment areas.
+    r"""Delineates catchment areas.
 
     Given a field indicating one or more start locations (e.g., outlet points or pour points),
     this function delineates the catchments upstream of each start location by grouping all cells that flow into these points.
@@ -491,6 +486,7 @@ def find(river_network, locations, overwrite=True, return_type=None):
     -------
     array-like
         Array of labelled catchments for every river network node or gridcell, depending on `return_grid`.
+
     """
     return _operations.find(
         river_network=river_network,

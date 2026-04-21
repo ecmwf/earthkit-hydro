@@ -35,12 +35,8 @@ except Exception:
     ],
     indirect=["river_network"],
 )
-def test_catchments_percentile_unweighted(
-    river_network, input_field, locations, expected, p
-):
-    output = ekh.catchments.array.percentile(
-        river_network, input_field, p=p, locations=locations, node_weights=None
-    )
+def test_catchments_percentile_unweighted(river_network, input_field, locations, expected, p):
+    output = ekh.catchments.array.percentile(river_network, input_field, p=p, locations=locations, node_weights=None)
     np.testing.assert_allclose(output, expected)
 
 
@@ -57,9 +53,7 @@ def test_catchments_percentile_unweighted(
     ],
     indirect=["river_network"],
 )
-def test_catchments_percentile_weighted(
-    river_network, input_field, locations, expected
-):
+def test_catchments_percentile_weighted(river_network, input_field, locations, expected):
     node_weights = np.arange(1, river_network.n_nodes + 1, dtype="float64")
     output = ekh.catchments.array.percentile(
         river_network,

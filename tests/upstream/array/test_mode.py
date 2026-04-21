@@ -16,8 +16,7 @@ except Exception:
 
 @pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_manual_verification():
-    """
-    Test mode with manually constructed network and verified expected output.
+    """Test mode with manually constructed network and verified expected output.
 
     This test creates a simple network with known topology and manually
     computes the expected mode values to robustly verify the implementation.
@@ -36,7 +35,6 @@ def test_upstream_mode_manual_verification():
     - 2: mode([1, 2, 1]) = 1 (appears twice)
     - 3: mode([1, 2, 1, 3]) = 1 (appears twice)
     """
-
     d8 = np.array([[3, 3, 3, 5]])
 
     # Create river network
@@ -62,8 +60,7 @@ def test_upstream_mode_manual_verification():
 
 @pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_branching_network():
-    r"""
-    Test mode with a branching network topology (V-shape confluence).
+    r"""Test mode with a branching network topology (V-shape confluence).
 
     Network:
 
@@ -81,7 +78,6 @@ def test_upstream_mode_branching_network():
     - 2: mode([3, 2, 3]) = 3
     - 3: mode([3, 2, 3, 2]) = 2 (tie between 2 and 3, smallest wins)
     """
-
     d8 = np.array([[8, 7], [6, 5]])
 
     river_network_storage = from_d8(d8)
@@ -103,8 +99,7 @@ def test_upstream_mode_branching_network():
 
 @pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_complex_branching():
-    r"""
-    Test mode with a more complex branching network.
+    r"""Test mode with a more complex branching network.
 
     Network:
 
@@ -124,7 +119,6 @@ def test_upstream_mode_complex_branching():
     - 4: mode([1, 2, 5, 1, 5]) = 1 (tie between 1 and 5, smallest wins)
     - 5: mode([1, 1, 2, 5, 5, 5]) = 5
     """
-
     d8 = np.array([[8, 8, 7], [6, 6, 5]])
 
     river_network_storage = from_d8(d8)
@@ -145,8 +139,7 @@ def test_upstream_mode_complex_branching():
 
 @pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_complex_branching_negative():
-    r"""
-    Test mode with a more complex branching network.
+    r"""Test mode with a more complex branching network.
 
     Network:
 
@@ -166,7 +159,6 @@ def test_upstream_mode_complex_branching_negative():
     - 4: mode([-1, -2, -5, -1, -5]) = -5 (tie between -1 and -5, smallest wins)
     - 5: mode([-1, -1, -2, -5, -5, -5]) = -5
     """
-
     d8 = np.array([[8, 8, 7], [6, 6, 5]])
 
     river_network_storage = from_d8(d8)
@@ -187,8 +179,7 @@ def test_upstream_mode_complex_branching_negative():
 
 @pytest.mark.skipif(not RUST, reason="Rust unavailable")
 def test_upstream_mode_dominant_category():
-    r"""
-    Test mode where one category clearly dominates.
+    r"""Test mode where one category clearly dominates.
 
     Network:
 
@@ -200,7 +191,6 @@ def test_upstream_mode_dominant_category():
 
     Expected: Category 2 should dominate at downstream nodes.
     """
-
     d8 = np.array([[3, 3, 3, 5]])
 
     river_network_storage = from_d8(d8)
@@ -234,14 +224,10 @@ def test_upstream_mode_constant(river_network):
     input_field = np.full(n_nodes, constant_value, dtype=np.int64)
 
     # Compute mode
-    output_field = ekh.upstream.array.mode(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
+    output_field = ekh.upstream.array.mode(river_network, input_field, node_weights=None, return_type="masked")
 
     # All output values should be the constant value
-    assert np.all(
-        output_field == constant_value
-    ), f"Expected all {constant_value}, got {output_field}"
+    assert np.all(output_field == constant_value), f"Expected all {constant_value}, got {output_field}"
 
 
 @pytest.mark.skipif(not RUST, reason="Rust unavailable")
@@ -252,7 +238,6 @@ def test_upstream_mode_constant(river_network):
 )
 def test_negative_non_consecutive_categories(river_network):
     """Test mode with negative and non-consecutive category values."""
-
     input_field = np.array(
         [
             [-9, -9, -5, -23, -5],
@@ -264,9 +249,7 @@ def test_negative_non_consecutive_categories(river_network):
     )
 
     # Compute mode
-    result = ekh.upstream.array.mode(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
+    result = ekh.upstream.array.mode(river_network, input_field, node_weights=None, return_type="masked")
 
     expected_mode = np.array(
         [

@@ -37,20 +37,18 @@ def field_to_xarray(river_network, field_1d):
             cama_nextxy_1,
             input_field_1c,
             upstream_metric_percentile_p05_1c,
-            upstream_metric_percentile_gridded_p05_1c,
             0.5,
         ),
         (
             cama_nextxy_1,
             input_field_1c,
             upstream_metric_percentile_p025_1c,
-            None,
             0.25,
         ),
     ],
 )
 def test_upstream_percentile_xarray_masked(
-    flow_directions, input_field, expected_masked, expected_gridded, p
+    flow_directions, input_field, expected_masked, p
 ):
     rn = make_river_network_with_coords(flow_directions)
     field_xr = field_to_xarray(rn, input_field)

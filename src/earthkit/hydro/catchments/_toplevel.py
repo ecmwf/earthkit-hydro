@@ -6,6 +6,81 @@ from ._xarray import xarray
 
 
 @xarray
+def percentile(
+    river_network,
+    field,
+    p,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+    input_core_dims=None,
+):
+    r"""
+    Computes the weighted percentile of a field over the upstream
+    catchment of each specified location.
+
+    For each location, this function identifies all upstream nodes
+    (the contributing area) and computes the requested percentile from the field values,
+    optionally weighted by node weights.
+
+    The weighted percentile is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        \mathcal{A}(j) &= \{j\} \cup \bigcup_{i \in \mathrm{Up}(j)} \mathcal{A}(i) \\
+        P_p(x)_j &= \mathrm{percentile}_p \bigl(\{ w'_i \cdot x_i : i \in \mathcal{A}(j) \}\bigr)
+        \end{align*}
+
+    where:
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`\mathrm{Up}(j)` is the set of immediate upstream nodes flowing into node :math:`j`,
+    - :math:`\mathcal{A}(j)` is the full contributing area of node :math:`j` (all upstream nodes including :math:`j` itself),
+    - :math:`P_p(x)_j` is the :math:`p`-th percentile at node :math:`j`.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array containing field values defined on river network nodes or gridcells.
+    p : float
+        Requested percentile expressed as a fraction between 0 and 1 inclusive
+        (e.g. 0.5 for median, 0.95 for the 95th percentile).
+    locations : array-like or dict
+        Locations at which to compute. Accepts a list/array of nodes or a mapping
+        from dimension names to coordinate labels, consistent with other catchments APIs.
+    node_weights : array-like or xarray object, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like or xarray object, optional
+        Array of weights for each river network edge. Default is None (unweighted).
+        Currently unsupported.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of percentile values for each location in `locations`.
+    """
+    from earthkit.hydro.catchments.array._operations import percentile as perc
+
+    return perc(
+        river_network=river_network,
+        field=field,
+        p=p,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
+
+
+@xarray
 def var(
     river_network,
     field,
@@ -423,6 +498,79 @@ def max(
         Array of maximum values for each location in `locations`.
     """
     return array.max(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
+
+
+@xarray
+def mode(
+    river_network,
+    field,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+    input_core_dims=None,
+):
+    r"""
+    Computes the mode (most frequent categorical value) of a field over
+    the upstream catchment of each specified location.
+
+    For each location, this function identifies all upstream nodes in the river network
+    and computes the mode (spatial majority) of categorical values.
+
+    The mode is defined as the categorical value that appears most frequently in the
+    upstream catchment. For categorical data (e.g., land use classes, soil types),
+    mode provides the dominant category. When multiple categories have the same
+    maximum frequency (a tie), the smallest category value is returned.
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        \mathrm{Mode}(x)_j &= \mathrm{arg\,max}_c \left( \sum_{i \in C_j} \mathbb{1}_{x_i = c} \right)
+        \end{align*}
+
+    where:
+
+    - :math:`x_i` is the categorical value at node :math:`i` (e.g., land use class),
+    - :math:`C_j` is the set of all upstream nodes in the catchment of location :math:`j`,
+    - :math:`\mathbb{1}_{x_i = c}` is an indicator function (1 if :math:`x_i = c`, 0 otherwise),
+    - :math:`\mathrm{Mode}(x)_j` is the most frequent category in catchment :math:`j`.
+
+    Note: Mode calculation does not support node weights or edge weights, as it operates
+    on categorical data. If weights are provided, they will be ignored.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array containing integer categorical values defined on river network nodes or gridcells.
+        Values must be integers representing categories (e.g., 1=forest, 2=urban, 3=water).
+    locations : array-like or dict
+        A list of nodes at which to compute the catchment mode.
+    node_weights : array-like or xarray object, optional
+        Not supported for mode. Will be ignored if provided.
+    edge_weights : array-like or xarray object, optional
+        Not supported for mode. Will be ignored if provided.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of mode (most frequent categorical) values for each location in `locations`.
+    """
+
+    from earthkit.hydro.catchments.array._operations import mode as m
+
+    return m(
         river_network=river_network,
         field=field,
         locations=locations,

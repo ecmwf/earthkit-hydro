@@ -1,6 +1,77 @@
 from earthkit.hydro.downstream.array import _operations
 
 
+def percentile(
+    river_network, field, p, node_weights=None, edge_weights=None, return_type=None
+):
+    r"""
+    Computes the weighted percentile of a field over all downstream nodes.
+
+    For each node in the river network, this function identifies all downstream nodes
+    (the draining area) and computes the requested percentile from the field values,
+    optionally weighted by node weights.
+
+    The weighted percentile is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        \mathcal{D}(j) &= \{j\} \cup \bigcup_{i \in \mathrm{Down}(j)} \mathcal{D}(i) \\
+        P_p(x)_j &= \mathrm{percentile}_p \bigl(\{ w'_i \cdot x_i : i \in \mathcal{D}(j) \}\bigr)
+        \end{align*}
+
+    where:
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`\mathrm{Down}(j)` is the set of immediate downstream nodes flowing out of node :math:`j`,
+    - :math:`\mathcal{D}(j)` is the full draining area of node :math:`j` (all downstream nodes including :math:`j` itself),
+    - :math:`P_p(x)_j` is the :math:`p`-th percentile at node :math:`j`.
+
+    Accumulation proceeds in inverse topological order from the sinks to the sources.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like
+        An array containing field values defined on river network nodes or gridcells.
+    p : float
+        Requested percentile expressed as a fraction between 0 and 1 inclusive
+        (e.g. 0.5 for median, 0.95 for the 95th percentile).
+    node_weights : array-like, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like, optional
+        Array of weights for each edge. Default is None (unweighted).
+        Currently unsupported.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+
+    Returns
+    -------
+    array-like
+        Array of percentile values for every river network node or gridcell, depending on `return_type`.
+    """
+    if edge_weights is not None:
+        raise NotImplementedError("edge_weights are currently unsupported.")
+    if river_network.array_backend != "numpy":
+        raise NotImplementedError(
+            "Only numpy backend is currently supported for percentiles."
+        )
+    if p < 0 or p > 1:
+        raise ValueError(
+            "The requested percentile `p` must be between 0 and 1 inclusive."
+        )
+    return _operations.percentile(
+        river_network=river_network,
+        field=field.astype("float64"),
+        weights=node_weights,
+        p=p,
+        return_type=return_type,
+    )
+
+
 def var(river_network, field, node_weights=None, edge_weights=None, return_type=None):
     r"""
     Computes the weighted variance of a field over all downstream nodes.
@@ -342,6 +413,59 @@ def max(river_network, field, node_weights=None, edge_weights=None, return_type=
         Array of maximum values for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.max(
+        river_network=river_network,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        return_type=return_type,
+    )
+
+
+def mode(river_network, field, node_weights=None, edge_weights=None, return_type=None):
+    r"""
+    Computes the mode (most frequent value) of a categorical field over all downstream nodes.
+
+    For each node in the river network, this function identifies all downstream nodes and
+    determines the most frequently occurring category value.
+
+    For categorical data (e.g., land cover classes, soil types), the mode represents
+    the dominant downstream category. Ties are broken by selecting the smallest category value.
+
+    Accumulation proceeds in inverse topological order from the sinks to the sources.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like
+        An array of categorical (integer) values defined on river network nodes or gridcells.
+    node_weights : array-like, optional
+        Not supported for mode calculation. Must be None.
+    edge_weights : array-like, optional
+        Not supported for mode calculation. Must be None.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+
+    Returns
+    -------
+    array-like
+        Array of mode (most frequent category) values for every river network node or gridcell,
+        depending on `return_type`.
+
+    Notes
+    -----
+    - Mode calculation does not support node or edge weights.
+    - Input field must contain integer categorical values.
+    - Currently only supported for numpy backend.
+
+    Examples
+    --------
+    Computing dominant downstream land cover class:
+
+    >>> land_cover = np.array([1, 2, 2, 3, 2])  # Land cover categories
+    >>> result = mode(river_network, land_cover)
+    """
+    return _operations.mode(
         river_network=river_network,
         field=field,
         node_weights=node_weights,

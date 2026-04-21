@@ -12,6 +12,7 @@ import earthkit.hydro.downstream
 import earthkit.hydro.length
 import earthkit.hydro.move
 import earthkit.hydro.river_network
+import earthkit.hydro.streamorder
 import earthkit.hydro.subnetwork
 import earthkit.hydro.upstream
 
@@ -26,5 +27,6 @@ __all__ = [
     "river_network",
     "upstream",
     "subnetwork",
+    "streamorder",
     "__version__",
 ]

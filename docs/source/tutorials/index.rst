@@ -20,4 +20,5 @@ Operations:
    finding_catchments
    catchment_statistics
    distance_length
+   streamorder
    creating_subnetworks

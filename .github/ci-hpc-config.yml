@@ -3,3 +3,4 @@ build:
   - rust
   python_dependencies:
   - ecmwf/earthkit-data@develop
+  - ecmwf/earthkit-utils@develop

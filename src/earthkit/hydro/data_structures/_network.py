@@ -1,5 +1,4 @@
 import numpy as np
-from earthkit.utils.array.convert import convert
 
 from ._network_storage import RiverNetworkStorage
 
@@ -78,6 +77,8 @@ class RiverNetwork:
         RiverNetwork
             The modified RiverNetwork.
         """
+
+        from earthkit.utils.array.convert import convert
 
         # TODO: use xp.asarray
         if array_backend == "np":

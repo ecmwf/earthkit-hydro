@@ -100,6 +100,14 @@ upstream_metric_product_1b = np.array(
     dtype=int,
 )
 
+upstream_metric_mode_1b = np.array(
+    [1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, 3, 4, 5, 6, -1, -1, -1, -1], dtype=np.int64
+)
+
+downstream_metric_mode_1b = np.array(
+    [1, 2, 3, -1, 3, 1, 7, 3, 3, 3, 1, 2, 3, 3, 3, 6, 7, 7, 7, -1], dtype=np.int64
+)
+
 # 1c: non-missing float field input
 input_field_1c = np.array(
     [

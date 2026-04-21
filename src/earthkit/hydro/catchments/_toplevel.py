@@ -567,7 +567,10 @@ def mode(
     xarray object
         Array of mode (most frequent categorical) values for each location in `locations`.
     """
-    return array.mode(
+
+    from earthkit.hydro.catchments.array._operations import mode as m
+
+    return m(
         river_network=river_network,
         field=field,
         locations=locations,

@@ -3,6 +3,72 @@ from earthkit.hydro.upstream import array
 
 
 @xarray
+def percentile(
+    river_network,
+    field,
+    p,
+    node_weights=None,
+    edge_weights=None,
+    return_type=None,
+    input_core_dims=None,
+):
+    r"""
+    Computes the weighted percentile of a field over all upstream nodes.
+
+    For each node in the river network, this function identifies all upstream nodes
+    (the contributing area) and computes the requested percentile from the field values,
+    optionally weighted by node weights.
+
+    The weighted percentile is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        \mathcal{A}(j) &= \{j\} \cup \bigcup_{i \in \mathrm{Up}(j)} \mathcal{A}(i) \\
+        P_p(x)_j &= \mathrm{percentile}_p \bigl(\{ w'_i \cdot x_i : i \in \mathcal{A}(j) \}\bigr)
+        \end{align*}
+
+    where:
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`\mathrm{Up}(j)` is the set of immediate upstream nodes flowing into node :math:`j`,
+    - :math:`\mathcal{A}(j)` is the full contributing area of node :math:`j` (all upstream nodes including :math:`j` itself),
+    - :math:`P_p(x)_j` is the :math:`p`-th percentile at node :math:`j`.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array containing field values defined on river network nodes or gridcells.
+    p : float
+        Requested percentile expressed as a fraction between 0 and 1 inclusive
+        (e.g. 0.5 for median, 0.95 for the 95th percentile).
+    node_weights : array-like or xarray object, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like or xarray object, optional
+        Array of weights for each edge. Default is None (unweighted).
+        Currently unsupported.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of percentile values for every river network node or gridcell, depending on `return_type`.
+    """
+    return array.percentile(
+        river_network, field, p, node_weights, edge_weights, return_type
+    )
+
+
+@xarray
 def var(
     river_network,
     field,

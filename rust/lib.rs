@@ -6,12 +6,16 @@
 // granted to it by virtue of its status as an intergovernmental organisation
 // nor does it submit to any jurisdiction.
 
-use pyo3::prelude::*;
-use rayon::prelude::*;
+use fixedbitset::FixedBitSet;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::exceptions::PyValueError;
+use pyo3::prelude::*;
+use rayon::prelude::*;
 use std::sync::atomic::{AtomicI64, Ordering};
-use fixedbitset::FixedBitSet;
+mod percentile;
+mod percentile_downstream;
+mod weighted_percentile;
+mod weighted_percentile_downstream;
 
 mod mode;
 
@@ -23,10 +27,7 @@ fn compute_topological_labels_rust<'py>(
     downstream_nodes: PyReadonlyArray1<'py, usize>,
     n_nodes: usize,
 ) -> PyResult<Py<PyArray1<i64>>> {
-
-    let labels: Vec<AtomicI64> = (0..n_nodes)
-        .map(|_| AtomicI64::new(0))
-        .collect();
+    let labels: Vec<AtomicI64> = (0..n_nodes).map(|_| AtomicI64::new(0)).collect();
 
     let mut current = sources.as_slice()?.to_vec();
     let sinks = sinks.as_slice()?;
@@ -69,12 +70,12 @@ fn compute_topological_labels_rust<'py>(
     }
 
     if !current.is_empty() {
-        return Err(PyErr::new::<PyValueError, _>("River Network contains a cycle."));
+        return Err(PyErr::new::<PyValueError, _>(
+            "River Network contains a cycle.",
+        ));
     }
 
-    let result: Vec<i64> = labels.iter()
-        .map(|a| a.load(Ordering::Relaxed))
-        .collect();
+    let result: Vec<i64> = labels.iter().map(|a| a.load(Ordering::Relaxed)).collect();
     let array = PyArray1::from_vec(py, result);
     Ok(array.to_owned().into())
 }
@@ -84,5 +85,18 @@ fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(compute_topological_labels_rust, m)?)?;
     m.add_function(wrap_pyfunction!(mode::compute_upstream_mode_rust, m)?)?;
     m.add_function(wrap_pyfunction!(mode::compute_mode_rust, m)?)?;
+    m.add_function(wrap_pyfunction!(percentile::calc_perc, m)?)?;
+    m.add_function(wrap_pyfunction!(
+        weighted_percentile::calc_weighted_perc,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        percentile_downstream::calc_perc_downstream,
+        m
+    )?)?;
+    m.add_function(wrap_pyfunction!(
+        weighted_percentile_downstream::calc_weighted_perc_downstream,
+        m
+    )?)?;
     Ok(())
 }

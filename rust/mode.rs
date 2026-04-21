@@ -6,12 +6,12 @@
 // granted to it by virtue of its status as an intergovernmental organisation
 // nor does it submit to any jurisdiction.
 
+use fixedbitset::FixedBitSet;
 use numpy::{PyArray1, PyReadonlyArray1};
 use pyo3::prelude::*;
 use rayon::prelude::*;
 use std::collections::HashMap;
 use std::sync::Mutex;
-use fixedbitset::FixedBitSet;
 
 /// Compute the mode (most common value) for each node in a river network.
 ///
@@ -59,8 +59,8 @@ pub fn compute_mode_rust<'py>(
         let mut up_adj: Vec<Vec<usize>> = vec![Vec::new(); n_nodes];
         for (&u, &d) in upstream_slice.iter().zip(downstream_slice.iter()) {
             if d < n_nodes {
-                down_adj[u].push(d);  // downstream nodes from each node
-                up_adj[d].push(u);    // upstream nodes to each node (can be multiple)
+                down_adj[u].push(d); // downstream nodes from each node
+                up_adj[d].push(u); // upstream nodes to each node (can be multiple)
             }
         }
         (down_adj, up_adj)
@@ -79,9 +79,8 @@ pub fn compute_mode_rust<'py>(
     };
 
     // Store count maps for each node using Mutex for thread-safe parallel access
-    let node_counts: Vec<Mutex<HashMap<i64, i64>>> = (0..n_nodes)
-        .map(|_| Mutex::new(HashMap::new()))
-        .collect();
+    let node_counts: Vec<Mutex<HashMap<i64, i64>>> =
+        (0..n_nodes).map(|_| Mutex::new(HashMap::new())).collect();
 
     // Initialize sources with their own values
     for &src in sources_slice {
@@ -155,7 +154,8 @@ pub fn compute_mode_rust<'py>(
             } else {
                 // Find category with maximum count
                 // In case of ties, use the smallest category value
-                counts.iter()
+                counts
+                    .iter()
                     .max_by_key(|(&cat, &count)| (count, -cat))
                     .map(|(&cat, _)| cat)
                     .unwrap_or(field_slice[node])
@@ -190,7 +190,15 @@ pub fn compute_upstream_mode_rust<'py>(
     sources: PyReadonlyArray1<'py, usize>,
     n_nodes: usize,
 ) -> PyResult<Py<PyArray1<i64>>> {
-    compute_mode_rust(py, field, upstream_nodes, downstream_nodes, sources, n_nodes, false)
+    compute_mode_rust(
+        py,
+        field,
+        upstream_nodes,
+        downstream_nodes,
+        sources,
+        n_nodes,
+        false,
+    )
 }
 
 #[cfg(test)]

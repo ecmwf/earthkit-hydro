@@ -658,6 +658,98 @@ upstream_metric_product_1g = np.array(
     [1, 2, 3, -1, 5, 6, 14, -1, 45, 10, 6, 28, -1, 200, 5, 6, -1, -1, -1, -1], dtype=int
 )
 
+# 1c percentile: unweighted, p=0.5 (median)
+upstream_metric_percentile_p05_1c = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        3.3,
+        9.2,
+        5.6,
+        2.8,
+        1.5,
+        3.2,
+        7.3,
+        3.3,
+        1.5,
+        -4.5,
+        -8.9,
+        3.85,
+        4.4,
+        2.75,
+        1.1,
+    ],
+    dtype=float,
+)
+
+# 1c percentile: unweighted, p=0.25
+upstream_metric_percentile_p025_1c = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        2.4,
+        8.25,
+        1.2,
+        1.45,
+        1.5,
+        2.35,
+        5.95,
+        0.1,
+        -1.5,
+        -4.5,
+        -8.9,
+        0.85,
+        2.75,
+        1.925,
+        1.1,
+    ],
+    dtype=float,
+)
+
+# 1c percentile: weighted (weights=arange(1,21)), p=0.5
+upstream_metric_percentile_weighted_p05_1c = np.array(
+    [
+        1.5,
+        7.3,
+        5.6,
+        -3.2,
+        0.1,
+        3.3,
+        9.2,
+        4.5,
+        2.8,
+        1.5,
+        4.06363636,
+        6.175,
+        3.69285714,
+        0.5,
+        -4.5,
+        -8.9,
+        3.49642857,
+        4.3175,
+        2.75,
+        1.1,
+    ],
+    dtype=float,
+)
+
+# 1c percentile: gridded output, p=0.5
+upstream_metric_percentile_gridded_p05_1c = np.array(
+    [
+        [1.5, 7.3, 5.6, -3.2, 0.1],
+        [3.3, 9.2, 5.6, 2.8, 1.5],
+        [3.2, 7.3, 3.3, 1.5, -4.5],
+        [-8.9, 3.85, 4.4, 2.75, 1.1],
+    ],
+    dtype=float,
+)
+
 # RIVER NETWORK TWO
 
 # 2a: unit field input
@@ -1005,6 +1097,98 @@ downstream_metric_mean_1e = np.array(
         1.55,
         np.nan,
         np.nan,
+    ],
+    dtype=float,
+)
+
+# Downstream percentile for network 1, field 1c, unweighted, p=0.5
+downstream_metric_percentile_p05_1c = np.array(
+    [
+        2.35,
+        5.95,
+        6.0,
+        2.15,
+        2.8,
+        3.2,
+        4.6,
+        6.4,
+        5.5,
+        2.4,
+        0.55,
+        1.25,
+        2.15,
+        3.3,
+        0.6,
+        -5.5,
+        -2.1,
+        1.55,
+        4.4,
+        2.75,
+    ],
+    dtype=float,
+)
+
+# Downstream percentile for network 1, field 1c, unweighted, p=0.25
+downstream_metric_percentile_p025_1c = np.array(
+    [
+        0.6,
+        2.925,
+        3.675,
+        -2.375,
+        -0.45,
+        0.55,
+        1.25,
+        2.15,
+        1.7,
+        0.6,
+        -0.775,
+        -0.425,
+        0.025,
+        0.6,
+        -2.7,
+        -7.2,
+        -2.1,
+        -0.275,
+        1.15,
+        0.3,
+    ],
+    dtype=float,
+)
+
+# Downstream percentile for network 1, field 1c, weighted (weights=arange(1,21)), p=0.5
+downstream_metric_percentile_weighted_p05_1c = np.array(
+    [
+        0.97058824,
+        4.00882353,
+        5.37352941,
+        4.4,
+        -0.09411765,
+        2.26470588,
+        3.61470588,
+        5.4,
+        3.71176471,
+        2.13,
+        0.55,
+        1.25,
+        2.15,
+        2.82352941,
+        0.44117647,
+        -5.5,
+        -2.1,
+        1.55,
+        4.44210526,
+        2.915,
+    ],
+    dtype=float,
+)
+
+# Downstream percentile for network 1, field 1c, gridded output, p=0.5
+downstream_metric_percentile_gridded_p05_1c = np.array(
+    [
+        [2.35, 5.95, 6.0, 2.15, 2.8],
+        [3.2, 4.6, 6.4, 5.5, 2.4],
+        [0.55, 1.25, 2.15, 3.3, 0.6],
+        [-5.5, -2.1, 1.55, 4.4, 2.75],
     ],
     dtype=float,
 )

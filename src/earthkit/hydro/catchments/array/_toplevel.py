@@ -1,6 +1,62 @@
 from earthkit.hydro.catchments.array import _operations
 
 
+def percentile(
+    river_network, field, p, locations, node_weights=None, edge_weights=None
+):
+    r"""
+    Computes the weighted percentile of a field over the upstream
+    catchment of each specified location.
+
+    For each location, this function identifies all upstream nodes
+    (the contributing area) and computes the requested percentile from the field values,
+    optionally weighted by node weights.
+
+    The weighted percentile is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        \mathcal{A}(j) &= \{j\} \cup \bigcup_{i \in \mathrm{Up}(j)} \mathcal{A}(i) \\
+        P_p(x)_j &= \mathrm{percentile}_p \bigl(\{ w'_i \cdot x_i : i \in \mathcal{A}(j) \}\bigr)
+        \end{align*}
+
+    where:
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`\mathrm{Up}(j)` is the set of immediate upstream nodes flowing into node :math:`j`,
+    - :math:`\mathcal{A}(j)` is the full contributing area of node :math:`j` (all upstream nodes including :math:`j` itself),
+    - :math:`P_p(x)_j` is the :math:`p`-th percentile at node :math:`j`.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like
+        An array containing field values defined on river network nodes or gridcells.
+    p : float
+        Requested percentile expressed as a fraction between 0 and 1 inclusive
+        (e.g. 0.5 for median, 0.95 for the 95th percentile).
+    locations : array-like or dict
+        A list of nodes at which to compute.
+    node_weights : array-like, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like, optional
+        Array of weights for each river network edge. Default is None (unweighted).
+        Currently unsupported.
+
+    Returns
+    -------
+    array-like
+        Array of percentile values for each location in `locations`.
+    """
+    return _operations.percentile(
+        river_network, field, p, locations, node_weights, edge_weights
+    )
+
+
 def var(river_network, field, locations, node_weights=None, edge_weights=None):
     r"""
     Computes the weighted variance of a field over the upstream

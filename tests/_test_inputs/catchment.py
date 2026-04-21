@@ -55,3 +55,12 @@ catchment_sum_1c = np.array([5.6, 23.6, 0.3, 23.0, 9.8])
 catchment_mean_1c = np.array([2.8, 2.62222222, 0.1, 7.66666667, 3.26666667])
 catchment_min_1c = np.array([0.1, -4.5, -4.5, 4.6, 1.5])
 catchment_max_1c = np.array([5.5, 8.9, 3.3, 11.1, 5.1])
+
+# Catchment percentile results for catchment_query_field_1 with input_field_1c
+# Locations: [8, 12, 13, 11, 10]
+catchment_percentile_p05_1c = np.array([2.8, 3.3, 1.5, 7.3, 3.2])
+catchment_percentile_p025_1c = np.array([1.45, 0.1, -1.5, 5.95, 2.35])
+# Weighted percentile (weights = arange(1, 21)), p=0.5
+catchment_percentile_weighted_p05_1c = np.array(
+    [2.8, 3.69285714, 0.5, 6.175, 4.06363636]
+)

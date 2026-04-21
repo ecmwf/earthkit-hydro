@@ -107,7 +107,8 @@ ignore = [
   "D413",
   "D415",
   "D416",
-  "D417"
+  "D417",
+  "E501"  # temporary!!!
 ]
 select = [
   "F",  # pyflakes

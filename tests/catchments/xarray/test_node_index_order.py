@@ -35,8 +35,12 @@ def test_catchment_mean_preserves_location_order_2d(river_network):
     result = ekh.catchments.mean(river_network, _FIELD_DA, locations=_OUTLET_NODES_2D)
 
     np.testing.assert_array_equal(result.coords["node_index"].values, _OUTLET_NODES)
-    np.testing.assert_array_equal(result.coords["y"].values, [t[0] for t in _OUTLET_NODES_2D])
-    np.testing.assert_array_equal(result.coords["x"].values, [t[1] for t in _OUTLET_NODES_2D])
+    np.testing.assert_array_equal(
+        result.coords["y"].values, [t[0] for t in _OUTLET_NODES_2D]
+    )
+    np.testing.assert_array_equal(
+        result.coords["x"].values, [t[1] for t in _OUTLET_NODES_2D]
+    )
     np.testing.assert_allclose(result.values, _OUTLET_MEANS, rtol=1e-6)
 
 
@@ -44,5 +48,7 @@ def test_catchment_mean_preserves_location_order_dict(river_network):
     result = ekh.catchments.mean(river_network, _FIELD_DA, locations=_OUTLET_DICT)
 
     np.testing.assert_array_equal(result.coords["node_index"].values, _OUTLET_NODES)
-    np.testing.assert_array_equal(result.coords["name"].values, list(_OUTLET_DICT.keys()))
+    np.testing.assert_array_equal(
+        result.coords["name"].values, list(_OUTLET_DICT.keys())
+    )
     np.testing.assert_allclose(result.values, _OUTLET_MEANS, rtol=1e-6)

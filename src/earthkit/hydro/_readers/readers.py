@@ -6,12 +6,14 @@
 # granted to it by virtue of its status as an intergovernmental organisation
 # nor does it submit to any jurisdiction.
 
+from typing import Literal
 
 import numpy as np
 
 from earthkit.hydro.data_structures._network_storage import RiverNetworkStorage
 
 from .group_labels import compute_topological_labels
+from .ldd_repair import LddRepair
 
 
 def import_earthkit_or_prompt_install(river_network_format, source):
@@ -136,7 +138,11 @@ def from_cama_downxy(dx, dy):
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
-def from_d8(data, river_network_format="pcr_d8"):
+def from_d8(
+    data: np.ndarray,
+    river_network_format: Literal["esri_d8", "pcr_d8", "merit_d8"] = "pcr_d8",
+    repair: bool = False,
+) -> RiverNetworkStorage:
     """
     Create a river network from PCRaster d8 data.
 
@@ -144,12 +150,20 @@ def from_d8(data, river_network_format="pcr_d8"):
     ----------
     data : numpy.ndarray
         The PCRaster d8 drain direction data.
+    river_network_format : str, optional
+        The format of the river network data.
+        Supported formats are "pcr_d8", "esri_d8", and "merit_d8". Default is "pcr_d8".
+    repair : bool, optional
+        Whether to repair the river network. Default is False.
 
     Returns
     -------
     earthkit.hydro.network.RiverNetwork
         The created river network.
     """
+    if repair:
+        # Repair the river network using LddRepair before processing it.
+        data = LddRepair(data, river_network_format).repair()
     shape = data.shape
     data_flat = data.flatten()
     del data

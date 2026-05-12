@@ -35,7 +35,8 @@ dependencies = [
     "numpy",
     "joblib",
     "xarray",
-    "earthkit-utils>=1.0.0rc0"
+    "earthkit-utils>=1.0.0rc0",
+    "earthkit-data>=0.19.2"
 ]
 
 [project.urls]

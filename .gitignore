@@ -354,4 +354,5 @@ autodocs/
 
 *.joblib
 *.nc
+!tests/ldd_repair/data/*.nc
 .roo/

@@ -117,7 +117,8 @@ def xarray(func):
             result = xr.DataArray(output, dims=dim_names, coords=coords, name="out")
 
             if not return_grid:
-                coords_grid = np.meshgrid(*river_network.coords.values())
+                coords = list(river_network.coords.values())[::-1]
+                coords_grid = np.meshgrid(*coords)[::-1]
                 assign_dict = {
                     k: (node_default_coord, v.flat[river_network.mask])
                     for k, v in zip(river_network.coords.keys(), coords_grid)

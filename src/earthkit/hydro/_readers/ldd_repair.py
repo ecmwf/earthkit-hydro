@@ -149,11 +149,7 @@ class LddRepair:
             Coordinates of the downstream cell, or None if no valid downstream cell exists.
         """
         ldd_val = int(self.ldd_array[i, j])
-        if (
-            ldd_val < self.LDD_OFFSET_MIN
-            or ldd_val > self.LDD_OFFSET_MAX
-            or ldd_val == self.LDD_PIT_VALUE
-        ):
+        if self.__is_pit_or_invalid(ldd_val):
             return None  # Invalid or pit
         di, dj = self.LDD_OFFSETS[ldd_val]
         next_i, next_j = i + di, j + dj
@@ -176,11 +172,7 @@ class LddRepair:
                 ldd_val = int(self.ldd_array[i, j])
 
                 # Skip invalid cells and pits
-                if (
-                    ldd_val < self.LDD_OFFSET_MIN
-                    or ldd_val > self.LDD_OFFSET_MAX
-                    or ldd_val == self.LDD_PIT_VALUE
-                ):
+                if self.__is_pit_or_invalid(ldd_val):
                     continue
 
                 # Follow the downstream path, tracking visited cells
@@ -192,11 +184,7 @@ class LddRepair:
                 while current_i is not None and current_j is not None:
                     # Check if we've hit a pit or invalid cell - no cycle here
                     current_ldd = int(self.ldd_array[current_i, current_j])
-                    if (
-                        current_ldd < self.LDD_OFFSET_MIN
-                        or current_ldd > self.LDD_OFFSET_MAX
-                        or current_ldd == self.LDD_PIT_VALUE
-                    ):
+                    if self.__is_pit_or_invalid(current_ldd):
                         break
 
                     # Check if we've already visited this cell in the current path - cycle detected!
@@ -222,6 +210,22 @@ class LddRepair:
         for i, j in cycle_cells:
             self.ldd_array[i, j] = self.LDD_MISSING_VALUE
 
+    def __is_pit_or_invalid(self, ldd_val: int) -> bool:
+        """
+        Check if the LDD value is a pit or invalid.
+        Parameters:
+        -----------
+        ldd_val : int
+            LDD value to check.
+        Returns:
+        --------
+            bool
+                True if the LDD value is a pit or invalid, False otherwise.
+        """
+        return (ldd_val == self.LDD_PIT_VALUE or
+                ldd_val < self.LDD_OFFSET_MIN or
+                ldd_val > self.LDD_OFFSET_MAX)
+
     def __correct_edge_pits(self):
         """
         Correct edge cells that flow out of bounds by assigning them
@@ -232,11 +236,7 @@ class LddRepair:
                 ldd_val = int(self.ldd_array[i, j])
 
                 # Skip if already a pit (5) or invalid
-                if (
-                    ldd_val == self.LDD_PIT_VALUE
-                    or ldd_val < self.LDD_OFFSET_MIN
-                    or ldd_val > self.LDD_OFFSET_MAX
-                ):
+                if self.__is_pit_or_invalid(ldd_val):
                     continue
 
                 # Check if this cell's immediate downstream is out of bounds
@@ -257,11 +257,7 @@ class LddRepair:
                 ldd_val = int(self.ldd_array[i, j])
 
                 # Skip if already a pit (5) or invalid
-                if (
-                    ldd_val == self.LDD_PIT_VALUE
-                    or ldd_val < self.LDD_OFFSET_MIN
-                    or ldd_val > self.LDD_OFFSET_MAX
-                ):
+                if self.__is_pit_or_invalid(ldd_val):
                     continue
 
                 # Check if this cell's downstream is a missing value

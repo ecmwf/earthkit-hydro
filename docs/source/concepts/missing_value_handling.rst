@@ -118,14 +118,6 @@ earthkit-hydro's approach requires you to make explicit choices about missing da
     # Check which locations have complete data
     valid_results = ~np.isnan(result)
 
-**Option 4: Skip missing regions**
-
-.. code-block:: python
-
-    # Only process where data is complete
-    mask = ~np.isnan(field)
-    result = ekh.upstream.sum(network, field, mask=mask)
-
 Each choice has implications—earthkit-hydro forces you to think about them.
 
 Benefits of explicit handling

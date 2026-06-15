@@ -1,11 +1,8 @@
 from earthkit.hydro.upstream.array import _operations
 
 
-def percentile(
-    river_network, field, p, node_weights=None, edge_weights=None, return_type=None
-):
-    r"""
-    Computes the weighted percentile of a field over all upstream nodes.
+def percentile(river_network, field, p, node_weights=None, edge_weights=None, return_type=None):
+    r"""Computes the weighted percentile of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes
     (the contributing area) and computes the requested percentile from the field values,
@@ -50,17 +47,14 @@ def percentile(
     -------
     array-like
         Array of percentile values for every river network node or gridcell, depending on `return_type`.
+
     """
     if edge_weights is not None:
         raise NotImplementedError("edge_weights are currently unsupported.")
     if river_network.array_backend != "numpy":
-        raise NotImplementedError(
-            "Only numpy backend is currently supported for percentiles."
-        )
+        raise NotImplementedError("Only numpy backend is currently supported for percentiles.")
     if p < 0 or p > 1:
-        raise ValueError(
-            "The requested percentile `p` must be between 0 and 1 inclusive."
-        )
+        raise ValueError("The requested percentile `p` must be between 0 and 1 inclusive.")
     return _operations.percentile(
         river_network=river_network,
         field=field.astype("float64"),
@@ -71,8 +65,7 @@ def percentile(
 
 
 def var(river_network, field, node_weights=None, edge_weights=None, return_type=None):
-    r"""
-    Computes the weighted variance of a field over all upstream nodes.
+    r"""Computes the weighted variance of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -123,6 +116,7 @@ def var(river_network, field, node_weights=None, edge_weights=None, return_type=
     -------
     array-like
         Array of variance values for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.var(
         river_network=river_network,
@@ -134,8 +128,7 @@ def var(river_network, field, node_weights=None, edge_weights=None, return_type=
 
 
 def std(river_network, field, node_weights=None, edge_weights=None, return_type=None):
-    r"""
-    Computes the weighted standard deviation of a field over all
+    r"""Computes the weighted standard deviation of a field over all
     upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
@@ -189,6 +182,7 @@ def std(river_network, field, node_weights=None, edge_weights=None, return_type=
     -------
     array-like
         Array of standard deviation values for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.std(
         river_network=river_network,
@@ -200,8 +194,7 @@ def std(river_network, field, node_weights=None, edge_weights=None, return_type=
 
 
 def mean(river_network, field, node_weights=None, edge_weights=None, return_type=None):
-    r"""
-    Computes the weighted mean of a field over all upstream nodes.
+    r"""Computes the weighted mean of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -247,6 +240,7 @@ def mean(river_network, field, node_weights=None, edge_weights=None, return_type
     -------
     array-like
         Array of mean values for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.mean(
         river_network=river_network,
@@ -258,8 +252,7 @@ def mean(river_network, field, node_weights=None, edge_weights=None, return_type
 
 
 def sum(river_network, field, node_weights=None, edge_weights=None, return_type=None):
-    r"""
-    Computes the weighted sum of a field over all upstream nodes.
+    r"""Computes the weighted sum of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -301,6 +294,7 @@ def sum(river_network, field, node_weights=None, edge_weights=None, return_type=
     -------
     array-like
         Array of sum values for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.sum(
         river_network=river_network,
@@ -312,8 +306,7 @@ def sum(river_network, field, node_weights=None, edge_weights=None, return_type=
 
 
 def min(river_network, field, node_weights=None, edge_weights=None, return_type=None):
-    r"""
-    Computes the weighted minimum of a field over all upstream nodes.
+    r"""Computes the weighted minimum of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -355,6 +348,7 @@ def min(river_network, field, node_weights=None, edge_weights=None, return_type=
     -------
     array-like
         Array of minimum values for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.min(
         river_network=river_network,
@@ -366,8 +360,7 @@ def min(river_network, field, node_weights=None, edge_weights=None, return_type=
 
 
 def max(river_network, field, node_weights=None, edge_weights=None, return_type=None):
-    r"""
-    Computes the weighted maximum of a field over all upstream nodes.
+    r"""Computes the weighted maximum of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -409,6 +402,7 @@ def max(river_network, field, node_weights=None, edge_weights=None, return_type=
     -------
     array-like
         Array of maximum values for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.max(
         river_network=river_network,
@@ -420,8 +414,7 @@ def max(river_network, field, node_weights=None, edge_weights=None, return_type=
 
 
 def mode(river_network, field, node_weights=None, edge_weights=None, return_type=None):
-    r"""
-    Computes the mode (most common value) of categorical data over all upstream nodes.
+    r"""Computes the mode (most common value) of categorical data over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes
     and finds the most frequent categorical value (spatial majority) among them.
@@ -479,6 +472,7 @@ def mode(river_network, field, node_weights=None, edge_weights=None, return_type
     >>> import earthkit.hydro as ekh
     >>> # Compute mode of land cover categories
     >>> mode_landcover = ekh.upstream.array.mode(river_network, landcover_field)
+
     """
     return _operations.mode(
         river_network=river_network,

@@ -24,9 +24,7 @@ def test_catchments_max(river_network, field, locations, expected, array_backend
     """Test catchment max aggregation."""
     river_network = river_network.to_device("cpu", array_backend)
     xp = ekh._backends.find.get_array_backend(array_backend)
-    result = ekh.catchments.array.max(
-        river_network, xp.asarray(field), locations=locations
-    )
+    result = ekh.catchments.array.max(river_network, xp.asarray(field), locations=locations)
     result = np.asarray(result)
     print("Result:", result)
     print("Expected:", expected)

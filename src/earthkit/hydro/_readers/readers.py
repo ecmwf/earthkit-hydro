@@ -15,8 +15,7 @@ from .group_labels import compute_topological_labels
 
 
 def import_earthkit_or_prompt_install(river_network_format, source):
-    """
-    Ensure that the `earthkit.data` package is installed and import it.
+    """Ensure that the `earthkit.data` package is installed and import it.
     If the package is not installed, prompt the user to install it.
 
     Parameters
@@ -35,6 +34,7 @@ def import_earthkit_or_prompt_install(river_network_format, source):
     ------
     ModuleNotFoundError
         If the `earthkit.data` package is not installed.
+
     """
     try:
         import earthkit.data as ekd
@@ -48,8 +48,7 @@ def import_earthkit_or_prompt_install(river_network_format, source):
 
 
 def find_main_var(ds, min_dim=2):
-    """
-    Find the main variable in the dataset.
+    """Find the main variable in the dataset.
 
     Parameters
     ----------
@@ -67,6 +66,7 @@ def find_main_var(ds, min_dim=2):
     ------
     ValueError
         If no variable or more than one variable with the required dimensions is found.
+
     """
     variable_names = [k for k in ds.variables if len(ds.variables[k].dims) >= min_dim]
     if len(variable_names) > 1:
@@ -78,8 +78,7 @@ def find_main_var(ds, min_dim=2):
 
 
 def from_cama_nextxy(x, y):
-    """
-    Create a river network from CaMa nextxy data.
+    """Create a river network from CaMa nextxy data.
 
     Parameters
     ----------
@@ -92,6 +91,7 @@ def from_cama_nextxy(x, y):
     -------
     earthkit.hydro.network.RiverNetwork
         The created river network.
+
     """
     shape = x.shape
     x = x.flatten()
@@ -105,8 +105,7 @@ def from_cama_nextxy(x, y):
 
 
 def from_cama_downxy(dx, dy):
-    """
-    Create a river network from CaMa downxy data.
+    """Create a river network from CaMa downxy data.
 
     Parameters
     ----------
@@ -119,6 +118,7 @@ def from_cama_downxy(dx, dy):
     -------
     earthkit.hydro.network.RiverNetwork
         The created river network.
+
     """
     x_offsets = dx
     y_offsets = dy.flatten()
@@ -128,17 +128,14 @@ def from_cama_downxy(dx, dy):
     missing_mask = x_offsets != -9999
     x_offsets = x_offsets[mask_upstream]
     y_offsets = y_offsets[mask_upstream]
-    upstream_indices, downstream_indices = (
-        find_upstream_downstream_indices_from_offsets(
-            x_offsets, y_offsets, missing_mask, mask_upstream, shape
-        )
+    upstream_indices, downstream_indices = find_upstream_downstream_indices_from_offsets(
+        x_offsets, y_offsets, missing_mask, mask_upstream, shape
     )
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
 def from_d8(data, river_network_format="pcr_d8"):
-    """
-    Create a river network from PCRaster d8 data.
+    """Create a river network from PCRaster d8 data.
 
     Parameters
     ----------
@@ -149,6 +146,7 @@ def from_d8(data, river_network_format="pcr_d8"):
     -------
     earthkit.hydro.network.RiverNetwork
         The created river network.
+
     """
     shape = data.shape
     data_flat = data.flatten()
@@ -157,14 +155,10 @@ def from_d8(data, river_network_format="pcr_d8"):
         missing_mask = np.isin(data_flat, range(1, 10))
         mask_upstream = data_flat != 5
     elif river_network_format == "esri_d8":
-        missing_mask = np.isin(data_flat, np.append(0, 2 ** np.arange(8))) & (
-            data_flat != 255
-        )
+        missing_mask = np.isin(data_flat, np.append(0, 2 ** np.arange(8))) & (data_flat != 255)
         mask_upstream = (data_flat != 0) & (data_flat != -1)
     elif river_network_format == "merit_d8":
-        missing_mask = np.isin(data_flat, np.append(0, 2 ** np.arange(8))) & (
-            data_flat != 247
-        )
+        missing_mask = np.isin(data_flat, np.append(0, 2 ** np.arange(8))) & (data_flat != 247)
         mask_upstream = (data_flat != 0) & (data_flat != 255)
     else:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
@@ -180,19 +174,14 @@ def from_d8(data, river_network_format="pcr_d8"):
         x_offsets = np.vectorize(x_mapping.get)(directions)
         y_offsets = -np.vectorize(y_mapping.get)(directions)
     del directions
-    upstream_indices, downstream_indices = (
-        find_upstream_downstream_indices_from_offsets(
-            x_offsets, y_offsets, missing_mask, mask_upstream, shape
-        )
+    upstream_indices, downstream_indices = find_upstream_downstream_indices_from_offsets(
+        x_offsets, y_offsets, missing_mask, mask_upstream, shape
     )
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
-def find_upstream_downstream_indices_from_offsets(
-    x_offsets, y_offsets, missing_mask, mask_upstream, shape
-):
-    """
-    Function to convert from offsets to absolute indices.
+def find_upstream_downstream_indices_from_offsets(x_offsets, y_offsets, missing_mask, mask_upstream, shape):
+    """Function to convert from offsets to absolute indices.
 
     Parameters
     ----------
@@ -211,6 +200,7 @@ def find_upstream_downstream_indices_from_offsets(
     -------
     earthkit.hydro.network.RiverNetwork
         The created river network.
+
     """
     ny, nx = shape
     upstream_indices = np.arange(missing_mask.size)[mask_upstream]
@@ -269,9 +259,7 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
         n_nodes,
     )[has_downstream]
 
-    sort_indices = np.lexsort(
-        (nodes[has_downstream], distances)
-    )  # np.argsort(distances)
+    sort_indices = np.lexsort((nodes[has_downstream], distances))  # np.argsort(distances)
     sorted_distances = distances[sort_indices]  # from source to sink
 
     up_ids_sort = up_ids[sort_indices]
@@ -352,9 +340,7 @@ def from_grit(path):
     offsets[1:] = np.cumsum(counts)
     del counts
 
-    topological_labels = compute_topological_labels_bifurcations(
-        down_ids, offsets, sources, sinks
-    )
+    topological_labels = compute_topological_labels_bifurcations(down_ids, offsets, sources, sinks)
     topological_labels = topological_labels[up_ids]
 
     sort_indices = np.argsort(topological_labels)

@@ -4,8 +4,7 @@ from ._network_storage import RiverNetworkStorage
 
 
 class RiverNetwork:
-    """
-    A class representing a river network for hydrological processing.
+    """A class representing a river network for hydrological processing.
 
     Attributes
     ----------
@@ -29,6 +28,7 @@ class RiverNetwork:
         The device of the river network.
     return_type : str
         The default return type of the river network. Either "gridded" or "masked".
+
     """
 
     def __init__(self, river_network_storage: RiverNetworkStorage):
@@ -59,8 +59,7 @@ class RiverNetwork:
         return self.__str__()
 
     def to_device(self, device=None, array_backend=None):
-        """
-        Change the RiverNetwork's array backend and/or move it to a
+        """Change the RiverNetwork's array backend and/or move it to a
         different device.
 
         Parameters
@@ -76,8 +75,8 @@ class RiverNetwork:
         -------
         RiverNetwork
             The modified RiverNetwork.
-        """
 
+        """
         from earthkit.utils.array.convert import convert
 
         # TODO: use xp.asarray
@@ -103,14 +102,9 @@ class RiverNetwork:
                 array_backend = self.array_backend
 
         if array_backend in ["torch", "cupy", "numpy"]:
-            self.groups = [
-                convert(group, device=device, array_namespace=array_backend)
-                for group in self.groups
-            ]
+            self.groups = [convert(group, device=device, array_namespace=array_backend) for group in self.groups]
             self.mask = convert(self.mask, device=device, array_namespace=array_backend)
-            self.data = [
-                convert(self.data[0], device=device, array_namespace=array_backend)
-            ]
+            self.data = [convert(self.data[0], device=device, array_namespace=array_backend)]
         elif array_backend == "jax":
             assert device == "cpu"
             import jax.numpy as jnp
@@ -142,8 +136,7 @@ class RiverNetwork:
         return self
 
     def set_default_return_type(self, return_type):
-        """
-        Set the default return type for the river network.
+        """Set the default return type for the river network.
 
         Parameters
         ----------
@@ -153,16 +146,14 @@ class RiverNetwork:
         Returns
         -------
         None
+
         """
         if return_type not in ["gridded", "masked"]:
-            raise ValueError(
-                f'Invalid return_type {return_type}. Valid types are "gridded", "masked"'
-            )
+            raise ValueError(f'Invalid return_type {return_type}. Valid types are "gridded", "masked"')
         self.return_type = return_type
 
     def export(self, fpath="river_network.joblib", compression=1):
-        """
-        Save the river network to a local file.
+        """Save the river network to a local file.
 
         Parameters
         ----------
@@ -174,6 +165,7 @@ class RiverNetwork:
         Returns
         -------
         None
+
         """
         import joblib
 

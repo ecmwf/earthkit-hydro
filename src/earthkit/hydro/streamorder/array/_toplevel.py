@@ -2,8 +2,7 @@ import earthkit.hydro.streamorder.array._operations as array
 
 
 def strahler(river_network, return_type=None):
-    r"""
-    Computes the Strahler stream order for each node in the river network.
+    r"""Computes the Strahler stream order for each node in the river network.
 
     For each node in the river network, this algorithm identifies the upstream nodes
     and uses them to calculate the Strahler number of the current node.
@@ -47,14 +46,14 @@ def strahler(river_network, return_type=None):
     -------
     array-like
         Array of Strahler stream order values for every river network node or gridcell, depending on `return_type`.
+
     """
     return_type = river_network.return_type if return_type is None else return_type
     return array.strahler(river_network=river_network, return_type=return_type)
 
 
 def shreve(river_network, return_type=None):
-    r"""
-    Computes the Shreve stream order for each node in the river network.
+    r"""Computes the Shreve stream order for each node in the river network.
 
     For each node in the river network, this algorithm identifies the upstream nodes
     and uses them to calculate the Shreve order of the current node.
@@ -91,6 +90,7 @@ def shreve(river_network, return_type=None):
     -------
     array-like
         Array of Shreve stream order values for every river network node or gridcell, depending on `return_type`.
+
     """
     return_type = river_network.return_type if return_type is None else return_type
     return array.shreve(river_network=river_network, return_type=return_type)

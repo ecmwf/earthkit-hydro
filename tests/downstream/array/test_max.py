@@ -25,9 +25,7 @@ import earthkit.hydro as ekh
     indirect=["river_network"],
 )
 @pytest.mark.parametrize("array_backend", ["numpy", "torch"])
-def test_downstream_metric_max(
-    river_network, input_field, flow_downstream, mv, array_backend
-):
+def test_downstream_metric_max(river_network, input_field, flow_downstream, mv, array_backend):
     river_network = river_network.to_device("cpu", array_backend)
     xp = ekh._backends.find.get_array_backend(array_backend)
     output_field = ekh.downstream.array.max(

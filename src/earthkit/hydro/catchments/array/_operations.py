@@ -9,57 +9,43 @@ def percentile(river_network, field, p, locations, node_weights, edge_weights):
     from earthkit.hydro.upstream.array import percentile as arr_perc
 
     stations_1d, _, _ = locations_to_1d(NumPyBackend(), river_network, locations)
-    return arr_perc(
-        river_network, field, p, node_weights, edge_weights, return_type="masked"
-    )[..., stations_1d]
+    return arr_perc(river_network, field, p, node_weights, edge_weights, return_type="masked")[..., stations_1d]
 
 
 @multi_backend(allow_jax_jit=False)
 def var(xp, river_network, field, locations, node_weights, edge_weights):
     stations_1d, _, _ = locations_to_1d(xp, river_network, locations)
-    return _operations.var(
-        xp, river_network, field, stations_1d, node_weights, edge_weights
-    )
+    return _operations.var(xp, river_network, field, stations_1d, node_weights, edge_weights)
 
 
 @multi_backend(allow_jax_jit=False)
 def std(xp, river_network, field, locations, node_weights, edge_weights):
     stations_1d, _, _ = locations_to_1d(xp, river_network, locations)
-    return _operations.std(
-        xp, river_network, field, stations_1d, node_weights, edge_weights
-    )
+    return _operations.std(xp, river_network, field, stations_1d, node_weights, edge_weights)
 
 
 @multi_backend(allow_jax_jit=False)
 def mean(xp, river_network, field, locations, node_weights, edge_weights):
     stations_1d, _, _ = locations_to_1d(xp, river_network, locations)
-    return _operations.mean(
-        xp, river_network, field, stations_1d, node_weights, edge_weights
-    )
+    return _operations.mean(xp, river_network, field, stations_1d, node_weights, edge_weights)
 
 
 @multi_backend(allow_jax_jit=False)
 def sum(xp, river_network, field, locations, node_weights, edge_weights):
     stations_1d, _, _ = locations_to_1d(xp, river_network, locations)
-    return _operations.sum(
-        xp, river_network, field, stations_1d, node_weights, edge_weights
-    )
+    return _operations.sum(xp, river_network, field, stations_1d, node_weights, edge_weights)
 
 
 @multi_backend(allow_jax_jit=False)
 def min(xp, river_network, field, locations, node_weights, edge_weights):
     stations_1d, _, _ = locations_to_1d(xp, river_network, locations)
-    return _operations.min(
-        xp, river_network, field, stations_1d, node_weights, edge_weights
-    )
+    return _operations.min(xp, river_network, field, stations_1d, node_weights, edge_weights)
 
 
 @multi_backend(allow_jax_jit=False)
 def max(xp, river_network, field, locations, node_weights, edge_weights):
     stations_1d, _, _ = locations_to_1d(xp, river_network, locations)
-    return _operations.max(
-        xp, river_network, field, stations_1d, node_weights, edge_weights
-    )
+    return _operations.max(xp, river_network, field, stations_1d, node_weights, edge_weights)
 
 
 def mode(river_network, field, locations, node_weights, edge_weights):
@@ -68,9 +54,7 @@ def mode(river_network, field, locations, node_weights, edge_weights):
     from earthkit.hydro.upstream.array import mode as arr_mode
 
     stations_1d, _, _ = locations_to_1d(NumPyBackend(), river_network, locations)
-    return arr_mode(
-        river_network, field, node_weights, edge_weights, return_type="masked"
-    )[..., stations_1d]
+    return arr_mode(river_network, field, node_weights, edge_weights, return_type="masked")[..., stations_1d]
 
 
 @multi_backend()

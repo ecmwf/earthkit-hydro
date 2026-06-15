@@ -9,8 +9,7 @@ def upstream(
     metric="sum",
     return_type=None,
 ):
-    r"""
-    Moves a field upstream.
+    r"""Moves a field upstream.
 
     Computes a one-step neighbor accumulation (local aggregation) moving upstream only.
 
@@ -55,6 +54,7 @@ def upstream(
     -------
     array-like
         Array of values after movement up the river network for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.upstream(
         river_network=river_network,
@@ -74,8 +74,7 @@ def downstream(
     metric="sum",
     return_type=None,
 ):
-    r"""
-    Moves a field downstream.
+    r"""Moves a field downstream.
 
     Computes a one-step neighbor accumulation (local aggregation) moving downstream only.
 
@@ -120,6 +119,7 @@ def downstream(
     -------
     array-like
         Array of values after movement down the river network for every river network node or gridcell, depending on `return_type`.
+
     """
     return _operations.downstream(
         river_network=river_network,

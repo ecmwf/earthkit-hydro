@@ -25,9 +25,7 @@ import earthkit.hydro as ekh
     indirect=["river_network"],
 )
 def test_calculate_upstream_metric_max(river_network, input_field, flow_downstream, mv):
-    output_field = ekh.upstream.array.max(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
+    output_field = ekh.upstream.array.max(river_network, input_field, node_weights=None, return_type="masked")
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype

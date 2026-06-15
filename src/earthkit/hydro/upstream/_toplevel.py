@@ -12,8 +12,7 @@ def percentile(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted percentile of a field over all upstream nodes.
+    r"""Computes the weighted percentile of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes
     (the contributing area) and computes the requested percentile from the field values,
@@ -62,10 +61,9 @@ def percentile(
     -------
     xarray object
         Array of percentile values for every river network node or gridcell, depending on `return_type`.
+
     """
-    return array.percentile(
-        river_network, field, p, node_weights, edge_weights, return_type
-    )
+    return array.percentile(river_network, field, p, node_weights, edge_weights, return_type)
 
 
 @xarray
@@ -77,8 +75,7 @@ def var(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted variance of a field over all upstream nodes.
+    r"""Computes the weighted variance of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -133,6 +130,7 @@ def var(
     -------
     xarray object
         Array of variance values for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.var(river_network, field, node_weights, edge_weights, return_type)
 
@@ -146,8 +144,7 @@ def std(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted standard deviation of a field over all
+    r"""Computes the weighted standard deviation of a field over all
     upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
@@ -205,6 +202,7 @@ def std(
     -------
     xarray object
         Array of standard deviation values for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.std(river_network, field, node_weights, edge_weights, return_type)
 
@@ -218,8 +216,7 @@ def mean(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted mean of a field over all upstream nodes.
+    r"""Computes the weighted mean of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -269,6 +266,7 @@ def mean(
     -------
     xarray object
         Array of mean values for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.mean(river_network, field, node_weights, edge_weights, return_type)
 
@@ -282,8 +280,7 @@ def sum(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted sum of a field over all upstream nodes.
+    r"""Computes the weighted sum of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -329,6 +326,7 @@ def sum(
     -------
     xarray object
         Array of sum values for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.sum(river_network, field, node_weights, edge_weights, return_type)
 
@@ -342,8 +340,7 @@ def min(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted minimum of a field over all upstream nodes.
+    r"""Computes the weighted minimum of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -389,6 +386,7 @@ def min(
     -------
     xarray object
         Array of minimum values for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.min(river_network, field, node_weights, edge_weights, return_type)
 
@@ -402,8 +400,7 @@ def max(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the weighted maximum of a field over all upstream nodes.
+    r"""Computes the weighted maximum of a field over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes in the river network
     and accumulates their contributions downstream, weighted by both node and edge weights.
@@ -449,6 +446,7 @@ def max(
     -------
     xarray object
         Array of maximum values for every river network node or gridcell, depending on `return_type`.
+
     """
     return array.max(river_network, field, node_weights, edge_weights, return_type)
 
@@ -462,8 +460,7 @@ def mode(
     return_type=None,
     input_core_dims=None,
 ):
-    r"""
-    Computes the mode (most common value) of categorical data over all upstream nodes.
+    r"""Computes the mode (most common value) of categorical data over all upstream nodes.
 
     For each node in the river network, this function identifies all upstream nodes
     and finds the most frequent categorical value (spatial majority) among them.
@@ -525,5 +522,6 @@ def mode(
     >>> import earthkit.hydro as ekh
     >>> # Compute mode of land cover categories
     >>> mode_landcover = ekh.upstream.mode(river_network, landcover_field)
+
     """
     return array.mode(river_network, field, node_weights, edge_weights, return_type)

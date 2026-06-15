@@ -14,8 +14,7 @@ ekh_version = ".".join(ekh_version.split(".")[:2])
 
 
 def cache(func):
-    """
-    Decorator to allow automatic use of cache.
+    """Decorator to allow automatic use of cache.
 
     Parameters
     ----------
@@ -26,6 +25,7 @@ def cache(func):
     -------
     callable
         The wrapped function.
+
     """
 
     @wraps(func)
@@ -38,8 +38,7 @@ def cache(func):
         cache_fname="{ekh_version}_{hash}.joblib",
         cache_compression=1,
     ):
-        """
-        Wrapper to load river network from cache if available, otherwise
+        """Wrapper to load river network from cache if available, otherwise
         create and cache it.
 
         Parameters
@@ -67,6 +66,7 @@ def cache(func):
         -------
         earthkit.hydro.network_class.RiverNetwork
             The loaded river network.
+
         """
         if use_cache:
             hashed_name = sha256(path.encode("utf-8")).hexdigest()

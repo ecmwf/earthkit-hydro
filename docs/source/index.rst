@@ -3,11 +3,7 @@ earthkit-hydro
 
 .. important::
 
-    This software is in **release candidate** stage. It is not yet considered stable and may still undergo significant changes before the final release. We welcome feedback and contributions as we approach that milestone.
-
-.. important::
-
-    This software is **Incubating** and subject to ECMWF's guidelines on `Software Maturity <https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity>`_.
+    This software is **Graduated** and subject to ECMWF's guidelines on `Software Maturity <https://github.com/ecmwf/codex/raw/refs/heads/main/Project%20Maturity>`_.
 
 **earthkit-hydro** is a Python library for common hydrological functions.
 It is the hydrological component of earthkit :cite:`earthkit`.

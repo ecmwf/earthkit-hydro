@@ -211,9 +211,7 @@ exclude_patterns = ["_build", "build"]
 suppress_warnings = []
 
 
-_EARTHKIT_PACKAGES_URL = (
-    "https://raw.githubusercontent.com/ecmwf/earthkit/refs/heads/develop/docs/earthkit-packages.yml"
-)
+_EARTHKIT_PACKAGES_URL = "https://raw.githubusercontent.com/ecmwf/earthkit/refs/heads/develop/docs/earthkit-packages.yml"
 
 
 def _write_earthkit_packages_js(app):

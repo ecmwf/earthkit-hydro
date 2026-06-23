@@ -7,12 +7,8 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 import datetime
-import json
 import os
 import sys
-import urllib.request
-
-import yaml
 
 on_rtd = os.environ.get("READTHEDOCS") == "True"
 
@@ -30,6 +26,18 @@ if rtd_version_type in ("branch", "tag"):
     source_branch = rtd_version
 else:
     source_branch = "main"
+
+# Branch for upstream earthkit repo (used for fetching earthkit-packages.yml)
+# Tags will use main
+if rtd_version_type in ("tag"):
+    ek_branch = "main"
+# Pull requests and unknmown versions will use develop
+# Not sure how you get unknown, but its a valid value of rtd_version_type
+elif rtd_version_type in ("external", "unknown"):
+    ek_branch = "develop"
+else:
+    ek_branch = rtd_version
+
 
 sys.path.insert(0, os.path.abspath("../../src"))
 
@@ -211,28 +219,9 @@ exclude_patterns = ["_build", "build"]
 suppress_warnings = []
 
 
-_EARTHKIT_PACKAGES_URL = "https://raw.githubusercontent.com/ecmwf/earthkit/refs/heads/develop/docs/earthkit-packages.yml"
-
-
-def _write_earthkit_packages_js(app):
-    """Fetch earthkit-packages.yml from remote and write a JS data file into the output _static dir.
-
-    Falls back to the local copy if the remote fetch fails.
-    """
-    try:
-        with urllib.request.urlopen(_EARTHKIT_PACKAGES_URL, timeout=10) as response:
-            config = yaml.safe_load(response.read())
-    except Exception:
-        config_path = os.path.join(os.path.dirname(__file__), "earthkit-packages.yml")
-        with open(config_path, encoding="utf-8") as fh:
-            config = yaml.safe_load(fh)
-    packages = config.get("packages", [])
-    static_dir = os.path.join(app.outdir, "_static")
-    os.makedirs(static_dir, exist_ok=True)
-    js_path = os.path.join(static_dir, "earthkit-packages.js")
-    with open(js_path, "w", encoding="utf-8") as fh:
-        fh.write(f"window.earthkitPackages = {json.dumps(packages)};\n")
-
-
 def setup(app):
-    app.connect("builder-inited", _write_earthkit_packages_js)
+    from earthkit_packages import _write_earthkit_packages_js
+
+    app.connect(
+        "builder-inited", lambda app: _write_earthkit_packages_js(app, ek_branch)
+    )

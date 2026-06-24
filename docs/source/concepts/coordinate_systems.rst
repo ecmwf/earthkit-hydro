@@ -1,42 +1,43 @@
 Coordinate systems
 ==================
 
-Spatial data requires careful attention to coordinate reference systems (CRS).
-This page explains how earthkit-hydro handles coordinates and what you need to know.
+earthkit-hydro assumes that all input data are defined on the same grid as the river network. This means that the coordinates and grid structure of forcing data, masks, and locations must be consistent with the river network being used.
 
-Importance of coordinate systems
----------------------------------
+Why this matters
+----------------
 
-River networks and input data must use compatible coordinate systems for operations like:
+Many operations in earthkit-hydro depend on a direct correspondence between the river network and the input data, including:
 
-- Locating monitoring stations
-- Extracting catchment boundaries
-- Overlaying with other spatial data
-- Calculating distances
+* Locating monitoring stations
+* Extracting catchment boundaries
+* Associating data values with river reaches
+* Calculating upstream and downstream relationships
 
-Mismatched coordinate systems lead to incorrect results or errors.
+If the input data are on a different grid, these operations may produce incorrect results or fail entirely.
 
-Supported systems
------------------
+Grid compatibility
+------------------
 
-earthkit-hydro works with:
+earthkit-hydro does not automatically reproject or regrid data. Instead, it assumes that:
 
-- **Geographic coordinates** (latitude/longitude)
-- **Projected coordinates** (meter-based grids like UTM)
-- **Custom grids** (model-specific coordinate systems)
+* Input datasets use the same grid as the river network
+* Grid coordinates correspond to the river network coordinates
+* Any required coordinate transformations have already been applied
 
-The library relies on coordinate information from your data source (NetCDF attributes, GeoTIFF metadata, etc.).
+The underlying coordinate reference system (CRS) may be geographic, projected, or model-specific, provided that both the river network and the input data use the same grid definition.
+
+To regrid data, we recommend using **earthkit-geo**.
 
 Best practices
 --------------
 
-**Check your CRS:** Always verify that input locations use the same CRS as your river network
+**Verify grid consistency:** Check that your input data and river network share the same grid and coordinate definitions.
 
-**Use metadata:** Store CRS information in your data files (NetCDF CF conventions, GeoTIFF tags)
+**Preserve metadata:** Store coordinate and CRS information in your data files whenever possible.
 
-**Reproject when needed:** Use tools like ``rasterio`` or ``pyproj`` to reproject coordinate data before using with earthkit-hydro
+**Regrid before use:** If your data are on a different grid, regrid them to the river network grid using appropriate tools such as earthkit-geo before using them with earthkit-hydro.
 
-**Document assumptions:** Note which CRS you're using in analysis scripts
+**Document assumptions:** Record any regridding or coordinate transformations applied during preprocessing.
 
 See also
 --------

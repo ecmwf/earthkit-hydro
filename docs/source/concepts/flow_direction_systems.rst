@@ -46,22 +46,10 @@ Value 5 indicates a pit (no outflow).
 
 Value 0 indicates a pit.
 
-**Sequential indices:** Some formats use 0-7 indexing, often following:
+Other methods
+-------------
 
-.. code-block:: text
-
-    5  6  7
-    4  X  0
-    3  2  1
-
-Automatic conversion
---------------------
-
-When you load a river network, earthkit-hydro automatically converts the native encoding to its internal representation. You typically don't need to worry about these differences unless you're:
-
-- Creating custom river networks
-- Debugging flow direction issues
-- Interfacing with external tools
+Numerous other river network formats also exist, such as CaMa, GRIT etc. that use other non-D8 approaches.
 
 Special cases
 -------------

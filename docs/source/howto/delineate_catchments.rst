@@ -8,7 +8,7 @@ Catchment delineation determines the area that drains into a specific outlet poi
    :width: 250px
    :align: right
 
-In earthkit-hydro, you specify start locations and label all nodes flowing towards those locations.
+In earthkit-hydro, you specify start locations and label all nodes flowing towards those locations with labels from 0, ... ,number of locations - 1.
 If start locations belong to the same catchment, the node furthest downstream takes priority and overwrites any upstream start locations.
 
 .. raw:: html

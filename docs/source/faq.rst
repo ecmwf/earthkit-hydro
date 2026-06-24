@@ -19,19 +19,22 @@ Yes. Any backend with GPU support (CuPy, PyTorch, JAX, etc.) can be used directl
 
 **Can I use earthkit-hydro with xarray datasets?**
 
-Yes. All top-level functions accept xarray and return xarray objects with coordinates preserved. This integrates naturally with common climate and weather data workflows.
+Yes. All top-level functions accept xarray and return xarray objects.
 
 **Does earthkit-hydro handle bifurcating river networks?**
 
-Yes. Networks where flow splits at a node (e.g. distributary channels, braided rivers) are fully supported. This is a key distinction from many other hydrological tools that assume tree-structured networks.
+Yes.
 
+**Why am I getting "Index is out of bounds"?**
+
+Data passed to functions is assumed to be already on the same grid as the river network you are using. Check that your data is indeed on the same grid. If you need to regrid, please refer to earthkit-geo.
 
 Installation
 ------------
 
 **What Python version do I need?**
 
-We adopt stable Python versions. Check the [status of Python versions](https://devguide.python.org/versions/) for the latest information. As of April 2025, Python 3.10+ is required.
+We adopt stable Python versions (see https://devguide.python.org/versions/).
 
 **How do I install GPU support?**
 

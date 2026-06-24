@@ -1,7 +1,28 @@
 Visualising results
 ===================
 
-earthkit-hydro returns standard NumPy arrays or xarray DataArrays, so any Python plotting library works.
+earthkit-hydro returns standard NumPy arrays or xarray DataArrays, so any Python plotting library works, but **earthkit-plots** is recommended.
+
+earthkit-plots
+--------------
+
+For quick, consistent visualisation using the earthkit ecosystem:
+
+.. code-block:: python
+
+    import earthkit.plots as ekp
+
+    style = ekp.styles.Style(
+        colors="Blues",
+        levels=[0, 10, 50, 100, 500, 1000, 2000, 5000, 10000],
+        extend="max",
+    )
+
+    chart = ekp.Map()
+    chart.quickplot(result, style=style)
+    chart.coastlines()
+    chart.show()
+
 
 Basic matplotlib
 ----------------
@@ -47,38 +68,4 @@ For geographic projections with coastlines:
     ax.coastlines(resolution='10m', linewidth=0.5)
     ax.add_feature(cfeature.BORDERS, linewidth=0.3)
     plt.colorbar(im, ax=ax, label='Upstream accumulation', orientation='horizontal', pad=0.05)
-    plt.show()
-
-earthkit-plots
---------------
-
-For quick, consistent visualisation using the earthkit ecosystem:
-
-.. code-block:: python
-
-    import earthkit.plots as ekp
-
-    style = ekp.styles.Style(
-        colors="Blues",
-        levels=[0, 10, 50, 100, 500, 1000, 2000, 5000, 10000],
-        extend="max",
-    )
-
-    chart = ekp.Map()
-    chart.quickplot(result, style=style)
-    chart.coastlines()
-    chart.show()
-
-Catchment boundaries
---------------------
-
-Plot catchment labels with a discrete colormap:
-
-.. code-block:: python
-
-    catchments = ekh.catchments.find(network, locations)
-
-    plt.figure(figsize=(12, 8))
-    plt.imshow(catchments, cmap='tab20', interpolation='nearest')
-    plt.colorbar(label='Catchment ID')
     plt.show()

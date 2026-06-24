@@ -17,7 +17,7 @@ In earthkit-hydro, catchment delineation works by tracing flow paths upstream fr
 
 1. **Specify outlet locations** - Define one or more points where you want to delineate catchments
 2. **Trace upstream** - Follow flow directions backwards to identify all cells that drain to each outlet
-3. **Label cells** - Assign each cell a label corresponding to its outlet
+3. **Label cells** - Assign each cell a label corresponding to its outlet, with labels being 0, ..., number of points - 1
 
 .. image:: ../../images/catchment.gif
    :width: 400px
@@ -65,9 +65,9 @@ Practical considerations
 - Confluences for tributary analysis
 - Points of interest like water intakes or discharge locations
 
-**Coordinate systems:** Ensure your outlet locations use the same coordinate reference system as your river network to avoid misalignment.
+**Coordinate systems:** Ensure your outlet locations correspond to the location on the river network to avoid misalignment.
 
-**Resolution effects:** Catchment boundaries depend on the resolution of your river network. Coarser networks produce more generalized boundaries.
+**Resolution effects:** Catchment boundaries depend on the resolution of your river network.
 
 See also
 --------

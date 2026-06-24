@@ -35,6 +35,8 @@ This can be done in earthkit-hydro using the `upstream` submodule, which compute
     upstream_min = ekh.upstream.min(network, field, node_weights, edge_weights)
     upstream_std = ekh.upstream.std(network, field, node_weights, edge_weights)
     upstream_var = ekh.upstream.var(network, field, node_weights, edge_weights)
+    upstream_mode = ekh.upstream.mode(network, field, locations)
+    upstream_percentile = ekh.upstream.percentile(network, field, locations, p) # p=0.5 for median
 
 Whilst typically flow accumulations go from sources to sinks, it is also possible to compute the flow accumulation in the reverse direction, from sinks to sources.
 The `downstream` submodule provides this functionality, with an analagous API to the `upstream` submodule.
@@ -47,6 +49,8 @@ The `downstream` submodule provides this functionality, with an analagous API to
     downstream_min = ekh.downstream.min(network, field, node_weights, edge_weights)
     downstream_std = ekh.downstream.std(network, field, node_weights, edge_weights)
     downstream_var = ekh.downstream.var(network, field, node_weights, edge_weights)
+    downstream_mode = ekh.downstream.mode(network, field, locations)
+    downstream_percentile = ekh.downstream.percentile(network, field, locations, p) # p=0.5 for median
 
 One-step neighbor accumulation (local aggregation)
 --------------------------------------------------

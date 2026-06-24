@@ -6,9 +6,9 @@ This page explains how river networks are represented in earthkit-hydro and why 
 What is a river network?
 -------------------------
 
-In earthkit-hydro, a river network is a digital representation of how water flows across a landscape. Rather than storing every detail of every stream, river networks use a structured grid where:
+In earthkit-hydro, a river network is a digital representation of how water flows across a landscape. Rather than storing every detail of every stream, river networks specify connectivities where:
 
-- Each grid cell (or node) represents a location
+- Each node (often a gridcell) represents a location
 - Flow directions indicate which cells drain into which neighbors
 - Topological relationships capture the network structure
 
@@ -27,7 +27,7 @@ River networks store flow direction using different encoding schemes depending o
 - ArcGIS: Powers of 2 (1, 2, 4, 8, 16, 32, 64, 128)
 - CaMa-Flood: Custom sequential indices
 
-earthkit-hydro automatically handles these different encodings when you specify the appropriate format.
+earthkit-hydro handles these different encodings when you specify the appropriate format.
 
 Topological sorting
 -------------------
@@ -67,22 +67,6 @@ Most river networks represent convergent flow (many tributaries → one downstre
 - Artificial diversions
 
 earthkit-hydro includes specialized support for bifurcations in compatible formats (e.g., CaMa-Flood), enabling more realistic representation of these features.
-
-Resolution and scale
---------------------
-
-River networks are available at different resolutions:
-
-- **High resolution** (< 100m): Detailed local analysis, large data volumes
-- **Medium resolution** (1-5 km): Regional modeling, balanced computation
-- **Coarse resolution** (> 10 km): Continental/global scale, fast computation
-
-Resolution choice affects:
-
-- Catchment boundary precision
-- Small stream representation
-- Computational requirements
-- Available datasets
 
 Why pre-computed networks?
 ---------------------------

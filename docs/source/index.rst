@@ -110,5 +110,6 @@ Have a feature request or found a bug? Feel free to open an
    :caption: Extras
    :hidden:
 
+   citing
    references
    genindex

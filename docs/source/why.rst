@@ -1,6 +1,8 @@
 Why earthkit-hydro?
 ===================
 
+**earthkit-hydro** provides an efficient graph-based library for scalable hydrological modelling and analysis. The library empowers users to leverage tried-and-tested code that ECMWF uses in operational workflows.
+
 **Main Features**
 
 .. raw:: html

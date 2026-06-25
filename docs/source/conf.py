@@ -40,6 +40,7 @@ else:
 
 
 sys.path.insert(0, os.path.abspath("../../src"))
+sys.path.insert(0, os.path.abspath("./"))
 
 project = "earthkit-hydro"
 module_prefix = project.replace("-", ".")

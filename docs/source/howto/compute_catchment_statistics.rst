@@ -28,3 +28,5 @@ The following methods are available:
     upstream_min = ekh.catchments.min(network, field, locations, node_weights, edge_weights)
     upstream_std = ekh.catchments.std(network, field, locations, node_weights, edge_weights)
     upstream_var = ekh.catchments.var(network, field, locations, node_weights, edge_weights)
+    upstream_var = ekh.catchments.mode(network, field, locations)
+    upstream_var = ekh.catchments.percentile(network, field, locations, p) # p=0.5 for median

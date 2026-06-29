@@ -17,7 +17,7 @@ For the EFAS network (which uses regular lat/lon) we can specify via the lat/lon
 
     labelled_field = ekh.catchments.sum(network, field, locations)
 
-However, for more performance, it is also possible to specify directly a grid index.
+However, for more performance, it is also possible to specify directly a 2D grid index.
 
 .. code-block:: python
 
@@ -25,7 +25,7 @@ However, for more performance, it is also possible to specify directly a grid in
 
     labelled_field = ekh.catchments.sum(network, field, locations)
 
-Or, for maximum performance, it is possible to also specify node labels.
+Or, for maximum performance, it is possible to also specify the 1D graph node index.
 
 .. code-block:: python
 

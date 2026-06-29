@@ -76,23 +76,6 @@ This means:
 
 **Why this matters:** If you're calculating travel time with distance-dependent decay (e.g., for pollutant attenuation), you need edge-based distances to correctly account for different paths to the confluence.
 
-When to use each
-----------------
-
-**Use lengths when:**
-
-- Calculating channel residence time (velocity × length)
-- Applying friction or roughness coefficients
-- Computing channel storage capacity
-- Weighting by actual river channel amount
-
-**Use distances when:**
-
-- Finding shortest/longest path between points
-- Calculating travel distance through the network
-- Implementing distance-decay functions
-- Routing based on connection topology
-
 Mathematical formulation
 ------------------------
 
@@ -120,41 +103,6 @@ This distinction aligns with standard graph theory terminology:
 - **Edge weights** (distances) = properties of edges
 
 River networks are **edge-weighted directed graphs** where both node and edge properties matter for hydrological calculations.
-
-Historical context
-------------------
-
-Many hydrological tools (including some versions of PCRaster) have traditionally used "distance" to refer to what is technically a length measurement, or conflated the two concepts. This simplification works for some analyses but breaks down for:
-
-- Complex routing schemes
-- Networks with varying cell sizes
-- Bifurcation handling
-- Distance-dependent processes
-
-earthkit-hydro's explicit distinction enables more sophisticated and accurate analyses while remaining clear about what is being calculated.
-
-Practical example
------------------
-
-**Problem:** Calculate pollutant concentration downstream, with 10% attenuation per unit distance traveled.
-
-**Wrong approach:** Use lengths
-
-.. code-block:: python
-
-    # This uses channel length within cells
-    # Attenuation will be too high (counts length within destination cell)
-    result = ekh.upstream.sum(network, concentration * 0.9**lengths)
-
-**Correct approach:** Use distances
-
-.. code-block:: python
-
-    # This uses distance between cells
-    # Attenuation correctly represents travel distance
-    result = ekh.upstream.sum(network, concentration * 0.9**distances)
-
-The difference can be significant, especially in networks with variable cell sizes or long channels within cells.
 
 Implementation in earthkit-hydro
 ---------------------------------

@@ -14,7 +14,6 @@ Core Concepts
    river_network_concepts
    catchment_concepts
    distance_vs_length_concepts
-   topological_sorting
    flow_direction_systems
 
 Design Decisions

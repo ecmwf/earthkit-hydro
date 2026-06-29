@@ -35,7 +35,7 @@ dependencies = [
     "numpy",
     "joblib",
     "xarray",
-    "earthkit-utils~=1.0.0"
+    "earthkit-utils~=1.0"
 ]
 
 [project.urls]
@@ -45,7 +45,7 @@ dependencies = [
 
 [project.optional-dependencies]
     readers = [
-        "earthkit-data[geotiff]~=1.0.0"
+        "earthkit-data[geotiff]~=1.0"
         ]
     grit = [
         "geopandas",
@@ -70,7 +70,7 @@ dependencies = [
         "sphinx_design"
     ]
     all = [
-        "earthkit-data[geotiff]~=1.0.0",
+        "earthkit-data[geotiff]~=1.0",
         "pytest",
         "pre-commit"
         ]

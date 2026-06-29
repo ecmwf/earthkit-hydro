@@ -3,6 +3,72 @@ from earthkit.hydro.upstream import array
 
 
 @xarray
+def percentile(
+    river_network,
+    field,
+    p,
+    node_weights=None,
+    edge_weights=None,
+    return_type=None,
+    input_core_dims=None,
+):
+    r"""
+    Computes the weighted percentile of a field over all upstream nodes.
+
+    For each node in the river network, this function identifies all upstream nodes
+    (the contributing area) and computes the requested percentile from the field values,
+    optionally weighted by node weights.
+
+    The weighted percentile is defined as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        \mathcal{A}(j) &= \{j\} \cup \bigcup_{i \in \mathrm{Up}(j)} \mathcal{A}(i) \\
+        P_p(x)_j &= \mathrm{percentile}_p \bigl(\{ w'_i \cdot x_i : i \in \mathcal{A}(j) \}\bigr)
+        \end{align*}
+
+    where:
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`\mathrm{Up}(j)` is the set of immediate upstream nodes flowing into node :math:`j`,
+    - :math:`\mathcal{A}(j)` is the full contributing area of node :math:`j` (all upstream nodes including :math:`j` itself),
+    - :math:`P_p(x)_j` is the :math:`p`-th percentile at node :math:`j`.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array containing field values defined on river network nodes or gridcells.
+    p : float
+        Requested percentile expressed as a fraction between 0 and 1 inclusive
+        (e.g. 0.5 for median, 0.95 for the 95th percentile).
+    node_weights : array-like or xarray object, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like or xarray object, optional
+        Array of weights for each edge. Default is None (unweighted).
+        Currently unsupported.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of percentile values for every river network node or gridcell, depending on `return_type`.
+    """
+    return array.percentile(
+        river_network, field, p, node_weights, edge_weights, return_type
+    )
+
+
+@xarray
 def var(
     river_network,
     field,
@@ -385,3 +451,79 @@ def max(
         Array of maximum values for every river network node or gridcell, depending on `return_type`.
     """
     return array.max(river_network, field, node_weights, edge_weights, return_type)
+
+
+@xarray
+def mode(
+    river_network,
+    field,
+    node_weights=None,
+    edge_weights=None,
+    return_type=None,
+    input_core_dims=None,
+):
+    r"""
+    Computes the mode (most common value) of categorical data over all upstream nodes.
+
+    For each node in the river network, this function identifies all upstream nodes
+    and finds the most frequent categorical value (spatial majority) among them.
+    This is designed for categorical/integer data such as land cover classifications.
+
+    The mode is computed as:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        c_j^{(k)} &= \mathrm{count}(x_i = k,~i \in \{\mathrm{Up}(j) \cup \{j\}\}) \\
+        \mathrm{Mode}(x)_j &= \arg\max_{k} c_j^{(k)}
+        \end{align*}
+
+    where:
+
+    - :math:`x_i` is the categorical value at node :math:`i` (e.g., land cover class),
+    - :math:`\mathrm{Up}(j)` is the set of upstream nodes flowing into node :math:`j`,
+    - :math:`c_j^{(k)}` is the count of category :math:`k` at node :math:`j`,
+    - :math:`\mathrm{Mode}(x)_j` is the most common category at node :math:`j`.
+
+    In case of ties, the smallest category value is returned. The computation is performed
+    using a performant Rust implementation with parallel processing.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array containing integer categorical values defined on river network nodes or gridcells.
+        Values should be integers representing categories (e.g., 1=forest, 2=grassland, 3=urban).
+    node_weights : array-like or xarray object, optional
+        Not supported for mode calculation. Must be None.
+    edge_weights : array-like or xarray object, optional
+        Not supported for mode calculation. Must be None.
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of mode (most common category) values for every river network node or gridcell,
+        depending on `return_type`.
+
+    Notes
+    -----
+    - Mode calculation currently only supports the numpy backend.
+    - The Rust extension must be available for this function to work.
+    - Node weights and edge weights are not supported for mode calculation.
+    - Field values are converted to int64 internally.
+
+    Examples
+    --------
+    >>> import earthkit.hydro as ekh
+    >>> # Compute mode of land cover categories
+    >>> mode_landcover = ekh.upstream.mode(river_network, landcover_field)
+    """
+    return array.mode(river_network, field, node_weights, edge_weights, return_type)

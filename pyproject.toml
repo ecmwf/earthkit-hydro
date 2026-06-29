@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=65", "setuptools-rust", "setuptools_scm[toml]>=8"]
+requires = ["setuptools>=77", "setuptools-rust", "setuptools_scm[toml]>=8"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "earthkit-hydro"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 authors = [
     { name = "European Centre for Medium-Range Weather Forecasts (ECMWF)", email = "software.support@ecmwf.int" }
     ]
@@ -13,15 +13,15 @@ maintainers = [
     {name = "Corentin Carton de Wiart", email = "corentin.carton@ecmwf.int"}
     ]
 description = "A Python library for common hydrological functions"
-license = { text = "Apache License Version 2.0" }
+license = "Apache-2.0"
+license-files = [ "LICENSE" ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Natural Language :: English",
-    "License :: OSI Approved :: Apache Software License",
     "Operating System :: OS Independent",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
@@ -35,7 +35,7 @@ dependencies = [
     "numpy",
     "joblib",
     "xarray",
-    "earthkit-utils>=0.2.1"
+    "earthkit-utils~=1.0.0"
 ]
 
 [project.urls]
@@ -45,7 +45,7 @@ dependencies = [
 
 [project.optional-dependencies]
     readers = [
-        "earthkit-data[geotiff]>=0.13.8"
+        "earthkit-data[geotiff]~=1.0.0"
         ]
     grit = [
         "geopandas",
@@ -66,10 +66,11 @@ dependencies = [
         "sphinxcontrib-bibtex",
         "nbsphinx",
         "nbconvert",
-        "ipykernel"
+        "ipykernel",
+        "sphinx_design"
     ]
     all = [
-        "earthkit-data[geotiff]>=0.13.8",
+        "earthkit-data[geotiff]~=1.0.0",
         "pytest",
         "pre-commit"
         ]

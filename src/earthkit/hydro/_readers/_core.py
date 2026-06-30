@@ -69,7 +69,7 @@ def find_main_var(ds, min_dim=2):
 
 
 def find_upstream_downstream_indices_from_offsets(
-    x_offsets, y_offsets, missing_mask, mask_upstream, shape
+    x_offsets, y_offsets, missing_mask, mask_upstream, shape, truncate_domain=False
 ):
     """
     Function to convert from offsets to absolute indices.
@@ -96,18 +96,34 @@ def find_upstream_downstream_indices_from_offsets(
     upstream_indices = np.arange(missing_mask.size)[mask_upstream]
     del mask_upstream
     x_coords = upstream_indices % nx
-    x_coords = (x_coords + x_offsets) % nx
+    x_coords = x_coords + x_offsets
+    if truncate_domain:
+        in_bounds = (x_coords >= 0) & (x_coords < nx)
+        upstream_indices = upstream_indices[in_bounds]
+        x_coords = x_coords[in_bounds]
+        y_offsets = y_offsets[in_bounds]
+        del in_bounds
+    else:
+        x_coords = x_coords % nx
+
     downstream_indices = x_coords
     del x_coords
     y_coords = np.floor_divide(upstream_indices, nx)
-    y_coords = (y_coords + y_offsets) % ny
+    y_coords = y_coords + y_offsets
+    if truncate_domain:
+        in_bounds = (y_coords >= 0) & (y_coords < ny)
+        downstream_indices = downstream_indices[in_bounds]
+        upstream_indices = upstream_indices[in_bounds]
+        y_coords = y_coords[in_bounds]
+        del in_bounds
+    else:
+        y_coords = y_coords % ny
     downstream_indices += y_coords * nx
     del y_coords
     return upstream_indices, downstream_indices
 
 
 def create_graph_nodes_edges(upstream_indices, downstream_indices, missing_mask):
-
     n_nodes = int(np.sum(missing_mask))
     nodes = np.arange(n_nodes, dtype=np.uintp)
     nodes_matrix = np.full(missing_mask.size, n_nodes, dtype=np.uintp)

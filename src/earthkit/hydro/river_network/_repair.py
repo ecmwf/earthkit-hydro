@@ -1,7 +1,7 @@
 # ALGORITHM
 # 1. Remove cycles - replace with missing.
 # 2. Cells with a missing downstream are made into sinks.
-# 3. NOT YET IMPLEMENTED. Cells pointing outside the domain are made into sinks
+# 3. ONLY FOR D8. Cells pointing outside the domain are made into sinks
 # 4. NOT YET IMPLEMENTED. Cells with invalid LDD values are made into sinks if a cell flows into it, otherwise set to missing.
 
 import numpy as np

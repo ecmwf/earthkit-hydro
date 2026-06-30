@@ -96,11 +96,11 @@ def repair(path, river_network_format, source="file"):
         n_nodes,
         n_edges,
     )
-    up, down, edge, mask, n_n, n_e = set_sink_if_downstream_missing(
+    up, down, mask, n_n, n_e, edge = set_sink_if_downstream_missing(
         up, down, mask, n_n, n_e, edge
     )
-    up, down, edge, mask, n_n, n_e = set_missing_if_cycle(
-        up, down, edge, mask, n_n, n_e
+    up, down, mask, n_n, n_e, edge = set_missing_if_cycle(
+        up, down, mask, n_n, n_e, edge
     )
 
     store = RiverNetworkStorage(

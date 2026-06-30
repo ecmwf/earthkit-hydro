@@ -9,7 +9,7 @@ One-time costs vs. repeated operations
 **Creating/loading networks:**
 
 - Loading pre-computed networks: Fast (seconds)
-- Creating custom networks: Slow (minutes to hours for large networks)
+- Creating custom networks: Slow
 - Reason: Topological sorting required for custom networks
 
 **Recommendation:** Export and reuse custom networks
@@ -65,13 +65,10 @@ Different backends have different performance characteristics:
 Memory considerations
 ----------------------
 
-**Rule of thumb:** Expect memory usage of 2-3x your input data size during operations
-
 **Strategies for large datasets:**
 
 - Process time steps sequentially rather than all at once
 - Use chunking with xarray/dask
-- Choose memory-efficient data types (e.g., float32 vs. float64)
 - Stream data from disk rather than loading all at once
 
 **GPU memory:** More limited than system RAM - monitor VRAM usage with ``nvidia-smi``
@@ -95,30 +92,6 @@ Optimization strategies
 
 1. Use ``torch.no_grad()`` when gradients not needed
 2. Batch multiple scenarios together
-3. Consider mixed precision (float16/float32)
-
-Profiling your code
--------------------
-
-To identify bottlenecks:
-
-**Python profiling:**
-
-.. code-block:: python
-
-    import cProfile
-    cProfile.run('your_function()')
-
-**Line profiling:**
-
-.. code-block:: bash
-
-    pip install line_profiler
-    # Use @profile decorator and run kernprof
-
-**GPU profiling:**
-
-For CUDA operations, use ``nvprof`` or ``nsys``
 
 Common performance pitfalls
 ----------------------------

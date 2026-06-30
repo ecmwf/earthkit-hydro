@@ -8,10 +8,11 @@ What is earthkit?
 
 earthkit :cite:`earthkit` is a collection of Python tools for working with earth system data. Each component focuses on a specific domain:
 
-- **earthkit-data:** Data acquisition and access
 - **earthkit-hydro:** Hydrological analysis (this package)
+- **earthkit-data:** Data acquisition and access
 - **earthkit-plots:** Visualization and mapping
 - **earthkit-transforms:** Data transformations
+- **earthkit-geo:** Regridding and geographic computations
 - **earthkit-meteo:** Meteorological calculations
 
 Why the modular design?
@@ -24,14 +25,10 @@ Rather than one monolithic package, earthkit components are:
 - **Compatible:** Designed to work together seamlessly
 - **Maintainable:** Smaller codebases, clearer purpose
 
-Integration through xarray
----------------------------
+Interoperability
+----------------
 
-The earthkit components integrate primarily through xarray DataArrays and Datasets. This means:
-
-- Metadata (coordinates, attributes) flows between components
-- No custom data structures to learn
-- Compatibility with the broader scientific Python ecosystem
+The earthkit components are built to integrate seamlessly between each other via support for xarray, arrays and fieldlists.
 
 Example workflow
 ----------------
@@ -104,40 +101,4 @@ You don't need the full earthkit ecosystem to use earthkit-hydro. The library wo
 - Visualization using matplotlib, cartopy, or other tools
 - Your existing data pipeline
 
-earthkit integration is optional, not required.
-
-.. code-block:: python
-
-    import earthkit.data as ekd
-    import earthkit.hydro as ekh
-    import earthkit.plots as ekp
-
-    # specify some custom styles
-    style = ekp.styles.Style(
-        colors="Blues",
-        levels=[0, 0.5, 1, 2, 5, 10, 50, 100, 500, 1000, 2000, 3000, 4000],
-        extend="max",
-    )
-
-    # load data and river network
-    network = ekh.river_network.load("efas", "5")
-    da = ekd.from_source(
-        "sample",
-        "R06a.nc",
-    )[0].to_xarray()
-
-    # compute upstream accumulation
-    upstream_sum = ekh.upstream.sum(network, da)
-
-    # plot result
-    chart = ekp.Map()
-    chart.quickplot(upstream_sum, style=style)
-    chart.legend(label="{variable_name}")
-    chart.title("Upstream precipitation at {time:%H:%M on %-d %B %Y}")
-    chart.coastlines()
-    chart.gridlines()
-    chart.show()
-
-.. image:: ../../images/earthkit_example.png
-   :width: 100%
-   :align: center
+earthkit integration is recommended, not required.

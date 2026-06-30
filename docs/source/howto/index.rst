@@ -42,6 +42,5 @@ Data Handling
 .. toctree::
    :maxdepth: 1
 
-   handle_missing_data
    visualize_results
    optimize_performance

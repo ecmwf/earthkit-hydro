@@ -47,18 +47,6 @@ Extract a regional subnetwork for faster development cycles:
     mask = (lats > 40) & (lats < 50) & (lons > 0) & (lons < 10)
     small_network = ekh.subnetwork.from_mask(network, mask)
 
-Use float32
------------
-
-Most analyses do not need float64 precision. Halving the data type halves memory usage:
-
-.. code-block:: python
-
-    import numpy as np
-
-    field = np.ones(network.shape, dtype=np.float32)
-    result = ekh.upstream.sum(network, field)  # also float32
-
 See also
 --------
 

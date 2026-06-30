@@ -587,7 +587,9 @@ def find(
     Delineates catchment areas.
 
     Given a field indicating one or more start locations (e.g., outlet points or pour points),
-    this function delineates the catchments upstream of each start location by grouping all cells that flow into these points.
+    this function delineates the catchments upstream of each start location by labelling all cells that flow into these points.
+
+    Cells are given labels from 0, ..., n_locations - 1.
 
     Parameters
     ----------

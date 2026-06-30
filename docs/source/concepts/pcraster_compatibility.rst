@@ -15,8 +15,8 @@ PCRaster has been a cornerstone of hydrological modeling for decades. earthkit-h
 
 **Performance characteristics:**
 
-- **PCRaster:** C++ backend, mature optimizations
-- **earthkit-hydro:** Vectorized Python operations, often faster for large datasets
+- **PCRaster:** C++ backend
+- **earthkit-hydro:** Vectorized Python operations, acceleration via Rust when needed, often faster for large datasets
 
 **Ecosystem integration:**
 
@@ -26,22 +26,18 @@ PCRaster has been a cornerstone of hydrological modeling for decades. earthkit-h
 When to use each
 ----------------
 
-**Use PCRaster if:**
+**PCRaster is a good choice when:**
 
 - You have existing PCRaster workflows
 - You need PCRaster-specific functionality
 - You work primarily with PCRaster map formats
 
-**Use earthkit-hydro if:**
+**earthkit-hydro is a good choice when:**
 
 - You want better integration with Python scientific stack
 - You need GPU acceleration or ML framework integration
 - You want faster performance for large-scale operations
 - You work with xarray or other modern data structures
-
-**Use both:**
-
-earthkit-hydro can work with PCRaster-format river networks, so you can combine tools as needed.
 
 Function mapping
 ----------------
@@ -92,6 +88,14 @@ earthkit-hydro can work with vector (multi-dimensional) fields, while PCRaster o
 **API philosophy:**
 
 earthkit-hydro uses a functional API (pass data to functions) rather than PCRaster's map algebra syntax. This means slightly different code structure even for equivalent operations.
+
+**Array-backend support**
+
+earthkit-hydro provides support for multiple array backends and GPU support.
+
+**Bifurcation support**
+
+earthkit-hydro can support bifurcations.
 
 See also
 --------

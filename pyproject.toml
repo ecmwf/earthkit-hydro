@@ -16,7 +16,7 @@ description = "A Python library for common hydrological functions"
 license = "Apache-2.0"
 license-files = [ "LICENSE" ]
 classifiers = [
-    "Development Status :: 4 - Beta",
+    "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
     "Intended Audience :: Science/Research",
     "Natural Language :: English",
@@ -35,8 +35,7 @@ dependencies = [
     "numpy",
     "joblib",
     "xarray",
-    "earthkit-utils>=1.0.0rc0",
-    "earthkit-data>=0.19.2"
+    "earthkit-utils~=1.0"
 ]
 
 [project.urls]
@@ -46,7 +45,7 @@ dependencies = [
 
 [project.optional-dependencies]
     readers = [
-        "earthkit-data[geotiff]>=1.0.0rc0"
+        "earthkit-data[geotiff]~=1.0"
         ]
     grit = [
         "geopandas",
@@ -71,7 +70,7 @@ dependencies = [
         "sphinx_design"
     ]
     all = [
-        "earthkit-data[geotiff]>=1.0.0rc0",
+        "earthkit-data[geotiff]~=1.0",
         "pytest",
         "pre-commit"
         ]

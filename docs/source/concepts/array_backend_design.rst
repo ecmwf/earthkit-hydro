@@ -18,7 +18,7 @@ Rather than forcing everyone into one framework, earthkit-hydro is **backend-agn
 How it works
 ------------
 
-earthkit-hydro operations work with any array backend that supports basic operations like indexing, aggregation, and mathematical operations. The library:
+Earthkit in general, but specifically also earthkit-hydro operations work with any array backend that supports basic operations like indexing, aggregation, and mathematical operations. The library:
 
 1. **Detects** what array type you provide (numpy, cupy, torch, etc.)
 2. **Dispatches** operations to backend-appropriate implementations
@@ -36,11 +36,11 @@ This means:
 
     # Works with NumPy
     numpy_data = np.ones(network.shape)
-    result_np = ekh.accumulate(network, numpy_data)  # Returns NumPy array
+    result_np = ekh.upstream.array.sum(network, numpy_data)  # Returns NumPy array
 
     # Works with PyTorch
     torch_data = torch.ones(network.shape)
-    result_torch = ekh.accumulate(network, torch_data)  # Returns PyTorch tensor
+    result_torch = ekh.upstream.array.sum(network, torch_data)  # Returns PyTorch tensor
 
 No conversion needed, no backend lock-in.
 
@@ -72,16 +72,15 @@ Even if you don't use ML frameworks, backend flexibility provides:
 
 .. code-block:: python
 
-    import xarray as xr
+    import earthkit.data as ekd
     import earthkit.hydro as ekh
 
     # Input as xarray with coordinates and metadata
-    runoff = xr.open_dataset("runoff.nc")["runoff"]
+    runoff = ekd.from_source("file", "runoff.nc").to_xarray()["runoff"]
 
     network = ekh.river_network.load("efas", "5")
 
-    # Output preserves xarray structure
-    discharge = ekh.accumulate(network, runoff)
+    discharge = ekh.upstream.sum(network, runoff)
     # discharge is still an xarray DataArray with coordinates!
 
 **Performance portability:** Switch to GPU execution by changing array type, not code:
@@ -91,57 +90,12 @@ Even if you don't use ML frameworks, backend flexibility provides:
     # CPU version
     import numpy as np
     data = np.array(...)
-    result = ekh.accumulate(network, data)
+    result = ekh.upstream.array.sum(network, data)
 
     # GPU version - same operation, just different array type
     import cupy as cp
     data = cp.array(...)
-    result = ekh.accumulate(network, data)  # Runs on GPU!
-
-Trade-offs and limitations
---------------------------
-
-**Not all operations possible on all backends:** Some backends lack certain features. For example:
-
-- JAX arrays are immutable, limiting in-place operations
-- Some sparse operations aren't available in all frameworks
-
-earthkit-hydro will raise clear errors when operations aren't supported.
-
-**Performance varies:** While all backends work, performance characteristics differ:
-
-- NumPy: Mature, CPU-optimized
-- CuPy: Drop-in GPU acceleration
-- PyTorch: Optimized for ML, good GPU support
-- JAX: JIT compilation can be very fast
-
-**Memory layout matters:** Each framework has preferred memory layouts. earthkit-hydro tries to respect these, but cross-framework conversion can be expensive.
-
-Choosing a backend
-------------------
-
-**Use NumPy if:** You want simplicity, wide compatibility, and CPU-based computation
-
-**Use xarray if:** You work with labeled multi-dimensional earth science data
-
-**Use CuPy if:** You need GPU acceleration without PyTorch/TensorFlow overhead
-
-**Use PyTorch if:** You're integrating with ML models or need autograd
-
-**Use JAX if:** You want JIT compilation and functional programming benefits
-
-**Use TensorFlow if:** You're already in TensorFlow ecosystem
-
-Implementation details
-----------------------
-
-earthkit-hydro uses **array protocols** rather than explicit type checking:
-
-- Duck typing for compatibility
-- ``__array_namespace__`` support for Array API standard
-- Minimal backend-specific code
-
-This approach future-proofs the library as new array libraries emerge.
+    result = ekh.upstream.array.sum(network, data)  # Runs on GPU!
 
 See also
 --------

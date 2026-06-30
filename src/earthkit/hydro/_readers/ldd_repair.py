@@ -95,9 +95,7 @@ class LddRepair:
         }
         self.LDD_OFFSET_MIN = 1
         self.LDD_OFFSET_MAX = 9
-        self.LDD_MISSING_VALUE = (
-            0  # Value to use for missing/invalid LDD cells in the repaired LDD
-        )
+        self.LDD_MISSING_VALUE = 0  # Value to use for missing/invalid LDD cells in the repaired LDD
 
     def __setup_esri_d8(self):
         """Set up constants and mappings for LDD repair."""
@@ -120,9 +118,7 @@ class LddRepair:
         }
         self.LDD_OFFSET_MIN = 1
         self.LDD_OFFSET_MAX = 128
-        self.LDD_MISSING_VALUE = (
-            0  # Value to use for missing/invalid LDD cells in the repaired LDD
-        )
+        self.LDD_MISSING_VALUE = -1  # Value to use for missing/invalid LDD cells in the repaired LDD (ESRI uses -1)
 
     def __setup_merit_d8(self):
         """Set up constants and mappings for LDD repair."""
@@ -275,9 +271,9 @@ class LddRepair:
         Correct cells with invalid LDD values (not in 1-9) by assigning them the LDD code of a pit cell (5).
         """
         # Find invalid values (not 1-9)
-        invalid_mask = (self.ldd_array < self.LDD_OFFSET_MIN) | (
-            self.ldd_array > self.LDD_OFFSET_MAX
-        )
+        invalid_mask = ((self.ldd_array < self.LDD_OFFSET_MIN) |
+                        (self.ldd_array > self.LDD_OFFSET_MAX)
+                    ) & (self.ldd_array != self.LDD_MISSING_VALUE)
         for i in range(self.rows):
             for j in range(self.cols):
                 if invalid_mask[i, j]:

@@ -46,10 +46,7 @@ def export(
 
     # Scatter back to 2D grids
     mv = missing_values[river_network_format]
-    downx = np.full(shape, dtype=int, fill_value=mv)
-    downy = np.full(shape, dtype=int, fill_value=mv)
-    downx.flat[mask] = dx
-    downy.flat[mask] = dy
+    data = np.full(shape, mv, dtype=np.uint8)
 
     if river_network_format == "pcr_d8":
         lut = np.array(
@@ -61,7 +58,7 @@ def export(
             dtype=np.uint8,
         )
         try:
-            data = lut[downy + 1, downx + 1]
+            data.flat[mask] = lut[dy + 1, dx + 1]
         except Exception as e:
             raise ValueError("Failed to represent river network as D8") from e
     elif river_network_format == "esri_d8" or river_network_format == "merit_d8":
@@ -74,7 +71,7 @@ def export(
             dtype=np.uint8,
         )
         try:
-            data = lut[downy + 1, downx + 1]
+            data.flat[mask] = lut[dy + 1, dx + 1]
         except Exception as e:
             raise ValueError("Failed to represent river network as D8") from e
     else:

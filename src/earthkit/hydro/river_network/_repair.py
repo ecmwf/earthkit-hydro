@@ -10,6 +10,8 @@ from earthkit.hydro._readers._cama import from_cama_nextxy_raw, load_cama_data
 from earthkit.hydro._readers._d8 import from_d8_raw, load_d8_data
 from earthkit.hydro.data_structures._network_storage import RiverNetworkStorage
 
+from ._export import export
+
 
 def set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge):
     invalid_nodes = down == n_n
@@ -69,9 +71,9 @@ def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
     return up, down, mask, n_n, n_e, edge
 
 
-def repair(path, river_network_format, source="file"):
+def repair(input_path, river_network_format, output_path, input_source="file"):
     if river_network_format == "cama":
-        data, coords = load_cama_data(path, river_network_format, source)
+        data, coords = load_cama_data(input_path, river_network_format, input_source)
         up_ids, down_ids, edge_indices, mask, n_nodes, n_edges = from_cama_nextxy_raw(
             *data
         )
@@ -80,7 +82,7 @@ def repair(path, river_network_format, source="file"):
         or river_network_format == "esri_d8"
         or river_network_format == "merit_d8"
     ):
-        data, coords = load_d8_data(path, river_network_format, source)
+        data, coords = load_d8_data(input_path, river_network_format, input_source)
         up_ids, down_ids, edge_indices, mask, n_nodes, n_edges = from_d8_raw(
             data, river_network_format=river_network_format
         )
@@ -117,4 +119,4 @@ def repair(path, river_network_format, source="file"):
         False,
         None,
     )
-    return store
+    export(store, output_path, river_network_format)

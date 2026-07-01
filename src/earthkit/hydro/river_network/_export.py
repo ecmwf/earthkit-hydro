@@ -85,6 +85,6 @@ def export(
     )
     da.attrs["generated_by"] = "earthkit-hydro"
     da.encoding = {
-        "_FillValue": mv,  # Map np.nan to -9999 on disk
+        "_FillValue": mv,
     }
     da.to_netcdf(path)

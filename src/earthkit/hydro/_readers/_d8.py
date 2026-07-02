@@ -29,7 +29,12 @@ def load_d8_data(path, river_network_format, source="file"):
     return data, coords
 
 
-def preprocess_d8_data(data, river_network_format="pcr_d8", truncate_domain=False):
+def preprocess_d8_data(
+    data,
+    river_network_format="pcr_d8",
+    truncate_domain=False,
+    missing_to_sink_if_connected=False,
+):
     shape = data.shape
     data_flat = data.flatten()
     del data
@@ -62,7 +67,13 @@ def preprocess_d8_data(data, river_network_format="pcr_d8", truncate_domain=Fals
     del directions
     upstream_indices, downstream_indices = (
         find_upstream_downstream_indices_from_offsets(
-            x_offsets, y_offsets, missing_mask, mask_upstream, shape, truncate_domain
+            x_offsets,
+            y_offsets,
+            missing_mask,
+            mask_upstream,
+            shape,
+            truncate_domain,
+            missing_to_sink_if_connected,
         )
     )
     return upstream_indices, downstream_indices, missing_mask, shape
@@ -70,7 +81,10 @@ def preprocess_d8_data(data, river_network_format="pcr_d8", truncate_domain=Fals
 
 def from_d8_raw(data, river_network_format="pcr_d8"):
     upstream_indices, downstream_indices, missing_mask, shape = preprocess_d8_data(
-        data, river_network_format, truncate_domain=True
+        data,
+        river_network_format,
+        truncate_domain=True,
+        missing_to_sink_if_connected=True,
     )
     up_ids, down_ids, edge_indices, mask, n_nodes, n_edges = create_initial_graph(
         upstream_indices, downstream_indices, missing_mask, shape

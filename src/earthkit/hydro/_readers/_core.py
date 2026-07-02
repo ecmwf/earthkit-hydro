@@ -69,7 +69,13 @@ def find_main_var(ds, min_dim=2):
 
 
 def find_upstream_downstream_indices_from_offsets(
-    x_offsets, y_offsets, missing_mask, mask_upstream, shape, truncate_domain=False
+    x_offsets,
+    y_offsets,
+    missing_mask,
+    mask_upstream,
+    shape,
+    truncate_domain=False,
+    missing_to_sink_if_connected=False,
 ):
     """
     Function to convert from offsets to absolute indices.
@@ -93,6 +99,24 @@ def find_upstream_downstream_indices_from_offsets(
         The created river network.
     """
     ny, nx = shape
+    if missing_to_sink_if_connected:
+        # convert missing values that have an upstream cell into sinks
+        rows, cols = np.indices((ny, nx))
+
+        # compute downstream coordinates
+        down_rows = rows.flat[mask_upstream] + y_offsets
+        down_cols = cols.flat[mask_upstream] + x_offsets
+        del rows, cols
+
+        valid = (
+            (down_rows >= 0) & (down_rows < ny) & (down_cols >= 0) & (down_cols < nx)
+        )
+        down_flat = down_rows[valid] * nx + down_cols[valid]
+        del down_rows, valid
+
+        missing_mask[down_flat] = True
+        del down_flat
+
     upstream_indices = np.arange(missing_mask.size)[mask_upstream]
     del mask_upstream
     x_coords = upstream_indices % nx

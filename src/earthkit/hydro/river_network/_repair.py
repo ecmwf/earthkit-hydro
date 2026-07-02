@@ -43,11 +43,18 @@ def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
             break
 
     # REMOVE DETECTED CYCLES
+    down_nodes[nodes_in_cycles] = n_n
+    upstream_neighbours = np.bincount(down_nodes, minlength=n_n)
+    without_connections = upstream_neighbours[nodes_in_cycles] == 0
+    nodes_in_cycles_without_connections = nodes_in_cycles[without_connections]
+    nodes_in_cycles_with_connections = nodes_in_cycles[~without_connections]
+    remove_node = np.zeros(n_n, dtype=bool)
+    remove_node[nodes_in_cycles_with_connections] = True
     subset_of_mask = mask[mask]
-    subset_of_mask[nodes_in_cycles] = False
+    subset_of_mask[nodes_in_cycles_without_connections] = False
     new_mask = mask.copy()
     new_mask[mask] = subset_of_mask
-    lost_nodes = nodes_in_cycles.shape[0]
+    lost_nodes = nodes_in_cycles_without_connections.shape[0]
     n_n -= lost_nodes
     initial_cumsum = np.cumsum(mask) - 1
     new_cumsum = np.cumsum(new_mask) - 1
@@ -56,6 +63,9 @@ def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
     initial_cumsum = initial_cumsum.reshape(new_mask.shape)
     dictionary = dict(zip(initial_cumsum[mask].flatten(), new_cumsum[mask].flatten()))
     mapping = np.vectorize(dictionary.get)
+    valid_edges = ~remove_node[up]
+    up = up[valid_edges]
+    down = down[valid_edges]
     up = mapping(up)
     down = mapping(down)
     missing_nodes = up == n_n

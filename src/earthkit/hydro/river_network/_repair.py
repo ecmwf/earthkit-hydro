@@ -77,7 +77,7 @@ def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
 
 def repair(input_path, output_path, river_network_format, input_source="file"):
     """ "
-    Given an initial river network, repairs the river network and writes the output to file.
+    Given an initial river network, repairs the river network and writes the output to local file.
 
     Warning: this function should only be used by advanced users.
     It should not be used without an understanding of why the initial river network needs reparation.
@@ -85,7 +85,7 @@ def repair(input_path, output_path, river_network_format, input_source="file"):
     The repairing algorithm is as follows:
     1. Any invalid values are made missing
     2. Any cycles are made missing
-    3. For offset/relative drainage directions convention river networks ("pcr_d8", "esri_d8"
+    3. For offset/relative drainage directions river networks formats ("pcr_d8", "esri_d8"
         and "merit_d8"), cells flowing outside the domain are set to sinks
     4. Any missing values with a cell flowing into it is made into a sink
 
@@ -107,7 +107,7 @@ def repair(input_path, output_path, river_network_format, input_source="file"):
 
     Returns
     -------
-    None. Writes a new river network at `output_path`.
+    None. Writes a repaired river network to a local file at `output_path`, in the same format as the original.
     """
     if river_network_format == "cama":
         data, coords = load_cama_data(input_path, river_network_format, input_source)

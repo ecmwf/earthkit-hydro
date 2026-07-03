@@ -354,3 +354,4 @@ autodocs/
 
 *.joblib
 *.nc
+.roo/

@@ -3,15 +3,9 @@ from urllib.request import urlopen
 
 import joblib
 
-from earthkit.hydro._readers import (
-    find_main_var,
-    from_cama_nextxy,
-    from_d8,
-    from_grit,
-    import_earthkit_or_prompt_install,
-)
-from earthkit.hydro._utils.coords import get_core_grid_dims
-from earthkit.hydro._utils.readers import from_file
+from earthkit.hydro._readers import assign_coords, from_cama_nextxy, from_d8, from_grit
+from earthkit.hydro._readers._cama import load_cama_data
+from earthkit.hydro._readers._d8 import load_d8_data
 from earthkit.hydro._version import __version__ as ekh_version
 from earthkit.hydro.data_structures._network import RiverNetwork
 
@@ -80,38 +74,17 @@ def create(
                 f"{river_network_format}: {source}."
             )
     elif river_network_format == "cama":
-        ekd = import_earthkit_or_prompt_install(river_network_format, source)
-        data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
-        x, y = data.nextx.values, data.nexty.values
-        river_network_storage = from_cama_nextxy(x, y)
-        coord1, coord2 = get_core_grid_dims(data)
-        river_network_storage.coords = {
-            coord1: data[coord1].values,
-            coord2: data[coord2].values,
-        }
+        data, coords = load_cama_data(path, river_network_format, source)
+        river_network_storage = from_cama_nextxy(*data)
+        river_network_storage = assign_coords(river_network_storage, data, coords)
     elif (
         river_network_format == "pcr_d8"
         or river_network_format == "esri_d8"
         or river_network_format == "merit_d8"
     ):
-        if path.endswith(".map"):
-            data = from_file(path, mask=False)
-            river_network_storage = from_d8(
-                data, river_network_format=river_network_format
-            )
-            # coords not available
-        else:
-            ekd = import_earthkit_or_prompt_install(river_network_format, source)
-            data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
-            coord1, coord2 = get_core_grid_dims(data)
-            var_name = find_main_var(data)
-            river_network_storage = from_d8(
-                data[var_name].values, river_network_format=river_network_format
-            )
-            river_network_storage.coords = {
-                coord1: data[coord1].values,
-                coord2: data[coord2].values,
-            }
+        data, coords = load_d8_data(path, river_network_format, source)
+        river_network_storage = from_d8(data, river_network_format=river_network_format)
+        river_network_storage = assign_coords(river_network_storage, data, coords)
     elif river_network_format == "grit":
         assert path.endswith(".gpkg")
         river_network_storage = from_grit(path)

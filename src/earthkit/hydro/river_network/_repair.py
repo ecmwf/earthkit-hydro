@@ -1,9 +1,3 @@
-# ALGORITHM
-# 1. invalid values are made missing
-# 2. cycles are made missing
-# 3. cells flowing outside the domain are set to sinks
-# 4. a missing value with a cell flowing into it is made into a sink
-
 import numpy as np
 
 from earthkit.hydro._readers._cama import from_cama_nextxy_raw, load_cama_data
@@ -82,6 +76,39 @@ def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
 
 
 def repair(input_path, output_path, river_network_format, input_source="file"):
+    """ "
+    Given an initial river network, repairs the river network and writes the output to file.
+
+    Warning: this function should only be used by advanced users.
+    It should not be used without an understanding of why the initial river network needs reparation.
+
+    The repairing algorithm is as follows:
+    1. Any invalid values are made missing
+    2. Any cycles are made missing
+    3. For offset/relative drainage directions convention river networks ("pcr_d8", "esri_d8"
+        and "merit_d8"), cells flowing outside the domain are set to sinks
+    4. Any missing values with a cell flowing into it is made into a sink
+
+    Parameters
+    ----------
+    input_path : str
+        The path to the initial river network data. All common file formats are supported such
+        as netCDF, GRIB, GeoTIFF, zarr, etc.
+    output_path : str
+        Where to export the repaired river network data. Currently only netcdf file format exports are supported.
+    river_network_format : str
+        The format of the river network data.
+        Currently supported formats are "cama", "pcr_d8", "esri_d8"
+        and "merit_d8".
+    input_source : str
+        The source of the initial river network data. Default is `'file'`.
+        For possible sources see:
+        https://earthkit-data.readthedocs.io/en/latest/guide/sources.html.
+
+    Returns
+    -------
+    None. Writes a new river network at `output_path`.
+    """
     if river_network_format == "cama":
         data, coords = load_cama_data(input_path, river_network_format, input_source)
         up_ids, down_ids, edge_indices, mask, n_nodes, n_edges = from_cama_nextxy_raw(

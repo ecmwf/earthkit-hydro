@@ -492,6 +492,9 @@ data = np.array(
 )
 INPUT3 = generate_ldd(data)
 
+data = np.array([[2, 4, 16], [16, 2, 64], [4, 1, 64]])
+INPUT4 = generate_ldd(data)
+
 data = np.array([[6, 2, 1], [255, 5, 5]])
 OUTPUT1 = generate_ldd(data)
 
@@ -966,6 +969,9 @@ data = np.array(
 )
 OUTPUT3 = generate_ldd(data)
 
+data = np.array([[2, 255, 255], [0, 0, 255], [0, 1, 0]])
+OUTPUT4 = generate_ldd(data)
+
 
 @pytest.mark.parametrize(
     "input_da, output_da, fmt",
@@ -973,6 +979,7 @@ OUTPUT3 = generate_ldd(data)
         (INPUT1, OUTPUT1, "pcr_d8"),
         (INPUT2, OUTPUT2, "pcr_d8"),
         (INPUT3, OUTPUT3, "pcr_d8"),
+        (INPUT4, OUTPUT4, "esri_d8"),
     ],
 )
 def test_convert_file(tmp_path, input_da, output_da, fmt):

@@ -81,7 +81,7 @@ def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
     return up, down, mask, n_n, n_e, edge
 
 
-def repair(input_path, river_network_format, output_path, input_source="file"):
+def repair(input_path, output_path, river_network_format, input_source="file"):
     if river_network_format == "cama":
         data, coords = load_cama_data(input_path, river_network_format, input_source)
         up_ids, down_ids, edge_indices, mask, n_nodes, n_edges = from_cama_nextxy_raw(

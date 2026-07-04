@@ -18,7 +18,7 @@ def set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge):
 
 def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
     # DETECT CYCLES
-    down_nodes = np.empty(n_n, dtype=int)
+    down_nodes = np.full(n_n, fill_value=n_n, dtype=int)
     down_nodes[up] = down
 
     current_nodes = up

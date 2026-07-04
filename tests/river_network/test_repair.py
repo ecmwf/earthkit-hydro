@@ -982,7 +982,7 @@ OUTPUT4 = generate_ldd(data)
         (INPUT4, OUTPUT4, "esri_d8"),
     ],
 )
-def test_convert_file(tmp_path, input_da, output_da, fmt):
+def test_repair_file(tmp_path, input_da, output_da, fmt):
     input_file = str(tmp_path / "input.txt")
     output_file = str(tmp_path / "output.txt")
 

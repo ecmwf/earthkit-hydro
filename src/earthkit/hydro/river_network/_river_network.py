@@ -164,7 +164,7 @@ def load(
             river_network_version=river_network_version,
         )
         network = create(uri, "precomputed", "url", *args, **kwargs)
-    except Exception:
+    except Exception:  # noqa: BLE001
         uri = data_source.format(
             ekh_version=ekh_version - 1,
             domain=domain,

@@ -30,7 +30,7 @@ def _write_earthkit_packages_js(app, ek_branch):
             with urllib.request.urlopen(url, timeout=10) as response:
                 config = yaml.safe_load(response.read())
                 break
-        except Exception:
+        except Exception:  # noqa: BLE001, S112
             continue
     else:
         raise RuntimeError("Failed to fetch earthkit-packages.yml from remote URLs.")

@@ -43,7 +43,7 @@ def from_grit(path):
     try:
         nodes_df["x"] = nodes_df.geometry.x
         nodes_df["y"] = nodes_df.geometry.y
-    except Exception:
+    except AttributeError:
         nodes_df["geometry"] = nodes_df["geometry"].apply(lambda geom: geom.geoms[0])
         nodes_df["x"] = nodes_df.geometry.x
         nodes_df["y"] = nodes_df.geometry.y

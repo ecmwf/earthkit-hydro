@@ -1,47 +1,47 @@
 default_language_version:
-    python: python3
+  python: python3
 default_stages:
-    - pre-commit
-    - pre-push
+- pre-commit
+- pre-push
 repos:
-    - repo: https://github.com/astral-sh/ruff-pre-commit
-      rev: v0.15.4
-      hooks:
-          - id: ruff-check # fix linting violations
-            types_or: [ python, pyi, jupyter ]
-            args:
-            - --fix
-            - --exit-non-zero-on-fix
-            - --preview
-          - id: ruff-format # fix formatting
-    - repo: https://github.com/doublify/pre-commit-rust
-      rev: v1.0
-      hooks:
-      -   id: fmt
-      -   id: cargo-check
-    - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v6.0.0
-      hooks:
-          - id: detect-private-key
-          - id: check-ast
-          - id: end-of-file-fixer
-          - id: mixed-line-ending
-            args: [--fix=lf]
-          - id: trailing-whitespace
-          - id: check-case-conflict
-    - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
-      rev: v2.16.0
-      hooks:
-      - id: pretty-format-yaml
-        args: [--autofix, --preserve-quotes]
-      - id: pretty-format-toml
-        args: [--autofix]
-    - repo: local
-      hooks:
-          - id: forbid-to-commit
-            name: Don't commit rej files
-            entry: |
-                Cannot commit .rej files. These indicate merge conflicts that arise during automated template updates.
-                Fix the merge conflicts manually and remove the .rej files.
-            language: fail
-            files: '.*\.rej$'
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  rev: v0.15.4
+  hooks:
+  - id: ruff-check         # fix linting violations
+    types_or: [python, pyi, jupyter]
+    args:
+    - --fix
+    - --exit-non-zero-on-fix
+    - --preview
+  - id: ruff-format         # fix formatting
+- repo: https://github.com/doublify/pre-commit-rust
+  rev: v1.0
+  hooks:
+  - id: fmt
+  - id: cargo-check
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v6.0.0
+  hooks:
+  - id: detect-private-key
+  - id: check-ast
+  - id: end-of-file-fixer
+  - id: mixed-line-ending
+    args: [--fix=lf]
+  - id: trailing-whitespace
+  - id: check-case-conflict
+- repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
+  rev: v2.16.0
+  hooks:
+  - id: pretty-format-yaml
+    args: [--autofix, --preserve-quotes]
+  - id: pretty-format-toml
+    args: [--autofix]
+- repo: local
+  hooks:
+  - id: forbid-to-commit
+    name: Don't commit rej files
+    entry: |
+      Cannot commit .rej files. These indicate merge conflicts that arise during automated template updates.
+      Fix the merge conflicts manually and remove the .rej files.
+    language: fail
+    files: '.*\.rej$'

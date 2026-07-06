@@ -2,11 +2,11 @@ from io import BytesIO
 from urllib.request import urlopen
 
 import joblib
+from earthkit.hydro._version import __version__ as ekh_version
 
 from earthkit.hydro._readers import assign_coords, from_cama_nextxy, from_d8, from_grit
 from earthkit.hydro._readers._cama import load_cama_data
 from earthkit.hydro._readers._d8 import load_d8_data
-from earthkit.hydro._version import __version__ as ekh_version
 from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._cache import cache

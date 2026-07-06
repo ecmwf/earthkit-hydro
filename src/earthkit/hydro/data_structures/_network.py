@@ -81,18 +81,8 @@ class RiverNetwork:
         from earthkit.utils.array.convert import convert
 
         # TODO: use xp.asarray
-        if array_backend == "np":
-            array_backend = "numpy"
-        elif array_backend == "cp":
-            array_backend = "cupy"
-        elif array_backend == "jnp":
-            array_backend = "jax"
-        elif array_backend == "tf":
-            array_backend = "tensorflow"
-        elif array_backend == "pytorch":
-            array_backend = "torch"
-        elif array_backend == "mx":
-            array_backend = "mlx"
+        shorthands = {"np": "numpy", "cp": "cupy", "jnp": "jax", "tf": "tensorflow", "pytorch": "torch", "mx": "mlx"}
+        array_backend = shorthands.get(array_backend, array_backend)
 
         if device is None:
             device = "cpu" if array_backend != "cupy" else "gpu"

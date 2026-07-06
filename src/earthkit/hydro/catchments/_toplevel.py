@@ -580,9 +580,7 @@ def mode(
 
 
 @find_xarray
-def find(
-    river_network, locations, overwrite=True, return_type=None, input_core_dims=None
-):
+def find(river_network, locations, overwrite=True, return_type=None, input_core_dims=None):
     r"""
     Delineates catchment areas.
 

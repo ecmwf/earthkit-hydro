@@ -19,9 +19,7 @@ import earthkit.hydro as ekh
 )
 def test_distance_to_source(river_network, field, expected):
     """Test distance to source computation."""
-    result = ekh.distance.array.to_source(
-        river_network, field=field, path="shortest", return_type="masked"
-    )
+    result = ekh.distance.array.to_source(river_network, field=field, path="shortest", return_type="masked")
     print("Result:", result)
     print("Expected:", expected)
     np.testing.assert_allclose(result, expected, rtol=1e-6)

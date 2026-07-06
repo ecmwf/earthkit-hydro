@@ -14,7 +14,7 @@ def compute_topological_labels(sources, sinks, downstream_nodes, n_nodes):
     else:
         try:
             from earthkit.hydro._rust import compute_topological_labels_rust as func
-        except (ModuleNotFoundError, ImportError):
+        except ImportError:
             func = compute_topological_labels_python
 
     return func(sources, sinks, downstream_nodes, n_nodes)

@@ -43,7 +43,7 @@ def from_grit(path):
     try:
         nodes_df["x"] = nodes_df.geometry.x
         nodes_df["y"] = nodes_df.geometry.y
-    except Exception:
+    except AttributeError:
         nodes_df["geometry"] = nodes_df["geometry"].apply(lambda geom: geom.geoms[0])
         nodes_df["x"] = nodes_df.geometry.x
         nodes_df["y"] = nodes_df.geometry.y
@@ -82,9 +82,7 @@ def from_grit(path):
     offsets[1:] = np.cumsum(counts)
     del counts
 
-    topological_labels = compute_topological_labels_bifurcations(
-        down_ids, offsets, sources, sinks
-    )
+    topological_labels = compute_topological_labels_bifurcations(down_ids, offsets, sources, sinks)
     topological_labels = topological_labels[up_ids]
 
     sort_indices = np.argsort(topological_labels)
@@ -107,7 +105,7 @@ def from_grit(path):
     edge_weights /= edge_weights_norm
     del edge_weights_norm
 
-    store = RiverNetworkStorage(
+    return RiverNetworkStorage(
         n_nodes,
         n_edges,
         np.vstack([down_ids_sort, up_ids_sort, edge_ids_sort]).astype(np.int64),
@@ -121,5 +119,3 @@ def from_grit(path):
         bifurcates,
         edge_weights,
     )
-
-    return store

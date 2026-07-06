@@ -4,8 +4,8 @@ from functools import wraps
 from hashlib import sha256
 
 import joblib
-
 from earthkit.hydro._version import __version__ as ekh_version
+
 from earthkit.hydro.data_structures._network import RiverNetwork
 
 # read in only up to second decimal point
@@ -34,7 +34,7 @@ def cache(func):
         river_network_format,
         source="file",
         use_cache=True,
-        cache_dir=tempfile.mkdtemp(suffix="_earthkit_hydro"),
+        cache_dir=None,
         cache_fname="{ekh_version}_{hash}.joblib",
         cache_compression=1,
     ):
@@ -56,7 +56,7 @@ def cache(func):
         use_cache : bool, optional
             Whether to use caching. Default is True.
         cache_dir : str, optional
-            The directory to store the cache files. Default is a temporary directory.
+            The directory to store the cache files. Default is None, which constructs a temporary directory.
         cache_fname : str, optional
             The filename template for the cache files.
             Default is "{ekh_version}_{hash}.joblib".
@@ -68,6 +68,8 @@ def cache(func):
         earthkit.hydro.network_class.RiverNetwork
             The loaded river network.
         """
+        if cache_dir is None:
+            cache_dir = tempfile.mkdtemp(suffix="_earthkit_hydro")
         if use_cache:
             hashed_name = sha256(path.encode("utf-8")).hexdigest()
             cache_dir = cache_dir.format(ekh_version=ekh_version, hash=hashed_name)

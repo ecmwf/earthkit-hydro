@@ -1,4 +1,4 @@
-import array_api_compat.torch as torch
+from array_api_compat import torch
 
 from .array_backend import ArrayBackend
 

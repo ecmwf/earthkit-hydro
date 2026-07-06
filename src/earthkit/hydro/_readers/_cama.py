@@ -38,9 +38,7 @@ def from_cama_nextxy(x, y):
     earthkit.hydro.network.RiverNetwork
         The created river network.
     """
-    upstream_indices, downstream_indices, missing_mask, shape = (
-        preprocess_cama_nextxy_data(x, y)
-    )
+    upstream_indices, downstream_indices, missing_mask, shape = preprocess_cama_nextxy_data(x, y)
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
 
@@ -68,10 +66,8 @@ def from_cama_downxy(dx, dy):
     missing_mask = x_offsets != -9999
     x_offsets = x_offsets[mask_upstream]
     y_offsets = y_offsets[mask_upstream]
-    upstream_indices, downstream_indices = (
-        find_upstream_downstream_indices_from_offsets(
-            x_offsets, y_offsets, missing_mask, mask_upstream, shape
-        )
+    upstream_indices, downstream_indices = find_upstream_downstream_indices_from_offsets(
+        x_offsets, y_offsets, missing_mask, mask_upstream, shape
     )
     return create_network(upstream_indices, downstream_indices, missing_mask, shape)
 
@@ -89,9 +85,7 @@ def preprocess_cama_nextxy_data(x, y):
 
 
 def from_cama_nextxy_raw(x, y):
-    upstream_indices, downstream_indices, missing_mask, shape = (
-        preprocess_cama_nextxy_data(x, y)
-    )
+    upstream_indices, downstream_indices, missing_mask, shape = preprocess_cama_nextxy_data(x, y)
     up_ids, down_ids, edge_indices, mask, n_nodes, n_edges = create_initial_graph(
         upstream_indices, downstream_indices, missing_mask, shape
     )

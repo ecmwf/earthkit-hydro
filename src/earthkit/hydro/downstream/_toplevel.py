@@ -3,9 +3,7 @@ from earthkit.hydro.downstream import array
 
 
 @xarray
-def percentile(
-    river_network, field, p, node_weights=None, edge_weights=None, return_type=None
-):
+def percentile(river_network, field, p, node_weights=None, edge_weights=None, return_type=None):
     r"""
     Computes the weighted percentile of a field over all downstream nodes.
 
@@ -55,9 +53,7 @@ def percentile(
     xarray object
         Array of percentile values for every river network node or gridcell, depending on `return_type`.
     """
-    return array.percentile(
-        river_network, field, p, node_weights, edge_weights, return_type
-    )
+    return array.percentile(river_network, field, p, node_weights, edge_weights, return_type)
 
 
 @xarray

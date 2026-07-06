@@ -122,7 +122,7 @@ def flow_python(
             xp=xp,
         )
 
-    field = propagate(
+    return propagate(
         river_network,
         river_network.groups,
         field,
@@ -134,5 +134,3 @@ def flow_python(
         edge_additive_weight,
         edge_multiplicative_weight,
     )
-
-    return field

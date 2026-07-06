@@ -1,4 +1,4 @@
-import earthkit.hydro.length.array
+from earthkit.hydro.length import array
 
 from ._toplevel import max, min, to_sink, to_source
 

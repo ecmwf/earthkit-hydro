@@ -1,9 +1,7 @@
 from earthkit.hydro.catchments.array import _operations
 
 
-def percentile(
-    river_network, field, p, locations, node_weights=None, edge_weights=None
-):
+def percentile(river_network, field, p, locations, node_weights=None, edge_weights=None):
     r"""
     Computes the weighted percentile of a field over the upstream
     catchment of each specified location.
@@ -52,9 +50,7 @@ def percentile(
     array-like
         Array of percentile values for each location in `locations`.
     """
-    return _operations.percentile(
-        river_network, field, p, locations, node_weights, edge_weights
-    )
+    return _operations.percentile(river_network, field, p, locations, node_weights, edge_weights)
 
 
 def var(river_network, field, locations, node_weights=None, edge_weights=None):

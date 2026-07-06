@@ -24,16 +24,12 @@ import earthkit.hydro as ekh
 )
 def test_downstream_metric_var(river_network, input_field, mv):
     """Test downstream variance computation."""
-    output_field = ekh.downstream.array.var(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
+    output_field = ekh.downstream.array.var(river_network, input_field, node_weights=None, return_type="masked")
 
     # Variance should be non-negative
     assert np.all(output_field[~np.isnan(output_field)] >= 0)
 
     # Test that variance is 0 for uniform fields
     uniform_field = np.ones(river_network.n_nodes)
-    var_uniform = ekh.downstream.array.var(
-        river_network, uniform_field, node_weights=None, return_type="masked"
-    )
+    var_uniform = ekh.downstream.array.var(river_network, uniform_field, node_weights=None, return_type="masked")
     np.testing.assert_allclose(var_uniform, 0, atol=1e-10)

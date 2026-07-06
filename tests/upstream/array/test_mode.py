@@ -234,14 +234,10 @@ def test_upstream_mode_constant(river_network):
     input_field = np.full(n_nodes, constant_value, dtype=np.int64)
 
     # Compute mode
-    output_field = ekh.upstream.array.mode(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
+    output_field = ekh.upstream.array.mode(river_network, input_field, node_weights=None, return_type="masked")
 
     # All output values should be the constant value
-    assert np.all(
-        output_field == constant_value
-    ), f"Expected all {constant_value}, got {output_field}"
+    assert np.all(output_field == constant_value), f"Expected all {constant_value}, got {output_field}"
 
 
 @pytest.mark.skipif(not RUST, reason="Rust unavailable")
@@ -264,9 +260,7 @@ def test_negative_non_consecutive_categories(river_network):
     )
 
     # Compute mode
-    result = ekh.upstream.array.mode(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
+    result = ekh.upstream.array.mode(river_network, input_field, node_weights=None, return_type="masked")
 
     expected_mode = np.array(
         [

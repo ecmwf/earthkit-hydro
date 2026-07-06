@@ -8,9 +8,7 @@ import earthkit.hydro as ekh
 def generate_ldd(data):
     coords = {"lat": np.arange(data.shape[0]), "lon": np.arange(data.shape[1])}
     coord1, coord2 = coords
-    da = xr.DataArray(
-        data.astype(np.uint8), dims=(coord1, coord2), coords=coords, name="ldd"
-    )
+    da = xr.DataArray(data.astype(np.uint8), dims=(coord1, coord2), coords=coords, name="ldd")
     da.attrs["generated_by"] = "earthkit-hydro"
     da.encoding = {
         "_FillValue": 255,

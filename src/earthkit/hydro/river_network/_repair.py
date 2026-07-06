@@ -25,9 +25,7 @@ def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
     remaining_up_nodes = up
     nodes_in_cycles = np.array([], dtype=int)
     for _ in range(n_n):
-        current_nodes = down_nodes[
-            current_nodes
-        ]  # node_ids downstream of current_nodes
+        current_nodes = down_nodes[current_nodes]  # node_ids downstream of current_nodes
         in_cycle = current_nodes == remaining_up_nodes
         nodes_in_cycles = np.append(nodes_in_cycles, current_nodes[in_cycle])
         remove_from_current = in_cycle | (current_nodes == n_n)
@@ -69,9 +67,7 @@ def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
     n_e = up.shape[0]
     edge = np.arange(n_e)
 
-    up, down, mask, n_n, n_e, edge = set_sink_if_downstream_missing(
-        up, down, mask, n_n, n_e, edge
-    )
+    up, down, mask, n_n, n_e, edge = set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge)
     return up, down, mask, n_n, n_e, edge
 
 
@@ -111,36 +107,14 @@ def repair(input_path, output_path, river_network_format, input_source="file"):
     """
     if river_network_format == "cama":
         data, coords = load_cama_data(input_path, river_network_format, input_source)
-        up_ids, down_ids, edge_indices, mask, n_nodes, n_edges = from_cama_nextxy_raw(
-            *data
-        )
-    elif (
-        river_network_format == "pcr_d8"
-        or river_network_format == "esri_d8"
-        or river_network_format == "merit_d8"
-    ):
+        up, down, edge, mask, n_n, n_e = from_cama_nextxy_raw(*data)
+    elif river_network_format in {"pcr_d8", "esri_d8", "merit_d8"}:
         data, coords = load_d8_data(input_path, river_network_format, input_source)
-        up_ids, down_ids, edge_indices, mask, n_nodes, n_edges = from_d8_raw(
-            data, river_network_format=river_network_format
-        )
+        up, down, edge, mask, n_n, n_e = from_d8_raw(data, river_network_format=river_network_format)
     else:
-        raise ValueError(
-            f"Unsupported river network format for the repair method: {river_network_format}."
-        )
-    up, down, edge, mask, n_n, n_e = (
-        up_ids,
-        down_ids,
-        edge_indices,
-        mask,
-        n_nodes,
-        n_edges,
-    )
-    up, down, mask, n_n, n_e, edge = set_sink_if_downstream_missing(
-        up, down, mask, n_n, n_e, edge
-    )
-    up, down, mask, n_n, n_e, edge = set_missing_if_cycle(
-        up, down, mask, n_n, n_e, edge
-    )
+        raise ValueError(f"Unsupported river network format for the repair method: {river_network_format}.")
+    up, down, mask, n_n, n_e, edge = set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge)
+    up, down, mask, n_n, n_e, edge = set_missing_if_cycle(up, down, mask, n_n, n_e, edge)
 
     store = RiverNetworkStorage(
         n_n,

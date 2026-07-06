@@ -58,9 +58,7 @@ def field_to_xarray(river_network, field_1d):
         ),
     ],
 )
-def test_catchments_percentile_xarray_unweighted(
-    flow_directions, input_field, locations, expected, p
-):
+def test_catchments_percentile_xarray_unweighted(flow_directions, input_field, locations, expected, p):
     rn = make_river_network_with_coords(flow_directions)
     field_xr = field_to_xarray(rn, input_field)
 
@@ -81,9 +79,7 @@ def test_catchments_percentile_xarray_unweighted(
         ),
     ],
 )
-def test_catchments_percentile_xarray_weighted(
-    flow_directions, input_field, locations, expected
-):
+def test_catchments_percentile_xarray_weighted(flow_directions, input_field, locations, expected):
     rn = make_river_network_with_coords(flow_directions)
     field_xr = field_to_xarray(rn, input_field)
     ny, nx = rn.shape
@@ -95,8 +91,6 @@ def test_catchments_percentile_xarray_weighted(
         coords={"y": rn.coords["y"], "x": rn.coords["x"]},
     )
 
-    result = ekh.catchments.percentile(
-        rn, field_xr, p=0.5, locations=locations, node_weights=weights_xr
-    )
+    result = ekh.catchments.percentile(rn, field_xr, p=0.5, locations=locations, node_weights=weights_xr)
     assert isinstance(result, xr.DataArray)
     np.testing.assert_allclose(result.values, expected)

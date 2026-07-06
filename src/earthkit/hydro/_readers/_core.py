@@ -108,9 +108,7 @@ def find_upstream_downstream_indices_from_offsets(
         down_cols = cols.flat[mask_upstream] + x_offsets
         del rows, cols
 
-        valid = (
-            (down_rows >= 0) & (down_rows < ny) & (down_cols >= 0) & (down_cols < nx)
-        )
+        valid = (down_rows >= 0) & (down_rows < ny) & (down_cols >= 0) & (down_cols < nx)
         down_flat = down_rows[valid] * nx + down_cols[valid]
         del down_rows, valid
 
@@ -179,17 +177,14 @@ def get_up_down_edge_mask(has_downstream, nodes, downstream, missing_mask, shape
 def get_sources(n_nodes, down_ids):
     tmp_nodes = np.arange(n_nodes)
     tmp_nodes[down_ids] = n_nodes + 1
-    inlets = tmp_nodes[tmp_nodes != n_nodes + 1]
-    return inlets
+    return tmp_nodes[tmp_nodes != n_nodes + 1]
 
 
 def create_initial_graph(upstream_indices, downstream_indices, missing_mask, shape):
     nodes, downstream, has_downstream, n_nodes, n_edges = create_graph_nodes_edges(
         upstream_indices, downstream_indices, missing_mask
     )
-    up_ids, down_ids, edge_indices, mask = get_up_down_edge_mask(
-        has_downstream, nodes, downstream, missing_mask, shape
-    )
+    up_ids, down_ids, edge_indices, mask = get_up_down_edge_mask(has_downstream, nodes, downstream, missing_mask, shape)
     return up_ids, down_ids, edge_indices, mask, n_nodes, n_edges
 
 
@@ -198,9 +193,7 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     nodes, downstream, has_downstream, n_nodes, n_edges = create_graph_nodes_edges(
         upstream_indices, downstream_indices, missing_mask
     )
-    up_ids, down_ids, edge_indices, mask = get_up_down_edge_mask(
-        has_downstream, nodes, downstream, missing_mask, shape
-    )
+    up_ids, down_ids, edge_indices, mask = get_up_down_edge_mask(has_downstream, nodes, downstream, missing_mask, shape)
 
     bifurcates = False
     sources = get_sources(n_nodes, down_ids)
@@ -217,9 +210,7 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
         n_nodes,
     )[has_downstream]
 
-    sort_indices = np.lexsort(
-        (nodes[has_downstream], distances)
-    )  # np.argsort(distances)
+    sort_indices = np.lexsort((nodes[has_downstream], distances))  # np.argsort(distances)
     sorted_distances = distances[sort_indices]  # from source to sink
 
     up_ids_sort = up_ids[sort_indices]
@@ -232,7 +223,7 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
     pixarea = None
     edge_weights = None
 
-    store = RiverNetworkStorage(
+    return RiverNetworkStorage(
         n_nodes,
         n_edges,
         np.vstack([down_ids_sort, up_ids_sort, edge_ids_sort]).astype(np.int64),
@@ -246,8 +237,6 @@ def create_network(upstream_indices, downstream_indices, missing_mask, shape):
         bifurcates,
         edge_weights,
     )
-
-    return store
 
 
 def assign_coords(river_network_storage, data, coords):

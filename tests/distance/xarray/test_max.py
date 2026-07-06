@@ -21,13 +21,9 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-def test_distance_max_xarray(
-    river_network, stations_list, upstream, downstream, weights, result
-):
+def test_distance_max_xarray(river_network, stations_list, upstream, downstream, weights, result):
     """Test distance max with xarray input."""
-    weights_da = xr.DataArray(
-        weights, dims=["node_index"], coords={"node_index": np.arange(len(weights))}
-    )
+    weights_da = xr.DataArray(weights, dims=["node_index"], coords={"node_index": np.arange(len(weights))})
     dist = ekh.distance.max(
         river_network,
         stations_list,

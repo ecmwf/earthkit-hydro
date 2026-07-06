@@ -6,16 +6,12 @@ def locations_to_1d(xp, river_network, locations):
     orig_locations = locations
     dict_locations = isinstance(locations, dict)
     if dict_locations:
-
         coord1_network_vals, coord2_network_vals = river_network.coords.values()
 
         locations = []
         if river_network.shape is None:  # vector network
             for coord1_val, coord2_val in orig_locations.values():
-                indx = (
-                    (coord1_val - coord1_network_vals) ** 2
-                    + (coord2_val - coord2_network_vals) ** 2
-                ).argmin()
+                indx = ((coord1_val - coord1_network_vals) ** 2 + (coord2_val - coord2_network_vals) ** 2).argmin()
                 locations.append(int(indx))
         else:
             for coord1_val, coord2_val in orig_locations.values():
@@ -38,14 +34,10 @@ def locations_to_1d(xp, river_network, locations):
             dtype=int,
             device=river_network.device,
         )
-        reverse_map[flat_mask] = xp.arange(
-            flat_mask.shape[0], device=river_network.device
-        )
+        reverse_map[flat_mask] = xp.arange(flat_mask.shape[0], device=river_network.device)
         masked_indices = reverse_map[flat_indices]
         if xp.any(masked_indices < 0):
-            raise ValueError(
-                "Some station points are not included in the masked array."
-            )
+            raise ValueError("Some station points are not included in the masked array.")
         stations = xp.asarray(masked_indices, device=river_network.device)
     else:
         assert stations.ndim == 1

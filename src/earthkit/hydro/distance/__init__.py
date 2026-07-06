@@ -1,4 +1,4 @@
-import earthkit.hydro.distance.array
+from earthkit.hydro.distance import array
 
 from ._toplevel import max, min, to_sink, to_source
 

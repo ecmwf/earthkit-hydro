@@ -1,5 +1,5 @@
-import earthkit.hydro.streamorder.array as array
 from earthkit.hydro._utils.decorators import xarray
+from earthkit.hydro.streamorder import array
 
 
 @xarray

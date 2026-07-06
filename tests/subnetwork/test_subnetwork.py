@@ -44,9 +44,7 @@ def test_from_mask_both_masks(river_network):
     edge_mask = np.zeros(river_network.n_edges, dtype=bool)
     edge_mask[:5] = True  # Select first 5 edges
 
-    subnetwork = ekh.subnetwork.from_mask(
-        river_network, node_mask=node_mask, edge_mask=edge_mask
-    )
+    subnetwork = ekh.subnetwork.from_mask(river_network, node_mask=node_mask, edge_mask=edge_mask)
 
     # Check that the subnetwork has fewer nodes and edges
     assert subnetwork.n_nodes <= 10
@@ -105,9 +103,7 @@ def test_crop(river_network):
     assert cropped.n_nodes == subnetwork.n_nodes
 
     # Check that the grid dimensions are reduced (actual cropping happened)
-    assert (cropped.shape[0] < subnetwork.shape[0]) or (
-        cropped.shape[1] < subnetwork.shape[1]
-    )
+    assert (cropped.shape[0] < subnetwork.shape[0]) or (cropped.shape[1] < subnetwork.shape[1])
 
     # Check that it's a different object
     assert cropped is not subnetwork

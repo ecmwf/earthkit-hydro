@@ -34,17 +34,13 @@ except Exception:
     indirect=["river_network"],
 )
 def test_upstream_percentile_unweighted(river_network, input_field, expected, p):
-    output = ekh.upstream.array.percentile(
-        river_network, input_field, p=p, node_weights=None, return_type="masked"
-    )
+    output = ekh.upstream.array.percentile(river_network, input_field, p=p, node_weights=None, return_type="masked")
     np.testing.assert_allclose(output, expected)
 
     # Also test with 2D (gridded) input field
     input_2d = convert_to_2d(river_network, input_field, 0)
     expected_2d = convert_to_2d(river_network, expected, 0)
-    output_2d = ekh.upstream.array.percentile(
-        river_network, input_2d, p=p, node_weights=None
-    ).flatten()
+    output_2d = ekh.upstream.array.percentile(river_network, input_2d, p=p, node_weights=None).flatten()
     np.testing.assert_allclose(output_2d, expected_2d.flatten())
 
 
@@ -86,7 +82,5 @@ def test_upstream_percentile_weighted(river_network, input_field, expected):
 )
 def test_upstream_percentile_gridded_return_type(river_network, input_field, expected):
     input_2d = convert_to_2d(river_network, input_field, 0)
-    output = ekh.upstream.array.percentile(
-        river_network, input_2d, p=0.5, node_weights=None, return_type="gridded"
-    )
+    output = ekh.upstream.array.percentile(river_network, input_2d, p=0.5, node_weights=None, return_type="gridded")
     np.testing.assert_allclose(output, expected)

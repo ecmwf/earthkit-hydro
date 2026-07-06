@@ -25,12 +25,8 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-def test_calculate_upstream_metric_mean(
-    river_network, input_field, flow_downstream, mv
-):
-    output_field = ekh.upstream.array.mean(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
+def test_calculate_upstream_metric_mean(river_network, input_field, flow_downstream, mv):
+    output_field = ekh.upstream.array.mean(river_network, input_field, node_weights=None, return_type="masked")
     assert output_field.dtype == flow_downstream.dtype
     np.testing.assert_allclose(output_field, flow_downstream)
 

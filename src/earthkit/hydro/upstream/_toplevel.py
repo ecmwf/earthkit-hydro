@@ -63,9 +63,7 @@ def percentile(
     xarray object
         Array of percentile values for every river network node or gridcell, depending on `return_type`.
     """
-    return array.percentile(
-        river_network, field, p, node_weights, edge_weights, return_type
-    )
+    return array.percentile(river_network, field, p, node_weights, edge_weights, return_type)
 
 
 @xarray

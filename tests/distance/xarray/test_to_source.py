@@ -20,8 +20,6 @@ import earthkit.hydro as ekh
 )
 def test_distance_to_source_xarray(river_network, field, expected):
     """Test distance to source with xarray output."""
-    result = ekh.distance.to_source(
-        river_network, field=field, path="shortest", return_type="masked"
-    )
+    result = ekh.distance.to_source(river_network, field=field, path="shortest", return_type="masked")
     assert isinstance(result, xr.DataArray)
     np.testing.assert_allclose(result.values, expected, rtol=1e-6)

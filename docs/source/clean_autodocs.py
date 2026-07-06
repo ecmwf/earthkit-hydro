@@ -225,12 +225,11 @@ def replace_automodule_with_autosummary(content: str, module_name: str) -> str:
     # Replace the entire automodule block (with any autodoc options) that
     # sphinx-apidoc emits.  The block starts with ``.. automodule::`` and
     # continues through consecutive option lines (``   :option:``).
-    content = re.sub(
+    return re.sub(
         r"\.\. automodule::[ \t]+" + re.escape(module_name) + r"(?:\n[ \t]+:.*)*\n",
         new_block + "\n",
         content,
     )
-    return content
 
 
 def clean_toctree(

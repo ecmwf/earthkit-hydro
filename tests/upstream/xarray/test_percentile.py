@@ -55,9 +55,7 @@ def field_to_xarray(river_network, field_1d):
         ),
     ],
 )
-def test_upstream_percentile_xarray_masked(
-    flow_directions, input_field, expected_masked, p
-):
+def test_upstream_percentile_xarray_masked(flow_directions, input_field, expected_masked, p):
     rn = make_river_network_with_coords(flow_directions)
     field_xr = field_to_xarray(rn, input_field)
 
@@ -79,9 +77,7 @@ def test_upstream_percentile_xarray_masked(
         ),
     ],
 )
-def test_upstream_percentile_xarray_gridded(
-    flow_directions, input_field, expected_gridded, p
-):
+def test_upstream_percentile_xarray_gridded(flow_directions, input_field, expected_gridded, p):
     rn = make_river_network_with_coords(flow_directions)
     field_xr = field_to_xarray(rn, input_field)
 

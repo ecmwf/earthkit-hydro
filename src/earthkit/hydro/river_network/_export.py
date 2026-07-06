@@ -1,5 +1,3 @@
-from typing import Union
-
 import numpy as np
 import xarray as xr
 
@@ -8,21 +6,15 @@ from earthkit.hydro.data_structures._network_storage import RiverNetworkStorage
 
 
 def export(
-    river_network: Union[RiverNetworkStorage, RiverNetwork],
+    river_network: RiverNetworkStorage | RiverNetwork,
     path: str,
     river_network_format: str = "precomputed",
     compression=1,
 ):
-    if river_network_format not in ["precomputed", "pcr_d8", "esri_d8", "merit_d8"]:
-        raise ValueError(
-            f"Exporting river network to format {river_network_format} is not currently supported."
-        )
+    if river_network_format not in {"precomputed", "pcr_d8", "esri_d8", "merit_d8"}:
+        raise ValueError(f"Exporting river network to format {river_network_format} is not currently supported.")
 
-    river_network_storage = (
-        river_network
-        if isinstance(river_network, RiverNetworkStorage)
-        else river_network._storage
-    )
+    river_network_storage = river_network if isinstance(river_network, RiverNetworkStorage) else river_network._storage
 
     if river_network_format == "precomputed":
         import joblib
@@ -61,7 +53,7 @@ def export(
             data.flat[mask] = lut[dy + 1, dx + 1]
         except Exception as e:
             raise ValueError("Failed to represent river network as D8") from e
-    elif river_network_format == "esri_d8" or river_network_format == "merit_d8":
+    elif river_network_format in {"esri_d8", "merit_d8"}:
         lut = np.array(
             [
                 [32, 64, 128],  # dy = -1
@@ -75,14 +67,10 @@ def export(
         except Exception as e:
             raise ValueError("Failed to represent river network as D8") from e
     else:
-        raise ValueError(
-            f"Unsupported river network format for the export method: {river_network_format}."
-        )
+        raise ValueError(f"Unsupported river network format for the export method: {river_network_format}.")
 
     coord1, coord2 = coords.keys()
-    da = xr.DataArray(
-        data.astype(np.uint8), dims=(coord1, coord2), coords=coords, name="ldd"
-    )
+    da = xr.DataArray(data.astype(np.uint8), dims=(coord1, coord2), coords=coords, name="ldd")
     da.attrs["generated_by"] = "earthkit-hydro"
     da.encoding = {
         "_FillValue": mv,

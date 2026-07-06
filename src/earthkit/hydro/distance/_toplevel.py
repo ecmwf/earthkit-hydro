@@ -1,5 +1,5 @@
-import earthkit.hydro.distance.array as array
 from earthkit.hydro._utils.decorators import xarray
+from earthkit.hydro.distance import array
 
 
 @xarray

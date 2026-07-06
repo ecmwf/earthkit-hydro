@@ -1,9 +1,7 @@
 from earthkit.hydro.downstream.array import _operations
 
 
-def percentile(
-    river_network, field, p, node_weights=None, edge_weights=None, return_type=None
-):
+def percentile(river_network, field, p, node_weights=None, edge_weights=None, return_type=None):
     r"""
     Computes the weighted percentile of a field over all downstream nodes.
 
@@ -56,13 +54,9 @@ def percentile(
     if edge_weights is not None:
         raise NotImplementedError("edge_weights are currently unsupported.")
     if river_network.array_backend != "numpy":
-        raise NotImplementedError(
-            "Only numpy backend is currently supported for percentiles."
-        )
+        raise NotImplementedError("Only numpy backend is currently supported for percentiles.")
     if p < 0 or p > 1:
-        raise ValueError(
-            "The requested percentile `p` must be between 0 and 1 inclusive."
-        )
+        raise ValueError("The requested percentile `p` must be between 0 and 1 inclusive.")
     return _operations.percentile(
         river_network=river_network,
         field=field.astype("float64"),

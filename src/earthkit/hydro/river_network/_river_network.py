@@ -15,11 +15,7 @@ from ._cache import cache
 # if dev version, try add +1 to major version
 # i.e. 0.1.dev90+gfdf4e33.d20250107 -> 1
 # i.e. 0.1.0 -> 0
-ekh_version = (
-    int(ekh_version.split(".")[0]) + 1
-    if "dev" in ekh_version
-    else int(ekh_version.split(".")[0])
-)
+ekh_version = int(ekh_version.split(".")[0]) + 1 if "dev" in ekh_version else int(ekh_version.split(".")[0])
 
 
 @cache
@@ -69,19 +65,12 @@ def create(
             with urlopen(path) as response:
                 river_network_storage = joblib.load(BytesIO(response.read()))
         else:
-            raise ValueError(
-                "Unsupported source for river network format"
-                f"{river_network_format}: {source}."
-            )
+            raise ValueError(f"Unsupported source for river network format{river_network_format}: {source}.")
     elif river_network_format == "cama":
         data, coords = load_cama_data(path, river_network_format, source)
         river_network_storage = from_cama_nextxy(*data)
         river_network_storage = assign_coords(river_network_storage, data, coords)
-    elif (
-        river_network_format == "pcr_d8"
-        or river_network_format == "esri_d8"
-        or river_network_format == "merit_d8"
-    ):
+    elif river_network_format in {"pcr_d8", "esri_d8", "merit_d8"}:
         data, coords = load_d8_data(path, river_network_format, source)
         river_network_storage = from_d8(data, river_network_format=river_network_format)
         river_network_storage = assign_coords(river_network_storage, data, coords)

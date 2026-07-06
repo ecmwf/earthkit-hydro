@@ -47,22 +47,22 @@ def _replace_missing_f8(cur, new):
 
 
 CELLREPR = {
-    CR_UINT1: dict(
-        dtype=np.dtype("uint8"),
-        fillmv=_replace_missing_u1,
-    ),
-    CR_INT4: dict(
-        dtype=np.dtype("int32"),
-        fillmv=_replace_missing_i4,
-    ),
-    CR_REAL4: dict(
-        dtype=np.dtype("float32"),
-        fillmv=_replace_missing_f4,
-    ),
-    CR_REAL8: dict(
-        dtype=np.dtype("float64"),
-        fillmv=_replace_missing_f8,
-    ),
+    CR_UINT1: {
+        "dtype": np.dtype("uint8"),
+        "fillmv": _replace_missing_u1,
+    },
+    CR_INT4: {
+        "dtype": np.dtype("int32"),
+        "fillmv": _replace_missing_i4,
+    },
+    CR_REAL4: {
+        "dtype": np.dtype("float32"),
+        "fillmv": _replace_missing_f4,
+    },
+    CR_REAL8: {
+        "dtype": np.dtype("float64"),
+        "fillmv": _replace_missing_f8,
+    },
 }
 
 
@@ -73,16 +73,12 @@ def from_file(path, mask=False):
         bytes = f.read()
 
     nbytes_header = 64 + 2 + 2 + 8 + 8 + 8 + 8 + 4 + 4 + 8 + 8 + 8
-    _, cellRepr, _, _, _, _, nrRows, nrCols, _, _, _ = unpack(
-        "=hhddddIIddd", bytes[64:nbytes_header]
-    )
+    _, cellRepr, _, _, _, _, nrRows, nrCols, _, _, _ = unpack("=hhddddIIddd", bytes[64:nbytes_header])
 
     try:
         celltype = CELLREPR[cellRepr]
     except KeyError:
-        raise Exception(
-            "{}: invalid cellRepr value ({}) in header".format(path, cellRepr)
-        )
+        raise ValueError(f"{path}: invalid cellRepr value ({cellRepr}) in header")
 
     dtype = celltype["dtype"]
 
@@ -91,6 +87,4 @@ def from_file(path, mask=False):
     if mask:
         data = celltype["fillmv"](data.astype(np.float64), np.nan)
 
-    data = data.reshape((nrRows, nrCols))
-
-    return data
+    return data.reshape((nrRows, nrCols))

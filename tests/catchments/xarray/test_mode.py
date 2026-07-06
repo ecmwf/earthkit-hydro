@@ -11,7 +11,7 @@ try:
     from earthkit.hydro import _rust  # noQA: F401
 
     RUST = True
-except Exception:
+except ImportError:
     RUST = False
 
 

@@ -75,8 +75,9 @@ def repair(input_path, output_path, river_network_format, input_source="file"):
     """
     Given an initial river network, repairs the river network and writes the output to local file.
 
-    Warning: this function should only be used by advanced users.
-    It should not be used without an understanding of why the initial river network needs reparation.
+    .. warning::
+        This function should only be used by advanced users.
+        It should not be used without an understanding of why the initial river network needs repair.
 
     The repairing algorithm is as follows:
 

@@ -11,6 +11,33 @@ def export(
     river_network_format: str = "precomputed",
     compression=1,
 ):
+    """
+    Export a river network to a local file.
+
+    .. note::
+        Exporting to precomputed format is highly recommended for efficiency reasons.
+        Other river network formats should only be used if compatibility is required with other tooling.
+
+    .. note::
+        For formats other than precomputed, only exporting as netcdf is currently supported.
+
+    Parameters
+    ----------
+    river_network : RiverNetworkStorage | RiverNetwork
+        The river network to export.
+    path : str
+        Where to export the river network.
+    river_network_format : str
+        The format of the river network data.
+        Currently supported formats are "pcr_d8", "esri_d8"
+        and "merit_d8".
+    compression : int
+        The compression factor to use for the saved file. Only applied if river_network_format is precomputed.
+
+    Returns
+    -------
+    None. Writes the river network to a local file at `path`.
+    """
     if river_network_format not in {"precomputed", "pcr_d8", "esri_d8", "merit_d8"}:
         raise ValueError(f"Exporting river network to format {river_network_format} is not currently supported.")
 
@@ -35,6 +62,11 @@ def export(
     dy = np.zeros(mask.shape, dtype=int)
     dx[u] = (mask[d] % nx) - (mask[u] % nx)
     dy[u] = (mask[d] // nx) - (mask[u] // nx)
+
+    if river_network_format in {"pcr_d8", "esri_d8", "merit_d8"} and not (
+        np.all(np.abs(dx) <= 1) and np.all(np.abs(dy) <= 1)
+    ):
+        raise ValueError("River network is not representable in d8 format.")
 
     # Scatter back to 2D grids
     mv = missing_values[river_network_format]

@@ -147,6 +147,9 @@ class RiverNetwork:
         """
         Save the river network to a local file.
 
+        .. warning::
+            This is not recommended. Please use `earthkit.hydro.river_network.export` instead.
+
         Parameters
         ----------
         fpath : str, optional

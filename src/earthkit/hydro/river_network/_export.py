@@ -46,6 +46,9 @@ def export(
     if river_network_format not in {"precomputed", "pcr_d8", "esri_d8", "merit_d8", "cama"}:
         raise ValueError(f"Exporting river network to format {river_network_format} is not currently supported.")
 
+    if isinstance(river_network, RiverNetwork) and river_network.array_backend != "numpy":
+        raise ValueError("Exporting for non-numpy backend not supported.")
+
     river_network_storage = river_network if isinstance(river_network, RiverNetworkStorage) else river_network._storage
 
     if river_network_format == "precomputed":

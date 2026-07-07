@@ -31,7 +31,7 @@ def import_earthkit_or_prompt_install(river_network_format, source):
         import earthkit.data as ekd
     except ModuleNotFoundError:
         raise ModuleNotFoundError(
-            "earthkit-data is required for loading river network format"
+            "earthkit-data is required for loading river network format "
             f"{river_network_format} from source {source}."
             "\nTo install it, run `pip install earthkit-data`"
         )

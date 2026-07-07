@@ -64,12 +64,17 @@ def export(
         raise ValueError("River network does not have coordinates.")
 
     shape = river_network_storage.shape
-    _, nx = shape
+    ny, nx = shape
 
     dx = np.zeros(mask.shape, dtype=int)
+    temp_dx = (mask[d] % nx) - (mask[u] % nx)
+    dx[u] = (temp_dx + nx // 2) % nx - nx // 2
+    del temp_dx
+
     dy = np.zeros(mask.shape, dtype=int)
-    dx[u] = (mask[d] % nx) - (mask[u] % nx)
-    dy[u] = (mask[d] // nx) - (mask[u] // nx)
+    temp_dy = (mask[d] // nx) - (mask[u] // nx)
+    dy[u] = (temp_dy + ny // 2) % ny - ny // 2
+    del temp_dy
 
     if river_network_format in {"pcr_d8", "esri_d8", "merit_d8"} and not (
         np.all(np.abs(dx) <= 1) and np.all(np.abs(dy) <= 1)

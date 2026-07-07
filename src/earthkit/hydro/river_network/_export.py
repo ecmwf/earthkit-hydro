@@ -66,15 +66,18 @@ def export(
     shape = river_network_storage.shape
     ny, nx = shape
 
+    def shortest_offset(delta, n):
+        # return (delta + n // 2) % n - n // 2 # negatives win ties
+        # positives win ties
+        delta = delta % n
+        delta[delta > n // 2] -= n
+        return delta
+
     dx = np.zeros(mask.shape, dtype=int)
-    temp_dx = (mask[d] % nx) - (mask[u] % nx)
-    dx[u] = (temp_dx + nx // 2) % nx - nx // 2
-    del temp_dx
+    dx[u] = shortest_offset((mask[d] % nx) - (mask[u] % nx), nx)
 
     dy = np.zeros(mask.shape, dtype=int)
-    temp_dy = (mask[d] // nx) - (mask[u] // nx)
-    dy[u] = (temp_dy + ny // 2) % ny - ny // 2
-    del temp_dy
+    dy[u] = shortest_offset((mask[d] // nx) - (mask[u] // nx), ny)
 
     if river_network_format in {"pcr_d8", "esri_d8", "merit_d8"} and not (
         np.all(np.abs(dx) <= 1) and np.all(np.abs(dy) <= 1)

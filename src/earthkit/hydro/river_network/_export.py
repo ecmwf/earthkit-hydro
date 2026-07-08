@@ -11,8 +11,43 @@ def export(
     river_network_format: str = "precomputed",
     compression=1,
 ):
-    if river_network_format not in {"precomputed", "pcr_d8", "esri_d8", "merit_d8"}:
+    """
+    Export a river network to a local file.
+
+    .. note::
+        Exporting to precomputed format is highly recommended for efficiency reasons.
+        Other river network formats should only be used if compatibility is required with other tooling.
+
+    .. note::
+        For formats other than precomputed, only exporting as netcdf is currently supported.
+
+    .. warning::
+        The cama format has two different sink representations, one for inland sinks (-10), and one for coastal sinks (-9).
+        There is only one sink representation in earthkit-hydro, so for cama format exports all sinks are exported as coastal sinks (-9).
+        This does not change any results with earthkit-hydro, but be aware when using other tools.
+
+    Parameters
+    ----------
+    river_network : RiverNetworkStorage | RiverNetwork
+        The river network to export.
+    path : str
+        Where to export the river network.
+    river_network_format : str
+        The format of the river network data.
+        Currently supported formats are "pcr_d8", "esri_d8"
+        and "merit_d8".
+    compression : int
+        The compression factor to use for the saved file. Only applied if river_network_format is precomputed.
+
+    Returns
+    -------
+    None. Writes the river network to a local file at `path`.
+    """
+    if river_network_format not in {"precomputed", "pcr_d8", "esri_d8", "merit_d8", "cama"}:
         raise ValueError(f"Exporting river network to format {river_network_format} is not currently supported.")
+
+    if isinstance(river_network, RiverNetwork) and river_network.array_backend != "numpy":
+        raise ValueError("Exporting for non-numpy backend not supported.")
 
     river_network_storage = river_network if isinstance(river_network, RiverNetworkStorage) else river_network._storage
 
@@ -22,22 +57,68 @@ def export(
         joblib.dump(river_network_storage, path, compress=compression)
         return
 
-    missing_values = {"pcr_d8": 255, "esri_d8": 255, "merit_d8": 247}
+    missing_values = {"pcr_d8": 255, "esri_d8": 255, "merit_d8": 247, "cama": -9999}
 
     d, u, _ = river_network_storage.sorted_data
     mask = river_network_storage.mask
     coords = river_network_storage.coords
 
+    if coords is None:
+        raise ValueError("River network does not have coordinates.")
+
     shape = river_network_storage.shape
-    _, nx = shape
+    ny, nx = shape
+
+    def shortest_offset(delta, n):
+        # return (delta + n // 2) % n - n // 2 # negatives win ties
+        # positives win ties
+        delta = delta % n
+        delta[delta > n // 2] -= n
+        return delta
 
     dx = np.zeros(mask.shape, dtype=int)
+    dx[u] = shortest_offset((mask[d] % nx) - (mask[u] % nx), nx)
+
     dy = np.zeros(mask.shape, dtype=int)
-    dx[u] = (mask[d] % nx) - (mask[u] % nx)
-    dy[u] = (mask[d] // nx) - (mask[u] // nx)
+    dy[u] = shortest_offset((mask[d] // nx) - (mask[u] // nx), ny)
+
+    if river_network_format in {"pcr_d8", "esri_d8", "merit_d8"} and not (
+        np.all(np.abs(dx) <= 1) and np.all(np.abs(dy) <= 1)
+    ):
+        raise ValueError("River network is not representable in d8 format.")
+
+    mv = missing_values[river_network_format]
+
+    if river_network_format == "cama":
+        sinks = (dx == 0) & (dy == 0)
+        cols, rows = np.indices(shape)
+        rows = rows.flat[mask]
+        cols = cols.flat[mask]
+
+        x_masked = ((rows + dx) % shape[1]) + 1
+        x_masked[sinks] = -9
+        del dx, rows
+        x = np.full(shape, mv, dtype=np.int32)
+        x.flat[mask] = x_masked
+        del x_masked
+
+        y_masked = ((cols + dy) % shape[0]) + 1
+        y_masked[sinks] = -9
+        del dy, cols
+        y = np.full(shape, mv, dtype=np.int32)
+        y.flat[mask] = y_masked
+        del y_masked
+
+        coord1, coord2 = coords.keys()
+        da_x = xr.DataArray(x, dims=(coord1, coord2), coords=coords, name="nextx")
+        da_x = _encode_da(da_x, mv)
+        da_y = xr.DataArray(y, dims=(coord1, coord2), coords=coords, name="nexty")
+        da_y = _encode_da(da_y, mv)
+        ds = xr.Dataset({"nextx": da_x, "nexty": da_y})
+        ds.to_netcdf(path)
+        return
 
     # Scatter back to 2D grids
-    mv = missing_values[river_network_format]
     data = np.full(shape, mv, dtype=np.uint8)
 
     if river_network_format == "pcr_d8":
@@ -66,13 +147,16 @@ def export(
             data.flat[mask] = lut[dy + 1, dx + 1]
         except Exception as e:
             raise ValueError("Failed to represent river network as D8") from e
-    else:
-        raise ValueError(f"Unsupported river network format for the export method: {river_network_format}.")
 
     coord1, coord2 = coords.keys()
     da = xr.DataArray(data.astype(np.uint8), dims=(coord1, coord2), coords=coords, name="ldd")
+    da = _encode_da(da, mv)
+    da.to_netcdf(path)
+
+
+def _encode_da(da, mv):
     da.attrs["generated_by"] = "earthkit-hydro"
     da.encoding = {
         "_FillValue": mv,
     }
-    da.to_netcdf(path)
+    return da

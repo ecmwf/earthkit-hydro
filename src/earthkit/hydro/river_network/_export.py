@@ -1,8 +1,7 @@
-import numpy as np
-import xarray as xr
-
 from earthkit.hydro.data_structures import RiverNetwork
 from earthkit.hydro.data_structures._network_storage import RiverNetworkStorage
+
+from ._formats import FORMATS
 
 
 def export(
@@ -43,7 +42,8 @@ def export(
     -------
     None. Writes the river network to a local file at `path`.
     """
-    if river_network_format not in {"precomputed", "pcr_d8", "esri_d8", "merit_d8", "cama"}:
+    fmt = FORMATS.get(river_network_format)
+    if fmt is None or not hasattr(fmt, "export_to"):
         raise ValueError(f"Exporting river network to format {river_network_format} is not currently supported.")
 
     if isinstance(river_network, RiverNetwork) and river_network.array_backend != "numpy":
@@ -51,112 +51,4 @@ def export(
 
     river_network_storage = river_network if isinstance(river_network, RiverNetworkStorage) else river_network._storage
 
-    if river_network_format == "precomputed":
-        import joblib
-
-        joblib.dump(river_network_storage, path, compress=compression)
-        return
-
-    missing_values = {"pcr_d8": 255, "esri_d8": 255, "merit_d8": 247, "cama": -9999}
-
-    d, u, _ = river_network_storage.sorted_data
-    mask = river_network_storage.mask
-    coords = river_network_storage.coords
-
-    if coords is None:
-        raise ValueError("River network does not have coordinates.")
-
-    shape = river_network_storage.shape
-    ny, nx = shape
-
-    def shortest_offset(delta, n):
-        # return (delta + n // 2) % n - n // 2 # negatives win ties
-        # positives win ties
-        delta = delta % n
-        delta[delta > n // 2] -= n
-        return delta
-
-    dx = np.zeros(mask.shape, dtype=int)
-    dx[u] = shortest_offset((mask[d] % nx) - (mask[u] % nx), nx)
-
-    dy = np.zeros(mask.shape, dtype=int)
-    dy[u] = shortest_offset((mask[d] // nx) - (mask[u] // nx), ny)
-
-    if river_network_format in {"pcr_d8", "esri_d8", "merit_d8"} and not (
-        np.all(np.abs(dx) <= 1) and np.all(np.abs(dy) <= 1)
-    ):
-        raise ValueError("River network is not representable in d8 format.")
-
-    mv = missing_values[river_network_format]
-
-    if river_network_format == "cama":
-        sinks = (dx == 0) & (dy == 0)
-        cols, rows = np.indices(shape)
-        rows = rows.flat[mask]
-        cols = cols.flat[mask]
-
-        x_masked = ((rows + dx) % shape[1]) + 1
-        x_masked[sinks] = -9
-        del dx, rows
-        x = np.full(shape, mv, dtype=np.int32)
-        x.flat[mask] = x_masked
-        del x_masked
-
-        y_masked = ((cols + dy) % shape[0]) + 1
-        y_masked[sinks] = -9
-        del dy, cols
-        y = np.full(shape, mv, dtype=np.int32)
-        y.flat[mask] = y_masked
-        del y_masked
-
-        coord1, coord2 = coords.keys()
-        da_x = xr.DataArray(x, dims=(coord1, coord2), coords=coords, name="nextx")
-        da_x = _encode_da(da_x, mv)
-        da_y = xr.DataArray(y, dims=(coord1, coord2), coords=coords, name="nexty")
-        da_y = _encode_da(da_y, mv)
-        ds = xr.Dataset({"nextx": da_x, "nexty": da_y})
-        ds.to_netcdf(path)
-        return
-
-    # Scatter back to 2D grids
-    data = np.full(shape, mv, dtype=np.uint8)
-
-    if river_network_format == "pcr_d8":
-        lut = np.array(
-            [
-                [7, 8, 9],  # dy = -1
-                [4, 5, 6],  # dy =  0
-                [1, 2, 3],  # dy = +1
-            ],
-            dtype=np.uint8,
-        )
-        try:
-            data.flat[mask] = lut[dy + 1, dx + 1]
-        except Exception as e:
-            raise ValueError("Failed to represent river network as D8") from e
-    elif river_network_format in {"esri_d8", "merit_d8"}:
-        lut = np.array(
-            [
-                [32, 64, 128],  # dy = -1
-                [16, 0, 1],  # dy =  0
-                [8, 4, 2],  # dy = +1
-            ],
-            dtype=np.uint8,
-        )
-        try:
-            data.flat[mask] = lut[dy + 1, dx + 1]
-        except Exception as e:
-            raise ValueError("Failed to represent river network as D8") from e
-
-    coord1, coord2 = coords.keys()
-    da = xr.DataArray(data.astype(np.uint8), dims=(coord1, coord2), coords=coords, name="ldd")
-    da = _encode_da(da, mv)
-    da.to_netcdf(path)
-
-
-def _encode_da(da, mv):
-    da.attrs["generated_by"] = "earthkit-hydro"
-    da.encoding = {
-        "_FillValue": mv,
-    }
-    return da
+    fmt.export_to(river_network_storage, path, compression)

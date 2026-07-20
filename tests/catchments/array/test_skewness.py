@@ -24,9 +24,7 @@ def test_catchments_skewness(river_network, field, locations, expected, array_ba
     """Test catchment skewness aggregation."""
     river_network = river_network.to_device("cpu", array_backend)
     xp = ekh._backends.find.get_array_backend(array_backend)
-    result = ekh.catchments.array.skewness(
-        river_network, xp.asarray(field), locations=locations
-    )
+    result = ekh.catchments.array.skewness(river_network, xp.asarray(field), locations=locations)
     result = np.asarray(result)
     expected_arr = np.asarray(expected)
     assert result.shape[-1] == np.asarray(locations).shape[-1]

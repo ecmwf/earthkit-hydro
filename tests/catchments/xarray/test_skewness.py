@@ -22,9 +22,7 @@ import earthkit.hydro as ekh
 )
 def test_catchments_skewness_xarray(river_network, field, locations, expected):
     """Test catchment skewness with xarray input."""
-    field_da = xr.DataArray(
-        field, dims=["node_index"], coords={"node_index": np.arange(len(field))}
-    )
+    field_da = xr.DataArray(field, dims=["node_index"], coords={"node_index": np.arange(len(field))})
     result = ekh.catchments.skewness(river_network, field_da, locations=locations)
     assert isinstance(result, xr.DataArray)
     expected_arr = np.asarray(expected)

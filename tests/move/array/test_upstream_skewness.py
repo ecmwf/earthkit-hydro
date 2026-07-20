@@ -20,9 +20,7 @@ def test_move_upstream_skewness(river_network, expected, array_backend):
     river_network = river_network.to_device("cpu", array_backend)
     xp = ekh._backends.find.get_array_backend(array_backend)
     field = xp.arange(1, river_network.n_nodes + 1, dtype=xp.float64)
-    output_field = ekh.move.array.upstream(
-        river_network, field, metric="skewness", return_type="masked"
-    )
+    output_field = ekh.move.array.upstream(river_network, field, metric="skewness", return_type="masked")
     output_field = np.asarray(output_field)
     expected_arr = np.asarray(expected)
     np.testing.assert_allclose(output_field, expected_arr, rtol=1e-5, atol=1e-9, equal_nan=True)

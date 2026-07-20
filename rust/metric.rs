@@ -110,14 +110,7 @@ fn process_level_fast<M: Metric>(
                     .map(|entry| entry.1)
                     .unwrap_or_else(|| metric.singleton(s as usize))
             };
-
-            map.entry(t)
-                .and_modify(|acc| metric.merge(acc, &s_acc))
-                .or_insert_with(|| {
-                    let mut acc = metric.singleton(t as usize);
-                    metric.merge(&mut acc, &s_acc);
-                    acc
-                });
+            merge_into(metric, map, t, &s_acc);
         });
 
     finalize(metric, target, map, result);
@@ -189,13 +182,7 @@ fn process_grouped<M: Metric>(
                 .unwrap_or_else(|| metric.singleton(s as usize));
 
             for t in targets {
-                map.entry(t)
-                    .and_modify(|acc| metric.merge(acc, &s_acc))
-                    .or_insert_with(|| {
-                        let mut acc = metric.singleton(t as usize);
-                        metric.merge(&mut acc, &s_acc);
-                        acc
-                    });
+                merge_into(metric, map, t, &s_acc);
             }
 
             (last_use[&s] != level).then_some((s, s_acc))
@@ -204,5 +191,103 @@ fn process_grouped<M: Metric>(
 
     for (s, acc) in retained {
         map.insert(s, acc);
+    }
+}
+
+#[inline]
+fn merge_into<M: Metric>(metric: &M, map: &DashMap<i64, M::Acc>, target: i64, source: &M::Acc) {
+    map.entry(target)
+        .and_modify(|acc| metric.merge(acc, source))
+        .or_insert_with(|| {
+            let mut acc = metric.singleton(target as usize);
+            metric.merge(&mut acc, source);
+            acc
+        });
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::sync::atomic::{AtomicUsize, Ordering};
+    use std::sync::Arc;
+
+    struct TestAcc {
+        value: usize,
+        clones: Arc<AtomicUsize>,
+    }
+
+    impl Clone for TestAcc {
+        fn clone(&self) -> Self {
+            self.clones.fetch_add(1, Ordering::Relaxed);
+            Self {
+                value: self.value,
+                clones: Arc::clone(&self.clones),
+            }
+        }
+    }
+
+    struct SumMetric {
+        clones: Arc<AtomicUsize>,
+    }
+
+    impl Metric for SumMetric {
+        type Acc = TestAcc;
+        type Out = usize;
+
+        fn singleton(&self, _node: usize) -> TestAcc {
+            TestAcc {
+                value: 1,
+                clones: Arc::clone(&self.clones),
+            }
+        }
+
+        fn merge(&self, dst: &mut TestAcc, src: &TestAcc) {
+            dst.value += src.value;
+        }
+
+        fn finalize(&self, acc: &TestAcc) -> usize {
+            acc.value
+        }
+    }
+
+    #[test]
+    fn grouped_fanout_does_not_clone_accumulators() {
+        const EDGES: i64 = 10_000;
+        let clones = Arc::new(AtomicUsize::new(0));
+        let metric = SumMetric {
+            clones: Arc::clone(&clones),
+        };
+        let map = DashMap::new();
+        let source = vec![0; EDGES as usize];
+        let target: Vec<i64> = (1..=EDGES).collect();
+        let last_use = HashMap::from([(0, 0)]);
+
+        process_grouped(&metric, &source, &target, &map, &last_use, 0);
+
+        assert_eq!(clones.load(Ordering::Relaxed), 0);
+        assert!(!map.contains_key(&0));
+        assert_eq!(map.len(), EDGES as usize);
+        assert!(target
+            .iter()
+            .all(|target| map.get(target).unwrap().value == 2));
+    }
+
+    #[test]
+    fn grouped_source_is_retained_until_its_last_level() {
+        let clones = Arc::new(AtomicUsize::new(0));
+        let metric = SumMetric {
+            clones: Arc::clone(&clones),
+        };
+        let map = DashMap::new();
+        let last_use = HashMap::from([(0, 1)]);
+
+        process_grouped(&metric, &[0], &[1], &map, &last_use, 0);
+        assert_eq!(map.get(&0).unwrap().value, 1);
+        assert_eq!(map.get(&1).unwrap().value, 2);
+
+        process_grouped(&metric, &[0], &[2], &map, &last_use, 1);
+        assert!(!map.contains_key(&0));
+        assert_eq!(map.get(&2).unwrap().value, 2);
+        assert_eq!(clones.load(Ordering::Relaxed), 0);
     }
 }

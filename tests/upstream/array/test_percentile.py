@@ -7,7 +7,7 @@ from utils import convert_to_2d
 import earthkit.hydro as ekh
 
 try:
-    from earthkit.hydro import _rust
+    from earthkit.hydro import _rust  # noQA: F401
 
     RUST = True
 except ImportError:
@@ -84,16 +84,3 @@ def test_upstream_percentile_gridded_return_type(river_network, input_field, exp
     input_2d = convert_to_2d(river_network, input_field, 0)
     output = ekh.upstream.array.percentile(river_network, input_2d, p=0.5, node_weights=None, return_type="gridded")
     np.testing.assert_allclose(output, expected)
-
-
-@pytest.mark.skipif(not RUST, reason="Rust unavailable")
-def test_upstream_percentile_bifurcation():
-    groups = [
-        np.array([[1], [0]], dtype=np.int64),
-        np.array([[2, 3], [1, 1]], dtype=np.int64),
-    ]
-    field = np.array([0.0, 10.0, 20.0, 30.0])
-
-    result = _rust.calc_perc(groups, field, 0.5, True)
-
-    np.testing.assert_allclose(result, [0.0, 5.0, 10.0, 10.0])

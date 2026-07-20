@@ -65,3 +65,7 @@ catchment_percentile_p05_1c = np.array([2.8, 3.3, 1.5, 7.3, 3.2])
 catchment_percentile_p025_1c = np.array([1.45, 0.1, -1.5, 5.95, 2.35])
 # Weighted percentile (weights = arange(1, 21)), p=0.5
 catchment_percentile_weighted_p05_1c = np.array([2.8, 3.69285714, 0.5, 6.175, 4.06363636])
+
+# Catchment skewness results for catchment_query_field_1 with input_field_1c
+# Locations: [8, 12, 13, 11, 10]
+catchment_skewness_1c = np.array([3.609931086521871e-16, -0.321660397499259, -0.5557489678765744, 0.20368140569949383, 0.0679132166389054])

@@ -7,7 +7,7 @@ from utils import convert_to_2d
 import earthkit.hydro as ekh
 
 try:
-    from earthkit.hydro import _rust  # noQA: F401
+    from earthkit.hydro import _rust
 
     RUST = True
 except ImportError:

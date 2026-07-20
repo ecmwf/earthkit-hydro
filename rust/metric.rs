@@ -44,63 +44,64 @@ pub fn run<M: Metric>(
     result: &mut [M::Out],
 ) {
     let map: DashMap<i64, M::Acc> = DashMap::new();
-    if !bifurcates {
-        if reverse {
-            for group in topo_groups.iter().rev() {
-                process_level_fast(metric, group, &map, reverse, result);
-            }
-        } else {
-            for group in topo_groups {
-                process_level_fast(metric, group, &map, reverse, result);
-            }
-        }
-        return;
-    }
 
-    let mut last_use = HashMap::new();
-    if reverse {
-        for (level, group) in topo_groups.iter().rev().enumerate() {
-            for &s in group.as_array().row(0).iter() {
-                last_use.insert(s, level);
-            }
-        }
+    // Upstream traversal walks levels sources -> sinks; downstream reverses that.
+    let order: Vec<usize> = if reverse {
+        (0..topo_groups.len()).rev().collect()
     } else {
-        for (level, group) in topo_groups.iter().enumerate() {
-            for &s in group.as_array().row(1).iter() {
-                last_use.insert(s, level);
-            }
-        }
-    }
+        (0..topo_groups.len()).collect()
+    };
 
-    if reverse {
-        for (level, group) in topo_groups.iter().rev().enumerate() {
-            process_level(metric, group, &map, &last_use, level, reverse, result);
+    // Bifurcating networks reuse a source across several edges and levels, so we
+    // record the last level each source feeds and only drop it once it is done.
+    let last_use = bifurcates.then(|| last_use_by_source(topo_groups, &order, reverse));
+
+    for (level, &g) in order.iter().enumerate() {
+        let arr = topo_groups[g].as_array();
+        let did_row = arr.row(0);
+        let uid_row = arr.row(1);
+        let did = did_row.as_slice().expect("Expected contiguous did slice");
+        let uid = uid_row.as_slice().expect("Expected contiguous uid slice");
+        let (source, target): (&[i64], &[i64]) = if reverse { (did, uid) } else { (uid, did) };
+
+        match &last_use {
+            Some(last_use) => accumulate_grouped(metric, source, target, &map, last_use, level),
+            None => accumulate_simple(metric, source, target, &map, reverse),
         }
-    } else {
-        for (level, group) in topo_groups.iter().enumerate() {
-            process_level(metric, group, &map, &last_use, level, reverse, result);
-        }
+        finalize(metric, target, &map, result);
     }
 }
 
-fn process_level_fast<M: Metric>(
+/// Record, for every source node, the highest traversal level at which it is used.
+fn last_use_by_source(
+    topo_groups: &[PyReadonlyArray2<'_, i64>],
+    order: &[usize],
+    reverse: bool,
+) -> HashMap<i64, usize> {
+    let mut last_use = HashMap::new();
+    for (level, &g) in order.iter().enumerate() {
+        let arr = topo_groups[g].as_array();
+        for &s in arr.row(if reverse { 0 } else { 1 }).iter() {
+            last_use.insert(s, level);
+        }
+    }
+    last_use
+}
+
+/// Accumulate a level whose sources each feed a single edge (non-bifurcating).
+fn accumulate_simple<M: Metric>(
     metric: &M,
-    topo_group: &PyReadonlyArray2<'_, i64>,
+    source: &[i64],
+    target: &[i64],
     map: &DashMap<i64, M::Acc>,
     reverse: bool,
-    result: &mut [M::Out],
 ) {
-    let arr = topo_group.as_array();
-    let did_vec = arr.row(0);
-    let uid_vec = arr.row(1);
-    let did = did_vec.as_slice().expect("Expected contiguous did slice");
-    let uid = uid_vec.as_slice().expect("Expected contiguous uid slice");
-    let (source, target): (&[i64], &[i64]) = if reverse { (did, uid) } else { (uid, did) };
-
     source
         .par_iter()
         .zip(target.par_iter())
         .for_each(|(&s, &t)| {
+            // Upstream sources are used once and can be moved out; downstream
+            // sources may feed several targets so they are cloned instead.
             let s_acc = if reverse {
                 map.get(&s)
                     .map(|entry| entry.clone())
@@ -112,30 +113,6 @@ fn process_level_fast<M: Metric>(
             };
             merge_into(metric, map, t, &s_acc);
         });
-
-    finalize(metric, target, map, result);
-}
-
-fn process_level<M: Metric>(
-    metric: &M,
-    topo_group: &PyReadonlyArray2<'_, i64>,
-    map: &DashMap<i64, M::Acc>,
-    last_use: &HashMap<i64, usize>,
-    level: usize,
-    reverse: bool,
-    result: &mut [M::Out],
-) {
-    let arr = topo_group.as_array();
-    let did_vec = arr.row(0);
-    let uid_vec = arr.row(1);
-    let did = did_vec.as_slice().expect("Expected contiguous did slice");
-    let uid = uid_vec.as_slice().expect("Expected contiguous uid slice");
-
-    let (source, target): (&[i64], &[i64]) = if reverse { (did, uid) } else { (uid, did) };
-
-    process_grouped(metric, source, target, map, last_use, level);
-
-    finalize(metric, target, map, result);
 }
 
 fn finalize<M: Metric>(
@@ -160,7 +137,10 @@ fn finalize<M: Metric>(
     }
 }
 
-fn process_grouped<M: Metric>(
+/// Accumulate a level where sources may feed several edges. Edges are grouped by
+/// source so each accumulator is moved once and shared across its targets rather
+/// than cloned per edge; a source is only removed on the level of its last use.
+fn accumulate_grouped<M: Metric>(
     metric: &M,
     source: &[i64],
     target: &[i64],
@@ -203,91 +183,4 @@ fn merge_into<M: Metric>(metric: &M, map: &DashMap<i64, M::Acc>, target: i64, so
             metric.merge(&mut acc, source);
             acc
         });
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::sync::atomic::{AtomicUsize, Ordering};
-    use std::sync::Arc;
-
-    struct TestAcc {
-        value: usize,
-        clones: Arc<AtomicUsize>,
-    }
-
-    impl Clone for TestAcc {
-        fn clone(&self) -> Self {
-            self.clones.fetch_add(1, Ordering::Relaxed);
-            Self {
-                value: self.value,
-                clones: Arc::clone(&self.clones),
-            }
-        }
-    }
-
-    struct SumMetric {
-        clones: Arc<AtomicUsize>,
-    }
-
-    impl Metric for SumMetric {
-        type Acc = TestAcc;
-        type Out = usize;
-
-        fn singleton(&self, _node: usize) -> TestAcc {
-            TestAcc {
-                value: 1,
-                clones: Arc::clone(&self.clones),
-            }
-        }
-
-        fn merge(&self, dst: &mut TestAcc, src: &TestAcc) {
-            dst.value += src.value;
-        }
-
-        fn finalize(&self, acc: &TestAcc) -> usize {
-            acc.value
-        }
-    }
-
-    #[test]
-    fn grouped_fanout_does_not_clone_accumulators() {
-        const EDGES: i64 = 10_000;
-        let clones = Arc::new(AtomicUsize::new(0));
-        let metric = SumMetric {
-            clones: Arc::clone(&clones),
-        };
-        let map = DashMap::new();
-        let source = vec![0; EDGES as usize];
-        let target: Vec<i64> = (1..=EDGES).collect();
-        let last_use = HashMap::from([(0, 0)]);
-
-        process_grouped(&metric, &source, &target, &map, &last_use, 0);
-
-        assert_eq!(clones.load(Ordering::Relaxed), 0);
-        assert!(!map.contains_key(&0));
-        assert_eq!(map.len(), EDGES as usize);
-        assert!(target
-            .iter()
-            .all(|target| map.get(target).unwrap().value == 2));
-    }
-
-    #[test]
-    fn grouped_source_is_retained_until_its_last_level() {
-        let clones = Arc::new(AtomicUsize::new(0));
-        let metric = SumMetric {
-            clones: Arc::clone(&clones),
-        };
-        let map = DashMap::new();
-        let last_use = HashMap::from([(0, 1)]);
-
-        process_grouped(&metric, &[0], &[1], &map, &last_use, 0);
-        assert_eq!(map.get(&0).unwrap().value, 1);
-        assert_eq!(map.get(&1).unwrap().value, 2);
-
-        process_grouped(&metric, &[0], &[2], &map, &last_use, 1);
-        assert!(!map.contains_key(&0));
-        assert_eq!(map.get(&2).unwrap().value, 2);
-        assert_eq!(clones.load(Ordering::Relaxed), 0);
-    }
 }

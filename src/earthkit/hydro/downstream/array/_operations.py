@@ -29,9 +29,11 @@ def percentile(river_network, field, weights, p, return_type):
 
     def calculate_percentile(xp, river_network, field, weights, p):
         if weights is not None:
-            return _rust.calc_weighted_perc_downstream(river_network.groups, field, weights, p)
+            return _rust.calc_weighted_perc_downstream(
+                river_network.groups, field, weights, p, river_network.bifurcates
+            )
         else:
-            return _rust.calc_perc_downstream(river_network.groups, field, p)
+            return _rust.calc_perc_downstream(river_network.groups, field, p, river_network.bifurcates)
 
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -156,7 +158,7 @@ def mode(xp, river_network, field, node_weights, edge_weights, return_type):
         # Mode only supported for numpy backend with Rust
         if xp.name != "numpy":
             raise NotImplementedError("Mode is only supported for numpy backend with Rust")
-        return _rust.calc_mode_downstream(river_network.groups, field)
+        return _rust.calc_mode_downstream(river_network.groups, field, river_network.bifurcates)
 
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:

@@ -63,6 +63,7 @@ pub fn calc_perc<'py>(
     topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
     field: PyReadonlyArray1<'py, f64>,
     p: f64,
+    bifurcates: bool,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let field_array = field.as_array();
     let mut result: Vec<f64> = field_array.to_vec();
@@ -70,7 +71,7 @@ pub fn calc_perc<'py>(
         field: field_array,
         p,
     };
-    run(&metric, &topo_groups, false, &mut result);
+    run(&metric, &topo_groups, false, bifurcates, &mut result);
     Ok(PyArray1::from_vec(py, result).to_owned().into())
 }
 
@@ -80,6 +81,7 @@ pub fn calc_perc_downstream<'py>(
     topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
     field: PyReadonlyArray1<'py, f64>,
     p: f64,
+    bifurcates: bool,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let field_array = field.as_array();
     let mut result: Vec<f64> = field_array.to_vec();
@@ -87,7 +89,7 @@ pub fn calc_perc_downstream<'py>(
         field: field_array,
         p,
     };
-    run(&metric, &topo_groups, true, &mut result);
+    run(&metric, &topo_groups, true, bifurcates, &mut result);
     Ok(PyArray1::from_vec(py, result).to_owned().into())
 }
 
@@ -98,6 +100,7 @@ pub fn calc_weighted_perc<'py>(
     field: PyReadonlyArray1<'py, f64>,
     weights: PyReadonlyArray1<'py, f64>,
     p: f64,
+    bifurcates: bool,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let field_array = field.as_array();
     let weights_array = weights.as_array();
@@ -107,7 +110,7 @@ pub fn calc_weighted_perc<'py>(
         weights: weights_array,
         p,
     };
-    run(&metric, &topo_groups, false, &mut result);
+    run(&metric, &topo_groups, false, bifurcates, &mut result);
     Ok(PyArray1::from_vec(py, result).to_owned().into())
 }
 
@@ -118,6 +121,7 @@ pub fn calc_weighted_perc_downstream<'py>(
     field: PyReadonlyArray1<'py, f64>,
     weights: PyReadonlyArray1<'py, f64>,
     p: f64,
+    bifurcates: bool,
 ) -> PyResult<Py<PyArray1<f64>>> {
     let field_array = field.as_array();
     let weights_array = weights.as_array();
@@ -127,7 +131,7 @@ pub fn calc_weighted_perc_downstream<'py>(
         weights: weights_array,
         p,
     };
-    run(&metric, &topo_groups, true, &mut result);
+    run(&metric, &topo_groups, true, bifurcates, &mut result);
     Ok(PyArray1::from_vec(py, result).to_owned().into())
 }
 

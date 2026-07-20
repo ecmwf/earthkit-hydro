@@ -84,3 +84,30 @@ def test_downstream_percentile_gridded_return_type(river_network, input_field, e
     input_2d = convert_to_2d(river_network, input_field, 0)
     output = ekh.downstream.array.percentile(river_network, input_2d, p=0.5, node_weights=None, return_type="gridded")
     np.testing.assert_allclose(output, expected)
+
+
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
+def test_downstream_percentile_bifurcation():
+    groups = [
+        np.array([[2, 2], [0, 1]], dtype=np.int64),
+        np.array([[3], [2]], dtype=np.int64),
+    ]
+    field = np.array([0.0, 10.0, 20.0, 30.0])
+
+    result = _rust.calc_perc_downstream(groups, field, 0.5, True)
+
+    np.testing.assert_allclose(result, [20.0, 20.0, 25.0, 30.0])
+
+
+@pytest.mark.skipif(not RUST, reason="Rust unavailable")
+def test_downstream_percentile_source_used_across_groups():
+    groups = [
+        np.array([[1, 3], [0, 2]], dtype=np.int64),
+        np.array([[3], [1]], dtype=np.int64),
+        np.array([[4], [3]], dtype=np.int64),
+    ]
+    field = np.array([0.0, 10.0, 20.0, 30.0, 40.0])
+
+    result = _rust.calc_perc_downstream(groups, field, 0.5, True)
+
+    np.testing.assert_allclose(result, [20.0, 30.0, 30.0, 35.0, 40.0])

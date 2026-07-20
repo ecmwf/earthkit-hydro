@@ -47,11 +47,12 @@ pub fn calc_mode<'py>(
     py: Python<'py>,
     topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
     field: PyReadonlyArray1<'py, i64>,
+    bifurcates: bool,
 ) -> PyResult<Py<PyArray1<i64>>> {
     let field_array = field.as_array();
     let mut result: Vec<i64> = field_array.to_vec();
     let metric = Mode { field: field_array };
-    run(&metric, &topo_groups, false, &mut result);
+    run(&metric, &topo_groups, false, bifurcates, &mut result);
     Ok(PyArray1::from_vec(py, result).to_owned().into())
 }
 
@@ -60,10 +61,11 @@ pub fn calc_mode_downstream<'py>(
     py: Python<'py>,
     topo_groups: Vec<PyReadonlyArray2<'py, i64>>,
     field: PyReadonlyArray1<'py, i64>,
+    bifurcates: bool,
 ) -> PyResult<Py<PyArray1<i64>>> {
     let field_array = field.as_array();
     let mut result: Vec<i64> = field_array.to_vec();
     let metric = Mode { field: field_array };
-    run(&metric, &topo_groups, true, &mut result);
+    run(&metric, &topo_groups, true, bifurcates, &mut result);
     Ok(PyArray1::from_vec(py, result).to_owned().into())
 }

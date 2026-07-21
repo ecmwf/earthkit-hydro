@@ -1,15 +1,10 @@
-from io import BytesIO
 from urllib.request import urlopen
 
-import joblib
 from earthkit.hydro._version import __version__ as ekh_version
-
-from earthkit.hydro._readers import assign_coords, from_cama_nextxy, from_d8, from_grit
-from earthkit.hydro._readers._cama import load_cama_data
-from earthkit.hydro._readers._d8 import load_d8_data
 from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._cache import cache
+from ._formats import FORMATS
 
 # read in major version
 # if dev version, try add +1 to major version
@@ -58,29 +53,11 @@ def create(
     RiverNetwork
         The river network object created from the given data.
     """
-    if river_network_format == "precomputed":
-        if source == "file":
-            river_network_storage = joblib.load(path)
-        elif source == "url":
-            with urlopen(path) as response:
-                river_network_storage = joblib.load(BytesIO(response.read()))
-        else:
-            raise ValueError(f"Unsupported source for river network format{river_network_format}: {source}.")
-    elif river_network_format == "cama":
-        data, coords = load_cama_data(path, river_network_format, source)
-        river_network_storage = from_cama_nextxy(*data)
-        river_network_storage = assign_coords(river_network_storage, data, coords)
-    elif river_network_format in {"pcr_d8", "esri_d8", "merit_d8"}:
-        data, coords = load_d8_data(path, river_network_format, source)
-        river_network_storage = from_d8(data, river_network_format=river_network_format)
-        river_network_storage = assign_coords(river_network_storage, data, coords)
-    elif river_network_format == "grit":
-        assert path.endswith(".gpkg")
-        river_network_storage = from_grit(path)
-    else:
+    fmt = FORMATS.get(river_network_format)
+    if fmt is None:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
 
-    return RiverNetwork(river_network_storage)
+    return RiverNetwork(fmt.create(path, source))
 
 
 def load(

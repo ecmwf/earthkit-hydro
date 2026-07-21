@@ -1,10 +1,9 @@
 import numpy as np
 
-from earthkit.hydro._readers._cama import from_cama_nextxy_raw, load_cama_data
-from earthkit.hydro._readers._d8 import from_d8_raw, load_d8_data
 from earthkit.hydro.data_structures._network_storage import RiverNetworkStorage
 
 from ._export import export
+from ._formats import FORMATS
 
 
 def set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge):
@@ -106,14 +105,10 @@ def repair(input_path, output_path, river_network_format, input_source="file"):
     -------
     None. Writes a repaired river network to a local file at `output_path`, in the same format as the original.
     """
-    if river_network_format == "cama":
-        data, coords = load_cama_data(input_path, river_network_format, input_source)
-        up, down, edge, mask, n_n, n_e = from_cama_nextxy_raw(*data)
-    elif river_network_format in {"pcr_d8", "esri_d8", "merit_d8"}:
-        data, coords = load_d8_data(input_path, river_network_format, input_source)
-        up, down, edge, mask, n_n, n_e = from_d8_raw(data, river_network_format=river_network_format)
-    else:
+    fmt = FORMATS.get(river_network_format)
+    if fmt is None or not hasattr(fmt, "load_partial"):
         raise ValueError(f"Unsupported river network format for the repair method: {river_network_format}.")
+    (up, down, edge, mask, n_n, n_e), coords = fmt.load_partial(input_path, input_source)
     up, down, mask, n_n, n_e, edge = set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge)
     up, down, mask, n_n, n_e, edge = set_missing_if_cycle(up, down, mask, n_n, n_e, edge)
 

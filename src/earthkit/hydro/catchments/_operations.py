@@ -15,6 +15,18 @@ def var(
 
 
 @multi_backend(allow_jax_jit=False)
+def skewness(
+    xp,
+    river_network,
+    field,
+    locations,
+    node_weights,
+    edge_weights,
+):
+    return array.skewness(xp, river_network, field, locations, node_weights, edge_weights)
+
+
+@multi_backend(allow_jax_jit=False)
 def std(
     xp,
     river_network,

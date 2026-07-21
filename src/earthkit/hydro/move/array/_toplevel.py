@@ -46,7 +46,7 @@ def upstream(
     edge_weights : array-like, optional
         Array of weights for each edge. Default is None (unweighted).
     metric : str, optional
-        Aggregation function to apply. Options are 'var', 'std', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
+        Aggregation function to apply. Options are 'var', 'std', 'skewness', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
     return_type : str, optional
         Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
 
@@ -111,7 +111,7 @@ def downstream(
     edge_weights : array-like, optional
         Array of weights for each edge. Default is None (unweighted).
     metric : str, optional
-        Aggregation function to apply. Options are 'var', 'std', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
+        Aggregation function to apply. Options are 'var', 'std', 'skewness', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
     return_type : str, optional
         Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
 

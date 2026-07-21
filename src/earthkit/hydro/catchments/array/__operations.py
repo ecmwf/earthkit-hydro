@@ -37,6 +37,19 @@ def var(xp, river_network, field, locations, node_weights, edge_weights):
 
 
 @mask(unmask=False)
+def skewness(xp, river_network, field, locations, node_weights, edge_weights):
+    return calculate_catchment_metric(
+        xp,
+        river_network,
+        field,
+        locations,
+        "skewness",
+        node_weights,
+        edge_weights,
+    )
+
+
+@mask(unmask=False)
 def std(xp, river_network, field, locations, node_weights, edge_weights):
     return calculate_catchment_metric(
         xp,

@@ -21,7 +21,7 @@ def calculate_move_metric(
         raise ValueError(f"flow_direction must be 'up' or 'down', got {flow_direction}.")
 
     if node_weights is None:
-        if metric in {"mean", "std", "var"}:
+        if metric in {"mean", "std", "var", "skewness"}:
             node_weights = xp.ones(river_network.n_nodes, dtype=xp.float64)
     else:
         node_weights = xp.copy(node_weights)
@@ -42,7 +42,7 @@ def calculate_move_metric(
         edge_multiplicative_weight=edge_weights,
     )
 
-    if metric in {"mean", "std", "var"}:
+    if metric in {"mean", "std", "var", "skewness"}:
         counts = flow(
             xp,
             river_network,
@@ -57,7 +57,7 @@ def calculate_move_metric(
         if metric == "mean":
             weighted_field /= counts
             return weighted_field
-        elif metric in {"var", "std"}:
+        elif metric in {"var", "std", "skewness"}:
             weighted_sum_of_squares = flow(
                 xp,
                 river_network,
@@ -69,11 +69,26 @@ def calculate_move_metric(
                 edge_multiplicative_weight=edge_weights,
             )
             mean = weighted_field / counts
-            weighted_sum_of_squares = weighted_sum_of_squares / counts - mean**2
-            weighted_sum_of_squares = xp.clip(weighted_sum_of_squares, 0, xp.inf)
+            var = weighted_sum_of_squares / counts - mean**2
+            var = xp.clip(var, 0, xp.inf)
             if metric == "var":
-                return weighted_sum_of_squares
+                return var
             elif metric == "std":
-                return xp.sqrt(weighted_sum_of_squares)
+                return xp.sqrt(var)
+            elif metric == "skewness":
+                weighted_sum_of_cubes = flow(
+                    xp,
+                    river_network,
+                    xp.zeros(field.shape),
+                    func,
+                    invert_graph,
+                    node_additive_weight=(field**3 if node_weights is None else field**3 * node_weights),
+                    node_modifier_use_upstream=node_modifier_use_upstream,
+                    edge_multiplicative_weight=edge_weights,
+                )
+                third_moment = (
+                    weighted_sum_of_cubes / counts - 3 * mean * (weighted_sum_of_squares / counts) + 2 * mean**3
+                )
+                return xp.where(var == 0, xp.nan, third_moment / var**1.5)
     else:
         return weighted_field

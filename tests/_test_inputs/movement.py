@@ -13,3 +13,103 @@ downstream_1 = np.array(
 
 
 downstream_2 = np.array([0, 3, 8, 0, 6, 11, 11, 12, 14, 14, 14, 7, 1, 0, 16, 12], dtype=float)
+
+# Move upstream skewness for network 1
+move_upstream_skewness_1 = np.array(
+    [
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+    ],
+    dtype=float,
+)
+
+# Move downstream skewness for network 1
+move_downstream_skewness_1 = np.array(
+    [
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        0.0,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        0.6309038567106233,
+        0.0,
+        np.nan,
+        np.nan,
+        0.40604028821330246,
+        np.nan,
+        np.nan,
+        np.nan,
+    ],
+    dtype=float,
+)
+
+# Move upstream skewness for network 2
+move_upstream_skewness_2 = np.array(
+    [
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+    ],
+    dtype=float,
+)
+
+# Move downstream skewness for network 2
+move_downstream_skewness_2 = np.array(
+    [
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        0.0,
+        0.0,
+        np.nan,
+        0.0,
+        np.nan,
+        np.nan,
+    ],
+    dtype=float,
+)

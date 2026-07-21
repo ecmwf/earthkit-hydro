@@ -17,6 +17,7 @@ def metrics_func_finder(metric, xp):
         "mean": SumBased,
         "std": SumBased,
         "var": SumBased,
+        "skewness": SumBased,
         "max": MaxBased,
         "min": MinBased,
     }

@@ -26,7 +26,7 @@ def percentile(
 
         \begin{align*}
         \mathcal{A}(j) &= \{j\} \cup \bigcup_{i \in \mathrm{Up}(j)} \mathcal{A}(i) \\
-        P_p(x)_j &= \mathrm{percentile}_p \bigl(\{ w'_i \cdot x_i : i \in \mathcal{A}(j) \}\bigr)
+        P_p(x)_j &= \operatorname{wpctl}_p \bigl(\{ (x_i,\, w'_i) : i \in \mathcal{A}(j) \}\bigr)
         \end{align*}
 
     where:
@@ -35,7 +35,27 @@ def percentile(
     - :math:`w'_i` is the node weight (e.g., pixel area),
     - :math:`\mathrm{Up}(j)` is the set of immediate upstream nodes flowing into node :math:`j`,
     - :math:`\mathcal{A}(j)` is the full contributing area of node :math:`j` (all upstream nodes including :math:`j` itself),
-    - :math:`P_p(x)_j` is the :math:`p`-th percentile at node :math:`j`.
+    - :math:`P_p(x)_j` is the :math:`p`-th weighted percentile at node :math:`j`.
+
+    The weighted percentile :math:`\operatorname{wpctl}_p` sorts the values
+    :math:`x_{(0)} \le \dots \le x_{(m-1)}` with associated weights :math:`w_{(k)}`, places
+    each value at a knot whose spacing is set by the weights, and interpolates linearly:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        L_k &= \tfrac{1}{2}\bigl(w_{(k)} + w_{(k+1)}\bigr), \qquad k = 0, \dots, m-2 \\
+        P_0 = 0, \quad P_k &= \frac{\sum_{l<k} L_l}{\sum_l L_l}, \quad P_{m-1} = 1 \\
+        \operatorname{wpctl}_p &= x_{(k)} + \frac{p - P_k}{P_{k+1} - P_k}\,\bigl(x_{(k+1)} - x_{(k)}\bigr), \qquad P_k \le p \le P_{k+1}
+        \end{align*}
+
+    A larger weight widens the percentile interval on either side of a value, shifting every
+    later knot. With uniform weights all :math:`L_k` are equal, so :math:`P_k = k/(m-1)` and
+    the result reduces exactly to NumPy's default (``linear`` / type 7) percentile. The
+    minimum is returned at :math:`p = 0` and the maximum at :math:`p = 1`. With only two
+    values there is a single interval, so the result is their plain linear interpolation
+    regardless of the weights (the midpoint at :math:`p = 0.5`).
 
     Parameters
     ----------

@@ -143,12 +143,32 @@ fn percentile(sorted_values: &[f64], percentile: f64) -> f64 {
     }
 }
 
-/// Weighted percentile with linear interpolation.
+/// Symmetric "edge length" between two neighbouring weights.
 ///
-/// Each sorted value x_i is assigned quantile position:
-///     q_i = C_i^- / D
-/// where C_i^- = Σ_{j<i} w_j (exclusive cumulative weight) and D = W - w_{n-1}.
-/// When all weights are equal this reduces to q_i = i/(n-1), matching numpy.
+/// This is the design knob that controls how strongly a node's weight stretches
+/// the percentile space of its adjacent intervals. The arithmetic mean makes the
+/// total axis length equal the summed weight (each interior node contributes its
+/// own weight, endpoints half), i.e. percentile width == probability mass.
+#[inline]
+fn edge_length(a: f64, b: f64) -> f64 {
+    0.5 * (a + b)
+}
+
+/// Weighted percentile that redistributes percentile space by weight.
+///
+/// The sorted values are placed at knots `P_i = (Σ_{k<i} L_k) / Σ L`, where the
+/// interval width `L_i = edge_length(w_i, w_{i+1})`. Heavier nodes widen their
+/// adjacent intervals, so every weight influences the position of all later
+/// knots (a value's weight affects both intervals it borders). Within the
+/// bracketing interval the two values are interpolated linearly.
+///
+/// Equal weights make every `L_i` equal, giving `P_i = i/(n-1)` and reproducing
+/// NumPy's `linear` (type-7) percentile exactly. The minimum is returned at
+/// `p = 0` and the maximum at `p = 1`.
+///
+/// Note: for `n = 2` there is a single interval, so `P = [0, 1]` regardless of
+/// weights and the result is the midpoint at `p = 0.5` — weights only redistribute
+/// space when there are at least three values.
 fn weighted_percentile(sorted_values: &[f64], weights: &[f64], p: f64) -> f64 {
     let n = sorted_values.len();
     if n == 1 {
@@ -161,30 +181,26 @@ fn weighted_percentile(sorted_values: &[f64], weights: &[f64], p: f64) -> f64 {
         return sorted_values[n - 1];
     }
 
-    // D = W - w_{n-1} so that q_{n-1} = C_{n-1}^- / D = 1
-    let total_w: f64 = weights.iter().sum();
-    let d = total_w - weights[n - 1];
-
-    if d <= 0.0 {
-        return sorted_values[0];
+    let total: f64 = (0..n - 1)
+        .map(|i| edge_length(weights[i], weights[i + 1]))
+        .sum();
+    if total <= 0.0 {
+        // All weights zero: fall back to an unweighted (type-7) position.
+        let rank = p * (n as f64 - 1.0);
+        let i = rank.floor() as usize;
+        let t = rank - i as f64;
+        return sorted_values[i] + t * (sorted_values[i + 1] - sorted_values[i]);
     }
 
-    // target in cumulative-weight-before space: C_k^- ≤ target < C_{k+1}^-
-    let target = p * d;
-
-    let mut cum_before: f64 = 0.0; // C_0^- = 0
+    let target = p * total;
+    let mut cum = 0.0;
     for i in 0..n - 1 {
-        let next_cum = cum_before + weights[i]; // C_{i+1}^-
-        if target <= next_cum {
-            // Interpolation fraction within [q_i, q_{i+1}]
-            let frac = if weights[i] > 0.0 {
-                (target - cum_before) / weights[i]
-            } else {
-                0.0
-            };
-            return sorted_values[i] + frac * (sorted_values[i + 1] - sorted_values[i]);
+        let len = edge_length(weights[i], weights[i + 1]);
+        if target <= cum + len {
+            let t = if len > 0.0 { (target - cum) / len } else { 0.0 };
+            return sorted_values[i] + t * (sorted_values[i + 1] - sorted_values[i]);
         }
-        cum_before = next_cum;
+        cum += len;
     }
 
     sorted_values[n - 1]

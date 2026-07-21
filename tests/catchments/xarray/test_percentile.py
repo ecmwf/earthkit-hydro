@@ -68,29 +68,24 @@ def test_catchments_percentile_xarray_unweighted(flow_directions, input_field, l
 
 
 @pytest.mark.skipif(not RUST, reason="Rust unavailable")
-@pytest.mark.parametrize(
-    "flow_directions, input_field, locations, expected",
-    [
-        (
-            cama_nextxy_1,
-            input_field_1c,
-            catchment_query_field_1,
-            catchment_percentile_weighted_p05_1c,
-        ),
-    ],
-)
-def test_catchments_percentile_xarray_weighted(flow_directions, input_field, locations, expected):
-    rn = make_river_network_with_coords(flow_directions)
-    field_xr = field_to_xarray(rn, input_field)
+def test_catchments_percentile_xarray_weighted_matches_array_backend():
+    # The xarray wrapper must forward node weights and return the same numbers as
+    # the (thoroughly tested) array backend.
+    rn = make_river_network_with_coords(cama_nextxy_1)
+    field_xr = field_to_xarray(rn, input_field_1c)
+    weights_1d = np.arange(1, rn.n_nodes + 1, dtype="float64")
     ny, nx = rn.shape
     weights_2d = np.zeros((ny, nx), dtype="float64")
-    weights_2d.flat[rn.mask] = np.arange(1, rn.n_nodes + 1, dtype="float64")
+    weights_2d.flat[rn.mask] = weights_1d
     weights_xr = xr.DataArray(
         weights_2d,
         dims=["y", "x"],
         coords={"y": rn.coords["y"], "x": rn.coords["x"]},
     )
 
-    result = ekh.catchments.percentile(rn, field_xr, p=0.5, locations=locations, node_weights=weights_xr)
+    result = ekh.catchments.percentile(rn, field_xr, p=0.5, locations=catchment_query_field_1, node_weights=weights_xr)
+    expected = ekh.catchments.array.percentile(
+        rn, np.asarray(input_field_1c, dtype=float), p=0.5, locations=catchment_query_field_1, node_weights=weights_1d
+    )
     assert isinstance(result, xr.DataArray)
-    np.testing.assert_allclose(result.values, expected)
+    np.testing.assert_allclose(result.values, np.asarray(expected))

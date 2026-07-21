@@ -50,7 +50,7 @@ class Precomputed:
             with urlopen(path) as response:
                 return joblib.load(BytesIO(response.read()))
         else:
-            raise ValueError(f"Unsupported source for river network format precomputed: {source}.")
+            raise ValueError(f"Unsupported source for precomputed river network format: {source}.")
 
     def export_to(self, river_network_storage, path, compression):
         joblib.dump(river_network_storage, path, compress=compression)

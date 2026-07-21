@@ -10,7 +10,7 @@ use numpy::ndarray::ArrayView1;
 use numpy::{PyArray1, PyReadonlyArray1, PyReadonlyArray2};
 use pyo3::prelude::*;
 
-use crate::metric::{run, Metric};
+use crate::metric::Metric;
 
 struct Percentile<'a> {
     field: ArrayView1<'a, f64>,
@@ -20,6 +20,10 @@ struct Percentile<'a> {
 impl Metric for Percentile<'_> {
     type Acc = Vec<f64>;
     type Out = f64;
+
+    fn initial(&self) -> Vec<f64> {
+        self.field.to_vec()
+    }
 
     fn singleton(&self, node: usize) -> Vec<f64> {
         vec![self.field[node]]
@@ -44,6 +48,10 @@ impl Metric for WeightedPercentile<'_> {
     type Acc = (Vec<f64>, Vec<f64>);
     type Out = f64;
 
+    fn initial(&self) -> Vec<f64> {
+        self.field.to_vec()
+    }
+
     fn singleton(&self, node: usize) -> (Vec<f64>, Vec<f64>) {
         (vec![self.field[node]], vec![self.weights[node]])
     }
@@ -65,14 +73,11 @@ pub fn calc_perc<'py>(
     p: f64,
     bifurcates: bool,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let field_array = field.as_array();
-    let mut result: Vec<f64> = field_array.to_vec();
     let metric = Percentile {
-        field: field_array,
+        field: field.as_array(),
         p,
     };
-    run(&metric, &topo_groups, false, bifurcates, &mut result);
-    Ok(PyArray1::from_vec(py, result).to_owned().into())
+    Ok(metric.compute(py, &topo_groups, false, bifurcates))
 }
 
 #[pyfunction]
@@ -83,14 +88,11 @@ pub fn calc_perc_downstream<'py>(
     p: f64,
     bifurcates: bool,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let field_array = field.as_array();
-    let mut result: Vec<f64> = field_array.to_vec();
     let metric = Percentile {
-        field: field_array,
+        field: field.as_array(),
         p,
     };
-    run(&metric, &topo_groups, true, bifurcates, &mut result);
-    Ok(PyArray1::from_vec(py, result).to_owned().into())
+    Ok(metric.compute(py, &topo_groups, true, bifurcates))
 }
 
 #[pyfunction]
@@ -102,16 +104,12 @@ pub fn calc_weighted_perc<'py>(
     p: f64,
     bifurcates: bool,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let field_array = field.as_array();
-    let weights_array = weights.as_array();
-    let mut result: Vec<f64> = field_array.to_vec();
     let metric = WeightedPercentile {
-        field: field_array,
-        weights: weights_array,
+        field: field.as_array(),
+        weights: weights.as_array(),
         p,
     };
-    run(&metric, &topo_groups, false, bifurcates, &mut result);
-    Ok(PyArray1::from_vec(py, result).to_owned().into())
+    Ok(metric.compute(py, &topo_groups, false, bifurcates))
 }
 
 #[pyfunction]
@@ -123,16 +121,12 @@ pub fn calc_weighted_perc_downstream<'py>(
     p: f64,
     bifurcates: bool,
 ) -> PyResult<Py<PyArray1<f64>>> {
-    let field_array = field.as_array();
-    let weights_array = weights.as_array();
-    let mut result: Vec<f64> = field_array.to_vec();
     let metric = WeightedPercentile {
-        field: field_array,
-        weights: weights_array,
+        field: field.as_array(),
+        weights: weights.as_array(),
         p,
     };
-    run(&metric, &topo_groups, true, bifurcates, &mut result);
-    Ok(PyArray1::from_vec(py, result).to_owned().into())
+    Ok(metric.compute(py, &topo_groups, true, bifurcates))
 }
 
 fn percentile(sorted_values: &[f64], percentile: f64) -> f64 {

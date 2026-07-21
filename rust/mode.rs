@@ -11,7 +11,7 @@ use numpy::{PyArray1, PyReadonlyArray1, PyReadonlyArray2};
 use pyo3::prelude::*;
 use std::collections::HashMap;
 
-use crate::metric::{run, Metric};
+use crate::metric::Metric;
 
 struct Mode<'a> {
     field: ArrayView1<'a, i64>,
@@ -20,6 +20,10 @@ struct Mode<'a> {
 impl Metric for Mode<'_> {
     type Acc = HashMap<i64, i64>;
     type Out = i64;
+
+    fn initial(&self) -> Vec<i64> {
+        self.field.to_vec()
+    }
 
     fn singleton(&self, node: usize) -> HashMap<i64, i64> {
         let mut counts = HashMap::new();
@@ -49,11 +53,10 @@ pub fn calc_mode<'py>(
     field: PyReadonlyArray1<'py, i64>,
     bifurcates: bool,
 ) -> PyResult<Py<PyArray1<i64>>> {
-    let field_array = field.as_array();
-    let mut result: Vec<i64> = field_array.to_vec();
-    let metric = Mode { field: field_array };
-    run(&metric, &topo_groups, false, bifurcates, &mut result);
-    Ok(PyArray1::from_vec(py, result).to_owned().into())
+    let metric = Mode {
+        field: field.as_array(),
+    };
+    Ok(metric.compute(py, &topo_groups, false, bifurcates))
 }
 
 #[pyfunction]
@@ -63,9 +66,8 @@ pub fn calc_mode_downstream<'py>(
     field: PyReadonlyArray1<'py, i64>,
     bifurcates: bool,
 ) -> PyResult<Py<PyArray1<i64>>> {
-    let field_array = field.as_array();
-    let mut result: Vec<i64> = field_array.to_vec();
-    let metric = Mode { field: field_array };
-    run(&metric, &topo_groups, true, bifurcates, &mut result);
-    Ok(PyArray1::from_vec(py, result).to_owned().into())
+    let metric = Mode {
+        field: field.as_array(),
+    };
+    Ok(metric.compute(py, &topo_groups, true, bifurcates))
 }

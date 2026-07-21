@@ -7,42 +7,64 @@
 // nor does it submit to any jurisdiction.
 
 use dashmap::DashMap;
-use numpy::PyReadonlyArray2;
+use numpy::{Element, PyArray1, PyReadonlyArray2};
+use pyo3::prelude::*;
 use rayon::prelude::*;
 use std::collections::HashMap;
 
 /// A metric that accumulates per-node state across the river network.
 ///
-/// Implementors only describe *what* to accumulate (`Acc`), how to seed it for a
-/// single node (`singleton`), how to combine two accumulations (`merge`) and how
-/// to turn an accumulation into a result value (`finalize`). The traversal itself
-/// (topological ordering, parallelism, memory cleanup) is handled by [`run`].
+/// An implementor only describes *what* to accumulate. The traversal itself
+/// (topological ordering, parallelism, memory cleanup) lives in [`Metric::compute`]:
+///
+/// * `initial`   – each node's result before any accumulation (its own value).
+/// * `singleton` – seed an accumulator from a single node.
+/// * `merge`     – fold one accumulator into another.
+/// * `finalize`  – turn a finished accumulator into a result value.
+///
+/// `reverse == false` accumulates upstream (data flows uid -> did); `reverse ==
+/// true` accumulates downstream (data flows did -> uid).
 pub trait Metric: Sync {
     type Acc: Clone + Send + Sync;
-    type Out: Copy + Send;
+    type Out: Element + Send;
 
+    fn initial(&self) -> Vec<Self::Out>;
     fn singleton(&self, node: usize) -> Self::Acc;
     fn merge(&self, dst: &mut Self::Acc, src: &Self::Acc);
     fn finalize(&self, acc: &Self::Acc) -> Self::Out;
+
+    /// Accumulate over the whole network and return the result as a NumPy array.
+    fn compute<'py>(
+        &self,
+        py: Python<'py>,
+        topo_groups: &[PyReadonlyArray2<'py, i64>],
+        reverse: bool,
+        bifurcates: bool,
+    ) -> Py<PyArray1<Self::Out>>
+    where
+        Self: Sized,
+    {
+        let result = run(self, topo_groups, reverse, bifurcates);
+        PyArray1::from_vec(py, result).to_owned().into()
+    }
 }
 
-/// Run a metric over the topological groups.
+/// Accumulate a metric over the topological groups and return the per-node result.
 ///
-/// `reverse == false` accumulates upstream (data flows uid -> did) and
-/// `reverse == true` accumulates downstream (data flows did -> uid). Accumulators
-/// are moved on their final use. Levels with repeated sources are grouped by
-/// source so one accumulator can feed every outgoing edge without being cloned.
+/// Accumulators are moved on their final use. When a network bifurcates a source
+/// feeds several edges (and levels), so edges are grouped by source to reuse one
+/// accumulator across all its targets instead of cloning it per edge.
 ///
 /// Accumulation is edge-based: if bifurcating paths reconverge, a shared node is
 /// represented once per path. Exact unique-node semantics would require carrying
 /// reachability sets, with potentially quadratic time and memory costs.
-pub fn run<M: Metric>(
+fn run<M: Metric>(
     metric: &M,
     topo_groups: &[PyReadonlyArray2<'_, i64>],
     reverse: bool,
     bifurcates: bool,
-    result: &mut [M::Out],
-) {
+) -> Vec<M::Out> {
+    let mut result = metric.initial();
     let map: DashMap<i64, M::Acc> = DashMap::new();
 
     // Upstream traversal walks levels sources -> sinks; downstream reverses that.
@@ -68,8 +90,10 @@ pub fn run<M: Metric>(
             Some(last_use) => accumulate_grouped(metric, source, target, &map, last_use, level),
             None => accumulate_simple(metric, source, target, &map, reverse),
         }
-        finalize(metric, target, &map, result);
+        write_results(metric, target, &map, &mut result);
     }
+
+    result
 }
 
 /// Record, for every source node, the highest traversal level at which it is used.
@@ -115,7 +139,8 @@ fn accumulate_simple<M: Metric>(
         });
 }
 
-fn finalize<M: Metric>(
+/// Finalize this level's target accumulators and write them into `result`.
+fn write_results<M: Metric>(
     metric: &M,
     target: &[i64],
     map: &DashMap<i64, M::Acc>,

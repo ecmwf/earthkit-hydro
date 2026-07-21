@@ -157,6 +157,75 @@ def var(
 
 
 @xarray
+def skewness(
+    river_network,
+    field,
+    locations,
+    node_weights=None,
+    edge_weights=None,
+    input_core_dims=None,
+):
+    r"""
+    Computes the weighted skewness of a field over the upstream
+    catchment of each specified location.
+
+    For each location, this function identifies all upstream nodes in the river network
+    and accumulates their contributions downstream, weighted by both node and edge weights.
+
+    The weighted skewness is defined as:
+
+    .. math::
+       :nowrap:
+
+       \begin{align*}
+       \bar{x}_j &= \frac{\sum_{i \in \mathcal{A}(j)} w'_i \cdot x_i}{\sum_{i \in \mathcal{A}(j)} w'_i} \\
+       \mu_k(x)_j &= \frac{\sum_{i \in \mathcal{A}(j)} w'_i \cdot (x_i - \bar{x}_j)^k}{\sum_{i \in \mathcal{A}(j)} w'_i} \\
+       \mathrm{Skew}(x)_j &= \frac{\mu_3(x)_j}{\mu_2(x)_j^{3/2}}
+       \end{align*}
+
+    where:
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`\mathcal{A}(j)` is the full contributing area of node :math:`j` (all upstream nodes including :math:`j` itself),
+    - :math:`\mu_k(x)_j` is the weighted :math:`k`-th central moment at node :math:`j`,
+    - :math:`\mathrm{Skew}(x)_j` is the weighted skewness at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sources to the sinks. This formulation computes the population skewness.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like or xarray object
+        An array containing field values defined on river network nodes or gridcells.
+    locations : array-like or dict
+        Locations at which to compute. Accepts a list/array of nodes or a mapping
+        from dimension names to coordinate labels, consistent with other catchments APIs.
+    node_weights : array-like or xarray object, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like or xarray object, optional
+        Array of weights for each river network edge. Default is None (unweighted).
+    input_core_dims : sequence of sequence, optional
+        List of core dimensions on each input xarray argument that should not be broadcast.
+        Default is None, which attempts to autodetect input_core_dims from the xarray inputs.
+        Ignored if no xarray inputs passed.
+
+    Returns
+    -------
+    xarray object
+        Array of skewness values for each location in `locations`.
+    """
+    return array.skewness(
+        river_network=river_network,
+        field=field,
+        locations=locations,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+    )
+
+
+@xarray
 def std(
     river_network,
     field,

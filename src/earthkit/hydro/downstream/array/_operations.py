@@ -68,6 +68,22 @@ def var(xp, river_network, field, node_weights, edge_weights, return_type):
 
 
 @multi_backend(jax_static_args=["xp", "river_network", "return_type"])
+def skewness(xp, river_network, field, node_weights, edge_weights, return_type):
+    return_type = river_network.return_type if return_type is None else return_type
+    if return_type not in ["gridded", "masked"]:
+        raise ValueError("return_type must be either 'gridded' or 'masked'.")
+    decorated_calculate_downstream_metric = mask(return_type == "gridded")(calculate_downstream_metric)
+    return decorated_calculate_downstream_metric(
+        xp,
+        river_network,
+        field,
+        "skewness",
+        node_weights,
+        edge_weights,
+    )
+
+
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
 def std(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:

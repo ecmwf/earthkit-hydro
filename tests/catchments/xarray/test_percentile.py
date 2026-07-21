@@ -1,9 +1,9 @@
 import numpy as np
 import pytest
 import xarray as xr
-from _test_inputs.accumulation import *
-from _test_inputs.catchment import *
-from _test_inputs.readers import *
+from _test_inputs.catchment import catchment_query_field_1
+from _test_inputs.readers import cama_nextxy_1
+from utils import gridded_network, make_field, to_dataarray
 
 import earthkit.hydro as ekh
 
@@ -14,78 +14,25 @@ try:
 except ImportError:
     RUST = False
 
+pytestmark = pytest.mark.skipif(not RUST, reason="Rust extension required for percentiles")
 
-def make_river_network_with_coords(flow_directions):
-    from earthkit.hydro._readers import from_cama_nextxy
-    from earthkit.hydro.data_structures import RiverNetwork
-
-    rn = RiverNetwork(from_cama_nextxy(*flow_directions))
-    # Assign synthetic grid coords so the xarray wrapper can attach them to output
-    ny, nx = rn.shape
-    rn.coords = {"y": np.arange(ny), "x": np.arange(nx)}
-    return rn
+LOCATIONS = catchment_query_field_1
 
 
-def field_to_xarray(river_network, field_1d):
-    """Convert a 1-D masked field to a 2-D DataArray with y/x coords."""
-    ny, nx = river_network.shape
-    field_2d = np.zeros((ny, nx), dtype=field_1d.dtype)
-    field_2d.flat[river_network.mask] = field_1d
-    return xr.DataArray(
-        field_2d,
-        dims=["y", "x"],
-        coords={"y": river_network.coords["y"], "x": river_network.coords["x"]},
+@pytest.mark.parametrize("p", [0.25, 0.5, 0.75])
+@pytest.mark.parametrize("weighted", [False, True])
+def test_xarray_wrapper_matches_array_backend(p, weighted):
+    river_network = gridded_network(cama_nextxy_1)
+    field = make_field(river_network)
+    weights = np.arange(1, river_network.n_nodes + 1, dtype=float) if weighted else None
+
+    result = ekh.catchments.percentile(
+        river_network,
+        to_dataarray(river_network, field),
+        p=p,
+        locations=LOCATIONS,
+        node_weights=to_dataarray(river_network, weights) if weighted else None,
     )
-
-
-@pytest.mark.skipif(not RUST, reason="Rust unavailable")
-@pytest.mark.parametrize(
-    "flow_directions, input_field, locations, expected, p",
-    [
-        (
-            cama_nextxy_1,
-            input_field_1c,
-            catchment_query_field_1,
-            catchment_percentile_p05_1c,
-            0.5,
-        ),
-        (
-            cama_nextxy_1,
-            input_field_1c,
-            catchment_query_field_1,
-            catchment_percentile_p025_1c,
-            0.25,
-        ),
-    ],
-)
-def test_catchments_percentile_xarray_unweighted(flow_directions, input_field, locations, expected, p):
-    rn = make_river_network_with_coords(flow_directions)
-    field_xr = field_to_xarray(rn, input_field)
-
-    result = ekh.catchments.percentile(rn, field_xr, p=p, locations=locations)
+    expected = ekh.catchments.array.percentile(river_network, field, p=p, locations=LOCATIONS, node_weights=weights)
     assert isinstance(result, xr.DataArray)
-    np.testing.assert_allclose(result.values, expected)
-
-
-@pytest.mark.skipif(not RUST, reason="Rust unavailable")
-def test_catchments_percentile_xarray_weighted_matches_array_backend():
-    # The xarray wrapper must forward node weights and return the same numbers as
-    # the (thoroughly tested) array backend.
-    rn = make_river_network_with_coords(cama_nextxy_1)
-    field_xr = field_to_xarray(rn, input_field_1c)
-    weights_1d = np.arange(1, rn.n_nodes + 1, dtype="float64")
-    ny, nx = rn.shape
-    weights_2d = np.zeros((ny, nx), dtype="float64")
-    weights_2d.flat[rn.mask] = weights_1d
-    weights_xr = xr.DataArray(
-        weights_2d,
-        dims=["y", "x"],
-        coords={"y": rn.coords["y"], "x": rn.coords["x"]},
-    )
-
-    result = ekh.catchments.percentile(rn, field_xr, p=0.5, locations=catchment_query_field_1, node_weights=weights_xr)
-    expected = ekh.catchments.array.percentile(
-        rn, np.asarray(input_field_1c, dtype=float), p=0.5, locations=catchment_query_field_1, node_weights=weights_1d
-    )
-    assert isinstance(result, xr.DataArray)
-    np.testing.assert_allclose(result.values, np.asarray(expected))
+    np.testing.assert_array_equal(result.values, expected)

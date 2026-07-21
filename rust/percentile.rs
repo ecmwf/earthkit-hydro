@@ -129,81 +129,45 @@ pub fn calc_weighted_perc_downstream<'py>(
     Ok(metric.compute(py, &topo_groups, true, bifurcates))
 }
 
-fn percentile(sorted_values: &[f64], percentile: f64) -> f64 {
+/// Unweighted percentile using the inverted-CDF (step) method.
+///
+/// Matches NumPy's ``method="inverted_cdf"``: each of the `n` sorted values holds
+/// probability mass `1/n`, and the p-th percentile is the smallest value whose
+/// inclusive cumulative probability reaches `p`, i.e. `x_i` for the smallest `i`
+/// with `(i + 1) >= p * n`. The result is always one of the input values (no
+/// interpolation); `p = 0` gives the minimum and `p = 1` the maximum.
+fn percentile(sorted_values: &[f64], p: f64) -> f64 {
     let n = sorted_values.len();
-    let rank = percentile * (n as f64 - 1.0);
-    let lower = rank.floor() as usize;
-    let upper = rank.ceil() as usize;
-
-    if lower == upper {
-        sorted_values[lower]
-    } else {
-        let weight = rank - lower as f64;
-        sorted_values[lower] * (1.0 - weight) + sorted_values[upper] * weight
-    }
-}
-
-/// Symmetric "edge length" between two neighbouring weights.
-///
-/// This is the design knob that controls how strongly a node's weight stretches
-/// the percentile space of its adjacent intervals. The arithmetic mean makes the
-/// total axis length equal the summed weight (each interior node contributes its
-/// own weight, endpoints half), i.e. percentile width == probability mass.
-#[inline]
-fn edge_length(a: f64, b: f64) -> f64 {
-    0.5 * (a + b)
-}
-
-/// Weighted percentile that redistributes percentile space by weight.
-///
-/// The sorted values are placed at knots `P_i = (Σ_{k<i} L_k) / Σ L`, where the
-/// interval width `L_i = edge_length(w_i, w_{i+1})`. Heavier nodes widen their
-/// adjacent intervals, so every weight influences the position of all later
-/// knots (a value's weight affects both intervals it borders). Within the
-/// bracketing interval the two values are interpolated linearly.
-///
-/// Equal weights make every `L_i` equal, giving `P_i = i/(n-1)` and reproducing
-/// NumPy's `linear` (type-7) percentile exactly. The minimum is returned at
-/// `p = 0` and the maximum at `p = 1`.
-///
-/// Note: for `n = 2` there is a single interval, so `P = [0, 1]` regardless of
-/// weights and the result is the midpoint at `p = 0.5` — weights only redistribute
-/// space when there are at least three values.
-fn weighted_percentile(sorted_values: &[f64], weights: &[f64], p: f64) -> f64 {
-    let n = sorted_values.len();
-    if n == 1 {
-        return sorted_values[0];
-    }
-    if p <= 0.0 {
-        return sorted_values[0];
-    }
-    if p >= 1.0 {
-        return sorted_values[n - 1];
-    }
-
-    let total: f64 = (0..n - 1)
-        .map(|i| edge_length(weights[i], weights[i + 1]))
-        .sum();
-    if total <= 0.0 {
-        // All weights zero: fall back to an unweighted (type-7) position.
-        let rank = p * (n as f64 - 1.0);
-        let i = rank.floor() as usize;
-        let t = rank - i as f64;
-        return sorted_values[i] + t * (sorted_values[i + 1] - sorted_values[i]);
-    }
-
-    let target = p * total;
-    let mut cum = 0.0;
-    for i in 0..n - 1 {
-        let len = edge_length(weights[i], weights[i + 1]);
-        if target <= cum + len {
-            let t = if len > 0.0 { (target - cum) / len } else { 0.0 };
-            return sorted_values[i] + t * (sorted_values[i + 1] - sorted_values[i]);
+    let target = p * n as f64;
+    for (i, &value) in sorted_values.iter().enumerate() {
+        if (i + 1) as f64 >= target {
+            return value;
         }
-        cum += len;
     }
-
     sorted_values[n - 1]
+}
+
+/// Weighted percentile using the inverted-CDF (step) method.
+///
+/// Matches NumPy's ``method="inverted_cdf"`` with ``weights``: each sorted value
+/// carries probability mass proportional to its weight, and the p-th percentile
+/// is the smallest value whose inclusive cumulative weight reaches `p * W` (where
+/// `W` is the total weight). The result is always one of the input values.
+///
+/// Uniform weights reduce this exactly to the unweighted [`percentile`] above, so
+/// the weighted and unweighted definitions are consistent. Weights genuinely shift
+/// the result, including for two values.
+fn weighted_percentile(sorted_values: &[f64], weights: &[f64], p: f64) -> f64 {
+    let total: f64 = weights.iter().sum();
+    let target = p * total;
+    let mut cumulative = 0.0;
+    for (&value, &weight) in sorted_values.iter().zip(weights) {
+        cumulative += weight;
+        if cumulative >= target {
+            return value;
+        }
+    }
+    sorted_values[sorted_values.len() - 1]
 }
 
 fn merge_sorted(a: &mut Vec<f64>, b: &[f64]) {
@@ -227,8 +191,8 @@ fn merge_sorted(a: &mut Vec<f64>, b: &[f64]) {
     *a = result;
 }
 
-/// Merge two sorted-by-value arrays, keeping ALL entries (duplicates preserved).
-/// Each entry retains its individual weight.
+/// Merge two value/weight arrays that are each already sorted by value, keeping
+/// every entry (duplicates included) with its own weight.
 fn merge_sorted_weighted(
     a_vals: &mut Vec<f64>,
     b_vals: &[f64],

@@ -134,17 +134,16 @@ pub fn calc_weighted_perc_downstream<'py>(
 /// Matches NumPy's ``method="inverted_cdf"``: each of the `n` sorted values holds
 /// probability mass `1/n`, and the p-th percentile is the smallest value whose
 /// inclusive cumulative probability reaches `p`, i.e. `x_i` for the smallest `i`
-/// with `(i + 1) >= p * n`. The result is always one of the input values (no
-/// interpolation); `p = 0` gives the minimum and `p = 1` the maximum.
+/// with `(i + 1) >= p * n`. That rank is computed directly as
+/// `ceil(p * n) - 1` (clamped to a valid index), avoiding a scan of the
+/// accumulator. The result is always one of the input values (no interpolation);
+/// `p = 0` gives the minimum and `p = 1` the maximum.
 fn percentile(sorted_values: &[f64], p: f64) -> f64 {
     let n = sorted_values.len();
-    let target = p * n as f64;
-    for (i, &value) in sorted_values.iter().enumerate() {
-        if (i + 1) as f64 >= target {
-            return value;
-        }
-    }
-    sorted_values[n - 1]
+    // Smallest count `m = i + 1` with `m >= p * n`, i.e. `ceil(p * n)`, at least 1.
+    let count = (p * n as f64).ceil().max(1.0);
+    let index = (count as usize - 1).min(n - 1);
+    sorted_values[index]
 }
 
 /// Weighted percentile using the inverted-CDF (step) method.

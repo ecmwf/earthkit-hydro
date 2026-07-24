@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 
 from earthkit.hydro.data_structures import RiverNetwork

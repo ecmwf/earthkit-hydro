@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from earthkit.hydro._core.accumulate import flow_downstream, flow_upstream
 from earthkit.hydro._core.metrics import metrics_func_finder
 

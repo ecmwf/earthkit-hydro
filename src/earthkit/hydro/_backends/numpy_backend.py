@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import array_api_compat.numpy as np
 
 from .array_backend import ArrayBackend

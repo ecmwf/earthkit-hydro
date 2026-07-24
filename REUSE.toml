@@ -1,0 +1,21 @@
+version = 1
+
+# Inline SPDX headers are kept only on source code (Python and Rust). Everything
+# else - documentation, config, CI, and the human-facing LICENSE/README - is
+# covered centrally here rather than stamped file-by-file.
+[[annotations]]
+SPDX-FileCopyrightText = "2026- European Centre for Medium-Range Weather Forecasts (ECMWF)"
+SPDX-License-Identifier = "Apache-2.0"
+path = [
+  "LICENSE",
+  "README.md",
+  "docs/**",
+  ".github/**",
+  ".gitignore",
+  ".readthedocs.yml",
+  ".pre-commit-config.yaml",
+  "pyproject.toml",
+  "Cargo.toml",
+  "pytest.ini"
+]
+precedence = "aggregate"

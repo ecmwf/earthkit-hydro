@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import earthkit.hydro.catchments._operations as array
 from earthkit.hydro._utils.decorators.xarray import xarray as find_xarray
 from earthkit.hydro.catchments.array._toplevel import find as find_func

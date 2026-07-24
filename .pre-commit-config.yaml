@@ -29,6 +29,10 @@ repos:
     args: [--fix=lf]
   - id: trailing-whitespace
   - id: check-case-conflict
+- repo: https://github.com/fsfe/reuse-tool
+  rev: v6.2.0
+  hooks:
+  - id: reuse
 - repo: https://github.com/macisamuele/language-formatters-pre-commit-hooks
   rev: v2.16.0
   hooks:

@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
+
 def get_core_grid_dims(ds):
     possible_names = [["lat", "lon"], ["latitude", "longitude"], ["y", "x"]]
     for names in possible_names:

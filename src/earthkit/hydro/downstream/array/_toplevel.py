@@ -16,7 +16,7 @@ def percentile(river_network, field, p, node_weights=None, edge_weights=None, re
 
         \begin{align*}
         \mathcal{D}(j) &= \{j\} \cup \bigcup_{i \in \mathrm{Down}(j)} \mathcal{D}(i) \\
-        P_p(x)_j &= \mathrm{percentile}_p \bigl(\{ w'_i \cdot x_i : i \in \mathcal{D}(j) \}\bigr)
+        P_p(x)_j &= \operatorname{wpctl}_p \bigl(\{ (x_i,\, w'_i) : i \in \mathcal{D}(j) \}\bigr)
         \end{align*}
 
     where:
@@ -25,7 +25,24 @@ def percentile(river_network, field, p, node_weights=None, edge_weights=None, re
     - :math:`w'_i` is the node weight (e.g., pixel area),
     - :math:`\mathrm{Down}(j)` is the set of immediate downstream nodes flowing out of node :math:`j`,
     - :math:`\mathcal{D}(j)` is the full draining area of node :math:`j` (all downstream nodes including :math:`j` itself),
-    - :math:`P_p(x)_j` is the :math:`p`-th percentile at node :math:`j`.
+    - :math:`P_p(x)_j` is the :math:`p`-th weighted percentile at node :math:`j`.
+
+    The weighted percentile :math:`\operatorname{wpctl}_p` inverts the weighted
+    cumulative distribution (NumPy's ``inverted_cdf`` method): the values are sorted and
+    the result is the smallest value whose inclusive cumulative weight reaches
+    :math:`p\,W`, with :math:`W = \sum_i w'_i`:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        C_k &= \sum_{l \le k} w'_{(l)}, \qquad W = C_{m-1} \\
+        \operatorname{wpctl}_p &= x_{(k)}, \qquad k = \min\{\, k : C_k \ge p\,W \,\}
+        \end{align*}
+
+    The result is always one of the input values (a step function, without
+    interpolation). Unit weights reproduce the unweighted percentile exactly; the
+    minimum is returned at :math:`p = 0` and the maximum at :math:`p = 1`.
 
     Accumulation proceeds in inverse topological order from the sinks to the sources.
 

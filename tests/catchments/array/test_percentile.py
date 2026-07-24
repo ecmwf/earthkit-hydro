@@ -1,8 +1,7 @@
 import numpy as np
 import pytest
-from _test_inputs.accumulation import *
-from _test_inputs.catchment import *
-from _test_inputs.readers import *
+from _test_inputs.readers import cama_nextxy_1, cama_nextxy_2, d8_ldd_1
+from utils import chain_network, make_field
 
 import earthkit.hydro as ekh
 
@@ -13,53 +12,47 @@ try:
 except ImportError:
     RUST = False
 
+pytestmark = pytest.mark.skipif(not RUST, reason="Rust extension required for percentiles")
 
-@pytest.mark.skipif(not RUST, reason="Rust unavailable")
-@pytest.mark.parametrize(
-    "river_network, input_field, locations, expected, p",
-    [
-        (
-            ("cama_nextxy", cama_nextxy_1),
-            input_field_1c,
-            catchment_query_field_1,
-            catchment_percentile_p05_1c,
-            0.5,
-        ),
-        (
-            ("cama_nextxy", cama_nextxy_1),
-            input_field_1c,
-            catchment_query_field_1,
-            catchment_percentile_p025_1c,
-            0.25,
-        ),
-    ],
-    indirect=["river_network"],
-)
-def test_catchments_percentile_unweighted(river_network, input_field, locations, expected, p):
-    output = ekh.catchments.array.percentile(river_network, input_field, p=p, locations=locations, node_weights=None)
-    np.testing.assert_allclose(output, expected)
+NETWORKS = [("cama_nextxy", cama_nextxy_1), ("cama_nextxy", cama_nextxy_2), ("d8_ldd", d8_ldd_1)]
+PERCENTILES = [0.0, 0.25, 0.5, 0.75, 1.0]
 
 
-@pytest.mark.skipif(not RUST, reason="Rust unavailable")
-@pytest.mark.parametrize(
-    "river_network, input_field, locations, expected",
-    [
-        (
-            ("cama_nextxy", cama_nextxy_1),
-            input_field_1c,
-            catchment_query_field_1,
-            catchment_percentile_weighted_p05_1c,
-        ),
-    ],
-    indirect=["river_network"],
-)
-def test_catchments_percentile_weighted(river_network, input_field, locations, expected):
-    node_weights = np.arange(1, river_network.n_nodes + 1, dtype="float64")
-    output = ekh.catchments.array.percentile(
-        river_network,
-        input_field,
-        p=0.5,
-        locations=locations,
-        node_weights=node_weights,
-    )
-    np.testing.assert_allclose(output, expected)
+def outlets(river_network):
+    return [0, river_network.n_nodes // 2, river_network.n_nodes - 1]
+
+
+@pytest.mark.parametrize("river_network", NETWORKS, indirect=True)
+@pytest.mark.parametrize("p", PERCENTILES)
+@pytest.mark.parametrize("weighted", [False, True])
+def test_catchment_percentile_is_upstream_percentile_at_the_outlet(river_network, p, weighted):
+    # A catchment is the contributing area of its outlet, so the catchment percentile
+    # must equal the upstream percentile evaluated at that outlet node.
+    field = make_field(river_network)
+    locations = outlets(river_network)
+    weights = np.arange(1, river_network.n_nodes + 1, dtype=float) if weighted else None
+
+    catchment = ekh.catchments.array.percentile(river_network, field, p=p, locations=locations, node_weights=weights)
+    upstream = ekh.upstream.array.percentile(river_network, field, p=p, node_weights=weights, return_type="masked")
+    np.testing.assert_allclose(catchment, upstream[locations])
+
+
+@pytest.mark.parametrize("p", PERCENTILES)
+def test_catchment_over_a_chain_matches_numpy(p):
+    # The catchment of outlet k in the chain is the slice {k, ..., n-1}.
+    field = np.array([3.0, 1.0, 4.0, 1.0, 5.0, 9.0, 2.0, 6.0, 5.0, 3.0])
+    locations = [0, 4, 9]
+    result = ekh.catchments.array.percentile(chain_network(len(field)), field, p=p, locations=locations)
+    expected = [np.percentile(field[k:], p * 100, method="inverted_cdf") for k in locations]
+    np.testing.assert_allclose(result, expected)
+
+
+@pytest.mark.parametrize("river_network", NETWORKS, indirect=True)
+@pytest.mark.parametrize("p", PERCENTILES)
+def test_unit_weights_match_unweighted(river_network, p):
+    field = make_field(river_network)
+    locations = outlets(river_network)
+    weights = np.ones(river_network.n_nodes)
+    weighted = ekh.catchments.array.percentile(river_network, field, p=p, locations=locations, node_weights=weights)
+    unweighted = ekh.catchments.array.percentile(river_network, field, p=p, locations=locations, node_weights=None)
+    np.testing.assert_array_equal(weighted, unweighted)

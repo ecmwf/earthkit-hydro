@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from earthkit.hydro._core.flow import propagate
 
 
@@ -25,15 +28,13 @@ def _flow_find(
             overwrite=overwrite,
         )
 
-    field = propagate(
+    return propagate(
         river_network,
         river_network.groups,
         field,
         invert_graph,
         operation,
     )
-
-    return field
 
 
 def _find_catchments(xp, field, did, uid, eid, overwrite):
@@ -57,18 +58,12 @@ def _find_catchments(xp, field, did, uid, eid, overwrite):
     None
     """
     down_not_missing = ~xp.isnan(xp.gather(field, uid, axis=-1))
-    did = did[
-        down_not_missing
-    ]  # only update nodes where the downstream belongs to a catchment
+    did = did[down_not_missing]  # only update nodes where the downstream belongs to a catchment
     if not overwrite:
         up_is_missing = xp.isnan(xp.gather(field, did, axis=-1))
         did = did[up_is_missing]
     else:
         up_is_missing = None
-    uid = (
-        uid[down_not_missing][up_is_missing]
-        if up_is_missing is not None
-        else uid[down_not_missing]
-    )
+    uid = uid[down_not_missing][up_is_missing] if up_is_missing is not None else uid[down_not_missing]
     updates = xp.gather(field, uid, axis=-1)
     return xp.scatter_assign(field, did, updates)

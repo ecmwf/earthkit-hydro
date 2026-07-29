@@ -1,31 +1,20 @@
-from io import BytesIO
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from urllib.request import urlopen
 
-import joblib
-
-from earthkit.hydro._readers import (
-    find_main_var,
-    from_cama_nextxy,
-    from_d8,
-    from_grit,
-    import_earthkit_or_prompt_install,
-)
-from earthkit.hydro._utils.coords import get_core_grid_dims
-from earthkit.hydro._utils.readers import from_file
 from earthkit.hydro._version import __version__ as ekh_version
+
 from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._cache import cache
+from ._formats import FORMATS
 
 # read in major version
 # if dev version, try add +1 to major version
 # i.e. 0.1.dev90+gfdf4e33.d20250107 -> 1
 # i.e. 0.1.0 -> 0
-ekh_version = (
-    int(ekh_version.split(".")[0]) + 1
-    if "dev" in ekh_version
-    else int(ekh_version.split(".")[0])
-)
+ekh_version = int(ekh_version.split(".")[0]) + 1 if "dev" in ekh_version else int(ekh_version.split(".")[0])
 
 
 @cache
@@ -68,57 +57,11 @@ def create(
     RiverNetwork
         The river network object created from the given data.
     """
-    if river_network_format == "precomputed":
-        if source == "file":
-            river_network_storage = joblib.load(path)
-        elif source == "url":
-            with urlopen(path) as response:
-                river_network_storage = joblib.load(BytesIO(response.read()))
-        else:
-            raise ValueError(
-                "Unsupported source for river network format"
-                f"{river_network_format}: {source}."
-            )
-    elif river_network_format == "cama":
-        ekd = import_earthkit_or_prompt_install(river_network_format, source)
-        data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
-        x, y = data.nextx.values, data.nexty.values
-        river_network_storage = from_cama_nextxy(x, y)
-        coord1, coord2 = get_core_grid_dims(data)
-        river_network_storage.coords = {
-            coord1: data[coord1].values,
-            coord2: data[coord2].values,
-        }
-    elif (
-        river_network_format == "pcr_d8"
-        or river_network_format == "esri_d8"
-        or river_network_format == "merit_d8"
-    ):
-        if path.endswith(".map"):
-            data = from_file(path, mask=False)
-            river_network_storage = from_d8(
-                data, river_network_format=river_network_format
-            )
-            # coords not available
-        else:
-            ekd = import_earthkit_or_prompt_install(river_network_format, source)
-            data = ekd.from_source(source, path).to_xarray(mask_and_scale=False)
-            coord1, coord2 = get_core_grid_dims(data)
-            var_name = find_main_var(data)
-            river_network_storage = from_d8(
-                data[var_name].values, river_network_format=river_network_format
-            )
-            river_network_storage.coords = {
-                coord1: data[coord1].values,
-                coord2: data[coord2].values,
-            }
-    elif river_network_format == "grit":
-        assert path.endswith(".gpkg")
-        river_network_storage = from_grit(path)
-    else:
+    fmt = FORMATS.get(river_network_format)
+    if fmt is None:
         raise ValueError(f"Unsupported river network format: {river_network_format}.")
 
-    return RiverNetwork(river_network_storage)
+    return RiverNetwork(fmt.create(path, source))
 
 
 def load(
@@ -202,7 +145,7 @@ def load(
             river_network_version=river_network_version,
         )
         network = create(uri, "precomputed", "url", *args, **kwargs)
-    except Exception:
+    except Exception:  # noqa: BLE001
         uri = data_source.format(
             ekh_version=ekh_version - 1,
             domain=domain,

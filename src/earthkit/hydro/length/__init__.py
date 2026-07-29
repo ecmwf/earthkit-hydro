@@ -1,4 +1,7 @@
-import earthkit.hydro.length.array
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
+from earthkit.hydro.length import array
 
 from ._toplevel import max, min, to_sink, to_source
 

@@ -1,12 +1,3 @@
-# (C) Copyright 2021 ECMWF.
-#
-# This software is licensed under the terms of the Apache Licence Version 2.0
-# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
-# In applying this licence, ECMWF does not waive the privileges and immunities
-# granted to it by virtue of its status as an intergovernmental organisation
-# nor does it submit to any jurisdiction.
-#
-
 import json
 import os
 import urllib.request
@@ -30,7 +21,7 @@ def _write_earthkit_packages_js(app, ek_branch):
             with urllib.request.urlopen(url, timeout=10) as response:
                 config = yaml.safe_load(response.read())
                 break
-        except Exception:
+        except Exception:  # noqa: BLE001, S112
             continue
     else:
         raise RuntimeError("Failed to fetch earthkit-packages.yml from remote URLs.")

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 from _test_inputs.accumulation import *
@@ -25,9 +28,7 @@ import earthkit.hydro as ekh
     indirect=["river_network"],
 )
 def test_calculate_upstream_metric_min(river_network, input_field, flow_downstream, mv):
-    output_field = ekh.upstream.array.min(
-        river_network, input_field, node_weights=None, return_type="masked"
-    )
+    output_field = ekh.upstream.array.min(river_network, input_field, node_weights=None, return_type="masked")
     print(output_field)
     print(flow_downstream)
     assert output_field.dtype == flow_downstream.dtype

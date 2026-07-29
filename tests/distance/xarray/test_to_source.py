@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -20,8 +23,6 @@ import earthkit.hydro as ekh
 )
 def test_distance_to_source_xarray(river_network, field, expected):
     """Test distance to source with xarray output."""
-    result = ekh.distance.to_source(
-        river_network, field=field, path="shortest", return_type="masked"
-    )
+    result = ekh.distance.to_source(river_network, field=field, path="shortest", return_type="masked")
     assert isinstance(result, xr.DataArray)
     np.testing.assert_allclose(result.values, expected, rtol=1e-6)

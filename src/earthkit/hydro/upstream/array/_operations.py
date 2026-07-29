@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from earthkit.hydro._core.online import calculate_online_metric
 from earthkit.hydro._utils.decorators import mask, multi_backend
 
@@ -25,26 +28,26 @@ def percentile(river_network, field, weights, p, return_type):
     try:
         from earthkit.hydro import _rust
     except Exception as e:
-        raise ImportError(
-            "Rust extension is unavailable and required for percentile computations."
-        ) from e
+        raise ImportError("Rust extension is unavailable and required for percentile computations.") from e
 
     def calculate_percentile(xp, river_network, field, weights, p):
         if weights is not None:
-            return _rust.calc_weighted_perc(river_network.groups, field, weights, p)
+            return _rust.calc_weighted_perc(river_network.groups, field, weights, p, river_network.bifurcates)
         else:
-            return _rust.calc_perc(river_network.groups, field, p)
+            return _rust.calc_perc(river_network.groups, field, p, river_network.bifurcates)
 
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
-        calculate_percentile
-    )
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(calculate_percentile)
     from earthkit.hydro._backends.numpy_backend import NumPyBackend
 
     return decorated_calculate_upstream_metric(
-        NumPyBackend(), river_network, field, weights, p  # ignored
+        NumPyBackend(),
+        river_network,
+        field,
+        weights,
+        p,  # ignored
     )
 
 
@@ -53,14 +56,28 @@ def var(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
-        calculate_upstream_metric
-    )
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(calculate_upstream_metric)
     return decorated_calculate_upstream_metric(
         xp,
         river_network,
         field,
         "var",
+        node_weights,
+        edge_weights,
+    )
+
+
+@multi_backend(jax_static_args=["xp", "river_network", "return_type"])
+def skewness(xp, river_network, field, node_weights, edge_weights, return_type):
+    return_type = river_network.return_type if return_type is None else return_type
+    if return_type not in ["gridded", "masked"]:
+        raise ValueError("return_type must be either 'gridded' or 'masked'.")
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(calculate_upstream_metric)
+    return decorated_calculate_upstream_metric(
+        xp,
+        river_network,
+        field,
+        "skewness",
         node_weights,
         edge_weights,
     )
@@ -78,9 +95,7 @@ def std(
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
-        calculate_upstream_metric
-    )
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(calculate_upstream_metric)
     return decorated_calculate_upstream_metric(
         xp,
         river_network,
@@ -96,9 +111,7 @@ def mean(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
-        calculate_upstream_metric
-    )
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(calculate_upstream_metric)
     return decorated_calculate_upstream_metric(
         xp,
         river_network,
@@ -114,9 +127,7 @@ def sum(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
-        calculate_upstream_metric
-    )
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(calculate_upstream_metric)
     return decorated_calculate_upstream_metric(
         xp,
         river_network,
@@ -132,9 +143,7 @@ def min(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
-        calculate_upstream_metric
-    )
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(calculate_upstream_metric)
     return decorated_calculate_upstream_metric(
         xp,
         river_network,
@@ -150,9 +159,7 @@ def max(xp, river_network, field, node_weights, edge_weights, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    decorated_calculate_upstream_metric = mask(return_type == "gridded")(
-        calculate_upstream_metric
-    )
+    decorated_calculate_upstream_metric = mask(return_type == "gridded")(calculate_upstream_metric)
     return decorated_calculate_upstream_metric(
         xp,
         river_network,
@@ -168,17 +175,13 @@ def mode(xp, river_network, field, node_weights, edge_weights, return_type):
     try:
         from earthkit.hydro import _rust
     except Exception as e:
-        raise ImportError(
-            "Rust extension is unavailable and required for mode computations."
-        ) from e
+        raise ImportError("Rust extension is unavailable and required for mode computations.") from e
 
     def calculate_mode(xp, river_network, field, node_weights, edge_weights):
         # Mode only supported for numpy backend with Rust
         if xp.name != "numpy":
-            raise NotImplementedError(
-                "Mode is only supported for numpy backend with Rust"
-            )
-        return _rust.calc_mode(river_network.groups, field)
+            raise NotImplementedError("Mode is only supported for numpy backend with Rust")
+        return _rust.calc_mode(river_network.groups, field, river_network.bifurcates)
 
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
@@ -188,5 +191,9 @@ def mode(xp, river_network, field, node_weights, edge_weights, return_type):
     from earthkit.hydro._backends.numpy_backend import NumPyBackend
 
     return decorated_calculate_mode(
-        NumPyBackend(), river_network, field, node_weights, edge_weights  # ignored
+        NumPyBackend(),
+        river_network,
+        field,
+        node_weights,
+        edge_weights,  # ignored
     )

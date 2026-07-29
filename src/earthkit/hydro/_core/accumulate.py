@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._accumulate import _ufunc_to_downstream
@@ -122,7 +125,7 @@ def flow_python(
             xp=xp,
         )
 
-    field = propagate(
+    return propagate(
         river_network,
         river_network.groups,
         field,
@@ -134,5 +137,3 @@ def flow_python(
         edge_additive_weight,
         edge_multiplicative_weight,
     )
-
-    return field

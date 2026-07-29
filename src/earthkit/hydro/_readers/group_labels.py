@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import os
 
 import numpy as np
@@ -14,7 +17,7 @@ def compute_topological_labels(sources, sinks, downstream_nodes, n_nodes):
     else:
         try:
             from earthkit.hydro._rust import compute_topological_labels_rust as func
-        except (ModuleNotFoundError, ImportError):
+        except ImportError:
             func = compute_topological_labels_python
 
     return func(sources, sinks, downstream_nodes, n_nodes)

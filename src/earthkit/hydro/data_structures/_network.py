@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 
 from ._network_storage import RiverNetworkStorage
@@ -81,18 +84,8 @@ class RiverNetwork:
         from earthkit.utils.array.convert import convert
 
         # TODO: use xp.asarray
-        if array_backend == "np":
-            array_backend = "numpy"
-        elif array_backend == "cp":
-            array_backend = "cupy"
-        elif array_backend == "jnp":
-            array_backend = "jax"
-        elif array_backend == "tf":
-            array_backend = "tensorflow"
-        elif array_backend == "pytorch":
-            array_backend = "torch"
-        elif array_backend == "mx":
-            array_backend = "mlx"
+        shorthands = {"np": "numpy", "cp": "cupy", "jnp": "jax", "tf": "tensorflow", "pytorch": "torch", "mx": "mlx"}
+        array_backend = shorthands.get(array_backend, array_backend)
 
         if device is None:
             device = "cpu" if array_backend != "cupy" else "gpu"
@@ -103,14 +96,9 @@ class RiverNetwork:
                 array_backend = self.array_backend
 
         if array_backend in ["torch", "cupy", "numpy"]:
-            self.groups = [
-                convert(group, device=device, array_namespace=array_backend)
-                for group in self.groups
-            ]
+            self.groups = [convert(group, device=device, array_namespace=array_backend) for group in self.groups]
             self.mask = convert(self.mask, device=device, array_namespace=array_backend)
-            self.data = [
-                convert(self.data[0], device=device, array_namespace=array_backend)
-            ]
+            self.data = [convert(self.data[0], device=device, array_namespace=array_backend)]
         elif array_backend == "jax":
             assert device == "cpu"
             import jax.numpy as jnp
@@ -155,14 +143,15 @@ class RiverNetwork:
         None
         """
         if return_type not in ["gridded", "masked"]:
-            raise ValueError(
-                f'Invalid return_type {return_type}. Valid types are "gridded", "masked"'
-            )
+            raise ValueError(f'Invalid return_type {return_type}. Valid types are "gridded", "masked"')
         self.return_type = return_type
 
     def export(self, fpath="river_network.joblib", compression=1):
         """
         Save the river network to a local file.
+
+        .. warning::
+            This is not recommended. Please use `earthkit.hydro.river_network.export` instead.
 
         Parameters
         ----------

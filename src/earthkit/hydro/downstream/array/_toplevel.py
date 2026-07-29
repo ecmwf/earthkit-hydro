@@ -1,9 +1,10 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from earthkit.hydro.downstream.array import _operations
 
 
-def percentile(
-    river_network, field, p, node_weights=None, edge_weights=None, return_type=None
-):
+def percentile(river_network, field, p, node_weights=None, edge_weights=None, return_type=None):
     r"""
     Computes the weighted percentile of a field over all downstream nodes.
 
@@ -18,7 +19,7 @@ def percentile(
 
         \begin{align*}
         \mathcal{D}(j) &= \{j\} \cup \bigcup_{i \in \mathrm{Down}(j)} \mathcal{D}(i) \\
-        P_p(x)_j &= \mathrm{percentile}_p \bigl(\{ w'_i \cdot x_i : i \in \mathcal{D}(j) \}\bigr)
+        P_p(x)_j &= \operatorname{wpctl}_p \bigl(\{ (x_i,\, w'_i) : i \in \mathcal{D}(j) \}\bigr)
         \end{align*}
 
     where:
@@ -27,7 +28,24 @@ def percentile(
     - :math:`w'_i` is the node weight (e.g., pixel area),
     - :math:`\mathrm{Down}(j)` is the set of immediate downstream nodes flowing out of node :math:`j`,
     - :math:`\mathcal{D}(j)` is the full draining area of node :math:`j` (all downstream nodes including :math:`j` itself),
-    - :math:`P_p(x)_j` is the :math:`p`-th percentile at node :math:`j`.
+    - :math:`P_p(x)_j` is the :math:`p`-th weighted percentile at node :math:`j`.
+
+    The weighted percentile :math:`\operatorname{wpctl}_p` inverts the weighted
+    cumulative distribution (NumPy's ``inverted_cdf`` method): the values are sorted and
+    the result is the smallest value whose inclusive cumulative weight reaches
+    :math:`p\,W`, with :math:`W = \sum_i w'_i`:
+
+    .. math::
+        :nowrap:
+
+        \begin{align*}
+        C_k &= \sum_{l \le k} w'_{(l)}, \qquad W = C_{m-1} \\
+        \operatorname{wpctl}_p &= x_{(k)}, \qquad k = \min\{\, k : C_k \ge p\,W \,\}
+        \end{align*}
+
+    The result is always one of the input values (a step function, without
+    interpolation). Unit weights reproduce the unweighted percentile exactly; the
+    minimum is returned at :math:`p = 0` and the maximum at :math:`p = 1`.
 
     Accumulation proceeds in inverse topological order from the sinks to the sources.
 
@@ -56,13 +74,9 @@ def percentile(
     if edge_weights is not None:
         raise NotImplementedError("edge_weights are currently unsupported.")
     if river_network.array_backend != "numpy":
-        raise NotImplementedError(
-            "Only numpy backend is currently supported for percentiles."
-        )
+        raise NotImplementedError("Only numpy backend is currently supported for percentiles.")
     if p < 0 or p > 1:
-        raise ValueError(
-            "The requested percentile `p` must be between 0 and 1 inclusive."
-        )
+        raise ValueError("The requested percentile `p` must be between 0 and 1 inclusive.")
     return _operations.percentile(
         river_network=river_network,
         field=field.astype("float64"),
@@ -127,6 +141,65 @@ def var(river_network, field, node_weights=None, edge_weights=None, return_type=
         Array of variance values for every river network node or gridcell, depending on `return_type`.
     """
     return _operations.var(
+        river_network=river_network,
+        field=field,
+        node_weights=node_weights,
+        edge_weights=edge_weights,
+        return_type=return_type,
+    )
+
+
+def skewness(river_network, field, node_weights=None, edge_weights=None, return_type=None):
+    r"""
+    Computes the weighted skewness of a field over all downstream nodes.
+
+    For each node in the river network, this function identifies all downstream nodes in the river network
+    and accumulates their contributions upstream, weighted by both node and edge weights.
+
+    The weighted skewness is defined as:
+
+    .. math::
+       :nowrap:
+
+       \begin{align*}
+       \bar{x}_j &= \frac{\sum_{i \in \mathcal{D}(j)} w'_i \cdot x_i}{\sum_{i \in \mathcal{D}(j)} w'_i} \\
+       \mu_k(x)_j &= \frac{\sum_{i \in \mathcal{D}(j)} w'_i \cdot (x_i - \bar{x}_j)^k}{\sum_{i \in \mathcal{D}(j)} w'_i} \\
+       \mathrm{Skew}(x)_j &= \begin{cases}
+                              \frac{\mu_3(x)_j}{\mu_2(x)_j^{3/2}} & \text{if } \mu_2(x)_j > 0 \\
+                              \mathrm{NaN} & \text{if } \mu_2(x)_j = 0
+                           \end{cases}
+       \end{align*}
+
+    where:
+
+    - :math:`x_i` is the input value at node :math:`i` (e.g., rainfall),
+    - :math:`w'_i` is the node weight (e.g., pixel area),
+    - :math:`\mathcal{D}(j)` is the set of downstream nodes of node :math:`j` (all downstream nodes including :math:`j` itself),
+    - :math:`\mu_k(x)_j` is the weighted :math:`k`-th central moment at node :math:`j`,
+    - :math:`\mathrm{Skew}(x)_j` is the weighted skewness at node :math:`j`.
+
+    Accumulation proceeds in topological order from the sinks to the sources. This formulation computes the population skewness.
+    When variance is zero (all values identical), skewness is undefined and returns NaN.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object.
+    field : array-like
+        An array containing field values defined on river network nodes or gridcells.
+    node_weights : array-like, optional
+        Array of weights for each river network node or gridcell. Default is None (unweighted).
+    edge_weights : array-like, optional
+        Array of weights for each edge. Default is None (unweighted).
+    return_type : str, optional
+        Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
+
+    Returns
+    -------
+    array-like
+        Array of skewness values for every river network node or gridcell, depending on `return_type`.
+    """
+    return _operations.skewness(
         river_network=river_network,
         field=field,
         node_weights=node_weights,

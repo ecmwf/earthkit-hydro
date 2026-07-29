@@ -1,32 +1,29 @@
-# (C) Copyright 2025- ECMWF.
-#
-# This software is licensed under the terms of the Apache Licence Version 2.0
-# which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
-# In applying this licence, ECMWF does not waive the privileges and immunities
-# granted to it by virtue of its status as an intergovernmental organisation
-# nor does it submit to any jurisdiction.
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
 
-import earthkit.hydro.catchments
-import earthkit.hydro.distance
-import earthkit.hydro.downstream
-import earthkit.hydro.length
-import earthkit.hydro.move
-import earthkit.hydro.river_network
-import earthkit.hydro.streamorder
-import earthkit.hydro.subnetwork
-import earthkit.hydro.upstream
+from earthkit.hydro import (
+    catchments,
+    distance,
+    downstream,
+    length,
+    move,
+    river_network,
+    streamorder,
+    subnetwork,
+    upstream,
+)
 
 from ._version import __version__
 
 __all__ = [
+    "__version__",
     "catchments",
     "distance",
     "downstream",
     "length",
     "move",
     "river_network",
-    "upstream",
-    "subnetwork",
     "streamorder",
-    "__version__",
+    "subnetwork",
+    "upstream",
 ]

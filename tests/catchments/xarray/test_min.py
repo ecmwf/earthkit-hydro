@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -22,9 +25,7 @@ import earthkit.hydro as ekh
 )
 def test_catchments_min_xarray(river_network, field, locations, expected):
     """Test catchment min with xarray input."""
-    field_da = xr.DataArray(
-        field, dims=["node_index"], coords={"node_index": np.arange(len(field))}
-    )
+    field_da = xr.DataArray(field, dims=["node_index"], coords={"node_index": np.arange(len(field))})
     result = ekh.catchments.min(river_network, field_da, locations=locations)
     assert isinstance(result, xr.DataArray)
     np.testing.assert_allclose(result.values, expected, rtol=1e-6)

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from functools import wraps
 
 from earthkit.hydro._backends.find import get_array_backend
@@ -13,7 +16,6 @@ def multi_backend(allow_jax_jit=True, jax_static_args=None):
             backend_name = xp.name
             kwargs["xp"] = xp
             if backend_name == "jax" and allow_jax_jit:
-
                 nonlocal compiled_jax_fn
                 if compiled_jax_fn is None:
                     from jax import jit

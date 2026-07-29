@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -11,7 +14,7 @@ try:
     from earthkit.hydro import _rust  # noQA: F401
 
     RUST = True
-except Exception:
+except ImportError:
     RUST = False
 
 

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 import xarray as xr
@@ -47,6 +50,4 @@ def test_upstream_std_xarray(river_network, input_field, mv):
 
     # Test relationship with variance
     var_result = ekh.upstream.var(river_network, field_da, return_type="masked")
-    np.testing.assert_allclose(
-        result.values**2, var_result.values, rtol=1e-10, equal_nan=True
-    )
+    np.testing.assert_allclose(result.values**2, var_result.values, rtol=1e-10, equal_nan=True)

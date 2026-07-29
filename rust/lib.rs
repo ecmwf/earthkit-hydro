@@ -1,10 +1,5 @@
-// (C) Copyright 2025- ECMWF.
-//
-// This software is licensed under the terms of the Apache Licence Version 2.0
-// which can be obtained at http://www.apache.org/licenses/LICENSE-2.0.
-// In applying this licence, ECMWF does not waive the privileges and immunities
-// granted to it by virtue of its status as an intergovernmental organisation
-// nor does it submit to any jurisdiction.
+// SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+// SPDX-License-Identifier: Apache-2.0
 
 use fixedbitset::FixedBitSet;
 use numpy::{PyArray1, PyReadonlyArray1};
@@ -12,12 +7,9 @@ use pyo3::exceptions::PyValueError;
 use pyo3::prelude::*;
 use rayon::prelude::*;
 use std::sync::atomic::{AtomicI64, Ordering};
-mod percentile;
-mod percentile_downstream;
-mod weighted_percentile;
-mod weighted_percentile_downstream;
-
+mod metric;
 mod mode;
+mod percentile;
 
 #[pyfunction]
 fn compute_topological_labels_rust<'py>(
@@ -86,16 +78,10 @@ fn _rust(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(mode::calc_mode, m)?)?;
     m.add_function(wrap_pyfunction!(mode::calc_mode_downstream, m)?)?;
     m.add_function(wrap_pyfunction!(percentile::calc_perc, m)?)?;
+    m.add_function(wrap_pyfunction!(percentile::calc_weighted_perc, m)?)?;
+    m.add_function(wrap_pyfunction!(percentile::calc_perc_downstream, m)?)?;
     m.add_function(wrap_pyfunction!(
-        weighted_percentile::calc_weighted_perc,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        percentile_downstream::calc_perc_downstream,
-        m
-    )?)?;
-    m.add_function(wrap_pyfunction!(
-        weighted_percentile_downstream::calc_weighted_perc_downstream,
+        percentile::calc_weighted_perc_downstream,
         m
     )?)?;
     Ok(())

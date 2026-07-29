@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import tensorflow as tf
 
 from .array_backend import ArrayBackend
@@ -25,15 +28,11 @@ class TFBackend(ArrayBackend):
 
         batch_range = tf.range(num_batch)[:, None]
         batch_ids = tf.tile(batch_range, [1, num_idx])
-        scatter_idx = tf.stack(
-            [batch_ids, tf.tile(tf.expand_dims(indices, 0), [num_batch, 1])], axis=-1
-        )
+        scatter_idx = tf.stack([batch_ids, tf.tile(tf.expand_dims(indices, 0), [num_batch, 1])], axis=-1)
         scatter_idx = tf.reshape(scatter_idx, (-1, 2))
 
         scatter_vals = tf.reshape(flat_values, (-1,))
-        flat_result = tf.tensor_scatter_nd_update(
-            flat_target, scatter_idx, scatter_vals
-        )
+        flat_result = tf.tensor_scatter_nd_update(flat_target, scatter_idx, scatter_vals)
 
         return tf.reshape(flat_result, target_shape)
 

@@ -1,0 +1,132 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
+import numpy as np
+
+from earthkit.hydro.data_structures._network_storage import RiverNetworkStorage
+
+from ._export import export
+from ._formats import FORMATS
+
+
+def set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge):
+    invalid_nodes = down == n_n
+    down = down[~invalid_nodes]
+    up = up[~invalid_nodes]
+    n_e = n_e - invalid_nodes.sum()
+    edge = np.arange(n_e)
+    return up, down, mask, n_n, n_e, edge
+
+
+def set_missing_if_cycle(up, down, mask, n_n, n_e, edge):
+    # DETECT CYCLES
+    down_nodes = np.full(n_n, fill_value=n_n, dtype=int)
+    down_nodes[up] = down
+
+    current_nodes = up
+    remaining_up_nodes = up
+    nodes_in_cycles = np.array([], dtype=int)
+    for _ in range(n_n):
+        current_nodes = down_nodes[current_nodes]  # node_ids downstream of current_nodes
+        in_cycle = current_nodes == remaining_up_nodes
+        nodes_in_cycles = np.append(nodes_in_cycles, current_nodes[in_cycle])
+        remove_from_current = in_cycle | (current_nodes == n_n)
+        current_nodes = current_nodes[~remove_from_current]
+        remaining_up_nodes = remaining_up_nodes[~remove_from_current]
+        if current_nodes.shape[0] == 0:
+            break
+
+    # REMOVE DETECTED CYCLES
+    down_nodes[nodes_in_cycles] = n_n
+    upstream_neighbours = np.bincount(down_nodes, minlength=n_n)
+    without_connections = upstream_neighbours[nodes_in_cycles] == 0
+    nodes_in_cycles_without_connections = nodes_in_cycles[without_connections]
+    nodes_in_cycles_with_connections = nodes_in_cycles[~without_connections]
+    remove_node = np.zeros(n_n, dtype=bool)
+    remove_node[nodes_in_cycles_with_connections] = True
+    subset_of_mask = mask[mask]
+    subset_of_mask[nodes_in_cycles_without_connections] = False
+    new_mask = mask.copy()
+    new_mask[mask] = subset_of_mask
+    lost_nodes = nodes_in_cycles_without_connections.shape[0]
+    n_n -= lost_nodes
+    initial_cumsum = np.cumsum(mask) - 1
+    new_cumsum = np.cumsum(new_mask) - 1
+    new_cumsum = new_cumsum.reshape(new_mask.shape)
+    new_cumsum[~new_mask] = n_n
+    initial_cumsum = initial_cumsum.reshape(new_mask.shape)
+    dictionary = dict(zip(initial_cumsum[mask].flatten(), new_cumsum[mask].flatten()))
+    mapping = np.vectorize(dictionary.get)
+    valid_edges = ~remove_node[up]
+    up = up[valid_edges]
+    down = down[valid_edges]
+    up = mapping(up)
+    down = mapping(down)
+    missing_nodes = up == n_n
+    up = up[~missing_nodes]
+    down = down[~missing_nodes]
+    mask = new_mask
+    n_e = up.shape[0]
+    edge = np.arange(n_e)
+
+    up, down, mask, n_n, n_e, edge = set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge)
+    return up, down, mask, n_n, n_e, edge
+
+
+def repair(input_path, output_path, river_network_format, input_source="file"):
+    """
+    Given an initial river network, repairs the river network and writes the output to local file.
+
+    .. warning::
+        This function should only be used by advanced users.
+        It should not be used without an understanding of why the initial river network needs repair.
+
+    The repairing algorithm is as follows:
+
+    #. Any invalid values are made missing
+    #. Any cycles are made missing
+    #. For offset/relative drainage directions river networks formats ("pcr_d8", "esri_d8" and "merit_d8"), cells flowing outside the domain are set to sinks
+    #. Any missing values with a cell flowing into them are made into sinks
+
+    Parameters
+    ----------
+    input_path : str
+        The path to the initial river network data. All common file formats are supported such
+        as netCDF, GRIB, GeoTIFF, zarr, etc.
+    output_path : str
+        Where to export the repaired river network data. Currently only netcdf file format exports are supported.
+    river_network_format : str
+        The format of the river network data.
+        Currently supported formats are "cama", "pcr_d8", "esri_d8"
+        and "merit_d8".
+    input_source : str
+        The source of the initial river network data. Default is `'file'`.
+        For possible sources see:
+        https://earthkit-data.readthedocs.io/en/latest/guide/sources.html.
+
+    Returns
+    -------
+    None. Writes a repaired river network to a local file at `output_path`, in the same format as the original.
+    """
+    fmt = FORMATS.get(river_network_format)
+    if fmt is None or not hasattr(fmt, "load_partial"):
+        raise ValueError(f"Unsupported river network format for the repair method: {river_network_format}.")
+    (up, down, edge, mask, n_n, n_e), coords = fmt.load_partial(input_path, input_source)
+    up, down, mask, n_n, n_e, edge = set_sink_if_downstream_missing(up, down, mask, n_n, n_e, edge)
+    up, down, mask, n_n, n_e, edge = set_missing_if_cycle(up, down, mask, n_n, n_e, edge)
+
+    store = RiverNetworkStorage(
+        n_n,
+        n_e,
+        np.vstack([down, up, edge]).astype(np.int64),
+        None,
+        None,
+        coords,
+        None,
+        None,
+        np.where(mask.flatten())[0],
+        mask.shape,
+        False,
+        None,
+    )
+    export(store, output_path, river_network_format)

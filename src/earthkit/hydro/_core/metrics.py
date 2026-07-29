@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
+
 def metrics_func_finder(metric, xp):
 
     class SumBased:
@@ -17,6 +21,7 @@ def metrics_func_finder(metric, xp):
         "mean": SumBased,
         "std": SumBased,
         "var": SumBased,
+        "skewness": SumBased,
         "max": MaxBased,
         "min": MinBased,
     }

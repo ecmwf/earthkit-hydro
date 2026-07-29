@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from earthkit.hydro._core._find import _flow_find
 from earthkit.hydro._utils.decorators import mask
 from earthkit.hydro.upstream.array._operations import calculate_upstream_metric
@@ -31,6 +34,19 @@ def var(xp, river_network, field, locations, node_weights, edge_weights):
         field,
         locations,
         "var",
+        node_weights,
+        edge_weights,
+    )
+
+
+@mask(unmask=False)
+def skewness(xp, river_network, field, locations, node_weights, edge_weights):
+    return calculate_catchment_metric(
+        xp,
+        river_network,
+        field,
+        locations,
+        "skewness",
         node_weights,
         edge_weights,
     )

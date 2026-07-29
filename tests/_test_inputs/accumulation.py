@@ -1,52 +1,35 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 
 # RIVER NETWORK ONE
 
 # 1a: unit field input
-input_field_1a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
-)
+input_field_1a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int)
 
 mv_1a = np.iinfo(np.int64).max
 
-upstream_metric_sum_1a = np.array(
-    [1, 1, 1, 1, 1, 2, 2, 3, 2, 1, 3, 3, 9, 3, 1, 1, 20, 3, 2, 1], dtype=int
-)
+upstream_metric_sum_1a = np.array([1, 1, 1, 1, 1, 2, 2, 3, 2, 1, 3, 3, 9, 3, 1, 1, 20, 3, 2, 1], dtype=int)
 
-upstream_metric_max_1a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
-)
+upstream_metric_max_1a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int)
 
-upstream_metric_min_1a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
-)
+upstream_metric_min_1a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int)
 
-upstream_metric_mean_1a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=float
-)
+upstream_metric_mean_1a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=float)
 
-upstream_metric_product_1a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
-)
+upstream_metric_product_1a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int)
 
 # 1b: non-missing integer field input
-input_field_1b = np.array(
-    [1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1], dtype=int
-)
+input_field_1b = np.array([1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1], dtype=int)
 
 mv_1b = np.iinfo(np.int64).max
 
-upstream_metric_sum_1b = np.array(
-    [1, 2, 3, -1, 5, 7, 9, 10, 14, 10, 8, 11, 46, 19, 5, 6, 94, 16, 8, -1], dtype=int
-)
+upstream_metric_sum_1b = np.array([1, 2, 3, -1, 5, 7, 9, 10, 14, 10, 8, 11, 46, 19, 5, 6, 94, 16, 8, -1], dtype=int)
 
-upstream_metric_max_1b = np.array(
-    [1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 6, 7, 10, 10, 5, 6, 10, 9, 9, -1], dtype=int
-)
+upstream_metric_max_1b = np.array([1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 6, 7, 10, 10, 5, 6, 10, 9, 9, -1], dtype=int)
 
-upstream_metric_min_1b = np.array(
-    [1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, -1, 4, 5, 6, -1, -1, -1, -1], dtype=int
-)
+upstream_metric_min_1b = np.array([1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, -1, 4, 5, 6, -1, -1, -1, -1], dtype=int)
 
 upstream_metric_mean_1b = np.array(
     [
@@ -100,13 +83,9 @@ upstream_metric_product_1b = np.array(
     dtype=int,
 )
 
-upstream_metric_mode_1b = np.array(
-    [1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, 3, 4, 5, 6, -1, -1, -1, -1], dtype=np.int64
-)
+upstream_metric_mode_1b = np.array([1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, 3, 4, 5, 6, -1, -1, -1, -1], dtype=np.int64)
 
-downstream_metric_mode_1b = np.array(
-    [1, 2, 3, -1, 3, 1, 7, 3, 3, 3, 1, 2, 3, 3, 3, 6, 7, 7, 7, -1], dtype=np.int64
-)
+downstream_metric_mode_1b = np.array([1, 2, 3, -1, 3, 1, 7, 3, 3, 3, 1, 2, 3, 3, 3, 6, 7, 7, 7, -1], dtype=np.int64)
 
 # 1c: non-missing float field input
 input_field_1c = np.array(
@@ -315,6 +294,32 @@ upstream_metric_std_1c = np.array(
         1.77451089,
         1.65,
         0.0,
+    ],
+    dtype=float,
+)
+
+upstream_metric_skewness_1c = np.array(
+    [
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        2.4367034834022637e-15,
+        0.0,
+        -0.4922084283307176,
+        3.609931086521871e-16,
+        np.nan,
+        0.0679132166389054,
+        0.20368140569949383,
+        -0.321660397499259,
+        -0.5557489678765744,
+        np.nan,
+        np.nan,
+        -0.6622086178497046,
+        -0.6008527311289603,
+        -1.581751923110108e-15,
+        np.nan,
     ],
     dtype=float,
 )
@@ -593,6 +598,32 @@ upstream_metric_std_1e = np.array(
     dtype=float,
 )
 
+upstream_metric_skewness_1e = np.array(
+    [
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        2.4367034834022637e-15,
+        0.0,
+        np.nan,
+        3.609931086521871e-16,
+        np.nan,
+        0.0679132166389054,
+        0.20368140569949383,
+        np.nan,
+        -0.5557489678765744,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+        np.nan,
+    ],
+    dtype=float,
+)
+
 # 1f: missing float field input with mv=0
 input_field_1f = np.nan_to_num(input_field_1e, nan=0)
 
@@ -610,23 +641,15 @@ upstream_metric_product_1f = np.nan_to_num(upstream_metric_product_1e, nan=0)
 
 
 # 1g: missing integer field input with mv=-1
-input_field_1g = np.array(
-    [1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1], dtype=int
-)
+input_field_1g = np.array([1, 2, 3, -1, 5, 6, 7, 8, 9, 10, 1, 2, 3, 4, 5, 6, 7, 8, 9, -1], dtype=int)
 
 mv_1g = -1
 
-upstream_metric_sum_1g = np.array(
-    [1, 2, 3, -1, 5, 7, 9, -1, 14, 10, 8, 11, -1, 19, 5, 6, -1, -1, -1, -1], dtype=int
-)
+upstream_metric_sum_1g = np.array([1, 2, 3, -1, 5, 7, 9, -1, 14, 10, 8, 11, -1, 19, 5, 6, -1, -1, -1, -1], dtype=int)
 
-upstream_metric_max_1g = np.array(
-    [1, 2, 3, -1, 5, 6, 7, -1, 9, 10, 6, 7, -1, 10, 5, 6, -1, -1, -1, -1], dtype=int
-)
+upstream_metric_max_1g = np.array([1, 2, 3, -1, 5, 6, 7, -1, 9, 10, 6, 7, -1, 10, 5, 6, -1, -1, -1, -1], dtype=int)
 
-upstream_metric_min_1g = np.array(
-    [1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, -1, 4, 5, 6, -1, -1, -1, -1], dtype=int
-)
+upstream_metric_min_1g = np.array([1, 2, 3, -1, 5, 1, 2, -1, 5, 10, 1, 2, -1, 4, 5, 6, -1, -1, -1, -1], dtype=int)
 
 upstream_metric_mean_1g = np.array(
     [
@@ -658,98 +681,6 @@ upstream_metric_product_1g = np.array(
     [1, 2, 3, -1, 5, 6, 14, -1, 45, 10, 6, 28, -1, 200, 5, 6, -1, -1, -1, -1], dtype=int
 )
 
-# 1c percentile: unweighted, p=0.5 (median)
-upstream_metric_percentile_p05_1c = np.array(
-    [
-        1.5,
-        7.3,
-        5.6,
-        -3.2,
-        0.1,
-        3.3,
-        9.2,
-        5.6,
-        2.8,
-        1.5,
-        3.2,
-        7.3,
-        3.3,
-        1.5,
-        -4.5,
-        -8.9,
-        3.85,
-        4.4,
-        2.75,
-        1.1,
-    ],
-    dtype=float,
-)
-
-# 1c percentile: unweighted, p=0.25
-upstream_metric_percentile_p025_1c = np.array(
-    [
-        1.5,
-        7.3,
-        5.6,
-        -3.2,
-        0.1,
-        2.4,
-        8.25,
-        1.2,
-        1.45,
-        1.5,
-        2.35,
-        5.95,
-        0.1,
-        -1.5,
-        -4.5,
-        -8.9,
-        0.85,
-        2.75,
-        1.925,
-        1.1,
-    ],
-    dtype=float,
-)
-
-# 1c percentile: weighted (weights=arange(1,21)), p=0.5
-upstream_metric_percentile_weighted_p05_1c = np.array(
-    [
-        1.5,
-        7.3,
-        5.6,
-        -3.2,
-        0.1,
-        3.3,
-        9.2,
-        4.5,
-        2.8,
-        1.5,
-        4.06363636,
-        6.175,
-        3.69285714,
-        0.5,
-        -4.5,
-        -8.9,
-        3.49642857,
-        4.3175,
-        2.75,
-        1.1,
-    ],
-    dtype=float,
-)
-
-# 1c percentile: gridded output, p=0.5
-upstream_metric_percentile_gridded_p05_1c = np.array(
-    [
-        [1.5, 7.3, 5.6, -3.2, 0.1],
-        [3.3, 9.2, 5.6, 2.8, 1.5],
-        [3.2, 7.3, 3.3, 1.5, -4.5],
-        [-8.9, 3.85, 4.4, 2.75, 1.1],
-    ],
-    dtype=float,
-)
-
 # RIVER NETWORK TWO
 
 # 2a: unit field input
@@ -757,44 +688,26 @@ input_field_2a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtyp
 
 mv_2a = np.iinfo(np.int64).max
 
-upstream_metric_sum_2a = np.array(
-    [2, 1, 2, 1, 1, 2, 7, 3, 1, 1, 10, 6, 1, 13, 1, 2], dtype=int
-)
+upstream_metric_sum_2a = np.array([2, 1, 2, 1, 1, 2, 7, 3, 1, 1, 10, 6, 1, 13, 1, 2], dtype=int)
 
-upstream_metric_max_2a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
-)
+upstream_metric_max_2a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int)
 
-upstream_metric_min_2a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
-)
+upstream_metric_min_2a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int)
 
-upstream_metric_mean_2a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=float
-)
+upstream_metric_mean_2a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=float)
 
-upstream_metric_product_2a = np.array(
-    [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int
-)
+upstream_metric_product_2a = np.array([1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1], dtype=int)
 
 # 2b: non-missing integer field input
-input_field_2b = np.array(
-    [1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16], dtype=int
-)
+input_field_2b = np.array([1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16], dtype=int)
 
 mv_2b = np.iinfo(np.int64).max
 
-upstream_metric_sum_2b = np.array(
-    [0, 2, 1, 4, 5, 11, 59, 9, 9, 10, 81, 52, -1, 114, 15, 31], dtype=int
-)
+upstream_metric_sum_2b = np.array([0, 2, 1, 4, 5, 11, 59, 9, 9, 10, 81, 52, -1, 114, 15, 31], dtype=int)
 
-upstream_metric_max_2b = np.array(
-    [1, 2, 2, 4, 5, 6, 16, 8, 9, 10, 16, 16, -1, 16, 15, 16], dtype=int
-)
+upstream_metric_max_2b = np.array([1, 2, 2, 4, 5, 6, 16, 8, 9, 10, 16, 16, -1, 16, 15, 16], dtype=int)
 
-upstream_metric_min_2b = np.array(
-    [-1, 2, -1, 4, 5, 5, -1, -1, 9, 10, -1, -1, -1, -1, 15, 15], dtype=int
-)
+upstream_metric_min_2b = np.array([-1, 2, -1, 4, 5, 5, -1, -1, 9, 10, -1, -1, -1, -1, 15, 15], dtype=int)
 
 upstream_metric_mean_2b = np.array(
     [
@@ -850,15 +763,11 @@ upstream_metric_product_2b = np.array(
 
 # 2g: missing integer field input with mv=-1
 
-input_field_2g = np.array(
-    [1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16], dtype=int
-)
+input_field_2g = np.array([1, 2, -1, 4, 5, 6, 7, 8, 9, 10, 11, 12, -1, 14, 15, 16], dtype=int)
 
 mv_2g = -1
 
-upstream_metric_sum_2g = np.array(
-    [-1, 2, -1, 4, 5, 11, -1, -1, 9, 10, -1, -1, -1, -1, 15, 31], dtype=int
-)
+upstream_metric_sum_2g = np.array([-1, 2, -1, 4, 5, 11, -1, -1, 9, 10, -1, -1, -1, -1, 15, 31], dtype=int)
 
 # DOWNSTREAM ACCUMULATION RESULTS
 
@@ -1101,94 +1010,56 @@ downstream_metric_mean_1e = np.array(
     dtype=float,
 )
 
-# Downstream percentile for network 1, field 1c, unweighted, p=0.5
-downstream_metric_percentile_p05_1c = np.array(
+# Downstream skewness for network 1, field 1c
+downstream_metric_skewness_1c = np.array(
     [
-        2.35,
-        5.95,
-        6.0,
-        2.15,
-        2.8,
-        3.2,
-        4.6,
-        6.4,
-        5.5,
-        2.4,
-        0.55,
-        1.25,
-        2.15,
-        3.3,
-        0.6,
-        -5.5,
-        -2.1,
-        1.55,
-        4.4,
-        2.75,
+        -0.4192694828318706,
+        -0.4057420816241133,
+        -0.8449276158317027,
+        0.0676607583565094,
+        -0.11492096753050882,
+        -0.5065106903742606,
+        -0.018554137375030234,
+        -0.5605382847001817,
+        -0.6776685254313546,
+        -0.11132080901893496,
+        -3.579512294176233e-17,
+        3.1893307796375735e-16,
+        9.256001442834604e-17,
+        -0.31702885414460985,
+        0.07377621207279435,
+        0.0,
+        np.nan,
+        -2.557111463160068e-16,
+        -0.6754789223576186,
+        -0.39308641193816735,
     ],
     dtype=float,
 )
 
-# Downstream percentile for network 1, field 1c, unweighted, p=0.25
-downstream_metric_percentile_p025_1c = np.array(
+# Downstream skewness for network 1, field 1e
+downstream_metric_skewness_1e = np.array(
     [
-        0.6,
-        2.925,
-        3.675,
-        -2.375,
-        -0.45,
-        0.55,
-        1.25,
-        2.15,
-        1.7,
-        0.6,
-        -0.775,
-        -0.425,
-        0.025,
-        0.6,
-        -2.7,
-        -7.2,
-        -2.1,
-        -0.275,
-        1.15,
-        0.3,
-    ],
-    dtype=float,
-)
-
-# Downstream percentile for network 1, field 1c, weighted (weights=arange(1,21)), p=0.5
-downstream_metric_percentile_weighted_p05_1c = np.array(
-    [
-        0.97058824,
-        4.00882353,
-        5.37352941,
-        4.4,
-        -0.09411765,
-        2.26470588,
-        3.61470588,
-        5.4,
-        3.71176471,
-        2.13,
-        0.55,
-        1.25,
-        2.15,
-        2.82352941,
-        0.44117647,
-        -5.5,
-        -2.1,
-        1.55,
-        4.44210526,
-        2.915,
-    ],
-    dtype=float,
-)
-
-# Downstream percentile for network 1, field 1c, gridded output, p=0.5
-downstream_metric_percentile_gridded_p05_1c = np.array(
-    [
-        [2.35, 5.95, 6.0, 2.15, 2.8],
-        [3.2, 4.6, 6.4, 5.5, 2.4],
-        [0.55, 1.25, 2.15, 3.3, 0.6],
-        [-5.5, -2.1, 1.55, 4.4, 2.75],
+        -0.4192694828318706,
+        -0.4057420816241133,
+        np.nan,
+        np.nan,
+        -0.11492096753050882,
+        -0.5065106903742606,
+        -0.018554137375030234,
+        np.nan,
+        -0.6776685254313546,
+        -0.11132080901893496,
+        -3.579512294176233e-17,
+        3.1893307796375735e-16,
+        9.256001442834604e-17,
+        -0.31702885414460985,
+        0.07377621207279435,
+        0.0,
+        np.nan,
+        -2.557111463160068e-16,
+        np.nan,
+        np.nan,
     ],
     dtype=float,
 )

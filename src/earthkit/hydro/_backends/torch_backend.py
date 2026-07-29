@@ -1,4 +1,7 @@
-import array_api_compat.torch as torch
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
+from array_api_compat import torch
 
 from .array_backend import ArrayBackend
 

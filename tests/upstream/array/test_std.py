@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 from _test_inputs.accumulation import *
@@ -25,9 +28,7 @@ import earthkit.hydro as ekh
     indirect=["river_network"],
 )
 @pytest.mark.parametrize("array_backend", ["numpy", "torch"])
-def test_calculate_upstream_metric_std(
-    river_network, input_field, flow_downstream, mv, array_backend
-):
+def test_calculate_upstream_metric_std(river_network, input_field, flow_downstream, mv, array_backend):
     river_network = river_network.to_device("cpu", array_backend)
     xp = ekh._backends.find.get_array_backend(array_backend)
     output_field = ekh.upstream.array.std(

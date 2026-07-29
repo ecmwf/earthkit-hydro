@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 from _test_inputs.accumulation import *
@@ -26,9 +29,7 @@ import earthkit.hydro as ekh
     indirect=["river_network"],
 )
 @pytest.mark.parametrize("array_backend", ["numpy", "torch", "jax"])
-def test_upstream_metric_sum(
-    river_network, input_field, flow_downstream, mv, array_backend
-):
+def test_upstream_metric_sum(river_network, input_field, flow_downstream, mv, array_backend):
     river_network = river_network.to_device("cpu", array_backend)
     xp = ekh._backends.find.get_array_backend(array_backend)
     output_field = ekh.upstream.array.sum(
@@ -46,9 +47,7 @@ def test_upstream_metric_sum(
     flow_downstream = convert_to_2d(river_network, flow_downstream, 0)
     print(mv, input_field.dtype)
     print(input_field, flow_downstream)
-    output_field = ekh.upstream.array.sum(
-        river_network, xp.asarray(input_field), node_weights=None
-    )
+    output_field = ekh.upstream.array.sum(river_network, xp.asarray(input_field), node_weights=None)
     output_field = np.asarray(output_field).flatten()
     flow_downstream = np.asarray(xp.asarray(flow_downstream))
     print(output_field)

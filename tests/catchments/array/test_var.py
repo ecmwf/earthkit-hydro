@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 from _test_inputs.accumulation import input_field_1c
@@ -27,7 +30,5 @@ def test_catchments_var(river_network, field, locations):
 
     # Test that variance is 0 for uniform fields
     uniform_field = np.ones(river_network.n_nodes)
-    var_uniform = ekh.catchments.array.var(
-        river_network, uniform_field, locations=locations
-    )
+    var_uniform = ekh.catchments.array.var(river_network, uniform_field, locations=locations)
     np.testing.assert_allclose(var_uniform, 0, atol=1e-10)

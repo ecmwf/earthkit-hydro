@@ -1,5 +1,8 @@
-import earthkit.hydro.downstream.array as array
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
 
-from ._toplevel import max, mean, min, mode, percentile, std, sum, var
+from earthkit.hydro.downstream import array
 
-__all__ = ["array", "max", "mean", "min", "mode", "std", "sum", "var", "percentile"]
+from ._toplevel import max, mean, min, mode, percentile, skewness, std, sum, var
+
+__all__ = ["array", "max", "mean", "min", "mode", "percentile", "skewness", "std", "sum", "var"]

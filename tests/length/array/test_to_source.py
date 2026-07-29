@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 from _test_inputs.distance import *
@@ -19,9 +22,7 @@ import earthkit.hydro as ekh
 )
 def test_length_to_source(river_network, field, expected):
     """Test length to source computation."""
-    result = ekh.length.array.to_source(
-        river_network, field=field, path="shortest", return_type="masked"
-    )
+    result = ekh.length.array.to_source(river_network, field=field, path="shortest", return_type="masked")
     print("Result:", result)
     print("Expected:", expected)
     np.testing.assert_allclose(result, expected, rtol=1e-6)

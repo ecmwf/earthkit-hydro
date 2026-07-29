@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 from earthkit.hydro._utils.decorators import xarray
 from earthkit.hydro.move import array
 
@@ -47,7 +50,7 @@ def upstream(
     edge_weights : array-like or xarray object, optional
         Array of weights for each edge. Default is None (unweighted).
     metric : str, optional
-        Aggregation function to apply. Options are 'var', 'std', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
+        Aggregation function to apply. Options are 'var', 'std', 'skewness', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
     return_type : str, optional
         Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
@@ -61,9 +64,7 @@ def upstream(
     xarray object
         Array of values after movement up the river network for every river network node or gridcell, depending on `return_type`.
     """
-    return array.upstream(
-        river_network, field, node_weights, edge_weights, metric, return_type
-    )
+    return array.upstream(river_network, field, node_weights, edge_weights, metric, return_type)
 
 
 @xarray
@@ -111,7 +112,7 @@ def downstream(
     edge_weights : array-like or xarray object, optional
         Array of weights for each edge. Default is None (unweighted).
     metric : str, optional
-        Aggregation function to apply. Options are 'var', 'std', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
+        Aggregation function to apply. Options are 'var', 'std', 'skewness', 'mean', 'sum', 'min' and 'max'. Default is `'sum'`.
     return_type : str, optional
         Either "masked", "gridded" or None. If None (default), uses `river_network.return_type`.
     input_core_dims : sequence of sequence, optional
@@ -125,6 +126,4 @@ def downstream(
     xarray object
         Array of values after movement down the river network for every river network node or gridcell, depending on `return_type`.
     """
-    return array.downstream(
-        river_network, field, node_weights, edge_weights, metric, return_type
-    )
+    return array.downstream(river_network, field, node_weights, edge_weights, metric, return_type)

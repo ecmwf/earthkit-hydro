@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import numpy as np
 import pytest
 from _test_inputs.distance import *
@@ -28,9 +31,7 @@ import earthkit.hydro as ekh
     ],
     indirect=["river_network"],
 )
-def test_length_max(
-    river_network, stations_list, upstream, downstream, weights, result
-):
+def test_length_max(river_network, stations_list, upstream, downstream, weights, result):
     dist = ekh.length.array.max(
         river_network,
         stations_list,

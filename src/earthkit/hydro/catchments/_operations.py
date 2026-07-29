@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import earthkit.hydro.catchments.array.__operations as array
 from earthkit.hydro._utils.decorators import multi_backend
 
@@ -12,6 +15,18 @@ def var(
     edge_weights,
 ):
     return array.var(xp, river_network, field, locations, node_weights, edge_weights)
+
+
+@multi_backend(allow_jax_jit=False)
+def skewness(
+    xp,
+    river_network,
+    field,
+    locations,
+    node_weights,
+    edge_weights,
+):
+    return array.skewness(xp, river_network, field, locations, node_weights, edge_weights)
 
 
 @multi_backend(allow_jax_jit=False)

@@ -1,3 +1,6 @@
+# SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
+# SPDX-License-Identifier: Apache-2.0
+
 import earthkit.hydro.move.array.__operations as array
 from earthkit.hydro._utils.decorators import mask, multi_backend
 
@@ -12,9 +15,7 @@ def upstream(xp, river_network, field, node_weights, edge_weights, metric, retur
 
 
 @multi_backend(jax_static_args=["xp", "river_network", "return_type", "metric"])
-def downstream(
-    xp, river_network, field, node_weights, edge_weights, metric, return_type
-):
+def downstream(xp, river_network, field, node_weights, edge_weights, metric, return_type):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")

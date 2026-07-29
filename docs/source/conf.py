@@ -9,6 +9,7 @@
 import datetime
 import os
 import sys
+import zoneinfo
 
 on_rtd = os.environ.get("READTHEDOCS") == "True"
 
@@ -45,7 +46,7 @@ sys.path.insert(0, os.path.abspath("./"))
 project = "earthkit-hydro"
 module_prefix = project.replace("-", ".")
 autodocs_dir = "autodocs"
-copyright = f"{datetime.datetime.now().year}, European Centre for Medium-Range Weather Forecasts (ECMWF)"
+copyright = f"{datetime.datetime.now(zoneinfo.ZoneInfo('Europe/Berlin')).year}, European Centre for Medium-Range Weather Forecasts (ECMWF)"
 author = "European Centre for Medium-Range Weather Forecasts (ECMWF)"
 
 # -- General configuration ---------------------------------------------------
@@ -112,19 +113,11 @@ extensions = [
 # clean_autodocs.py feature flags
 # Set to False/None to disable or soften the corresponding processing step.
 autodocs_delete_hidden = True  # delete RST files for private/hidden modules
-autodocs_replace_automodule = (
-    False  # replace automodule directives with autosummary tables
-)
-autodocs_short_display_names = (
-    False  # shorten toctree labels to the last module component
-)
-autodocs_top_level_maxdepth = (
-    1  # :maxdepth: on top-level page (None = keep sphinx-apidoc value)
-)
+autodocs_replace_automodule = False  # replace automodule directives with autosummary tables
+autodocs_short_display_names = False  # shorten toctree labels to the last module component
+autodocs_top_level_maxdepth = 1  # :maxdepth: on top-level page (None = keep sphinx-apidoc value)
 autodocs_rename_titles = True  # strip " package"/" module" from RST page headings
-autodocs_top_level_title = (
-    "API Reference"  # top-level page heading (used when rename_titles=True)
-)
+autodocs_top_level_title = "API Reference"  # top-level page heading (used when rename_titles=True)
 autodocs_titlesonly = False  # inject :titlesonly: into toctree directives
 
 templates_path = ["_templates"]
@@ -147,7 +140,9 @@ html_js_files = [
     "custom.js",
 ]
 
-html_favicon = "https://github.com/ecmwf/logos/raw/refs/heads/feat/grey_notext_logos/logos/earthkit/earthkit-hydro-notext.svg"
+html_favicon = (
+    "https://github.com/ecmwf/logos/raw/refs/heads/feat/grey_notext_logos/logos/earthkit/earthkit-hydro-notext.svg"
+)
 
 bibtex_bibfiles = ["references.bib"]
 
@@ -223,6 +218,4 @@ suppress_warnings = []
 def setup(app):
     from earthkit_packages import _write_earthkit_packages_js
 
-    app.connect(
-        "builder-inited", lambda app: _write_earthkit_packages_js(app, ek_branch)
-    )
+    app.connect("builder-inited", lambda app: _write_earthkit_packages_js(app, ek_branch))

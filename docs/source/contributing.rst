@@ -19,7 +19,7 @@ Development workflow
 
 Code style
 ----------
-This project uses ruff, black, isort and flake8 for code styling and formatting. To handle these automatically, you can use pre-commit hooks. To set them up, run:
+This project uses ruff for code styling and formatting. To handle these automatically, you can use pre-commit hooks. To set them up, run:
 
 .. code-block:: bash
 

@@ -62,6 +62,8 @@ def from_mask(river_network: RiverNetwork, node_mask=None, edge_mask=None, copy=
     storage.sorted_data[1] = node_relabel[storage.sorted_data[1]]
     storage.sorted_data[2] = edge_relabel[storage.sorted_data[2]]
 
+    storage.sorted_data = np.ascontiguousarray(storage.sorted_data)
+
     storage.splits = np.cumsum(valid_edges)[storage.splits - 1]
     storage.mask = storage.mask[node_mask]
     storage.n_nodes = storage.mask.shape[0]

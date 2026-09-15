@@ -9,6 +9,9 @@ from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._cache import cache
 from ._formats import FORMATS
+from io import BytesIO
+from urllib.request import urlopen
+import numpy as np
 
 # read in major version
 # if dev version, try add +1 to major version
@@ -152,6 +155,12 @@ def load(
             river_network_version=river_network_version,
         )
         network = create(uri, "precomputed", "url", *args, **kwargs)
+
+    try:
+        with urlopen(uri.replace("river_network.joblib", "static/area.npy")) as response:
+            network._storage.area = np.load(BytesIO(response.read()))
+    except:
+        network._storage.area = None
 
     return network
 

@@ -1,3 +1,3 @@
-from ._toplevel import upstream_area
+from ._toplevel import upstream_area, area
 
-__all__ = ["upstream_area"]
+__all__ = ["upstream_area", "area"]

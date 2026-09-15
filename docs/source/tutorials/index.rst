@@ -18,6 +18,7 @@ Operations:
 
    computing_accumulations
    finding_catchments
+   catchment_outlines
    catchment_statistics
    distance_length
    streamorder

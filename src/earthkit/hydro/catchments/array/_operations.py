@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
 # SPDX-License-Identifier: Apache-2.0
 
+import numpy as np
+
 from earthkit.hydro._utils.decorators import multi_backend
 from earthkit.hydro._utils.locations import locations_to_1d
 from earthkit.hydro.catchments.array import __operations as _operations
@@ -72,3 +74,34 @@ def find(xp, river_network, locations, overwrite, return_type):
     field = xp.full(river_network.n_nodes, xp.nan, device=river_network.device)
     field = xp.scatter_assign(field, stations1d, xp.arange(stations1d.shape[0]))
     return _operations.find(xp, river_network, field, overwrite, return_type)
+
+
+def outline(river_network, locations, overwrite):
+    from earthkit.hydro._utils.outline import outline_labels
+
+    if river_network.array_backend != "numpy":
+        raise NotImplementedError("Only numpy backend is currently supported for catchments.outline.")
+    if river_network.shape is None:
+        raise NotImplementedError("catchments.outline is only supported for gridded river networks.")
+    if river_network.coords is None:
+        raise ValueError("catchments.outline requires a river network with coordinates.")
+
+    labels = find(
+        river_network=river_network,
+        locations=locations,
+        overwrite=overwrite,
+        return_type="masked",
+    )
+    in_catchment = ~np.isnan(labels)
+
+    outlines = outline_labels(
+        labels[in_catchment].astype(int),
+        len(locations),
+        river_network.mask[in_catchment],
+        river_network.shape,
+        list(river_network.coords.values()),
+    )
+
+    if isinstance(locations, dict):
+        return dict(zip(locations.keys(), outlines))
+    return outlines

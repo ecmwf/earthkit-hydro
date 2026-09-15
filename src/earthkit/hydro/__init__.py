@@ -11,6 +11,7 @@ from earthkit.hydro import (
     streamorder,
     subnetwork,
     upstream,
+    static
 )
 
 from ._version import __version__
@@ -26,4 +27,5 @@ __all__ = [
     "streamorder",
     "subnetwork",
     "upstream",
+    "static"
 ]

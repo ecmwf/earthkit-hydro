@@ -1,17 +1,16 @@
 # SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
 # SPDX-License-Identifier: Apache-2.0
 
+from io import BytesIO
 from urllib.request import urlopen
 
-from earthkit.hydro._version import __version__ as ekh_version
+import numpy as np
 
+from earthkit.hydro._version import __version__ as ekh_version
 from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._cache import cache
 from ._formats import FORMATS
-from io import BytesIO
-from urllib.request import urlopen
-import numpy as np
 
 # read in major version
 # if dev version, try add +1 to major version

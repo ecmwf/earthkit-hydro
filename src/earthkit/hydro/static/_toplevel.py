@@ -1,10 +1,13 @@
 from earthkit.hydro import upstream
-from .array import area as array_area
 from earthkit.hydro._utils.decorators import xarray
+
+from .array import area as array_area
+
 
 @xarray
 def area(river_network, return_type=None):
     return array_area(river_network, return_type=return_type)
+
 
 @xarray
 def upstream_area(river_network, return_type=None):

@@ -8,10 +8,10 @@ from earthkit.hydro import (
     length,
     move,
     river_network,
+    static,
     streamorder,
     subnetwork,
     upstream,
-    static
 )
 
 from ._version import __version__
@@ -24,8 +24,8 @@ __all__ = [
     "length",
     "move",
     "river_network",
+    "static",
     "streamorder",
     "subnetwork",
     "upstream",
-    "static"
 ]

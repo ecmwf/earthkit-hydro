@@ -155,11 +155,12 @@ def load(
         )
         network = create(uri, "precomputed", "url", *args, **kwargs)
 
-    try:
-        with urlopen(uri.replace("river_network.joblib", "static/area.npy")) as response:
-            network._storage.area = np.load(BytesIO(response.read()))
-    except:
-        network._storage.area = None
+    if network._storage.area is None:
+        try:
+            with urlopen(uri.replace("river_network.joblib", "static/area.npy")) as response:
+                network._storage.area = np.load(BytesIO(response.read()))
+        except:
+            network._storage.area = None
 
     return network
 

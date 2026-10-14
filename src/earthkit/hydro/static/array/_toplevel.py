@@ -1,8 +1,9 @@
 from earthkit.hydro._backends.numpy_backend import NumPyBackend
 from earthkit.hydro._utils.decorators import mask
-from earthkit.hydro.static.array import _operations
 from earthkit.hydro.upstream import array
 
+def _area(xp, river_network, area):
+    return river_network._storage.area
 
 def area(river_network, return_type=None):
     if river_network._storage.area is None:
@@ -10,7 +11,7 @@ def area(river_network, return_type=None):
     return_type = river_network.return_type if return_type is None else return_type
     if return_type not in ["gridded", "masked"]:
         raise ValueError("return_type must be either 'gridded' or 'masked'.")
-    func = mask(return_type == "gridded")(_operations.area)
+    func = mask(return_type == "gridded")(_area)
     return func(river_network=river_network, xp=NumPyBackend(), field=river_network._storage.area)
 
 

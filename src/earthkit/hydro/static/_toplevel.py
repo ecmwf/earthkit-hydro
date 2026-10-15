@@ -1,13 +1,12 @@
 # SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
 # SPDX-License-Identifier: Apache-2.0
 
-from earthkit.hydro import upstream
 from earthkit.hydro._utils.decorators import xarray
 
 from .array import area as array_area
+from .array import upstream_area as array_upstream_area
 
 
-@xarray
 def area(river_network, return_type=None):
     r"""
     Returns the area of each node in the river network.
@@ -26,10 +25,12 @@ def area(river_network, return_type=None):
     xarray object
         Array of areas in :math:`\mathrm{m}^2` for every river network node or gridcell, depending on `return_type`.
     """
-    return array_area(river_network, return_type=return_type)
+    da = xarray(array_area)(river_network, return_type=return_type)
+    da.name = "area"
+    da.attrs["units"] = "m^2"
+    return da
 
 
-@xarray
 def upstream_area(river_network, return_type=None):
     r"""
     Computes the upstream area of each node in the river network.
@@ -67,7 +68,7 @@ def upstream_area(river_network, return_type=None):
     xarray object
         Array of upstream areas in :math:`\mathrm{m}^2` for every river network node or gridcell, depending on `return_type`.
     """
-    if river_network._storage.area is None:
-        raise ValueError("River network pixel area is not available.")
-
-    return upstream.array.sum(river_network, field=river_network._storage.area, return_type=return_type)
+    da = xarray(array_upstream_area)(river_network, return_type=return_type)
+    da.name = "upstream_area"
+    da.attrs["units"] = "m^2"
+    return da

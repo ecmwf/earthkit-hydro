@@ -1,10 +1,12 @@
 # SPDX-FileCopyrightText: 2026- European Centre for Medium-Range Weather Forecasts (ECMWF)
 # SPDX-License-Identifier: Apache-2.0
 
+from io import BytesIO
 from urllib.request import urlopen
 
-from earthkit.hydro._version import __version__ as ekh_version
+import numpy as np
 
+from earthkit.hydro._version import __version__ as ekh_version
 from earthkit.hydro.data_structures._network import RiverNetwork
 
 from ._cache import cache
@@ -152,6 +154,13 @@ def load(
             river_network_version=river_network_version,
         )
         network = create(uri, "precomputed", "url", *args, **kwargs)
+
+    if network._storage.area is None:
+        try:
+            with urlopen(uri.replace("river_network.joblib", "static/area.npy")) as response:
+                network._storage.area = np.load(BytesIO(response.read()))
+        except:
+            network._storage.area = None
 
     return network
 

@@ -576,3 +576,48 @@ def find(river_network, locations, overwrite=True, return_type=None):
         overwrite=overwrite,
         return_type=return_type,
     )
+
+
+def outline(river_network, locations, overwrite=True):
+    r"""
+    Traces the outline of catchment areas.
+
+    Catchments are delineated exactly as in :func:`find`, then the boundary of each
+    catchment is traced along the edges of its gridcells. Each outline is a closed
+    ring of coordinate pairs, ordered so that it can be plotted directly, e.g.
+    ``plt.plot(outline[:, 1], outline[:, 0])`` for a latitude/longitude network.
+
+    Coordinate pairs are given in grid axis order, which is
+    ``(latitude, longitude)`` for a latitude/longitude network. Only the corners at
+    which the boundary turns are kept. Cell edges are the midpoints between
+    neighbouring cell centres, so non-uniform grid spacing is handled exactly.
+
+    A catchment whose boundary consists of several rings (because it has holes, or
+    because parts of it touch only diagonally) is returned as a single array with a
+    row of NaNs separating consecutive rings, largest ring first. Plotting libraries
+    break the line at the NaNs, so no spurious segment joins the rings.
+
+    Parameters
+    ----------
+    river_network : RiverNetwork
+        A river network object. Must be gridded, carry coordinates and use the numpy
+        array backend.
+    locations : array-like or dict
+        A list of catchment sink nodes (start locations), or a mapping from names to
+        coordinate pairs.
+    overwrite : bool, optional
+        Whether to overwrite subcatchments or not. Default is True.
+
+    Returns
+    -------
+    dict of str to numpy.ndarray, or list of numpy.ndarray
+        One `(n_points, 2)` array of coordinate pairs per location. If `locations` is
+        a dict, a dict with the same keys is returned, otherwise a list in the same
+        order as `locations`. A location whose catchment was absorbed into another
+        one gives an empty `(0, 2)` array.
+    """
+    return _operations.outline(
+        river_network=river_network,
+        locations=locations,
+        overwrite=overwrite,
+    )

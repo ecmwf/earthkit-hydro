@@ -10,6 +10,7 @@ path = [
   "LICENSE",
   "README.md",
   "docs/**",
+  ".ci/**",
   ".github/**",
   ".gitignore",
   ".readthedocs.yml",

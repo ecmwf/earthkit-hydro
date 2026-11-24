@@ -42,6 +42,7 @@ python-version = "3.13"
 
 [package]
 ci-pre-commit = false
+ci-schedule = "from-dependencies+19"
 compiler-inputs = []
 fork-pull-requests = false
 full-history = true

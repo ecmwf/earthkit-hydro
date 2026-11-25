@@ -22,7 +22,7 @@ triggers = ["upstream-change", "rebuild-request"]
 [matrix.test.defaults]
 build-type = "RelWithDebInfo"
 c-compiler = "gcc-13"
-container = "eccr.ecmwf.int/public-ci-images/ubuntu24.04-gcc13-gfortran13"
+container = "eccr.ecmwf.int/public-ci-images/ubuntu24.04-gcc13-gfortran13-boost-qt6-rust1.90"
 cxx-compiler = "g++-13"
 extras = "all,tests"
 job-script = "./.ci/test.sh.j2"
@@ -41,6 +41,7 @@ python-version = "3.12"
 python-version = "3.13"
 
 [package]
+allow-stale-deps = true
 ci-pre-commit = false
 ci-schedule = "from-dependencies+19"
 compiler-inputs = []
